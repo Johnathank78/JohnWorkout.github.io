@@ -86,8 +86,10 @@ function audioMouseDownHandler() {
     };
 };
 
-if(isWebMobile){
-    $(document).on("touchstart", audioMouseDownHandler);
-}else{
-    $(document).on("mousedown", audioMouseDownHandler);
-};
+$(document).ready(function(){
+    if(isWebMobile){
+        $(document).on("touchstart", audioMouseDownHandler);
+    }else{
+        $(document).on("mousedown", audioMouseDownHandler);
+    };
+});//readyEnd
