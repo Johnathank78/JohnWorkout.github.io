@@ -259,8 +259,7 @@ async function sendWebNotification(title, body, time){
     if(haveWebNotificationsBeenAccepted){
         setTimeout(() => {
             activeNotification = new Notification(title, {
-                body: body,
-                icon: './resources/imgs/appLogo.png'
+                body: body
             });
         }, time);
     };
