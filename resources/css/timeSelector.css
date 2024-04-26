@@ -1,0 +1,108 @@
+.timeSelectorBody{
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    padding: 15px;
+    background-color: #303344;
+
+    width: 70vw;
+    max-width: 400px;
+    height: 140px;
+
+    border-radius: 12px;
+    display: none;
+}
+
+.timeSelectorFirstRow{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    height: 60%;
+}
+
+.timeSelectorThirdRow{
+    display: flex;
+    flex-direction: row;
+
+    height: 25%;
+}
+
+.timeSelectorOpt{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0px;
+
+    width: 28%;
+    height: 100%;
+}
+
+.timeSelectorBtn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 80%;
+    height: 25%;
+    background-color: #596075;
+    background-color: hsl(225, 16%, 30%);
+
+    cursor: pointer;
+}
+
+
+.timeSelectorBtnLabel{
+    font-size: 12px;
+    opacity: .6;
+}
+
+
+.timeSelectorBtn_up{
+    border-radius: 8px 8px 0 0;
+}
+
+.timeSelectorBtn_down{
+    border-radius: 0 0 8px 8px;
+}
+
+.timeSelectorInput{
+    width: calc(100%);
+    height: 50%;
+
+    background-color: #4C5368;
+    font-size: 20px;
+    font-weight: 400;
+    text-align: center;
+    line-height: 30px;
+    
+    outline: none;
+    border: none;
+    overflow: hidden;
+
+    border-radius: 8px;
+}
+
+.timeSelectorSubmit{    
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    
+    background-color: rgb(71, 71, 108);
+    font-size: 17px;
+    border-color: transparent;
+    
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.timeSelectorSubmit:active{  
+    background-color: hsl(240, 21%, 40%);
+}

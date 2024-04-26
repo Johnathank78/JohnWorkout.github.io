@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Workouts</title>
+    
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="color-scheme" content="light dark" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="theme-color" content="#262837">
+        <link rel="manifest" href="./manifest.json">
+    
+    <link rel="icon" href="./resources/imgs/appLogo.png">
+    <link rel="apple-touch-icon" sizes="1000x1000" href="./resources/imgs/appLogo.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="./resources/splash_screens/iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="./resources/splash_screens/iPhone_15_Pro__iPhone_15__iPhone_14_Pro_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="./resources/splash_screens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="./resources/splash_screens/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="./resources/splash_screens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="./resources/splash_screens/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/iPhone_11__iPhone_XR_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="./resources/splash_screens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/12.9__iPad_Pro_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/11__iPad_Pro__10.5__iPad_Pro_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/10.9__iPad_Air_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/10.5__iPad_Air_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/10.2__iPad_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="./resources/splash_screens/8.3__iPad_Mini_landscape.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./resources/splash_screens/iPhone_15_Pro_Max__iPhone_15_Plus__iPhone_14_Pro_Max_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./resources/splash_screens/iPhone_15_Pro__iPhone_15__iPhone_14_Pro_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./resources/splash_screens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./resources/splash_screens/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./resources/splash_screens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./resources/splash_screens/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/iPhone_11__iPhone_XR_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="./resources/splash_screens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/12.9__iPad_Pro_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/11__iPad_Pro__10.5__iPad_Pro_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/10.9__iPad_Air_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/10.5__iPad_Air_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/10.2__iPad_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/8.3__iPad_Mini_portrait.png">
+        
+    <link rel="stylesheet" href="./resources/css/FlexReorder.css"/>
+
+    <link rel="stylesheet" href="./resources/css/fonts.css"/>
+    <link rel="stylesheet" href="./resources/css/global.css"/>
+    <link rel="stylesheet" href="./resources/css/screenSaver.css"/>
+    <link rel="stylesheet" href="./resources/css/toggle.css"/>
+    <link rel="stylesheet" href="./resources/css/selectionPage.css"/>
+    
+    <link rel="stylesheet" href="./resources/css/stats.css"/>
+    <link rel="stylesheet" href="./resources/css/calendar.css"/>
+    <link rel="stylesheet" href="./resources/css/parameters.css"/>
+    <link rel="stylesheet" href="./resources/css/timeSelector.css"/>
+    <link rel="stylesheet" href="./resources/css/updatePage.css"/>
+    <link rel="stylesheet" href="./resources/css/sessionPage.css"/>
+    <link rel="stylesheet" href="./resources/css/utility.css"/>
+    <link rel="stylesheet" href="./resources/css/mediaQueries.css"/>
+    <link rel="stylesheet" href="./resources/css/animations.css"/>
+    <link rel="stylesheet" href="./resources/css/fixNvars.css"/>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/JohnWorkout.github.io/service-worker.js').then(registration => {
+                    console.log('Service worker registered:', registration);
+                }).catch(error => {
+                    console.error('Service worker registration failed:', error);
+                });
+            });
+        }
+    </script>
+    <script src="./resources/js/jquery.js"></script>
+    <script src="./resources/js/FlexReorder.js"></script>
+    
+
+    <script src="./resources/js/method.js"></script>
+    <script src="./resources/js/globalVars.js"></script>
+    <script src="./resources/js/sound.js"></script>
+    <script src="./resources/js/utility.js"></script>
+
+    <script src="./resources/js/domAppend.js"></script>
+    <script src="./resources/js/dataNsav.js"></script>
+    <script src="./resources/js/readWrite.js"></script>
+
+    <script src="./resources/js/init.js"></script>
+
+    <script src="./resources/js/graphicUpdate.js"></script>
+    <script src="./resources/js/checkNformat.js"></script>
+    <script src="./resources/js/keys.js"></script>
+    <script src="./resources/js/click.js"></script>
+    <script src="./resources/js/phone.js"></script>
+
+    <script src="./resources/js/schedule.js"></script>
+
+    <script src="./resources/js/selectionPage.js"></script>
+    <script src="./resources/js/calendar.js"></script>
+
+    <script src="./resources/js/timeSelector.js"></script>
+
+    <script src="./resources/js/updatePage.js"></script>
+    <script src="./resources/js/errorHandling.js"></script>
+    <script src="./resources/js/bottomNotification.js"></script>
+
+    <script src="./resources/js/bothSessions.js"></script>
+    <script src="./resources/js/intervallSession.js"></script>
+    <script src="./resources/js/workoutSession.js"></script>
+
+</head>
+
+<body>
+    <div class="app">
+
+        <div class="imgSet">
+            <img src="./resources/imgs/bin.svg" alt="" id="binIMG">
+            <img src="./resources/imgs/add.svg" alt="" id="addIMG">
+            <img src="./resources/imgs/edit.svg" alt="" id="editIMG">
+            <img src="./resources/imgs/grab.svg" alt="" id="grabIMG">
+            <img src="./resources/imgs/next.svg" alt="" id="nextIMG">
+            <img src="./resources/imgs/parameters.svg" alt="" id="parametersIMG">
+            <img src="./resources/imgs/pause.svg" alt="" id="pauseIMG">
+            <img src="./resources/imgs/play.svg" alt="" id="playIMG">
+            <img src="./resources/imgs/sound_full.svg" alt="" id="sound_fullIMG">
+            <img src="./resources/imgs/sound_mid.svg" alt="" id="sound_midIMG">
+            <img src="./resources/imgs/sound_low.svg" alt="" id="sound_lowIMG">
+            <img src="./resources/imgs/sound_off.svg" alt="" id="sound_offIMG">
+            <img src="./resources/imgs/stats.svg" alt="" id="statsIMG">
+            <img src="./resources/imgs/timer2.svg" alt="" id="timer2IMG">
+            <img src="./resources/imgs/tick.png" alt="" id="tickIMG">
+            <img src="./resources/imgs/arrow.png" alt="" id="arrowIMG">
+            <img src="./resources/imgs/congrats.png" alt="" id="congratsIMG">
+            <img src="./resources/imgs/clock.png" alt="" id="clockIMG">
+            <img src="./resources/imgs/barbell.png" alt="" id="barbellIMG">
+        </div>
+
+        <div class="IOSbacker noselect"></div>
+
+        <div class="blurBG">
+            <!-- GLOBAL -->
+
+            <div class="timeSelectorBody">
+                <div class="timeSelectorFirstRow">
+                    <div class="timeSelectorOpt timeSelectorHours">
+                        <div class="timeSelectorBtn timeSelectorBtn_up noselect">
+                            <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
+                        </div>
+                        <input type="tel" value="0" class="timeSelectorInput strictlyNumeric">
+                        <div class="timeSelectorBtn timeSelectorBtn_down noselect">
+                            <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
+                        </div>
+                    </div>
+                    <span class="timeSelector_Unit noselect">h</span>
+                    <div class="timeSelectorOpt timeSelectorMinutes">
+                        <div class="timeSelectorBtn timeSelectorBtn_up noselect">
+                            <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
+                        </div>
+                        <input type="tel" value="0" class="timeSelectorInput strictlyNumeric">
+                        <div class="timeSelectorBtn timeSelectorBtn_down noselect">
+                            <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
+                        </div>
+                    </div>
+                    <span class="timeSelector_Unit noselect">m</span>
+                    <div class="timeSelectorOpt timeSelectorSeconds">
+                        <div class="timeSelectorBtn timeSelectorBtn_up noselect">
+                            <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
+                        </div>
+                        <input type="tel" value="0" class="timeSelectorInput strictlyNumeric">
+                        <div class="timeSelectorBtn timeSelectorBtn_down noselect">
+                            <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
+                        </div>
+                    </div>
+                    <span class="timeSelector_Unit noselect">s</span>
+                </div>
+                
+                <div class="timeSelectorThirdRow noselect">
+                    <span class="timeSelectorSubmit">Submit</span>
+                </div>
+                
+            </div>
+
+            <!-- SELECTION -->
+
+            <div class="selection_recovery_page">
+                <span class="selection_recovery_headerText">Recovery</span>
+                <span>
+                    <span class="selection_recovery_subText selection_recovery_subText1">[W] PDT</span>
+                    <span class="selection_recovery_subText selection_recovery_subText2"> unexpectedly stopped, resume it ?</span>
+                </span>
+                <div class="selection_recovery_page_btnContainer">
+                    <button class="selection_recovery_page_btn selection_recovery_page_btn_n">No</button>
+                    <button class="selection_recovery_page_btn selection_recovery_page_btn_y">Yes</button>
+                </div>
+            </div>
+
+            <div class="selection_saveLoad_page noselect">
+                <span class="selection_saveLoad_headerText">Select elements</span>
+                <div class="selection_saveLoad_item"><input type="checkbox" name="session_list" id="selection_saveLoad_sl" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Session List</span></div>
+                <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_rl" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Reminder List</span></div>
+                <div class="selection_saveLoad_item"><input type="checkbox" name="parameters" id="selection_saveLoad_pa" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Parameters</span></div>
+                <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_st" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Stats</span></div>
+                <span class="selection_saveLoad_emptyMsg">Nothing saved</span>
+                <span class="selection_saveLoad_btn_submit">Export</span>
+            </div>
+
+            <div class="selection_sessionFinished noselect">
+                <div class="selection_sessionFinishedBody">
+
+                    <div class="selection_sessionFinished_subPage failed">
+                        <img src="./resources/imgs/sad.png" alt="congrats" class="selection_sessionFinished_img">
+                        <div class="selection_sessionFinished_textContainer">
+                            <span class="selection_sessionFinished_mainText"></span>
+                            <span class="selection_sessionFinished_subText failedSubText"></span>
+                        </div>
+                    </div>
+
+                    <div class="selection_sessionFinished_subPage finished">
+                        <img src="./resources/imgs/congrats.png" alt="congrats" class="selection_sessionFinished_img">
+                        <div class="selection_sessionFinished_textContainer">
+                            <span class="selection_sessionFinished_mainText"></span>
+                            <span class="selection_sessionFinished_subText">
+                                <span class="selection_sessionFinished_subTextPart"></span>
+                                <span class="selection_sessionFinished_subTextInterest finishedInterestName"></span>
+                                <span>
+                                    <span class="selection_sessionFinished_subTextPart"></span>
+                                    <span class="selection_sessionFinished_subTextPart finishedInterest"></span>
+                                    <span class="selection_sessionFinished_subTextPart"></span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="selection_sessionFinished_subPage chrono">
+                        <img src="./resources/imgs/clock.png" alt="chrono" class="selection_sessionFinished_img">
+                        <div class="selection_sessionFinished_textContainer">
+                            <span class="selection_sessionFinished_mainText"></span>
+                            <span class="selection_sessionFinished_subText">
+                                <span class="selection_sessionFinished_subTextPart"></span>
+                                <span class="selection_sessionFinished_subTextInterest chronoInterest"></span>
+                                <span class="selection_sessionFinished_subTextPart"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="selection_sessionFinished_subPage lift">
+                        <img src="./resources/imgs/barbell.png" alt="lift" class="selection_sessionFinished_img">
+                        <div class="selection_sessionFinished_textContainer">
+                            <span class="selection_sessionFinished_mainText"></span>
+                            <span class="selection_sessionFinished_subText">
+                                <span class="selection_sessionFinished_subTextPart"></span>
+                                <span class="selection_sessionFinished_subTextInterest liftInterest"></span>
+                                <span class="selection_sessionFinished_subTextPart"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selection_sessionFinished_navigator">
+                    <div class="selection_sessionFinished_navigator_indicator"></div>
+                    <div class="selection_sessionFinished_navigator_indicator"></div>
+                    <div class="selection_sessionFinished_navigator_indicator"></div>
+                </div>
+            </div>
+
+            <!-- SESSION -->
+            
+            <div class="session_exit_confirm noselect">
+                <span class="session_exist_text">Exit the session ?</span>
+                <span class="session_exist_subtext">Your progression will be lost</span>
+                <div class="session_exit_button_container">
+                    <button class="session_exit_btn session_exit_y">Quit</button>
+                    <button class="session_exit_btn session_exit_n">Cancel</button>
+                </div>
+            </div>
+
+            <div class="session_hintBody">
+                <div class="session_hintHeader noselect">
+                    <img src="./resources/imgs/preview.png" class="session_hintIcon" alt="">
+                    <span class="session_hintTitle"></span>
+                </div>
+                <span class="session_hintText"></span>
+            </div>
+
+            <div class="session_remaining_page noselect">
+                <div class="session_remaining_item">
+                    <span class="session_remaining_item_title">Time remaining</span>
+                    <span class="session_remaining_item_value session_remaining_TimeSpent"></span>
+                </div>
+        
+                <div class="session_remaining_item">
+                    <span class="session_remaining_item_title">Working time remaining</span>
+                    <span class="session_remaining_item_value session_remaining_WorkedTime"></span>
+                </div>
+
+                <div class="session_remaining_item">
+                    <span class="session_remaining_item_title">Sets remaining</span>
+                    <span class="session_remaining_item_value session_remaining_SetsDone"></span>
+                </div>
+
+                <div class="session_remaining_item">
+                    <span class="session_remaining_item_title">Reps remaining</span>
+                    <span class="session_remaining_item_value session_remaining_RepsDone"></span>
+                </div>
+        
+                <div class="session_remaining_item">
+                    <span class="session_remaining_item_title">Weight remaining</span>
+                    <span class="session_remaining_item_value session_remaining_WeightLifted"></span>
+                </div>
+            </div>
+
+            <div class="session_setPreviewBody noselect">
+                <span class="session_setPreviewTitle"></span>
+                <div class="session_setPreviewInfoContainer">
+                    <span class="session_setPreviewInfo"></span>
+                    <span class="session_setPreviewPastInfo"></span>
+                </div>
+                <span class="session_setPreviewRest"></span>
+            </div>
+        </div>
+
+        <div class="screensaver noselect">
+            <span class="screensaver_text noselect">Saver</span>
+            <div class="screensaver_textContainer screensaver_LtextContainer">
+                <span class="screensaver_timer screensaver_Ltimer_prefix">L |</span>
+                <span class="screensaver_timer screensaver_Ltimer noselect"></span>
+            </div>
+            <div class="screensaver_textContainer screensaver_RtextContainer">
+                <span class="screensaver_timer screensaver_Rtimer_prefix">R |</span>
+                <span class="screensaver_timer screensaver_Rtimer noselect"></span>
+            </div>
+            <span class="screensaver_timer screensaver_Xtimer noselect"></span>
+        </div>
+
+        <div class="bottomNotification noselect">
+            <span class="bottomNotification_msg">[W] PDT scheduled</span>
+            <img src="./resources/imgs/tick.png" alt="" class="bottomNotification_Icon">
+        </div>
+
+        
+        
+        <div class="main_page">
+            <div class="selection_page">
+                
+                <div class="selection_header">
+                    <div class="selection_header_firstRow noselect">
+
+                        <img class="selection_info info_icon" src="./resources/imgs/stats.svg"/>  
+    
+                        <div class="main_title_block noselect">
+                            <span class="main_title">Workouts</span>
+                        </div> 
+                        
+                        <img src="./resources/imgs/parameters.svg" draggable="false" class="selection_parameters">            
+
+                    </div>
+
+                    <div class="selection_header_secondRow">
+                        <div class="selection_info_page noselect">
+                            <div class="selection_info_item">
+                                <span class="selection_info_item_title">Time spent</span>
+                                <span class="selection_info_item_value selection_info_TimeSpent"></span>
+                            </div>
+            
+                            <div class="selection_info_item">
+                                <span class="selection_info_item_title">Worked time</span>
+                                <span class="selection_info_item_value selection_info_WorkedTime"></span>
+                            </div>
+            
+                            <div class="selection_info_item">
+                                <span class="selection_info_item_title">Weight lifted</span>
+                                <span class="selection_info_item_value selection_info_WeightLifted"></span>
+                            </div>
+            
+                            <div class="selection_info_item">
+                                <span class="selection_info_item_title">Reps done</span>
+                                <span class="selection_info_item_value selection_info_RepsDone"></span>
+                            </div>
+            
+                            <div class="selection_infoStart">
+                                <div class="selection_infoStart_title">Since</div>
+                                <div class="selection_infoStart_value"></div>
+                            </div>
+                        </div>
+
+                        <div class="selection_page_calendar noselect">
+        
+                            <div class="selection_page_calendar_main">
+        
+                                <div class="selection_page_calendar_previewBox_triangleTip"></div>
+                                <div class="selection_page_calendar_previewBox_body"></div>
+        
+                                <div class="selection_page_calendar_header">
+                                    <div class="selection_page_calendar_headerMonths">
+                                        <span class="selection_page_calendar_header_M">April</span>
+                                        <span class="selection_page_calendar_header_Y">2023</span>
+                                        <span class="selection_page_calendar_header_M">May</span>
+                                    </div>
+        
+                                    <div class="selection_page_calendar_headerDays">
+                                        <span class="selection_page_calendar_header_D">M</span>
+                                        <span class="selection_page_calendar_header_D">T</span>
+                                        <span class="selection_page_calendar_header_D">W</span>
+                                        <span class="selection_page_calendar_header_D">T</span>
+                                        <span class="selection_page_calendar_header_D">F</span>
+                                        <span class="selection_page_calendar_header_D">S</span>
+                                        <span class="selection_page_calendar_header_D">S</span>
+                                    </div>
+                                </div>
+            
+                                <div class="selection_page_calendar_row">
+                                    <span class="selection_page_calendar_row_day">M</span>
+                                    <span class="selection_page_calendar_row_day">T</span>
+                                    <span class="selection_page_calendar_row_day">W</span>
+                                    <span class="selection_page_calendar_row_day">T</span>
+                                    <span class="selection_page_calendar_row_day">F</span>
+                                    <span class="selection_page_calendar_row_day">S</span>
+                                    <span class="selection_page_calendar_row_day">S</span>
+                                </div>
+            
+                                <div class="selection_page_calendar_row">
+                                    <span class="selection_page_calendar_row_day">M</span>
+                                    <span class="selection_page_calendar_row_day">T</span>
+                                    <span class="selection_page_calendar_row_day">W</span>
+                                    <span class="selection_page_calendar_row_day">T</span>
+                                    <span class="selection_page_calendar_row_day">F</span>
+                                    <span class="selection_page_calendar_row_day">S</span>
+                                    <span class="selection_page_calendar_row_day">S</span>
+                                </div>
+                                
+                                <div class="selection_page_calendar_row">
+                                    <span class="selection_page_calendar_row_day">M</span>
+                                    <span class="selection_page_calendar_row_day">T</span>
+                                    <span class="selection_page_calendar_row_day">W</span>
+                                    <span class="selection_page_calendar_row_day">T</span>
+                                    <span class="selection_page_calendar_row_day">F</span>
+                                    <span class="selection_page_calendar_row_day">S</span>
+                                    <span class="selection_page_calendar_row_day">S</span>
+                                </div>
+                            </div>
+                            
+                            <div class="selection_page_calendar_second">
+                            </div>
+        
+                            <div class="selection_page_calendar_goConainer">
+                                <div class="calendarGoBack calendarGo noselect">Back</div>
+                                <div class="calendarGoForward calendarGo noselect">Forward</div>
+                            </div>
+        
+                            <div class="selection_page_calendar_btnConainer">
+                                <div class="selection_page_calendar_parameters noselect"><img src="./resources/imgs/parameters.svg" draggable="false" class="selection_calendar_parameters_icon"></div>
+                                <span speed="1000" darken="10" class="selection_page_calendar_plusOne longClickable noselect">Shift by one Day</span>
+                            </div>
+                        </div>
+
+                        <div class="selection_parameters_page">
+                            <span class="selection_parameters_title">Preferences</span>
+                            
+                            <div class="selection_parameters_item noselect">
+                                <span class="selection_parameters_text">Language</span>
+    
+                                <select name="" id="" class="selection_parameters_select selection_parameters_language">
+                                    <option class="selection_parameters_opt" value="english" selected>English</option>
+                                    <option class="selection_parameters_opt" value="french">Français</option>
+                                </select>
+                            </div>
+    
+                            <div class="selection_parameters_item noselect">
+                                <span class="selection_parameters_text">Weight Unit</span>
+                                <select name="" id="" class="selection_parameters_select selection_parameters_weightunit">
+                                    <option class="selection_parameters_opt" value="kg" selected>kg</option>  
+                                    <option class="selection_parameters_opt" value="lbs">lbs</option>
+                                </select>
+                            </div>
+    
+                            <div class="selection_parameters_item">
+                                <span class="selection_parameters_text noselect">Notif Before</span>
+                                <input type="text" value="0s" readonly="readonly" class="timeString selection_parameters_input selection_parameters_notifbefore">
+                            </div>
+    
+                            <div class="selection_parameters_item noselect">
+                                <span class="selection_parameters_text">Keep History</span>
+    
+                                <select name="" id="" class="selection_parameters_select selection_parameters_deleteafter">
+                                    <option class="selection_parameters_opt" value="For ever" selected>For ever</option>
+                                    <option class="selection_parameters_opt" value="7 Days">7 Days</option>
+                                    <option class="selection_parameters_opt" value="1 Month">1 Month</option>
+                                    <option class="selection_parameters_opt" value="3 Month">3 Month</option>
+                                    <option class="selection_parameters_opt" value="6 Month">6 Month</option>
+                                    <option class="selection_parameters_opt" value="1 Year">1 Year</option>
+                                </select>
+                            </div>
+    
+                            <div class="selection_parameters_item noselect">
+                                <span class="selection_parameters_text">Keep awake</span>
+                                <div class="toggle parameters_toggle selection_parameters_keepawake" state="false" moveState="true"><div class="toggle_dot"></div></div>
+                            </div>
+    
+                            <div class="selection_parameters_item noselect">
+                                <span class="selection_parameters_text">Auto saver</span>
+                                <div class="toggle parameters_toggle selection_parameters_autosaver" state="false" moveState="true"><div class="toggle_dot"></div></div>
+                            </div>
+    
+                            <div class="selection_parameters_saveLoad_container noselect">
+                                <span class="selection_parameters_saveLoad_btn selection_parameters_save">Export</span>
+                                <span class="selection_parameters_saveLoad_btn selection_parameters_load">Import</span>
+                            </div>
+    
+                            <div class="selection_parameters_error_container noselect">
+                                <img src="./resources/imgs/preview.png" alt="" class="selection_parameters_error_infoIcon">
+                                <span class="selection_parameters_error_msg"></span>
+                            </div>
+        
+                        </div>
+                    </div>
+                </div>
+
+                <input type="file" id="folder" style="display: none;" webkitdirectory multiple/>
+
+
+                <span class="selection_empty_msg noselect">Add a session</span>
+
+                <div class="selection_SR_container scrollable noselect">
+                    <div class="selection_SR_child selection_session_container">
+                    
+                    </div>
+
+                    <div class="selection_SR_separator"></div>
+
+                    <div class="selection_SR_child selection_reminder_container">
+
+                    </div>
+
+                </div>
+
+                <div class="selection_add_container noselect">
+                    <div class="selection_add_option selection_add_option_session">Session</div>
+                    <div class="selection_add_option selection_add_option_reminder">Reminder</div>
+                </div>
+                <button class="selection_round_btn selection_add_btn noselect"><img src="./resources/imgs/add.svg" draggable="false" alt="" class="selection_icon_btn selection_add_icon_btn noselect"></button>
+            </div>
+            
+            <div class="update_page"> 
+
+                <div class="update_tile_overHeader noselect">
+                    <div class="update_mode_select update_mode_intervall">Intervall</div>
+                    <div class="update_mode_select update_mode_workout">Workout</div>
+                </div>
+
+                <div class="update_tile_header">
+                    <div class="update_tile_header_left">
+                        <span class="update_name_info noselect">Name</span>
+                        <input value="" type="text" class="update_name_tile update_data_name">
+                        <span class="update_history_count noselect">20</span>
+                        <div class="toggle history_toggle noselect" state="false" moveState="true"><div class="toggle_dot"></div></div>
+                    </div>
+                </div>
+                
+                <div class="update_workout_container">
+                    <div class="update_exercice_container"></div>
+                </div>
+
+                <div class="update_intervall_container">
+                    <div class="update_data_block">
+                        <div class="update_data_tile_info_container"><span class="update_data_tile_info noselect">Cycle</span></div>
+                        <input value="" type="tel" class="strictlyNumeric update_data_tile update_intervall_data_cycle">
+                    </div>
+                    <div class="update_data_block">
+                        <div class="update_data_tile_info_container"><span class="update_data_tile_info noselect">Work</span></div>
+                        <input value="" type="text" readonly="readonly" class="timeString update_data_tile update_intervall_data_work">
+                    </div>
+                    <div class="update_data_block">
+                        <div class="update_data_tile_info_container"><span class="update_data_tile_info noselect">Rest</span></div>
+                        <input value="" type="text" readonly="readonly" class="timeString update_data_tile update_intervall_data_rest">
+                    </div>
+                </div>
+
+                <div class="update_reminder_container">
+                    <div class="udpate_reminder_body">
+                        <span class="update_reminder_body_title noselect">Reminder Body</span>
+                        <textarea name="ReminderBody" class="udpate_reminder_body_txtarea" placeholder="Body"></textarea>
+                    </div>
+                </div>
+
+                <div class="update_schedule_container">
+                    <div class="update_schedule_fline">
+                        <div class="update_schedule_fline_fblock">
+                            <span class="update_schedule_span noselect">On</span>
+                            <select name="" id="" class="update_schedule_select update_schedule_select_day">
+                                <option class="update_schedule_opt" value="Monday">Monday</option>  
+                                <option class="update_schedule_opt" value="Tuesday">Tuesday</option>  
+                                <option class="update_schedule_opt" value="Wednesday">Wednesday</option>  
+                                <option class="update_schedule_opt" value="Thursday">Thursday</option>  
+                                <option class="update_schedule_opt" value="Friday">Friday</option>  
+                                <option class="update_schedule_opt" value="Saturday">Saturday</option>  
+                                <option class="update_schedule_opt" value="Sunday">Sunday</option>  
+                            </select>
+                        </div>
+                            
+                        <div class="update_schedule_fline_sblock">
+                            <span class="update_schedule_span noselect">At</span>
+                            <div class="update_schedule_fline_sblock_input_container">
+                                <input type="tel" placeholder="18" class="strictlyNumeric update_schedule_input update_schedule_input_hours">
+                                <span class="update_schedule_span">:</span>
+                                <input type="tel" placeholder="00" class="strictlyNumeric update_schedule_input update_schedule_input_minutes">
+                            </div>  
+                        </div>
+                    </div>
+
+                    <div class="update_schedule_sline">
+                        <span class="update_schedule_span noselect">Every</span>
+                        <div class="update_schedule_sline_sblock_input_container">
+                            <input type="tel" placeholder="2" class="strictlyNumeric update_schedule_input update_schedule_input_count">
+                            <select name="" id="" class="update_schedule_select update_schedule_select_every">
+                                <option class="update_schedule_opt" value="Day">Day</option>  
+                                <option class="update_schedule_opt" value="Week">Week</option> 
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="update_history_container">
+                    
+                </div>
+
+                <div class="update_btn_container noselect">
+                    <div class="update_workout_button_container">
+                        <button class="update_workout_pause"><img src="./resources/imgs/timer2.svg" draggable=False alt="" class="update_workout_pause_icon_btn noselect"></button>
+                        <button class="update_workout_add"><img src="./resources/imgs/add.svg" draggable=False alt="" class="update_workout_add_icon_btn noselect"></button>
+                        <button class="update_schedule_bin"><img src="./resources/imgs/bin.svg" draggable=False alt="" class="update_workout_bin_icon_btn noselect"></button>
+                    </div>
+                    <button class="update_btn">Update</button>
+                </div>
+            </div>
+            
+            <div class="update_error_container noselect">
+                <img src="./resources/imgs/preview.png" alt="" class="update_error_infoIcon">
+                <span class="update_error_msg"></span>
+            </div>
+        </div>
+
+        <div class="session_page">            
+            <div class="session_header noselect">
+                <div class="session_header_firstRow">
+                    <img class="session_info info_icon" src="./resources/imgs/stats.svg"/>
+
+                    <div class="session_volume_slider_container">
+                        <div class="session_volume_slider_dot noselect"></div>
+                        <img src="./resources/imgs/sound_full.svg" draggable="false" alt="" class="sessions_sound_icon noselect">
+                        <div class="session_volume_slider_bar noselect"></div>
+                    </div>
+
+                    <div class="screensaver_btn">
+                        <div class="screensaver_btn_upper"></div>
+                        <div class="screensaver_btn_body">
+                            <div class="screensaver_btn_body_contained"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="session_header_secondRow">
+                    
+                </div>
+            </div>
+            
+            <div class="session_intervall_container noselect">
+                <div class="session_info_container">
+                    <span class="session_state"></span>
+                    <span class="session_intervall_timer"></span>
+                </div>
+                <span class="session_remaining_cycle"></span>
+                <button class="session_continue_btn">Continue</button>
+                <div class="session_intervall_btn_container">
+                    <button class="selection_round_btn session_workout_next_btn session_intervall_skip"><img src="./resources/imgs/next.svg" alt="" class="session_workout_next_icon"></button>
+                    <button class="selection_round_btn session_play_pause_btn"><img src="./resources/imgs/pause.svg" draggable=False alt="" class="selection_icon_play_pause"></button>
+                </div>
+            </div>
+
+            <div class="session_workout_container">
+
+                <img src="./resources/imgs/preview.png" alt="" class="session_hint">
+
+                <div class="session_workout_historyNotes_container">
+                    <span class="session_workout_historyNotes_isAbout"></span>
+                    <textarea name="HistoryNotes" class="session_workout_historyNotes_inp"></textarea>
+                </div>
+
+                <div class="session_workout_extraTimer_container noselect">
+                    <div class="session_workout_Xtimer_container">
+                        <span class="session_workout_Xtimer Xtimer">1:00</span>
+                        <div class="session_workout_Xtimer_container_sdrow">
+                            <div class="session_workout_minus">-</div>
+                            <div class="session_workout_plus">+</div>
+                        </div>
+                    </div>
+
+                    <diV class="session_workout_tiret_hitBox">
+                        <div class="session_workout_tiret"></div>
+                    </diV>
+                </div>
+                
+                <div class="session_body">
+                    <div class="session_current_exercise_info_container noselect">
+                        <span class="session_current_exercise_name"></span>
+                        <div class="session_current_exercise_specs">
+                            <input class="strictlyNumeric session_current_exercise_specs_details_inp session_current_exercise_specs_reps resizingInp" type="tel" value="">
+                            <span class="session_current_exercise_specs_pause">x</span>
+                            <input class="strictlyFloatable session_current_exercise_specs_details_inp session_current_exercise_specs_weight resizingInp" type="tel" value="">
+                            <span class="session_current_exercise_specs_weight_unit"></span>
+                        </div>
+                        <span class="session_current_exercise_specs_before"></span>
+                    </div>
+    
+                    <div class="sessions_rests_container">
+                        <div speed="600" class="session_exercise_Lrest_btn longClickable noselect">
+                            <div class="session_exercise_Lrest_react rest_react"></div>
+                            <span class="session_exercise_rest_btn_label session_btnLabelL">Left</span>
+                            <span class="session_exercise_rest_text Lrest">Rest</span>
+                            <span class="session_exercise_timer Ltimer"></span>
+                            <input type="text" readonly="readonly" class="timeString session_exercise_restInput Linput">
+                        </div>
+                        
+                        <div speed="600" class="session_exercise_Rrest_btn longClickable noselect">
+                            <div class="session_exercise_Rrest_react rest_react"></div>
+                            <span class="session_exercise_rest_btn_label session_btnLabelR">Right</span>
+                            <span class="session_exercise_rest_text Rrest">Rest</span>
+                            <span class="session_exercise_timer Rtimer"></span>
+                            <input type="text" readonly="readonly" class="timeString session_exercise_restInput Rinput">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="session_workout_footer noselect">
+                    <div class="session_workout_remaining_sets"></div>
+                    <div class="session_next_exercises_wrapper">
+                        <div class="session_next_exercise_expander">
+                            <img src="./resources/imgs/grab.svg" alt="" draggable="False" class="session_next_exercise_expander_icon noselect">
+                        </div>
+
+                        <div class="session_next_exercises_container">
+                            
+                        </div>
+                    </div>
+                    
+                    <button class="selection_round_btn session_workout_next_btn"><img src="./resources/imgs/next.svg" alt="" class="session_workout_next_icon"></button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+	<div class="footer noselect"><span class="footerText">&copy; 2021 J.Kancel, All rights reserved</span></div></body>
+</html>

@@ -1,0 +1,52 @@
+.IOSbacker{
+    z-index: 1000;
+    position: absolute;
+    
+    height: 100%;
+    width: 25px;
+
+    background-color: rgba(31, 28, 45, 0);
+
+    top : 0;
+    display: none;
+}
+
+.noselect{
+    -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+                user-select: none;
+}
+
+.flex_break{
+    flex-basis: 100%;
+    height: 0;
+}
+
+.imgSet{
+    display: none;
+}
+
+/*CONIC GRADIENT*/
+
+.a{
+    height:200px;
+    width:200px;
+    border-radius:50%;
+    background: conic-gradient(
+    var(--color) var(--degree), transparent calc(var(--degree) + 0.5deg) 100%);
+
+}
+
+.b{
+    height:84%;
+    width:84%;
+    top:8%;
+    left:8%;
+    position:relative;
+    border-radius:50%;
+    background:#D3D3D3;
+}
+/*CONIC GRADIENT*/

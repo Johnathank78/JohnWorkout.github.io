@@ -1,0 +1,46 @@
+.screensaver{
+    z-index: 999;
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+    height: 100%;
+    background-color: black;
+
+    display: none;
+}
+
+.screensaver>*{
+    scale: 1.09;
+    color: white;
+    opacity: 0.25;
+}
+
+.screensaver_text{
+    word-wrap: break-word;
+    white-space: normal;
+
+    width: 80%;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.screensaver_timer{
+    font-weight: 500;
+    font-size: 30px; 
+}
+
+.screensaver_Ltimer_prefix{
+    display: none;
+}
+
+.screensaver_Rtimer{
+    font-weight: 500;
+    font-size: 30px; 
+}

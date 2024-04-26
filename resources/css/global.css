@@ -1,0 +1,89 @@
+*{
+    margin: 0px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
+
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    
+    color: #FFFFFF;
+    font-family: 'test', sans-serif;
+}
+
+html{
+    position: fixed;
+    background-color: #1F1C2D;
+}
+
+body{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+span{
+    overflow: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;  
+}
+
+span::-webkit-scrollbar{
+    display: none;
+}
+
+.app{
+    position: absolute;
+
+    width: 100%;
+    height: calc(100% - 25px);
+
+    top: 0;
+
+    text-align: center;
+}
+
+.blurBG{
+    z-index: 1000;
+    position: absolute;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100dvh;
+    width: 100vw;
+
+    top:0;
+    left: 0;
+    
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+
+    display: none;
+}
+
+.main_page{
+    position: relative;
+    height: 100%;
+    width: 100%;
+
+    background-color: #1F1C2D;
+    overflow: hidden;
+}
+
+.timeString{
+    cursor: pointer;
+}
+
+.footer{
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 25px;
+	font-size: 12px;
+	text-align: center;
+	line-height: 25px;
+	background-color: hsl(251, 23%, 25%);
+}

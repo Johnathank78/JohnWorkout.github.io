@@ -1,0 +1,35 @@
+{
+  "name": "JohnWorkout",
+  "short_name": "Workout",
+  "description": "Musculation WebApp",
+  "start_url": "/JohnWorkout.github.io/index.html",
+  "display_override": ["fullscreen", "minimal-ui"],
+  "display": "standalone",
+  "background_color": "#1F1C2D",
+  "theme_color": "#1F1C2D",
+  "icons": [
+    {
+      "src": "/JohnWorkout.github.io/resources/imgs/appLogo.png",
+      "type": "image/png",
+      "sizes": "1000x1000",
+      "purpose": "any"
+    }
+  ],
+  "screenshots" : [
+    {
+      "src": "/JohnWorkout.github.io/resources/imgs/phone_ss.png",
+      "sizes": "430x871",
+      "type": "image/png",
+      "label": "Homescreen of JohnWorkout",
+      "purpose": "any"
+    },
+    {
+      "src": "/JohnWorkout.github.io/resources/imgs/web_ss.png",
+      "sizes": "1906x963",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Homescreen of JohnWorkout",
+      "purpose": "any"
+    }
+  ]
+}

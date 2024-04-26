@@ -1,0 +1,19 @@
+@keyframes leftSlide{
+    0%{
+        left: var(--start);
+    }
+
+    100%{
+        left: var(--stop);
+    }
+}
+
+@keyframes rightSlide{
+    0%{
+        right: var(--start);
+    }
+
+    100%{
+        right: var(--stop);
+    }
+}

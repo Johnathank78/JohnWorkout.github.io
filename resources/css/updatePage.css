@@ -1,0 +1,1294 @@
+.update_page{
+    position: absolute;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content:center;
+
+    width: 97%;
+    max-width: 500px;
+
+    top:50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.update_tile{
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content:center;
+    align-items: center;
+
+    height: 235px;
+    width: 100%;
+
+    margin: 25px 0px 0px 0px;
+    background-color: #262837;
+    border-radius: 15px;
+}
+
+.update_tile_overHeader{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    width: calc(90%);
+    border-radius: 10px;
+
+    display: none;
+}
+
+.update_tile_header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    width: calc(90% - 30px);
+    height: 60px;
+    gap: 15px;
+
+    padding: 0 15px 0 15px;
+    margin-bottom: 15px;
+
+    border-radius: 10px;
+    background-color: #262837;
+}
+
+.update_tile_header_left{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    flex-grow: 0;
+
+    width: 100%;
+    align-items: center;
+
+    gap: 15px;
+}
+
+.update_name_info{
+    font-size: 22px;
+    font-weight: 500; 
+
+    flex-shrink: 0;
+}
+
+.update_name_tile{
+    
+    flex-grow: 1;
+    
+    height: 35px;
+    width: 100%;
+    
+    padding-left: 10px;
+    
+    background-color: #34394C;
+    font-size: 20px;
+    font-weight: 500;
+
+    border-radius: 10px;
+    border: none;
+    outline: none;
+}
+
+.update_mode_select{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 35px;
+    width: 100%;
+
+    background-color: #262837;
+    font-weight: 500;
+    font-size: 17px;
+
+    border-radius: 8px 8px 0 0;
+    border: none;
+    cursor: pointer;
+}
+
+.update_mode_intervall{
+    border-top-right-radius: 12px;
+}
+
+.update_mode_workout{
+    border-top-right-radius: 12px;
+}
+
+.update_history_container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 15px;
+
+    max-height: 55dvh;
+    width: 90%;
+
+    
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+
+    border-radius: 10px;
+    display: none;
+}
+
+.update_history_container::-webkit-scrollbar{
+    display: none;
+}
+
+.update_history_count{
+    flex-grow: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    
+    width: auto;
+    height: calc(35px - 16px);
+    padding: 8px 14px;
+    
+    background-color: #34394C;
+    font-size: 20px;
+    font-weight: 500;
+
+    border-radius: 8px;
+
+    display: none;
+}
+
+.update_history_container_empty_msg{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 15px;
+
+    z-index: 1;
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -45%);
+
+    width: 85%;
+
+    pointer-events: none;
+    display: none;
+}
+
+.update_history_container_empty_msg_span{
+    color: white;
+    opacity: 0.1;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+.update_history_container_empty_msg_img{
+    width: 50px;
+    height: auto;
+    
+    opacity: 0.1;
+}
+
+.update_history_container_day{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    width: calc(100% - 30px);
+    
+    padding: 15px;
+
+    background-color: #303344;
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+.update_history_container_day_noHistory{
+    font-size: 20px;
+    font-weight: 700;
+
+    text-align: left;
+}
+
+.update_history_container_day_header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.update_history_container_day_date{
+    padding: 8px;
+
+    background-color: #4c5368;
+    font-size: 20px;
+    font-weight: 500;
+
+    border-radius: 7px;
+}
+
+.update_history_container_day_time{
+    padding: 8px;
+
+    background-color: #4c5368;
+    font-size: 20px;
+    font-weight: 500;
+
+    border-radius: 7px;
+}
+
+.update_history_container_day_sets_container{
+    padding: 8px;
+
+    background-color: #4c5368;
+
+    font-size: 22px;
+    font-weight: 500;
+    
+    border-radius: 7px;
+}
+
+.update_history_container_exercise{
+    display: flex;
+    flex-direction: column;
+    
+    gap: 15px;
+    height: 100%;
+
+    padding: 15px;
+
+    background-color: #4c5368;
+    border-radius: 7px;
+
+    cursor: pointer;
+}
+
+.update_history_container_exercise_header{
+    display: flex;
+
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.update_history_container_exercise_name{
+    font-size: 21px;
+    font-weight: 500;
+}
+
+.update_history_container_exercise_sets_container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    background-color: #545d72;
+
+    padding: 8px;
+    font-weight: 500;
+
+    border-radius: 7px;
+}
+
+.update_history_container_exercise_note_container_wrapper{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    width: 100%;
+    max-height: 58px;
+}
+
+.update_history_container_exercise_note_container{
+    width: calc(100% - 40px);
+    padding: 10px;
+
+    border-radius: 8px;
+    background-color: #545d72;
+    
+    overflow-x: hidden;
+}
+
+.update_history_container_exercise_note{
+    display: block;
+
+    width: 100%;
+    
+    white-space: normal;
+    text-align: left;
+    word-break: break-all;
+}
+
+.update_history_container_exercise_sets{
+    font-size: 17px;
+}
+
+.update_history_container_Expectedsets{
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.update_history_container_set{
+    display: flex;
+    flex-direction: row;
+    
+    justify-content: space-between;
+    align-items: center;
+    font-size: 19px;
+
+    padding: 0 30px 0 30px;
+}
+
+.update_history_container_reps_container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    background-color: #545d72;
+
+    padding: 8px;
+    font-weight: 500;
+
+    border-radius: 7px;
+}
+
+.update_history_container_reps, .update_history_container_weight{
+    outline: none;
+    border: none;
+    background-color: unset;
+    font-size: 19px;
+    font-weight: 500;
+}
+
+.update_history_container_Expectedreps{
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.update_history_container_weight_container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    background-color: #545d72;
+
+    padding: 8px;
+    font-weight: 500;
+
+    border-radius: 7px;
+}
+
+.update_history_container_Expectedweight{
+    font-size: 12px;
+    opacity: 0.7;   
+}
+
+.update_reminder_container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+
+    width: 90%;
+
+    max-height: 45dvh;
+
+    border-radius: 10px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+
+    display: none;
+}
+
+.update_reminder_container::-webkit-scrollbar{
+    display: none;
+}
+
+.udpate_reminder_body{  
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+    
+    padding: 15px;
+    width: calc(100% - 30px);
+    background-color: #303344;
+}
+
+.update_reminder_body_title{
+    display: flex;
+    align-self: flex-start;
+
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.udpate_reminder_body_txtarea{
+
+    width: calc(100% - 20px);
+    height: 20px;
+    max-height: 100px;
+    max-width: 717px;
+
+    padding: 10px;
+
+    color: white;
+
+    font-size: 20px;
+    font-weight: 400;
+    text-align: left;
+
+    background-color: #4C5368;
+    border: none;
+    outline: none;
+    
+    border-radius: 8px;
+    white-space: pre-wrap !important;
+    resize: none;
+}
+
+.udpate_reminder_body_txtarea::-webkit-scrollbar{
+    display: none;
+}
+
+.udpate_reminder_body_txtarea::placeholder{
+    color: white;
+    opacity: 0.4;
+}
+
+.update_intervall_container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+
+    width: 90%;
+
+    max-height: 45dvh;
+
+    border-radius: 10px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+
+    display: none;
+}
+
+.update_intervall_container::-webkit-scrollbar{
+    display: none;
+}
+
+.update_data_block{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+
+    width: calc(100% - 30px);
+    padding: 15px;
+
+    background-color: #303344;
+    border-radius: 10px;
+}
+
+.update_data_tile_info_container{
+    width: 50%;
+    height: 45px;
+
+    line-height: 45px;
+
+    background-color: #4C5368;
+    border-radius: 10px;
+}
+
+.update_data_tile_info{
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.update_data_tile{
+    flex-grow: 0;
+    flex-shrink: 0;
+    
+    height: 45px;
+    width: calc(50% - 7.5px);
+    
+    border-radius: 10px;
+    background-color: #4C5368;
+    font-size: 22px;
+    font-weight: 500;
+    
+    line-height: 45px;
+    text-align: center;
+    outline: none;
+    border: none;
+}
+
+.update_workout_container{
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    align-self: center;
+    
+    width: 100%;
+    height: 100%;
+    top: 0;
+
+    display: none;
+    display: flex;
+}
+
+.update_workout_data_info_container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    width: 90%;
+    margin-top: 22px;
+}
+
+.update_exercice_container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 15px;
+
+    max-height: 45dvh;
+    width: 90%;
+
+    border-radius: 10px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.update_exercice_container::-webkit-scrollbar{
+    display: none;
+}
+
+.update_exercise_pause_item{
+    position: relative;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    padding: 20px;
+    width: calc(100% - 44px);
+    height: 50px;
+
+    background-color: #303344;
+    border-radius: 10px;
+}
+
+.update_workout_pause_item_line{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+
+    height: 100%;
+    width: 100%;
+}
+
+.update_workout_item{
+    position: relative;
+    
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+
+    justify-content: center;
+    align-items: center;
+    gap: 15px;  
+
+    padding: 20px 20px 35px 20px;
+    width: calc(100% - 44px);
+
+    background-color: #303344;
+    border-radius: 10px;
+}
+
+.update_workout_item_first_line{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    justify-content: flex-start;
+    align-items: center;
+
+    gap: 15px;
+
+    height: 50px;
+    width: 100%;
+}
+
+.update_workout_item_second_line{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 15px;
+
+    height: 50px;
+    width: 100%;
+}
+
+.update_workout_expandRowContainer{
+    position: absolute;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 18px;
+
+    bottom: 0;
+    left: 0;
+
+    background-color: #4C5368;
+    border-radius: 0 0 10px 10px;
+    cursor: pointer;
+}
+
+.update_workout_expandRow{
+    height: 12px;
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(246deg) brightness(105%) contrast(103%);
+}
+
+.udpate_workout_hint_txtarea{
+    position: relative;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+    
+    width: calc(100% - 20px);
+    height: calc(45px - 20px);
+    
+    max-height: 50px;
+
+    padding: 8px 10px 8px 10px;
+
+    background-color: #4C5368;
+
+    font-size: 18px;
+    font-weight: 400;
+
+    margin-bottom: 15px;
+
+    text-align: left;
+    line-height: 25px;
+    
+    border-radius: 8px 8px 0 0;
+    outline: none;
+    border: none;
+
+    resize: none;
+    white-space: pre-wrap !important;
+
+    display: none;
+}
+
+.udpate_workout_hint_txtarea::placeholder{
+    opacity: 0.4;
+    color: #FFFFFF;
+}
+
+
+.udpate_workout_hint_txtarea::-webkit-scrollbar{
+    display: none;
+}
+
+.update_workout_item_grab_container{
+    position: absolute;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    width: 35px;
+    height: 35px;
+
+    left: 0px;
+    top: 2px;
+
+    background-color: #303344;
+    border-radius: 15px;
+}
+
+.update_workout_item_grab{
+    width: 19px;
+    height: auto;
+}   
+
+.update_workout_item_cross_container{
+    position: absolute;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    width: 35px;
+    height: 35px;
+
+    right: 0px;
+    top: 2px;
+
+    background-color: #303344;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.update_workout_item_cross{
+    width: 16px;
+    height: auto;
+
+    transform: rotate(45deg);
+    filter: brightness(0) saturate(100%) invert(53%) sepia(48%) saturate(2676%) hue-rotate(327deg) brightness(84%) contrast(119%);
+    
+}      
+
+.update_workout_intervall_data_container{
+    position: relative;
+    height: 100%;
+}
+
+.update_workout_data_container{
+    position: relative;
+    flex-grow: 1;
+    flex-shrink: 1;
+    
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+.update_workout_data_name_container{
+    position: relative;
+    height: 100%;
+    width: 64.5%;
+}
+
+.update_workout_data_lablel{
+    position: absolute;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: unset;
+    height: 15px;
+    width: 100%;
+
+    font-size: 10px;
+    opacity: .9;
+
+    bottom: 0;
+    left: 0;
+
+    background-color: hsl(225, 16%, 30%);
+
+    border-top-left-radius: unset;
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+
+    pointer-events: none;
+}
+
+.update_workout_hint_lablel{
+    position: absolute;
+    z-index: 1;
+
+    bottom: 35px;
+    right: 20px;
+    
+    opacity: 0;
+}
+
+.update_workout_hint_lablel{
+    position: absolute;
+    z-index: 1;
+
+    width: calc(100% - 40px);
+
+    bottom: 35px;
+    left: 20px;
+    
+    opacity: 0;
+}
+
+.update_workout_data{
+    padding-left: 10px;
+    
+    width: calc(100% - 10px);
+    height: calc(100% - 15px);
+
+    background-color: #4C5368;
+    font-size: 18px;
+    font-weight: 400;
+    text-align: left;
+    line-height: 30px;
+    
+    border-radius: unset;
+
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+
+    outline: none;
+    border: none;
+    overflow: hidden;
+}
+
+.update_workout_data::placeholder{
+    opacity: 0.4;
+    color: #FFFFFF;
+}
+
+.update_workout_data_type_container{
+    display: flex;
+    position: relative;
+
+    justify-content: center;
+    align-items: unset;
+
+    height: 100%;
+    width: 36.5%;
+    padding-left: 0px;
+
+    cursor: pointer;
+}
+
+.update_workout_data_type{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: calc(100% - 15px);
+    width: 100%;
+
+    padding-left: unset;
+
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.update_workout_data_type:disabled{
+    -webkit-appearance: none !important;
+    -webkit-text-fill-color: white !important;
+    color: white !important;
+    opacity: 1 !important;
+}
+
+.update_workout_data_name{
+    width: calc(100% - 10px);
+}
+
+.update_workout_data_pause{
+    padding-left: unset;
+    width: 100%;
+
+    text-align: center;
+    cursor: default;
+}
+
+.update_workout_break{
+    display: none;
+}
+
+.update_workout_data_pausetime{
+    padding-left: unset;
+    width: 100%;
+    
+    text-align: center;
+}
+
+.update_workout_intervall_data{
+    padding-left: 10px;
+    
+    width: calc(100% - 10px);
+    height: calc(100% - 15px);
+
+    background-color: #4C5368;
+    font-size: 18px;
+    font-weight: 400;
+    text-align: left;
+    line-height: 30px;
+    
+    border-radius: unset;
+
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+
+    outline: none;
+    border: none;
+    overflow: hidden;
+}
+
+.update_workout_intervall_data::placeholder{
+    opacity: 0.4;
+    color: #FFFFFF;
+}
+
+.update_workout_button_container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+
+    display: none;
+}
+
+.update_workout_add{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    height: 32px;
+    width: 32px;
+
+    background-color: #51535f;
+    border: none;
+    
+    border-radius: 7px;
+    cursor: pointer;
+
+    display: none;
+}
+
+.update_workout_add_icon_btn{
+    width: 18px;
+    height: auto;
+}
+
+.update_workout_pause{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    height: 32px;
+    width: 32px;
+
+    background-color: #51535f;
+    border: none;
+
+    border-radius: 7px;
+    cursor: pointer;
+    
+    display: none;
+}
+
+.update_workout_pause_icon_btn{
+    width: 20px;
+    height: auto;
+}
+
+.update_workout_add:active{
+    background-color: hsl(231, 8%, 40%);
+}
+
+.update_workout_pause:active{
+    background-color: hsl(231, 8%, 40%);
+}
+
+.update_schedule_container{
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    align-self: center;
+
+    gap: 15px;
+
+    width: 90%;
+    max-width: 500px;
+    
+    top: 0;
+    
+    display: none;
+}
+
+.update_schedule_fline{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    gap: 15px;
+
+    height: 110px;
+    width: 100%;
+}
+
+.update_schedule_fline_fblock{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 10px;
+
+    width: 100%;
+    
+    padding: 15px;
+    text-align: left;
+    background-color: #303344;
+
+    border-radius: 15px;
+}
+
+.update_schedule_select_day{
+    width: 105.84px;
+}
+
+.update_schedule_fline_sblock{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 10px;
+
+    width: 100%;
+
+    padding: 15px;
+    text-align: left;
+    background-color: #303344;
+
+    border-radius: 15px;
+}
+
+.update_schedule_fline_sblock_input_container{
+    display: flex;
+    flex-direction: row;
+    
+    justify-content: flex-start;
+    align-items: center;
+    
+    gap: 10px;
+}
+
+.update_schedule_sline{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+
+    gap: 10px;
+
+    width: calc(100% - 30px);
+
+    text-align: left;
+    padding: 15px;
+    background-color: #303344;
+
+    border-radius: 15px;
+}
+
+.update_schedule_sline_sblock_input_container{
+    display: flex;
+    flex-direction: row;
+    
+    justify-content: flex-start;
+    align-items: center;
+    
+    gap: 10px;
+}
+
+.update_schedule_span{
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.update_schedule_input{
+    background-color: #4C5368;
+    border: none;
+
+    height: 40px;
+    width: 40px;
+
+    font-size: 19px;
+    font-weight: 500;
+    text-align: center;
+
+    border-radius: 8px;
+    outline: none;
+}
+
+.update_schedule_input::placeholder{
+    color: #6F7682;
+}
+
+.update_schedule_select{
+    background-color: #4C5368;
+    border: none;
+
+    height: 40px;
+    width: 100%;
+
+    font-size: 19px;
+    font-weight: 500;
+    text-align: center;
+
+    outline: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.update_schedule_opt:hover{
+    background-color: #656e8b;
+}
+
+.update_schedule_bin{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    height: 32px;
+    width: 32px;
+
+    background-color: #E74C3C;
+    border: none;
+    
+    border-radius: 7px;
+    cursor: pointer;
+
+    display: none;
+}
+
+.update_workout_bin_icon_btn{
+    width: 16px;
+    height: auto;
+}
+
+.update_error_container{
+    position: absolute;
+    
+    display: inline-block;
+
+    height: 50px;
+    width: auto;
+    max-width: calc(100vw - 75px);
+    
+    left: 25px;
+    bottom: 25px;
+    
+    padding: 0px 17px 0px 10px;
+    
+    background-color: #ffd6d6;
+    text-align: left;
+    line-height: 50px;
+    
+    border-radius: 12px;
+    overflow: scroll;
+
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    
+    display: none;
+}
+
+.update_error_container::-webkit-scrollbar{
+    display: none;
+}
+
+.update_error_infoIcon{
+    width: 13px;
+    height: 13px;
+    margin-right: 5px;
+    filter: invert(34%) sepia(23%) saturate(2189%) hue-rotate(317deg) brightness(97%) contrast(118%);
+}
+
+.update_error_msg{
+    color: #cc3232;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.update_btn_container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+    gap: 10px;
+
+    padding: 15px 0px 15px 0px;
+    width: 90%;
+}
+
+.update_btn{
+    position: relative;
+    
+    width: 100%;
+    height: 32px;
+    
+    background-color: #1799d3;
+    font-size: 17px;
+    border-color: transparent;
+    
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.update_btn:active{
+    background-color: #66b6dc;    
+}
+
+.update_history_loadMore_btn{
+    align-self: center;
+    
+    height: 50px;
+    width: 50px;
+
+    background-color: #51535f;
+    scale: 0.8;
+    cursor: pointer;
+}
