@@ -751,7 +751,7 @@ function changeLanguage(lang, first=false){
     $($(".selection_info_item_title")[3]).text(textAssets[lang]["stats"]["repsDone"]);
     $(".selection_infoStart_title").text(textAssets[lang]["stats"]["since"]);
 
-    $(".selection_infoStart_value").text(formatDate(parseInt(localStorage.getItem("stats_since"))));
+    $(".selection_infoStart_value").text(formatDate(since));
 
     $(".selection_info_TimeSpent").text($(".selection_info_TimeSpent").text().replace(textAssets[previousLanguage]["misc"]["yearAbbrTimeString"], textAssets[lang]["misc"]["yearAbbrTimeString"]).replace(textAssets[previousLanguage]["misc"]["dayAbbrTimeString"], textAssets[language]["misc"]["dayAbbrTimeString"]));
     $(".selection_info_WorkedTime").text($(".selection_info_WorkedTime").text().replace(textAssets[previousLanguage]["misc"]["yearAbbrTimeString"], textAssets[lang]["misc"]["yearAbbrTimeString"]).replace(textAssets[previousLanguage]["misc"]["dayAbbrTimeString"], textAssets[language]["misc"]["dayAbbrTimeString"]));

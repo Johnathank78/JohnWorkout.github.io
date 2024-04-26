@@ -47,7 +47,7 @@
     <link rel="apple-touch-startup-image" media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/10.2__iPad_portrait.png">
     <link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png">
     <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="./resources/splash_screens/8.3__iPad_Mini_portrait.png">
-        
+
     <link rel="stylesheet" href="./resources/css/FlexReorder.css"/>
 
     <link rel="stylesheet" href="./resources/css/fonts.css"/>
@@ -79,6 +79,52 @@
         }
     </script>
     <script src="./resources/js/jquery.js"></script>
+
+    <script>
+        function checkDeviceMediaQuery() {
+            // Device parameters
+            var screenWidth = window.screen.width;
+            var screenHeight = window.screen.height;
+            var pixelRatio = window.devicePixelRatio;
+            var orientation = (screenWidth > screenHeight) ? 'landscape' : 'portrait';
+
+            // Array to store matched media queries
+            var matchedQueries = [];
+
+            // Loop through each media query
+            document.querySelectorAll('link[rel="apple-touch-startup-image"]').forEach(function(query) {
+                var media = query.media;
+                var mediaParams = media.match(/\((.*?)\)/g);
+
+                // Extract parameters from the media query
+                var queryWidth = parseInt(mediaParams[0].match(/\d+/)[0]);
+                var queryHeight = parseInt(mediaParams[1].match(/\d+/)[0]);
+                var queryPixelRatio = parseFloat(mediaParams[2].match(/\d+/)[0]);
+                var queryOrientation = "portrait";
+
+                // Check if the device matches the media query
+                if (screenWidth === queryWidth && screenHeight === queryHeight && pixelRatio === queryPixelRatio && orientation === queryOrientation) {
+                    matchedQueries.push(query.href);
+                }
+            });
+
+            // Output matched media queries
+            $(".main_title").text(screenWidth + " " +screenHeight + " " +pixelRatio + " " +orientation)
+            
+            if (matchedQueries.length > 0) {
+                console.log("Your device matches the following media queries:");
+                matchedQueries.forEach(function(match) {
+                    console.log(match);
+                });
+            } else {
+                console.log("Your device does not match any of the provided media queries.");
+            }
+        }
+
+        // Call the function when the page loads
+        window.onload = checkDeviceMediaQuery;
+    </script>
+
     <script src="./resources/js/FlexReorder.js"></script>
     
 
