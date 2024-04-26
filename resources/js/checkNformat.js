@@ -106,12 +106,6 @@ function notTargeted(target, classs){
 function unfocusDivs(e){
     if($(e.target).is(".IOSbacker")){return};
 
-    if(notTargeted(e.target, ".update_page, .blurBG") && current_page != "selection" && current_page != "session" && current_page != "import"){
-        if(isEditing){$(isEditing).blur();isEditing = false;return};
-        leave_update();
-        canNowClick();
-    };
-
     if(notTargeted(e.target, ".selection_info_page, .selection_info") && statOpened && (current_page == "selection" || current_page == "session")){
         closePanel("stat");
         canNowClick();

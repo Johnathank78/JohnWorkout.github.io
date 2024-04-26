@@ -1060,7 +1060,7 @@ function timerLaunch(LR){
         $('.session_exercise_Lrest_btn').data("canLongClick", false);
 
         if(autoSaver && LrestTime >= 5){screensaver_toggle(true)};
-        screensaver_set(next_name, LrestTime);
+        screensaver_set(next_name, parseInt(LrestTime));
 
         if(extype != "Pause"){remaining_sets -= 1};
 
@@ -1321,9 +1321,7 @@ function resetTimer(LR){
         screensaver_toggle(false);
     };
 
-    setTimeout(() => {
-        $(".screensaver_"+LR+"textContainer").css("display", "none");
-    }, 125);
+    $(".screensaver_"+LR+"textContainer").css("display", "none");
 };
 
 // DELETION

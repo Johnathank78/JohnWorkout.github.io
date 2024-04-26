@@ -894,4 +894,15 @@ $(document).ready(function(){
 
         manageHomeContainerStyle();
     });
+
+    $(document).on('click', ".main_page", function(e){
+        if(e.target != this){return};
+        if(isEditing){$(isEditing).blur();isEditing = false;return};
+
+        if(notTargeted(e.target, ".update_page", ".blurBG") && ['edit', 'add', 'schedule', 'history', "delete"].includes(current_page)){
+            leave_update();
+            canNowClick("allowed");
+        };
+    })
+
 });//readyEnd

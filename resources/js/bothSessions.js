@@ -177,7 +177,6 @@ async function quit_session(failed=false){
     $(".session_next_exercises_container").css("maxHeight", "calc(19vh - 45px)");
     $(".session_exercise_Lrest_btn, .session_exercise_Rrest_btn").css('opacity', '1');
     
-    fillSessionEnd(failed);
     updateRestBtnStyle('Reset');
     BehindExerciseContainer(true);
 
@@ -227,6 +226,9 @@ async function quit_session(failed=false){
             await uniq_reschedulerSESSION(id);
         };
 
+        // SessionEnd
+
+        fillSessionEnd(failed);
     };
 
     stats_set([timeSpent, workedTime, weightLifted, repsDone, since]);
@@ -654,6 +656,7 @@ function screensaver_toggle(on){
             $(".screensaver_text").text(textAssets[language]["screenSaver"]["saver"]);
             $(".screensaver_Ltimer, .screensaver_Rtimer, .screensaver_Xtimer").text("");
         };
+
         if(platform == "Mobile" && mobile != "IOS"){
             StatusBar.setBackgroundColor({color: black});
         };

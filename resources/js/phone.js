@@ -602,7 +602,7 @@ if(platform == "Mobile"){
     document.addEventListener("visibilitychange", async () => {
         if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
             isIdle = true;
-            pauseApp();
+            pauseAppTest();
         }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
             await resumeApp();
             isIdle = false;

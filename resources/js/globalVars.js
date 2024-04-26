@@ -284,12 +284,12 @@ const textAssets = {
             },
             "subText": {
                 "failed": {
-                    "0": "Frérot, ne lâche pas comme ça, tu en avais encore !",
+                    "0": "Frérot, lâche pas comme ça, tu en avais encore !",
                     "1": "Hé, tu as déjà fais beaucoup mieux, baisse pas les bras !",
                     "2": "Continue à pousser, l'échec n'est qu'une étape vers le succès !",
                     "3": "Tu as trébuché, mais ce n'est pas la fin, relève-toi plus fort !",
                     "4": "L'échec est temporaire, relève-toi et essaie à nouveau !",
-                    "5": "C'est un revers, pas une défaite, continue à progresser !"
+                    "5": "C'est un échec, pas une défaite, continue à progresser !"
                 },
                 "congrats": {
                     "YC": "Tu as complété ",
