@@ -4,7 +4,7 @@
  * Copyright (c) 2023, Avadhesh B.
  * Released under the MIT License.
  */
- //index.js
+
 function iosPWASplash(icon, color = 'white') {
     // Check if the provided 'icon' is a valid URL
     if (typeof icon !== 'string' || icon.length === 0) {
