@@ -326,8 +326,6 @@ function getSessionEndData(){
         };
     };
 
-    console.log(weight)
-
     weight = weight == 0 ? false : Math.round((TempweightLifted - weight) / weight) * 100;
     return [outNumber, time, weight]
 };
@@ -402,7 +400,7 @@ function fillSessionEnd(failed){
             $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["good"][randomTimeMain]);
 
             $($(secondTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["chrono"]["YHB"]);
-            $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(time) + textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["faster"]);
+            $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(time).toString() + textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["faster"]);
             $($(secondTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['TTLT']);
         }else if(time < 0){
             let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
@@ -411,7 +409,7 @@ function fillSessionEnd(failed){
             $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["bad"][randomTimeMain]);
 
             $($(secondTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["chrono"]["YHB"]);
-            $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(time) + textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["slower"]);
+            $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(time).toString() + textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["slower"]);
             $($(secondTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['TTLT']);
         }else{
             let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["even"]).length
@@ -433,7 +431,7 @@ function fillSessionEnd(failed){
             $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["weight"]["good"][randomWeightMain]);
 
             $($(thirdTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $($(thirdTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(weight) + textAssets[language]["sessionEnd"]["interestWord"]["weight"]["more"]);
+            $($(thirdTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(weight).toString() + textAssets[language]["sessionEnd"]["interestWord"]["weight"]["more"]);
             $($(thirdTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['TTLT']);
         }else if(weight < 0){
             let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
@@ -442,7 +440,7 @@ function fillSessionEnd(failed){
             $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["weight"]["bad"][randomWeightMain]);
 
             $($(thirdTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $($(thirdTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(weight) + textAssets[language]["sessionEnd"]["interestWord"]["weight"]["less"]);
+            $($(thirdTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(weight).toString() + textAssets[language]["sessionEnd"]["interestWord"]["weight"]["less"]);
             $($(thirdTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['TTLT']);
         }else{
             let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["even"]).length

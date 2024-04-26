@@ -145,7 +145,7 @@ const textAssets = {
                 "Bi." : "Bilatéral",
                 "Uni.": "Unilatéral",
                 "Int.": "Intervalle",
-                "Wrm.": "Echauff",
+                "Wrm.": "Echauff.",
                 "Pause": 'Pause'
             }
         },
@@ -233,84 +233,6 @@ const textAssets = {
             "read": "Permission de lecture refusée",
             "write": "Permission d'écriture refusée",
             "audioBroken": "Contrôle du son non disponible"
-        },
-        "sessionEnd": {
-            "mainText": {
-                "congrats": "Félicitation !",
-                "failed": "Quel échec !",
-                "chrono": {
-                    "good": {
-                        "0": "Si rapide !",
-                        "1": "Impressionnant !",
-                        "2": "Flash c'est vous ?",
-                    },
-                    "even": {
-                        "0": "Comme d'habitude",
-                        "1": "Tu es constant",
-                        "2": "Normal"
-                    },
-                    "bad": {
-                        "0": "Pas ton meilleur",
-                        "1": "Tu as fais mieux",
-                        "2": "T'es mou chef"
-                    }
-                },
-                "weight": {
-                    "good": {
-                        "0": "Si fort !",
-                        "1": "Puissance pure !",
-                        "2": "Qui te peux ?"
-                    },
-                    "even": {
-                        "0": "Rien de fou",
-                        "1": "Plutôt banal",
-                        "2": "Pas mal !"
-                    },
-                    "bad": {
-                        "0": "Tu te sens faible ?",
-                        "1": "Ne néglige pas le repos",
-                        "2": "La prochaine !"
-                    }
-                },
-            },
-            "subText": {
-                "failed": {
-                    "0": "Frérot, ne lâche pas comme ça, tu en avais encore !",
-                    "1": "Hé, tu as déjà fais beaucoup mieux, baisse pas les bras !",
-                    "2": "Continue à pousser, l'échec n'est qu'une étape vers le succès !",
-                    "3": "Tu as trébuché, mais ce n'est pas la fin, relève-toi plus fort !",
-                    "4": "L'échec est temporaire, relève-toi et essaie à nouveau !",
-                    "5": "C'est un revers, pas une défaite, continue à progresser !"
-                },
-                "congrats": {
-                    "YC": "Tu as complété ",
-                    "FT": " pour la ",
-                    "T": " fois"
-                },
-                "chrono": {
-                    "YHB": "Tu as été ",
-                    "YT": "Tu as pris "
-                },
-                "weight":{
-                    "YHL": "Tu as soulevé ",
-                }
-            },
-            "interestWord": {
-                "chrono": {
-                    "faster": "% plus rapide",
-                    "slower": "% plus lent",
-                    "even": "autant de temps"
-                },
-                "weight": {
-                    "more": "% plus lourd",
-                    "less": "% plus léger",
-                    "even": "autant"
-                }
-            },
-            "common": {
-                "TTLT": ' que la fois dernière',
-                "ATLT": ' que la fois dernière'
-            }
         }
     },
     "english": {
@@ -531,83 +453,6 @@ const textAssets = {
             "read": "Read permission error",
             "write": "Write permission error",
             "audioBroken": "Sound control not available"
-        },
-        "sessionEnd": {
-            "mainText": {
-                "congrats": "Congrats !",
-                "failed": "Failed",
-                "chrono": {
-                    "good": {
-                        "0": "So fast !",
-                        "1": "Impressive speed !",
-                        "2": "Lightning fast !",
-                    },
-                    "even": {
-                        "0": "As usual",
-                        "1": "Steady as always",
-                        "2": "You do you"
-                    },
-                    "bad": {
-                        "0": "Not your best",
-                        "1": "You've done better",
-                        "2": "Slower than usual"
-                    }
-                },
-                "weight": {
-                    "good": {
-                        "0": "So strong !",
-                        "1": "Unbelievably mighty !",
-                        "2": "Big boy !"
-                    },
-                    "even": {
-                        "0": "Nothing crazy",
-                        "1": "Fairly typical",
-                        "2": "Not bad !"
-                    },
-                    "bad": {
-                        "0": "Feeling weak ?",
-                        "1": "Don't forget to rest",
-                        "2": "Better next time !"
-                    }
-                },
-            },
-            "subText": {
-                "failed": {
-                    "0": "Bro, don't give up like that, you've got more in you!",
-                    "1": "Hey, that's not your best effort, you've got this!",
-                    "2": "Keep pushing, failure is just a step towards success!",
-                    "3": "You've stumbled, but it's not the end, rise up stronger!",
-                    "4": "Failure is temporary, get back up and give it another shot!",
-                    "5": "It's a setback, not defeat, keep striving for progress!"
-                },
-                "congrats": {
-                    "YC": "You completed ",
-                    "FT": " for the ",
-                    "T": " time"
-                },
-                "chrono": {
-                    "YHB": "You have been ",
-                    "YT": "You took "
-                },
-                "weight":{
-                    "YHL": "You have lifted ",
-                }
-            },
-            "interestWord": {
-                "chrono": {
-                    "faster": "% faster",
-                    "slower": "% slower",
-                    "even": "as long"
-                },
-                "weight": {
-                    "more": "% heavier",
-                    "even": "as much"
-                }
-            },
-            "common": {
-                "TTLT": ' than the last time',
-                "ATLT": ' as the last time'
-            }
         }
     }
 };
