@@ -307,11 +307,14 @@ $(document).ready(function(){
         $(this).parent().find("input").click();
     });
 
-    $('#folder').on('change', function(){
+    $('#folder').on('click', function(){
         current_page = "import"
+        $(".selection_saveLoad_btn_submit").text(textAssets[language]["preferences"]["import"]);
         closePanel('parameters');
         showBlurPage('selection_saveLoad_page');
+    });
 
+    $('#folder').on('change', function(){
         for(let i=0; i<localFiles.length;i++){
             if(localFiles[i].name == "session_list.txt"){
                 $(".selection_saveLoad_btn_submit").css('display', 'flex');
