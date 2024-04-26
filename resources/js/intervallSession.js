@@ -70,7 +70,7 @@ function intervall(from_wo = false){
                     TempworkedTime += iWork_time;
                     TemprepsDone += iWork_time/2.1;
 
-                    stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone]);
+                    stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
 
                     if(!from_wo && iCurrent_cycle != 0){
                         udpate_recovery("intervall", iCurrent_cycle);

@@ -37,8 +37,8 @@ function leave_update(){
         };
 
     }else if(current_page == "history"){
-        stats_save([timeSpent, workedTime, weightLifted, repsDone]);
-        stats_set([timeSpent, workedTime, weightLifted, repsDone]);
+        stats_save([timeSpent, workedTime, weightLifted, repsDone, since]);
+        stats_set([timeSpent, workedTime, weightLifted, repsDone, since]);
         session_save(session_list);
         rzinp_observer.disconnect();
     };

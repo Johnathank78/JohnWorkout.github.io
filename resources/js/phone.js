@@ -151,7 +151,7 @@ async function resumeApp(){
 
             TempworkedTime += iWork_time;
             TemprepsDone += iWork_time/2.1;
-            stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone]);
+            stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
 
             if(!extype && iCurrent_cycle != 0){
                 udpate_recovery("intervall", iCurrent_cycle);

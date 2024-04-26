@@ -145,7 +145,7 @@ const textAssets = {
                 "Bi." : "Bilatéral",
                 "Uni.": "Unilatéral",
                 "Int.": "Intervalle",
-                "Wrm.": "Echauff",
+                "Wrm.": "Echauffement",
                 "Pause": 'Pause'
             }
         },

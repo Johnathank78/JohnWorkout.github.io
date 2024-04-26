@@ -83,7 +83,7 @@ async function launchSession(index){
 
             tempCurrent_cycle = parseInt(current_session[4]);
 
-            stats_set([0,0,0,0]);
+            stats_set([0,0,0,0,since]);
         };
 
         $('.session_workout_footer').css("display", "none");
@@ -141,7 +141,7 @@ async function launchSession(index){
             TempweightLifted = 0;
             TemprepsDone = 0;
 
-            stats_set([0,0,0,0]);
+            stats_set([0,0,0,0,since]);
 
             tempNewHistory = [Date.now(), 0, []];
         };

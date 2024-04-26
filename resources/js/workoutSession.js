@@ -1467,7 +1467,7 @@ function undoMemorise(way){
         $('.Rrest').text(undoData[1]['RrestLib']);
 
         update_info(false, true);
-        stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone]);
+        stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
         $(".session_workout_remaining_sets").text(remaining_sets);
         $('.session_next_exercises_container').html(undoData[0]);
 
@@ -1514,7 +1514,7 @@ $(document).ready(function(){
 
                 TempworkedTime += (reps*2.1);
 
-                stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone]);
+                stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
             };
 
             udpate_recovery("workout");
@@ -1571,7 +1571,7 @@ $(document).ready(function(){
 
             TempworkedTime += (reps*2.1);
 
-            stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone]);
+            stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
 
             udpate_recovery("workout");
         };
