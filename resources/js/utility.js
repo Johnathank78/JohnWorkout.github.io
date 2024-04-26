@@ -277,10 +277,10 @@ function getSmallesRest(){
 };
 
 function showBlurPage(className){
-    $(".blurBG").children(':not(.'+className+')').css('display', 'none')
-    $('.'+className+'').css("display", 'flex')
+    $(".blurBG").children(':not(.'+className+')').css('display', 'none');
+    $('.'+className+'').css("display", 'flex');
     $(".blurBG").css("display", "flex");
-}
+};
 
 // History
 

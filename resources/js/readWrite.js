@@ -99,7 +99,7 @@ $(document).ready(function(){
                 $(".selection_saveLoad_btn_submit").text(textAssets[language]["preferences"]["export"]);
                 $('.selection_saveLoad_emptyMsg').css('display', 'none');
 
-                $(".selection_parameters").click();
+                closePanel('parameters');
 
                 $(".selection_saveLoad_btn_submit").css('display', 'flex');
                 $(".selection_saveLoad_headerText").css('display', 'inline-block');
@@ -149,11 +149,11 @@ $(document).ready(function(){
                         $('.selection_saveLoad_emptyMsg').css('display', 'none');
                     };
 
-                    $(".selection_parameters").click();
+                    closePanel('parameters');
                     showBlurPage('selection_saveLoad_page');
                 }else if(platform == "Web"){
 
-                    $(".selection_parameters").click();
+                    closePanel('parameters');
                     showBlurPage('selection_saveLoad_page');
 
                     $("#folder").click();
