@@ -1086,7 +1086,8 @@
 }
 
 .update_schedule_select_day{
-    width: 105.84px;
+    width: calc(100% - 24px);
+    padding: 0 12px;
 }
 
 .update_schedule_fline_sblock{

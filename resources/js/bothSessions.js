@@ -365,7 +365,8 @@ function fillSessionEnd(failed){
             $(firstTile).css('display', 'flex');
             $(secondTile).css('display', 'flex');
             $(thirdTile).css('display', 'none');
-
+            
+            $('.selection_sessionFinished').css('paddingBottom', '45px');
             $('.selection_sessionFinished_navigator_indicator:last').css('display', 'none');
             $('.selection_sessionFinished_navigator').css('display', 'flex');
         }else{
