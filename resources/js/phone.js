@@ -259,7 +259,8 @@ async function sendWebNotification(title, body, time){
     if(haveWebNotificationsBeenAccepted){
         setTimeout(() => {
             activeNotification = new Notification(title, {
-                body: body
+                body: body,
+                icon: './resources/imgs/appLogo.png'
             });
         }, time);
     };
@@ -286,7 +287,7 @@ async function pauseAppTest(){
     if(ongoing == "intervall" && !paused){
         if(intervall_state == 2){
             currentSide = "I";
-            start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
+            start = (iRest_time - Ispent) * 1000;
             title = textAssets[language]["notification"]["restOver"];
             body = textAssets[language]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
 
@@ -305,7 +306,7 @@ async function pauseAppTest(){
 
         if(Xtimer){
             currentSide = "X";
-            start = new Date(Date.now() + ((restDat - Xspent) * 1000));
+            start = (restDat - Xspent) * 1000;
             title = textAssets[language]["notification"]["xRestOver"];
             body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -315,7 +316,7 @@ async function pauseAppTest(){
         if(extype == "Bi"){
             if(Ltimer){
                 currentSide += "L";
-                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+                start = (LrestTime - Lspent) * 1000;
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -332,11 +333,11 @@ async function pauseAppTest(){
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
                 if(mini == textAssets[language]["misc"]["leftInitial"]){
-                    start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+                    start = (LrestTime - Lspent) * 1000;
 
                     sendWebNotification(title, body, start);
                 }else if(mini == textAssets[language]["misc"]["rightInitial"]){
-                    start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
+                    start = (RrestTime - Rspent) * 1000;
 
                     sendWebNotification(title, body, start);
                 }
@@ -344,7 +345,7 @@ async function pauseAppTest(){
                 currentSide += "L";
                 nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["rightInitial"];
 
-                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+                start = (LrestTime - Lspent) * 1000;
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -353,7 +354,7 @@ async function pauseAppTest(){
                 currentSide += "R";
                 nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["leftInitial"];
 
-                start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
+                start = (RrestTime - Rspent) * 1000;
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -361,7 +362,7 @@ async function pauseAppTest(){
             }
         }else if(extype == "Pause"){
             currentSide += "L";
-            start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+            start = (LrestTime - Lspent) * 1000;
             title = textAssets[language]["notification"]["breakOver"];
             body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
