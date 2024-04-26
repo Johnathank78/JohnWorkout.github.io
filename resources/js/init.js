@@ -76,6 +76,5 @@ $(document).ready(function(){
     reminder_reorder = new FlexReorder($(".selection_reminder_container")[0]);
     exercise_reorder = new FlexReorder($(".update_exercice_container")[0]);
     sets_reorder = new FlexReorder($(".session_next_exercises_container")[0]);
-
     // TEMP HOT FIX
 });//readyEnd

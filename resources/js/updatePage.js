@@ -186,7 +186,7 @@ $(document).ready(function(){
         let speed = parseInt(($(".update_exercice_container").prop('scrollHeight') - $(".update_exercice_container").scrollTop()))/1410*700;
 
         $(".update_exercice_container").animateFullScrollDown(speed, () => {
-            $(".update_exercice_container").animateAppend(pause_tile(), 45, -55, 350, false);
+            $(".update_exercice_container").animateAppend(pause_tile(), 50, -55, 350, false);
 
             let scrollInterval = setInterval(() => {
                 $(".update_exercice_container").scrollTop($(".update_exercice_container").prop('scrollHeight'));

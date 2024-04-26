@@ -237,17 +237,15 @@ function get_session_stats(session){
     for(let i=0;i<session[2].length;i++){
         
         type = session[2][i][0];
+        item = session[2][i];
         
         if(type == "Pause"){continue};
-        
-        item = session[2][i];
-        roundedWeight = unitRound(item[4]);
-
         if(type == "Int."){
-            repsDone += roundedWeight * (item[2] / 2.1);
-            workedTime += roundedWeight * item[2];
+            repsDone += parseInt(item[4]) * (time_unstring(item[2]) / 2.1);
+            workedTime += parseInt(item[4]) * time_unstring(item[2]);
         }else if(type == "Bi."){
-            reps = item[2] * item[3];
+            roundedWeight = unitRound(item[4]);
+            reps = parseInt(item[2]) * parseInt(item[3]);
             if(session[2][i][1].includes("Alt.")){
                 repsDone += 2 * reps;
                 workedTime += reps * 2.1;
@@ -258,7 +256,8 @@ function get_session_stats(session){
                 weightLifted += reps * roundedWeight;
             };
         }else if(type == "Uni."){
-            reps = item[2] * item[3];
+            roundedWeight = unitRound(item[4]);
+            reps = parseInt(item[2]) * parseInt(item[3]);
             repsDone += reps;
             workedTime += reps * 2.1;
             weightLifted += reps * roundedWeight;
