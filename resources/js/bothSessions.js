@@ -326,6 +326,8 @@ function getSessionEndData(){
         };
     };
 
+    console.log(weight)
+
     weight = weight == 0 ? false : Math.round((TempweightLifted - weight) / weight) * 100;
     return [outNumber, time, weight]
 };
