@@ -1,12 +1,13 @@
 {
   "name": "JohnWorkout",
-  "short_name": "Workout",
+  "short_name": "Workouts",
   "description": "Musculation WebApp",
   "start_url": "/JohnWorkout.github.io/index.html",
   "display_override": ["fullscreen", "minimal-ui"],
   "display": "standalone",
   "background_color": "#1F1C2D",
   "theme_color": "#1F1C2D",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/JohnWorkout.github.io/resources/imgs/appLogo.png",
