@@ -10,10 +10,6 @@ $(document).ready(function(){
             }else{
                 $(".main_page").mousedown();
             };
-        }else if(e.which === 27){
-            //current_session = session_list[0];
-            //current_history = getSessionHistory(current_session)
-            //fillSessionEndCheck(false, 26, current_history[current_history.length - 1][1]/2, get_session_stats(current_session)[1] - 50)
         };
     });
 

@@ -5,6 +5,8 @@ var isIdle = false;
 var haveWebNotificationsBeenAccepted = false;
 var activeNotification = false;
 
+//var notificationWorker = new Worker('./resources/js/notificationWorker.js');
+
 function goBack(platform){
     if(current_page == "selection"){
         if(add_state){
@@ -222,39 +224,6 @@ async function resumeApp(){
     };
 };
 
-async function pauseApp(){
-    backgroundTimestamp = new Date().getTime();
-    currentSide = "";
-
-    if(ongoing == "intervall" && !paused){
-        if(intervall_state == 2){
-            currentSide = "I";
-        }else if(intervall_state == 1){
-            currentSide = "W";
-        };
-    }else if(ongoing == "workout"){
-        if(Xtimer){
-            currentSide = "X";
-        };
-
-        if(extype == "Bi"){
-            if(Ltimer){
-                currentSide += "L";
-            };
-        }else if(extype == "Uni"){
-            if(Ltimer && Rtimer){
-                currentSide += "LR";
-            }else if(Ltimer){
-                currentSide += "L";
-            }else if(Rtimer){
-                currentSide += "R";
-            };
-        }else if(extype == "Pause"){
-            currentSide += "L";
-        };
-    };
-};
-
 async function sendWebNotification(title, body, time){
     if(haveWebNotificationsBeenAccepted){
         setTimeout(() => {
@@ -272,7 +241,7 @@ function closeActiveNotification(){
     };
 };
 
-async function pauseAppTest(){
+async function pauseApp(){
     closeActiveNotification();
 
     isIdle = true;
@@ -294,7 +263,7 @@ async function pauseAppTest(){
             sendWebNotification(title, body, start);
         }else if(intervall_state == 1){
             currentSide = "W";
-            start = new Date(Date.now() + ((iWork_time - Ispent) * 1000));
+            start = (iWork_time - Ispent) * 1000;
             title = textAssets[language]["notification"]["workOver"];
             body = textAssets[language]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
 
@@ -602,7 +571,7 @@ if(platform == "Mobile"){
     document.addEventListener("visibilitychange", async () => {
         if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
             isIdle = true;
-            pauseAppTest();
+            pauseApp();
         }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
             await resumeApp();
             isIdle = false;
