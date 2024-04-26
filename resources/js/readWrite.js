@@ -156,7 +156,7 @@ $(document).ready(function(){
                     closePanel('parameters');
                     showBlurPage('selection_saveLoad_page');
 
-                    $("#folder").click();
+                    $("#folder").trigger("click");
 
                     const eventPromise = new Promise((resolve) => {
                         const onChange = async function(event) {
