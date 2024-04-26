@@ -291,14 +291,14 @@ async function pauseAppTest(){
             title = textAssets[language]["notification"]["restOver"];
             body = textAssets[language]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
 
-            sendWebNotification(title, body, time);
+            sendWebNotification(title, body, start);
         }else if(intervall_state == 1){
             currentSide = "W";
             start = new Date(Date.now() + ((iWork_time - Ispent) * 1000));
             title = textAssets[language]["notification"]["workOver"];
             body = textAssets[language]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
 
-            sendWebNotification(title, body, time);
+            sendWebNotification(title, body, start);
         }
     }else if(ongoing == "workout"){
 
@@ -310,7 +310,7 @@ async function pauseAppTest(){
             title = textAssets[language]["notification"]["xRestOver"];
             body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-            sendWebNotification(title, body, time);
+            sendWebNotification(title, body, start);
         }
 
         if(extype == "Bi"){
@@ -320,7 +320,7 @@ async function pauseAppTest(){
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-                sendWebNotification(title, body, time);
+                sendWebNotification(title, body, start);
             }
         }else if(extype == "Uni"){
             if(Ltimer && Rtimer){
@@ -335,11 +335,11 @@ async function pauseAppTest(){
                 if(mini == textAssets[language]["misc"]["leftInitial"]){
                     start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
 
-                    sendWebNotification(title, body, time);
+                    sendWebNotification(title, body, start);
                 }else if(mini == textAssets[language]["misc"]["rightInitial"]){
                     start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
 
-                    sendWebNotification(title, body, time);
+                    sendWebNotification(title, body, start);
                 }
             }else if(Ltimer){
                 currentSide += "L";
@@ -349,7 +349,7 @@ async function pauseAppTest(){
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-                sendWebNotification(title, body, time);
+                sendWebNotification(title, body, start);
             }else if(Rtimer){
                 currentSide += "R";
                 nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["leftInitial"];
@@ -358,7 +358,7 @@ async function pauseAppTest(){
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-                sendWebNotification(title, body, time);
+                sendWebNotification(title, body, start);
             }
         }else if(extype == "Pause"){
             currentSide += "L";
@@ -366,7 +366,7 @@ async function pauseAppTest(){
             title = textAssets[language]["notification"]["breakOver"];
             body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-            sendWebNotification(title, body, time);
+            sendWebNotification(title, body, start);
         };
     };
 };
