@@ -152,6 +152,9 @@ $(document).ready(function(){
                     showBlurPage('selection_saveLoad_page');
                 }else if(platform == "Web"){
 
+                    closePanel('parameters');
+                    showBlurPage('selection_saveLoad_page');
+                    
                     $("#folder").click();
 
                     const eventPromise = new Promise((resolve) => {
@@ -194,9 +197,6 @@ $(document).ready(function(){
                             $('.selection_saveLoad_emptyMsg').css('display', 'none');
                         };
                     };
-
-                    closePanel('parameters');
-                    showBlurPage('selection_saveLoad_page');
                 };
             };
         };
