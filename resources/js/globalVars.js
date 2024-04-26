@@ -236,40 +236,49 @@ const textAssets = {
         },
         "sessionEnd": {
             "mainText": {
-                "congrats": "Félicitation !",
-                "failed": "Quel échec !",
+                "congrats": "Félicitations !",
+                "failed": "Quel échec",
                 "chrono": {
                     "good": {
                         "0": "Si rapide !",
                         "1": "Impressionnant !",
-                        "2": "Flash c'est vous ?",
+                        "2": "Flash, c'est vous ?",
+                        "3": "Ça fuse !"
                     },
                     "even": {
                         "0": "Comme d'habitude",
                         "1": "Tu es constant",
-                        "2": "Normal"
+                        "2": "Normal",
+                        "3": "Une formalité"
                     },
                     "bad": {
                         "0": "Pas ton meilleur",
-                        "1": "Tu as fais mieux",
-                        "2": "T'es mou chef"
+                        "1": "Tu as fait mieux",
+                        "2": "T'es mou chef",
+                        "3": "Ressaisis toi !",
+                        "4": "Ménage-toi un peu"
                     }
                 },
                 "weight": {
                     "good": {
                         "0": "Si fort !",
                         "1": "Puissance pure !",
-                        "2": "Qui te peux ?"
+                        "2": "Qui te peut ?",
+                        "3": "Dwayne !?",
+                        "4": "Monstrueux !",
+                        "5": "Une machine !"
                     },
                     "even": {
                         "0": "Rien de fou",
                         "1": "Plutôt banal",
-                        "2": "Pas mal !"
+                        "2": "Pas mal !",
+                        "3": "Consistant"
                     },
                     "bad": {
                         "0": "Tu te sens faible ?",
                         "1": "Pense à te reposer",
-                        "2": "La prochaine !"
+                        "2": "La prochaine !",
+                        "3": "Ça arrive"
                     }
                 },
             },
@@ -534,40 +543,48 @@ const textAssets = {
         },
         "sessionEnd": {
             "mainText": {
-                "congrats": "Congrats !",
+                "congrats": "Congratulations !",
                 "failed": "Failed",
                 "chrono": {
                     "good": {
                         "0": "So fast !",
                         "1": "Impressive speed !",
                         "2": "Lightning fast !",
+                        "3": "Blazing speed!"
                     },
                     "even": {
                         "0": "As usual",
                         "1": "Steady as always",
-                        "2": "You do you"
+                        "2": "You do you",
+                        "3": "On track"
                     },
                     "bad": {
                         "0": "Not your best",
                         "1": "You've done better",
-                        "2": "Slower than usual"
+                        "2": "Slower than usual",
+                        "3": "Time to hustle!"
                     }
                 },
                 "weight": {
                     "good": {
                         "0": "So strong !",
-                        "1": "Unbelievably mighty !",
-                        "2": "Big boy !"
+                        "1": "Superb gains !",
+                        "2": "Big boy !",
+                        "3": "Litteral beast !",
+                        "4": "Muscle machine",
+                        "5": "Dwayne !?"
                     },
                     "even": {
                         "0": "Nothing crazy",
                         "1": "Fairly typical",
-                        "2": "Not bad !"
+                        "2": "Not bad !",
+                        "3": "Steady as a rock"
                     },
                     "bad": {
                         "0": "Feeling weak ?",
                         "1": "Don't forget to rest",
-                        "2": "Better next time !"
+                        "2": "Better next time !",
+                        "3": "Take it easy champ" 
                     }
                 },
             },

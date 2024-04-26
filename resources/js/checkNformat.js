@@ -74,6 +74,7 @@ function closePanel(src, notAnimated=false){
         current_page = "selection";
         if(platform == "Web"){$("#folder").val("")};
         $('.blurBG').css('display', 'none');
+        canNowClick('allowed')
     }else if(src == "congrats"){
         congrats_shown = false;
         canNowClick();

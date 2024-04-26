@@ -285,7 +285,7 @@ function getSessionEndData(){
     let number = current_history[0][2] + 1;
     let outNumber = "";
     let time = 0;
-    let timeFactor = 0;
+    let performanceGrowth = 0;
     let weight = 0;
 
     if(language == "french"){
@@ -310,15 +310,17 @@ function getSessionEndData(){
         return [outNumber, false, false]
     };
     
-    timeFactor = current_history[current_history.length - 1][1] / TemptimeSpent;
-
-    if(TemptimeSpent == 0){
-        time = -100;
-    }else if(timeFactor < 1){
-        time = Math.round(((1 / timeFactor) - 1) * 100);
-    }else{
-        time = Math.round((timeFactor - 1) * 100);
+    if (current_history[current_history.length - 1][1] === 0) {
+        if (TemptimeSpent === 0) {
+            performanceGrowth = 0;
+        } else {
+            performanceGrowth = 100;
+        }
+    } else {
+        performanceGrowth = Math.round(((current_history[current_history.length - 1][1] - TemptimeSpent) / current_history[current_history.length - 1][1]) * 100);
     };
+    
+    time = Math.max(Math.min(performanceGrowth, Infinity), -100);
 
     for(const exo of current_history[current_history.length - 1][2]){
         for (const set of exo[2]) {
@@ -417,7 +419,7 @@ function fillSessionEnd(failed){
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
             $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["even"][randomTimeMain]);
 
-            $($(secondTile).find('.selection_sessionFinished_subTextPart')[0]).text();
+            $($(secondTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["chrono"]['YT']);
             $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["even"]);
             $($(secondTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['ATLT']);
         };

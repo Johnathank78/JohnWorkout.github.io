@@ -1980,10 +1980,5 @@ $(document).ready(function(){
         showBlurPage('session_remaining_page');
     });
 
-    $(document).on("click", ".session_remainingBG", function(e){
-        if(!$(e.target).is(this)){return};
-        $('.session_remainingBG').css("display", "none");
-    });
-
     $(".session_workout_Xtimer").text(get_time(restDat));
 });//readyEnd

@@ -99,19 +99,19 @@ $(document).ready(function(){
                 $(".selection_saveLoad_btn_submit").text(textAssets[language]["preferences"]["export"]);
                 $('.selection_saveLoad_emptyMsg').css('display', 'none');
 
-                closePanel('parameters');
 
                 $(".selection_saveLoad_btn_submit").css('display', 'flex');
                 $(".selection_saveLoad_headerText").css('display', 'inline-block');
 
-                $('#selection_saveLoad_pa, #selection_saveLoad_sl, #selection_saveLoad_rl, #selection_saveLoad_st').parent().css('display', 'flex');
-                showBlurPage('selection_saveLoad_page');
+                $(".selection_saveLoad_page").children(":not(.selection_saveLoad_emptyMsg)").css('display', 'flex');
 
+                closePanel('parameters');
+                showBlurPage('selection_saveLoad_page');
             }else if($(this).text() == textAssets[language]["preferences"]["import"]){
 
                 $(".selection_saveLoad_btn_submit").text(textAssets[language]["preferences"]["import"]);
 
-                $(".selection_saveLoad_page").children().css("display", "none");
+                $(".selection_saveLoad_page").children(":not(.selection_saveLoad_emptyMsg)").css('display', 'none');
                 $('.selection_saveLoad_emptyMsg').css('display', 'inline-block');
 
                 if(platform == "Mobile"){
@@ -122,7 +122,6 @@ $(document).ready(function(){
 
                         $('#selection_saveLoad_sl').parent().css('display', 'flex');
                         $('.selection_saveLoad_emptyMsg').css('display', 'none');
-
                     };
 
                     if(await fileExists("Workout", "reminder_list.txt")){
@@ -152,7 +151,52 @@ $(document).ready(function(){
                     closePanel('parameters');
                     showBlurPage('selection_saveLoad_page');
                 }else if(platform == "Web"){
-                    //test
+
+                    $("#folder").click();
+
+                    const eventPromise = new Promise((resolve) => {
+                        const onChange = async function(event) {
+                            localFiles = event.target.files;
+                            resolve(event);
+                        };
+
+                        $("#folder").off().on("change", onChange);
+                    });
+
+                    await eventPromise;
+                    for(let i=0; i<localFiles.length;i++){
+                        if(localFiles[i].name == "session_list.txt"){
+                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                            $('#selection_saveLoad_sl').parent().css('display', 'flex');
+                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
+                        };
+                        if(localFiles[i].name == "reminder_list.txt"){
+                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                            $('#selection_saveLoad_rl').parent().css('display', 'flex');
+                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
+                        };
+                        if(localFiles[i].name == "parameters.txt"){
+                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                            $('#selection_saveLoad_pa').parent().css('display', 'flex');
+                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
+                        };
+                        if(localFiles[i].name == "stats.txt"){
+                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                            $('#selection_saveLoad_st').parent().css('display', 'flex');
+                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
+                        };
+                    };
+
+                    closePanel('parameters');
+                    showBlurPage('selection_saveLoad_page');
                 };
             };
         };
@@ -306,44 +350,4 @@ $(document).ready(function(){
     $(document).on("click", '.selection_saveLoad_itemText', function(){
         $(this).parent().find("input").click();
     });
-
-    $('#folder').on('click', function(){
-        current_page = "import"
-        $(".selection_saveLoad_btn_submit").text(textAssets[language]["preferences"]["import"]);
-        closePanel('parameters');
-        showBlurPage('selection_saveLoad_page');
-    });
-
-    $('#folder').on('change', function(){
-        for(let i=0; i<localFiles.length;i++){
-            if(localFiles[i].name == "session_list.txt"){
-                $(".selection_saveLoad_btn_submit").css('display', 'flex');
-                $(".selection_saveLoad_headerText").css('display', 'inline-block');
-
-                $('#selection_saveLoad_sl').parent().css('display', 'flex');
-                $('.selection_saveLoad_emptyMsg').css('display', 'none');
-            };
-            if(localFiles[i].name == "reminder_list.txt"){
-                $(".selection_saveLoad_btn_submit").css('display', 'flex');
-                $(".selection_saveLoad_headerText").css('display', 'inline-block');
-
-                $('#selection_saveLoad_rl').parent().css('display', 'flex');
-                $('.selection_saveLoad_emptyMsg').css('display', 'none');
-            };
-            if(localFiles[i].name == "parameters.txt"){
-                $(".selection_saveLoad_btn_submit").css('display', 'flex');
-                $(".selection_saveLoad_headerText").css('display', 'inline-block');
-
-                $('#selection_saveLoad_pa').parent().css('display', 'flex');
-                $('.selection_saveLoad_emptyMsg').css('display', 'none');
-            };
-            if(localFiles[i].name == "stats.txt"){
-                $(".selection_saveLoad_btn_submit").css('display', 'flex');
-                $(".selection_saveLoad_headerText").css('display', 'inline-block');
-
-                $('#selection_saveLoad_st').parent().css('display', 'flex');
-                $('.selection_saveLoad_emptyMsg').css('display', 'none');
-            };
-        };
-    })
 });//readyEnd

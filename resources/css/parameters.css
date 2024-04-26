@@ -226,14 +226,7 @@
 }
 
 #folder{
-    position: absolute;
-    opacity: 0;
-    width: 50%;
-    height: 98%;
-    right: 0;
-    top: 0;
-
-    cursor: pointer;
+    display: none;
 }
 
 .selection_parameters_saveLoad_btn:active{
