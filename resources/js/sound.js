@@ -79,14 +79,14 @@ function audioMouseDownHandler() {
     beepPlayer = constructPlayer(beepPath, 1000);
     beep2x3Player =  constructPlayer(beep2x3Path, 1000);
     
-    it(isWebMobile){
+    if(isWebMobile){
         $(document).off("touchstart", audioMouseDownHandler);
     }else{
         $(document).off("mousedown", audioMouseDownHandler);
     };
 };
 
-it(isWebMobile){
+if(isWebMobile){
     $(document).on("touchstart", audioMouseDownHandler);
 }else{
     $(document).on("mousedown", audioMouseDownHandler);
