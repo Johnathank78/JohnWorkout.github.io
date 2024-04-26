@@ -7,7 +7,7 @@ async function writeToFile(data, folderName, fileName) {
 
         if (permission.publicStorage !== 'granted') {
             bottomNotification("write", "");
-            console.log('L\'autorisation est refusée.');
+            console.log('L\'autorisation est refusÃ©e.');
             return;
         };
 
@@ -37,7 +37,7 @@ async function readFromFile(folderName, fileName) {
 
         if (permission.publicStorage !== 'granted') {
             bottomNotification("read", "")
-            console.log('L\'autorisation est refusée.');
+            console.log('L\'autorisation est refusÃ©e.');
             return
         }
 

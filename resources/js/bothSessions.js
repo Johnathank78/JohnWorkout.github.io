@@ -292,7 +292,7 @@ function getSessionEndData(){
         if(number == 1){
             outNumber = "1er";
         }else{
-            outNumber = number.toString() + "ème";
+            outNumber = number.toString() + "Ã¨me";
         };
     }else if(language == "english"){
         if(number == 1){

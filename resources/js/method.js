@@ -202,9 +202,9 @@ jQuery.fn.animateFullScrollUp = function(duration, callback) {
     let startTime = null;
     const element = this;
     const startScrollTop = element.scrollTop();
-    const endScrollTop = 0; // Cible pour le défilement vers le haut
+    const endScrollTop = 0; // Cible pour le dÃ©filement vers le haut
 
-    // Fonction d'assouplissement, similaire à celle utilisée pour le défilement vers le bas
+    // Fonction d'assouplissement, similaire Ã  celle utilisÃ©e pour le dÃ©filement vers le bas
     const easeInOutQuad = (t, b, c, d) => {
         t /= d / 2;
         if (t < 1) return c / 2 * t * t + b;

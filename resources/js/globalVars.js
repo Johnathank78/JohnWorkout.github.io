@@ -58,16 +58,16 @@ const textAssets = {
             "submit": "Confirmer"
         },
         "stats": {
-            "timeSpent" : "Temps en séance",
+            "timeSpent" : "Temps en sÃ©ance",
             "workedTime" : "Temps sous tension",
-            "weightLifted" : "Charge soulevée",
-            "repsDone" : "Répétitions effectuées",
+            "weightLifted" : "Charge soulevÃ©e",
+            "repsDone" : "RÃ©pÃ©titions effectuÃ©es",
             "since" : "Depuis le",
         },
         "preferences": {
-            "preferences": "Paramètres",
+            "preferences": "ParamÃ¨tres",
             "language": "Langue",
-            "weightUnit": "Unité de charge",
+            "weightUnit": "UnitÃ© de charge",
             "notifBefore": "Avance notification",
             "keepHistory": "Garder l'historique",
             "forEver" : "Toujours",
@@ -76,7 +76,7 @@ const textAssets = {
             "tMonth" : "3 Mois",
             "sMonth" : "6 Mois",
             "oYear" : "1 An",
-            "keepAwake": "Toujours allumé",
+            "keepAwake": "Toujours allumÃ©",
             "autoSaver": "Economiseur auto",
             "export": "Exporter",
             "import": "Importer",
@@ -84,27 +84,27 @@ const textAssets = {
                 "selectElements": "Choisissez",
                 "sessionList": "Seances",
                 "reminderList": "Rappels",
-                "preferences": "Paramètres",
+                "preferences": "ParamÃ¨tres",
                 "stats": "Statistiques",
-                "emptyMessage": "Aucun élément sauvegardé"
+                "emptyMessage": "Aucun Ã©lÃ©ment sauvegardÃ©"
             }
         },
         "calendar": {
             "forWard": "Avant",
-            "backWard": "Arrière",
-            "shiftByOne": "Décaler d'un jour",
-            "emptyMessage": "Aucune séance programmée"
+            "backWard": "ArriÃ¨re",
+            "shiftByOne": "DÃ©caler d'un jour",
+            "emptyMessage": "Aucune sÃ©ance programmÃ©e"
         },
         "recovery": {
             "recovery": "Sauvegarde",
-            "subText2": " s'est arrêté de manière inattendue, reprendre ?",
+            "subText2": " s'est arrÃªtÃ© de maniÃ¨re inattendue, reprendre ?",
             "no": "Non",
             "yes": "Oui",
         },
         "sessionItem": {
             "schedule": "Programmer",
             "history": "Historique",
-            "addASession": "Créer une séance"
+            "addASession": "CrÃ©er une sÃ©ance"
         },
         "updatePage": {
             "name": "Nom",
@@ -112,7 +112,7 @@ const textAssets = {
             "on": "A partir de",
             "at": "A",
             "every": "Tout les",
-            "create": "Créer",
+            "create": "CrÃ©er",
             "update": "Actualiser",
             "delete": "Supprimer",
             "add": "Ajouter",
@@ -122,7 +122,7 @@ const textAssets = {
             "work": "Travail",
             "rest": "Repos",
             "emptyHistory": "Pas encore d'historique",
-            "disabledHistory": "L'historique est désactivé",
+            "disabledHistory": "L'historique est dÃ©sactivÃ©",
             "temporalityChoices": {
                 "day": "Jour",
                 "week": "Semaine"
@@ -133,7 +133,7 @@ const textAssets = {
             },
             "placeHolders": {
                 "name": "Nom",
-                "sets": "Séries",
+                "sets": "SÃ©ries",
                 "reps": "Reps",
                 "rest": "Repos",
                 "body": "Coprs",
@@ -142,8 +142,8 @@ const textAssets = {
                 "pause": "Pause"
             },
             "exerciseTypes": {
-                "Bi." : "Bilatéral",
-                "Uni.": "Unilatéral",
+                "Bi." : "BilatÃ©ral",
+                "Uni.": "UnilatÃ©ral",
                 "Int.": "Intervalle",
                 "Wrm.": "Echauff",
                 "Pause": 'Pause'
@@ -153,8 +153,8 @@ const textAssets = {
             "saver": "Economiseur",
         },
         "inSession": {
-            "noMore": "Plus de séries",
-            "start": "Début",
+            "noMore": "Plus de sÃ©ries",
+            "start": "DÃ©but",
             "rest": "Repos",
             "next": "Suivant",
             "last": "Dernier",
@@ -163,81 +163,81 @@ const textAssets = {
             "end": "Fin",
             "quit": "Quitter",
             "cancel": "Annuler",
-            "exitQuestion": "Quitter la séance ?",
-            "exitDetails": "Votre progression pourrait être perdue",
+            "exitQuestion": "Quitter la sÃ©ance ?",
+            "exitDetails": "Votre progression pourrait Ãªtre perdue",
             "remaining": {
-                "reSets": "Séries restantes",
-                "reReps": "Répétitions restantes",
+                "reSets": "SÃ©ries restantes",
+                "reReps": "RÃ©pÃ©titions restantes",
                 "reTime": "Temps restant",
                 "reWoTime": "Temps travail restant",
                 "reWeight": "Charge restante"
             },
         },
         "inIntervall": {
-            "getReady": "Préparation",
+            "getReady": "PrÃ©paration",
             "work": "Travail",
             "rest": "Repos",
             "end": "Fin",
         },
         "notification": {
-            "duration": "Durée",
-            "restOver": "Repos terminé",
-            "workOver": "Travail terminé",
-            "xRestOver": "Repos extra terminé",
-            "breakOver": "Pause terminée"
+            "duration": "DurÃ©e",
+            "restOver": "Repos terminÃ©",
+            "workOver": "Travail terminÃ©",
+            "xRestOver": "Repos extra terminÃ©",
+            "breakOver": "Pause terminÃ©e"
         },
         "error": {
             "updatePage": {
-                "nameAlreadyUsed": "Nom déjà utilisé",
-                "fillAllEntries": "Remplissez toutes les entrées",
-                "intNumericOnly": "Cycle et Travail doivent être numérique",
-                "restTimeOnly": "Repos doit être temporel",
-                "restGreater": "Repos doit être supérieur à 4s",
-                "workGreater": "Travail doit être supérieur à 5s",
+                "nameAlreadyUsed": "Nom dÃ©jÃ  utilisÃ©",
+                "fillAllEntries": "Remplissez toutes les entrÃ©es",
+                "intNumericOnly": "Cycle et Travail doivent Ãªtre numÃ©rique",
+                "restTimeOnly": "Repos doit Ãªtre temporel",
+                "restGreater": "Repos doit Ãªtre supÃ©rieur Ã  4s",
+                "workGreater": "Travail doit Ãªtre supÃ©rieur Ã  5s",
                 "workRestTooBig": "Travail ou Repos bien trop grand",
                 "totalTooBig": "Temps total bien trop grand",
                 "cycleMinimum" : "Il doit y avoir minimum 1 cycle",
                 "noComma": "Le nom ne peut pas contenir de virgule",
-                "workNumericOnly": "Série, Répétiton et Poids doivent être numérique",
-                "zeroSet": "Il ne peut pas y avoir 0 série",
-                "zeroRep": "Il ne peut pas y avoir 0 répétition",
-                "weightNumeric": 'Poids doit être numérique',
-                "goToSleep": "Tu peux également faire une sieste",
-                "breakNumeric": "Pause doit être temporel",
-                "consecutiveBreak": "Les pauses consécutives ne servent à rien",
+                "workNumericOnly": "SÃ©rie, RÃ©pÃ©titon et Poids doivent Ãªtre numÃ©rique",
+                "zeroSet": "Il ne peut pas y avoir 0 sÃ©rie",
+                "zeroRep": "Il ne peut pas y avoir 0 rÃ©pÃ©tition",
+                "weightNumeric": 'Poids doit Ãªtre numÃ©rique',
+                "goToSleep": "Tu peux Ã©galement faire une sieste",
+                "breakNumeric": "Pause doit Ãªtre temporel",
+                "consecutiveBreak": "Les pauses consÃ©cutives ne servent Ã  rien",
                 "zeroBreak": "Pause trop petite"
             },
             "schedule": {
-                "hoursMinNumeric": "Heure, Minute et Nombre doivent être numérique",
-                "greatherHours": "Heure ne peut pas être supérieur à 23",
-                "greaterMinutes": "Minute ne peut pas être supérieur à 59",
-                "timePassed": "Le temps est déjà passé",
-                "notScheduled": "Cette séance n'est pas encore programmée"
+                "hoursMinNumeric": "Heure, Minute et Nombre doivent Ãªtre numÃ©rique",
+                "greatherHours": "Heure ne peut pas Ãªtre supÃ©rieur Ã  23",
+                "greaterMinutes": "Minute ne peut pas Ãªtre supÃ©rieur Ã  59",
+                "timePassed": "Le temps est dÃ©jÃ  passÃ©",
+                "notScheduled": "Cette sÃ©ance n'est pas encore programmÃ©e"
             },
             "parameters": {
-                "notifTime": "Avance doit être temporelle",
+                "notifTime": "Avance doit Ãªtre temporelle",
                 "notifTooLarge": "Avance trop grande",
                 'notifTooSmall': "Avance trop petite"
             }
         },
         "bottomNotif": {
-            "scheduled": "programmée",
-            "unscheduled": "déprogrammé",
-            "created": "crée",
-            "deleted": "supprimé",
-            "updated": "mis à jour",
-            "IOprefix": "Données",
-            "imported": "importées avec succès",
-            "exported": "exportées avec succès",
-            "parameters": "mis à jour",
-            "read": "Permission de lecture refusée",
-            "write": "Permission d'écriture refusée",
-            "audioBroken": "Contrôle du son non disponible"
+            "scheduled": "programmÃ©e",
+            "unscheduled": "dÃ©programmÃ©",
+            "created": "crÃ©e",
+            "deleted": "supprimÃ©",
+            "updated": "mis Ã  jour",
+            "IOprefix": "DonnÃ©es",
+            "imported": "importÃ©es avec succÃ¨s",
+            "exported": "exportÃ©es avec succÃ¨s",
+            "parameters": "mis Ã  jour",
+            "read": "Permission de lecture refusÃ©e",
+            "write": "Permission d'Ã©criture refusÃ©e",
+            "audioBroken": "ContrÃ´le du son non disponible"
         },
         "sessionEnd": {
             "mainText": {
-                "congrats": "Félicitation !",
-                "failed": "Quel échec !",
+                "congrats": "FÃ©licitation !",
+                "failed": "Quel Ã©chec !",
                 "chrono": {
                     "good": {
                         "0": "Si rapide !",
@@ -263,36 +263,36 @@ const textAssets = {
                     },
                     "even": {
                         "0": "Rien de fou",
-                        "1": "Plutôt banal",
+                        "1": "PlutÃ´t banal",
                         "2": "Pas mal !"
                     },
                     "bad": {
                         "0": "Tu te sens faible ?",
-                        "1": "Pense à te reposer",
+                        "1": "Pense Ã  te reposer",
                         "2": "La prochaine !"
                     }
                 },
             },
             "subText": {
                 "failed": {
-                    "0": "Frérot, ne lâche pas comme ça, tu en avais encore !",
-                    "1": "Hé, tu as déjà fais beaucoup mieux, baisse pas les bras !",
-                    "2": "Continue à pousser, l'échec n'est qu'une étape vers le succès !",
-                    "3": "Tu as trébuché, mais ce n'est pas la fin, relève-toi plus fort !",
-                    "4": "L'échec est temporaire, relève-toi et essaie à nouveau !",
-                    "5": "C'est un revers, pas une défaite, continue à progresser !"
+                    "0": "FrÃ©rot, ne lÃ¢che pas comme Ã§a, tu en avais encore !",
+                    "1": "HÃ©, tu as dÃ©jÃ  fais beaucoup mieux, baisse pas les bras !",
+                    "2": "Continue Ã  pousser, l'Ã©chec n'est qu'une Ã©tape vers le succÃ¨s !",
+                    "3": "Tu as trÃ©buchÃ©, mais ce n'est pas la fin, relÃ¨ve-toi plus fort !",
+                    "4": "L'Ã©chec est temporaire, relÃ¨ve-toi et essaie Ã  nouveau !",
+                    "5": "C'est un revers, pas une dÃ©faite, continue Ã  progresser !"
                 },
                 "congrats": {
-                    "YC": "Tu as complété ",
+                    "YC": "Tu as complÃ©tÃ© ",
                     "FT": " pour la ",
                     "T": " fois"
                 },
                 "chrono": {
-                    "YHB": "Tu as été ",
+                    "YHB": "Tu as Ã©tÃ© ",
                     "YT": "Tu as pris "
                 },
                 "weight":{
-                    "YHL": "Tu as soulevé ",
+                    "YHL": "Tu as soulevÃ© ",
                 }
             },
             "interestWord": {
@@ -303,13 +303,13 @@ const textAssets = {
                 },
                 "weight": {
                     "more": "% plus lourd",
-                    "less": "% plus léger",
+                    "less": "% plus lÃ©ger",
                     "even": "autant"
                 }
             },
             "common": {
-                "TTLT": ' que la fois dernière',
-                "ATLT": ' que la fois dernière'
+                "TTLT": ' que la fois derniÃ¨re',
+                "ATLT": ' que la fois derniÃ¨re'
             }
         }
     },
@@ -618,7 +618,27 @@ var expanderOpenedHeight = mobile == "IOS" ? "calc(83vh - 65px)" : "calc(90vh - 
 var current_page = "selection";
 var color = null; var mid_color = null; var light_color = null;
 
+/*KONSOLEADD
 
+var consoleShown = true;
+var konsole = new Konsole($(".konsole"));
+    
+window.onerror = function(message, error) {
+    console.error(message, error);  
+};
+
+$(document).on("click", '.konsole_tiret', function(){
+    
+    if(!consoleShown){
+        $('.konsole__container').css('bottom', '0px');
+    }else{
+        $('.konsole__container').css('bottom', '-455px');
+    };
+
+    consoleShown = !consoleShown;
+})
+
+KONSOLEADD*/
 
 $(document).ready(function(){
     addIMG = $("#addIMG").attr('src');
