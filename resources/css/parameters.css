@@ -191,6 +191,7 @@
 }
 
 .selection_parameters_saveLoad_container{
+    position: relative;
     display: flex;
     
     flex-shrink: 0;
@@ -209,6 +210,7 @@
 }
 
 .selection_parameters_saveLoad_btn{
+    position: relative;
     display: flex;
     
     flex-direction: column;
@@ -221,6 +223,17 @@
     background-color: #4C5368;
 
     border-radius: 5px;
+}
+
+#folder{
+    position: absolute;
+    opacity: 0;
+    width: 50%;
+    height: 98%;
+    right: 0;
+    top: 0;
+
+    cursor: pointer;
 }
 
 .selection_parameters_saveLoad_btn:active{

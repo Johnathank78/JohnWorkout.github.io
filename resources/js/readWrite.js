@@ -152,52 +152,7 @@ $(document).ready(function(){
                     closePanel('parameters');
                     showBlurPage('selection_saveLoad_page');
                 }else if(platform == "Web"){
-
-                    closePanel('parameters');
-                    showBlurPage('selection_saveLoad_page');
-
-                    $("#folder").trigger("click");
-
-                    const eventPromise = new Promise((resolve) => {
-                        const onChange = async function(event) {
-                            localFiles = event.target.files;
-                            resolve(event);
-                        };
-
-                        $("#folder").off().on("change", onChange);
-                    });
-
-                    const event = await eventPromise;
-                    for(let i=0; i<localFiles.length;i++){
-                        if(localFiles[i].name == "session_list.txt"){
-                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
-                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
-
-                            $('#selection_saveLoad_sl').parent().css('display', 'flex');
-                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
-                        };
-                        if(localFiles[i].name == "reminder_list.txt"){
-                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
-                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
-
-                            $('#selection_saveLoad_rl').parent().css('display', 'flex');
-                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
-                        };
-                        if(localFiles[i].name == "parameters.txt"){
-                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
-                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
-
-                            $('#selection_saveLoad_pa').parent().css('display', 'flex');
-                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
-                        };
-                        if(localFiles[i].name == "stats.txt"){
-                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
-                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
-
-                            $('#selection_saveLoad_st').parent().css('display', 'flex');
-                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
-                        };
-                    };
+                    //test
                 };
             };
         };
@@ -351,4 +306,41 @@ $(document).ready(function(){
     $(document).on("click", '.selection_saveLoad_itemText', function(){
         $(this).parent().find("input").click();
     });
+
+    $('#folder').on('change', function(){
+        current_page = "import"
+        closePanel('parameters');
+        showBlurPage('selection_saveLoad_page');
+
+        for(let i=0; i<localFiles.length;i++){
+            if(localFiles[i].name == "session_list.txt"){
+                $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                $('#selection_saveLoad_sl').parent().css('display', 'flex');
+                $('.selection_saveLoad_emptyMsg').css('display', 'none');
+            };
+            if(localFiles[i].name == "reminder_list.txt"){
+                $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                $('#selection_saveLoad_rl').parent().css('display', 'flex');
+                $('.selection_saveLoad_emptyMsg').css('display', 'none');
+            };
+            if(localFiles[i].name == "parameters.txt"){
+                $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                $('#selection_saveLoad_pa').parent().css('display', 'flex');
+                $('.selection_saveLoad_emptyMsg').css('display', 'none');
+            };
+            if(localFiles[i].name == "stats.txt"){
+                $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                $('#selection_saveLoad_st').parent().css('display', 'flex');
+                $('.selection_saveLoad_emptyMsg').css('display', 'none');
+            };
+        };
+    })
 });//readyEnd
