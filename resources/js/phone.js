@@ -6,7 +6,7 @@ var haveWebNotificationsBeenAccepted = false;
 var activeNotification = false;
 
 
-var notificationWorker = new Worker('/JohnWorkout.github.io/notificationWorker.js');
+var notificationWorker = new Worker('/JohnWorkout.github.io/service-worker.js');
 
 function goBack(platform){
     if(current_page == "selection"){
