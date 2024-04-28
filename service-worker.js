@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.39';
+const CACHE_NAME = 'app-cache-v4.40';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -133,6 +133,7 @@ self.onmessage = function(event) {
         removeNotification();
     }else{
         setTimeout(() => {
+            console.log(self.registration)
             self.registration.showNotification(title, {
                 body: body,
                 icon: './resources/imgs/appLogo.png'
