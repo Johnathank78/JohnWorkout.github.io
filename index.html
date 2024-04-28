@@ -44,6 +44,12 @@
                 }).catch(error => {
                     console.error('Service worker registration failed:', error);
                 });
+
+                navigator.serviceWorker.register('/JohnWorkout.github.io/notificationWorker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
             });
         }
     </script>

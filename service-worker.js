@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.29';
+const CACHE_NAME = 'app-cache-v4.30';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -58,9 +58,9 @@ self.addEventListener('install', event => {
                 '/JohnWorkout.github.io/resources/imgs/stats.svg',
                 '/JohnWorkout.github.io/resources/imgs/tick.png',
                 '/JohnWorkout.github.io/resources/imgs/timer2.svg',
-                '/JohnWorkout.github.io/resources/js/pwaSSgenerator.js',
                 '/JohnWorkout.github.io/resources/js/bothSessions.js',
                 '/JohnWorkout.github.io/resources/js/bottomNotification.js',
+                '/JohnWorkout.github.io/resources/js/notificationWorker.js',
                 '/JohnWorkout.github.io/resources/js/calendar.js',
                 '/JohnWorkout.github.io/resources/js/checkNformat.js',
                 '/JohnWorkout.github.io/resources/js/click.js',

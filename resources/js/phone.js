@@ -5,7 +5,8 @@ var isIdle = false;
 var haveWebNotificationsBeenAccepted = false;
 var activeNotification = false;
 
-//var notificationWorker = new Worker('./resources/js/notificationWorker.js');
+
+var notificationWorker = new Worker('./resources/js/notificationWorker.js');
 
 function goBack(platform){
     if(current_page == "selection"){
@@ -75,6 +76,105 @@ async function loadSoundz(){
         audioChannelNum: 1,
         isUrl: false
     });
+};
+
+async function pauseApp(){
+    closeActiveNotification();
+
+    isIdle = true;
+
+    let start = false;
+    let title = false;
+    let body = false;
+
+    backgroundTimestamp = new Date().getTime();
+    currentSide = "";
+
+    if(ongoing == "intervall" && !paused){
+        if(intervall_state == 2){
+            currentSide = "I";
+            start = (iRest_time - Ispent) * 1000;
+            title = textAssets[language]["notification"]["restOver"];
+            body = textAssets[language]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
+
+            sendWebNotification(title, body, start);
+        }else if(intervall_state == 1){
+            currentSide = "W";
+            start = (iWork_time - Ispent) * 1000;
+            title = textAssets[language]["notification"]["workOver"];
+            body = textAssets[language]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
+
+            sendWebNotification(title, body, start);
+        }
+    }else if(ongoing == "workout"){
+
+        let nextThing = $(".session_next_exercise_name").first().text();
+
+        if(Xtimer){
+            currentSide = "X";
+            start = (restDat - Xspent) * 1000;
+            title = textAssets[language]["notification"]["xRestOver"];
+            body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+            sendWebNotification(title, body, start);
+        }
+
+        if(extype == "Bi"){
+            if(Ltimer){
+                currentSide += "L";
+                start = (LrestTime - Lspent) * 1000;
+                title = textAssets[language]["notification"]["restOver"];
+                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                sendWebNotification(title, body, start);
+            }
+        }else if(extype == "Uni"){
+            if(Ltimer && Rtimer){
+                currentSide += "LR";
+
+                let mini = getSmallesRest();
+                nextThing = nextThing.split(" - ")[0] + " - " + mini;
+
+                title = textAssets[language]["notification"]["restOver"];
+                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                if(mini == textAssets[language]["misc"]["leftInitial"]){
+                    start = (LrestTime - Lspent) * 1000;
+
+                    sendWebNotification(title, body, start);
+                }else if(mini == textAssets[language]["misc"]["rightInitial"]){
+                    start = (RrestTime - Rspent) * 1000;
+
+                    sendWebNotification(title, body, start);
+                }
+            }else if(Ltimer){
+                currentSide += "L";
+                nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["rightInitial"];
+
+                start = (LrestTime - Lspent) * 1000;
+                title = textAssets[language]["notification"]["restOver"];
+                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                sendWebNotification(title, body, start);
+            }else if(Rtimer){
+                currentSide += "R";
+                nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["leftInitial"];
+
+                start = (RrestTime - Rspent) * 1000;
+                title = textAssets[language]["notification"]["restOver"];
+                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                sendWebNotification(title, body, start);
+            }
+        }else if(extype == "Pause"){
+            currentSide += "L";
+            start = (LrestTime - Lspent) * 1000;
+            title = textAssets[language]["notification"]["breakOver"];
+            body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+            sendWebNotification(title, body, start);
+        };
+    };
 };
 
 async function resumeApp(){
@@ -226,117 +326,13 @@ async function resumeApp(){
 
 async function sendWebNotification(title, body, time){
     if(haveWebNotificationsBeenAccepted){
-        setTimeout(() => {
-            activeNotification = new Notification(title, {
-                body: body,
-                icon: './resources/imgs/appLogo.png'
-            });
-        }, time);
+        notificationWorker.postMessage({ title, body, time });
     };
 };
 
 function closeActiveNotification(){
     if(activeNotification){
-        activeNotification.close();
-    };
-};
-
-async function pauseApp(){
-    closeActiveNotification();
-
-    isIdle = true;
-
-    let start = false;
-    let title = false;
-    let body = false;
-
-    backgroundTimestamp = new Date().getTime();
-    currentSide = "";
-
-    if(ongoing == "intervall" && !paused){
-        if(intervall_state == 2){
-            currentSide = "I";
-            start = (iRest_time - Ispent) * 1000;
-            title = textAssets[language]["notification"]["restOver"];
-            body = textAssets[language]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
-
-            sendWebNotification(title, body, start);
-        }else if(intervall_state == 1){
-            currentSide = "W";
-            start = (iWork_time - Ispent) * 1000;
-            title = textAssets[language]["notification"]["workOver"];
-            body = textAssets[language]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
-
-            sendWebNotification(title, body, start);
-        }
-    }else if(ongoing == "workout"){
-
-        let nextThing = $(".session_next_exercise_name").first().text();
-
-        if(Xtimer){
-            currentSide = "X";
-            start = (restDat - Xspent) * 1000;
-            title = textAssets[language]["notification"]["xRestOver"];
-            body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-            sendWebNotification(title, body, start);
-        }
-
-        if(extype == "Bi"){
-            if(Ltimer){
-                currentSide += "L";
-                start = (LrestTime - Lspent) * 1000;
-                title = textAssets[language]["notification"]["restOver"];
-                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-                sendWebNotification(title, body, start);
-            }
-        }else if(extype == "Uni"){
-            if(Ltimer && Rtimer){
-                currentSide += "LR";
-
-                let mini = getSmallesRest();
-                nextThing = nextThing.split(" - ")[0] + " - " + mini;
-
-                title = textAssets[language]["notification"]["restOver"];
-                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-                if(mini == textAssets[language]["misc"]["leftInitial"]){
-                    start = (LrestTime - Lspent) * 1000;
-
-                    sendWebNotification(title, body, start);
-                }else if(mini == textAssets[language]["misc"]["rightInitial"]){
-                    start = (RrestTime - Rspent) * 1000;
-
-                    sendWebNotification(title, body, start);
-                }
-            }else if(Ltimer){
-                currentSide += "L";
-                nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["rightInitial"];
-
-                start = (LrestTime - Lspent) * 1000;
-                title = textAssets[language]["notification"]["restOver"];
-                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-                sendWebNotification(title, body, start);
-            }else if(Rtimer){
-                currentSide += "R";
-                nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["leftInitial"];
-
-                start = (RrestTime - Rspent) * 1000;
-                title = textAssets[language]["notification"]["restOver"];
-                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-                sendWebNotification(title, body, start);
-            }
-        }else if(extype == "Pause"){
-            currentSide += "L";
-            start = (LrestTime - Lspent) * 1000;
-            title = textAssets[language]["notification"]["breakOver"];
-            body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-            sendWebNotification(title, body, start);
-        };
+        notificationWorker.postMessage({ action: 'removeAllNotification' });
     };
 };
 
