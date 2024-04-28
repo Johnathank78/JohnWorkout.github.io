@@ -5,8 +5,7 @@ var isIdle = false;
 var haveWebNotificationsBeenAccepted = false;
 var activeNotification = false;
 
-
-var notificationWorker = false;
+//var notificationWorker = false;
 
 function goBack(platform){
     if(current_page == "selection"){
@@ -326,13 +325,26 @@ async function resumeApp(){
 
 async function sendWebNotification(title, body, time){
     if(haveWebNotificationsBeenAccepted){
-        notificationWorker.postMessage({ title, body, time });
+        navigator.serviceWorker.getRegistration().then(registration => {
+            setTimeout((registration) => {
+                registration.showNotification(title, {
+                    body: body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            }, time);
+        });
     };
 };
 
 function closeActiveNotification(){
     if(activeNotification){
-        notificationWorker.postMessage({ action: 'removeAllNotification' });
+        navigator.serviceWorker.getRegistration().then(registration => {
+            registration.getNotifications().then(notifications => {
+                notifications.forEach(notification => {
+                    notification.close();
+                });
+            });
+        });
     };
 };
 
@@ -601,8 +613,8 @@ if(platform == "Mobile"){
 }
 
 $(document).ready(function(){
-    notificationWorker = new Worker('/JohnWorkout.github.io/service-worker.js');
-    
+    //notificationWorker = new Worker('/JohnWorkout.github.io/service-worker.js');
+
     if(isStandalonePWA && isWebMobile){
         $('.IOSbacker').css('display', "block");
     };
