@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.42';
+const CACHE_NAME = 'app-cache-v4.41';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -128,20 +128,22 @@ self.addEventListener('fetch', event => {
 // Listen for messages from the main thread
 self.onmessage = function(event) {
     var { title, body, time, action} = event.data;
-    console.log(self, self.registration)
-
-    if(action === "removeAllNotification"){
-        self.registration.getNotifications().then(notifications => {
-            notifications.forEach(notification => {
-                notification.close();
+    
+    navigator.serviceWorker.getRegistration().then(registration => {
+        console.log(registration)
+        if(action === "removeAllNotification"){
+            registration.getNotifications().then(notifications => {
+                notifications.forEach(notification => {
+                    notification.close();
+                });
             });
-        });
-    }else{
-        setTimeout((registration = self.registration) => {
-            registration.showNotification(title, {
-                body: body,
-                icon: './resources/imgs/appLogo.png'
-            });
-        }, time);
-    };
+        }else{
+            setTimeout((registration) => {
+                registration.showNotification(title, {
+                    body: body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            }, time);
+        };
+    });    
 };
