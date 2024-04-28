@@ -1,8 +1,10 @@
 // Method to remove a notification by its unique identifier
 function removeNotification() {
-    self.registration.getNotifications().then(notifications => {
-        notifications.forEach(notification => {
-            notification.close();
+    self.getRegistration().then(registration => {
+        registration.getNotifications().then(notifications => {
+            notifications.forEach(notification => {
+                notification.close();
+            });
         });
     });
 }
@@ -14,12 +16,13 @@ self.onmessage = function(event) {
     if(action === "removeAllNotification"){
         removeNotification();
     }else{
-        setTimeout(() => {
-            self.registration.showNotification(title, {
-                body: body,
-                icon: './resources/imgs/appLogo.png'
-            });
-        }, time);
-    }
-
+        self.getRegistration().then(registration => {
+            setTimeout(() => {
+                registration.showNotification(title, {
+                    body: body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            }, time);
+        });
+    };
 };
