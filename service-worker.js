@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.40';
+const CACHE_NAME = 'app-cache-v4.39';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -132,21 +132,25 @@ self.onmessage = function(event) {
     if(action === "removeAllNotification"){
         removeNotification();
     }else{
-        setTimeout(() => {
-            console.log(self.registration)
-            self.registration.showNotification(title, {
-                body: body,
-                icon: './resources/imgs/appLogo.png'
-            });
-        }, time);
+        navigator.serviceWorker.getRegistration().then(registration => {
+            console.log(registration)
+            setTimeout((registration) => {
+                registration.showNotification(title, {
+                    body: body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            }, time);
+        });
     };
 };
 
 // Method to remove a notification by its unique identifier
 function removeNotification() {
-    self.registration.getNotifications().then(notifications => {
-        notifications.forEach(notification => {
-            notification.close();
+    navigator.serviceWorker.getRegistration().then(registration => {
+        registration.getNotifications().then(notifications => {
+            notifications.forEach(notification => {
+                notification.close();
+            });
         });
     });
 }
