@@ -6,7 +6,7 @@ var haveWebNotificationsBeenAccepted = false;
 var activeNotification = false;
 
 
-var notificationWorker = new Worker('/JohnWorkout.github.io/service-worker.js');
+var notificationWorker = false;
 
 function goBack(platform){
     if(current_page == "selection"){
@@ -601,6 +601,8 @@ if(platform == "Mobile"){
 }
 
 $(document).ready(function(){
+    notificationWorker = new Worker('/JohnWorkout.github.io/service-worker.js');
+    
     if(isStandalonePWA && isWebMobile){
         $('.IOSbacker').css('display', "block");
     };
