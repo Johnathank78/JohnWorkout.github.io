@@ -129,7 +129,8 @@ self.addEventListener('fetch', event => {
 self.onmessage = function(event) {
     var { title, body, time, action} = event.data;
     
-    console.log(navigator, self.registration)
+    console.log(navigator)
+    console.log(self)
     navigator.serviceWorker.getRegistration().then(registration => {
         if(action === "removeAllNotification"){
             registration.getNotifications().then(notifications => {
