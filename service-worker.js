@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.42';
+const CACHE_NAME = 'app-cache-v4.43';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -129,7 +129,7 @@ self.addEventListener('fetch', event => {
 self.onmessage = function(event) {
     var { title, body, time, action} = event.data;
     
-    console.log(navigator)
+    console.log(navigator, self.registration)
     navigator.serviceWorker.getRegistration().then(registration => {
         if(action === "removeAllNotification"){
             registration.getNotifications().then(notifications => {
