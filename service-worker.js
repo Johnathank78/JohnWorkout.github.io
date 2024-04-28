@@ -132,7 +132,8 @@ self.onmessage = function(event) {
     if(action === "removeAllNotification"){
         removeNotification();
     }else{
-        navigator.serviceWorker.ready.then(registration => {
+        console.log(navigator.serviceWorker)
+        navigator.serviceWorker.getRegistration().then(registration => {
             setTimeout((registration) => {
                 registration.showNotification(title, {
                     body: body,
@@ -145,7 +146,7 @@ self.onmessage = function(event) {
 
 // Method to remove a notification by its unique identifier
 function removeNotification() {
-    navigator.serviceWorker.ready.then(registration => {
+    navigator.serviceWorker.getRegistration().then(registration => {
         registration.getNotifications().then(notifications => {
             notifications.forEach(notification => {
                 notification.close();
