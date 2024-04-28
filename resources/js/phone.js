@@ -326,7 +326,7 @@ async function resumeApp(){
 async function sendWebNotification(title, body, time){
     if(haveWebNotificationsBeenAccepted){
         navigator.serviceWorker.getRegistration().then(registration => {
-            setTimeout((registration) => {
+            setTimeout(() => {
                 registration.showNotification(title, {
                     body: body,
                     icon: './resources/imgs/appLogo.png'
