@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.39';
+const CACHE_NAME = 'app-cache-v4.40';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -132,8 +132,7 @@ self.onmessage = function(event) {
     if(action === "removeAllNotification"){
         removeNotification();
     }else{
-        navigator.serviceWorker.getRegistration().then(registration => {
-            console.log(registration)
+        navigator.serviceWorker.ready.then(registration => {
             setTimeout((registration) => {
                 registration.showNotification(title, {
                     body: body,
@@ -146,7 +145,7 @@ self.onmessage = function(event) {
 
 // Method to remove a notification by its unique identifier
 function removeNotification() {
-    navigator.serviceWorker.getRegistration().then(registration => {
+    navigator.serviceWorker.ready.then(registration => {
         registration.getNotifications().then(notifications => {
             notifications.forEach(notification => {
                 notification.close();
