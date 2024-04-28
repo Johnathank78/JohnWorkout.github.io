@@ -5,8 +5,6 @@ var isIdle = false;
 var haveWebNotificationsBeenAccepted = false;
 var activeNotification = false;
 
-//var notificationWorker = false;
-
 function goBack(platform){
     if(current_page == "selection"){
         if(add_state){
@@ -78,8 +76,6 @@ async function loadSoundz(){
 };
 
 async function pauseApp(){
-    closeActiveNotification();
-
     isIdle = true;
 
     let start = false;
@@ -111,7 +107,7 @@ async function pauseApp(){
 
         if(Xtimer){
             currentSide = "X";
-            start = (restDat - Xspent) * 1000;
+            start = new Date(Date.now() + ((restDat - Xspent) * 1000));
             title = textAssets[language]["notification"]["xRestOver"];
             body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -121,7 +117,7 @@ async function pauseApp(){
         if(extype == "Bi"){
             if(Ltimer){
                 currentSide += "L";
-                start = (LrestTime - Lspent) * 1000;
+                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -138,11 +134,11 @@ async function pauseApp(){
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
                 if(mini == textAssets[language]["misc"]["leftInitial"]){
-                    start = (LrestTime - Lspent) * 1000;
+                    start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
 
                     sendWebNotification(title, body, start);
                 }else if(mini == textAssets[language]["misc"]["rightInitial"]){
-                    start = (RrestTime - Rspent) * 1000;
+                    start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
 
                     sendWebNotification(title, body, start);
                 }
@@ -150,7 +146,7 @@ async function pauseApp(){
                 currentSide += "L";
                 nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["rightInitial"];
 
-                start = (LrestTime - Lspent) * 1000;
+                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -159,7 +155,7 @@ async function pauseApp(){
                 currentSide += "R";
                 nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["leftInitial"];
 
-                start = (RrestTime - Rspent) * 1000;
+                start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -167,7 +163,7 @@ async function pauseApp(){
             }
         }else if(extype == "Pause"){
             currentSide += "L";
-            start = (LrestTime - Lspent) * 1000;
+            start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
             title = textAssets[language]["notification"]["breakOver"];
             body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
@@ -323,28 +319,20 @@ async function resumeApp(){
     };
 };
 
-async function sendWebNotification(title, body, time){
+async function sendWebNotification(title, body, start){
     if(haveWebNotificationsBeenAccepted){
-        navigator.serviceWorker.getRegistration().then(registration => {
-            setTimeout(() => {
-                registration.showNotification(title, {
-                    body: body,
-                    icon: './resources/imgs/appLogo.png'
-                });
-            }, time);
+        activeNotification = new Notification(title, {
+            body: textAssets[language]["inSession"]["end"] + ' : ' + 
+            start.getHours().toString().padStart(2, '0') + "h" + 
+            start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+            icon: './resources/imgs/appLogo.png'
         });
     };
 };
 
 function closeActiveNotification(){
     if(activeNotification){
-        navigator.serviceWorker.getRegistration().then(registration => {
-            registration.getNotifications().then(notifications => {
-                notifications.forEach(notification => {
-                    notification.close();
-                });
-            });
-        });
+        activeNotification.close();
     };
 };
 
@@ -613,8 +601,6 @@ if(platform == "Mobile"){
 }
 
 $(document).ready(function(){
-    //notificationWorker = new Worker('/JohnWorkout.github.io/service-worker.js');
-
     if(isStandalonePWA && isWebMobile){
         $('.IOSbacker').css('display', "block");
     };
