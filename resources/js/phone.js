@@ -88,13 +88,14 @@ async function pauseApp(){
     if(ongoing == "intervall" && !paused){
         if(intervall_state == 2){
             currentSide = "I";
-            start = (iRest_time - Ispent) * 1000;
+            start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
             title = textAssets[language]["notification"]["restOver"];
             body = textAssets[language]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
 
             sendWebNotification(title, body, start);
         }else if(intervall_state == 1){
             currentSide = "W";
+            start = new Date(Date.now() + ((restDat - Xspent) * 1000));
             start = (iWork_time - Ispent) * 1000;
             title = textAssets[language]["notification"]["workOver"];
             body = textAssets[language]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
@@ -322,9 +323,7 @@ async function resumeApp(){
 async function sendWebNotification(title, body, start){
     if(haveWebNotificationsBeenAccepted){
         activeNotification = new Notification(title, {
-            body: textAssets[language]["inSession"]["end"] + ' : ' + 
-            start.getHours().toString().padStart(2, '0') + "h" + 
-            start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+            body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
             icon: './resources/imgs/appLogo.png'
         });
     };
