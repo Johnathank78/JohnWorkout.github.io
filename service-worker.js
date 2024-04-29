@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.47';
+const CACHE_NAME = 'app-cache-v4.48';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -124,3 +124,24 @@ self.addEventListener('fetch', event => {
         })
     );
 });
+
+self.onmessage = function(event) {
+    var { title, body, time, action} = event.data;
+
+    navigator.serviceWorker.getRegistration().then(registration => {
+        if(action === "removeAllNotification"){
+            registration.getNotifications().then(notifications => {
+                notifications.forEach(notification => {
+                    notification.close();
+                });
+            });
+        }else{
+            registration.showNotification(title.split(' ')[0], {
+                body: textAssets[language]["inSession"]["end"] + ' : ' + time.getHours().toString().padStart(2, '0') + "h" + time.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                icon: './resources/imgs/appLogo.png'
+            });
+        };
+    });    
+};
+
+activeNotification = new Notification();
