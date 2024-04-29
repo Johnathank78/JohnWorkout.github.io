@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.70';
+const CACHE_NAME = 'app-cache-v4.71';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -67,13 +67,13 @@ self.addEventListener('install', event => {
                 '/JohnWorkout.github.io/resources/splash_screens/splash_1.png',
                 '/JohnWorkout.github.io/resources/splash_screens/splash_15.png',
                 '/JohnWorkout.github.io/resources/splash_screens/splash_13.png',
+                '/JohnWorkout.github.io/resources/imgs/appLogo.png',
                 '/JohnWorkout.github.io/resources/imgs/add.svg',
                 '/JohnWorkout.github.io/resources/imgs/arrow.png',
                 '/JohnWorkout.github.io/resources/imgs/bin.svg',
                 '/JohnWorkout.github.io/resources/imgs/edit.svg',
                 '/JohnWorkout.github.io/resources/imgs/grab.svg',
                 '/JohnWorkout.github.io/resources/imgs/icon2.ico',
-                '/JohnWorkout.github.io/resources/imgs/logo2.svg',
                 '/JohnWorkout.github.io/resources/imgs/congrats.png',
                 '/JohnWorkout.github.io/resources/imgs/clock.png',
                 '/JohnWorkout.github.io/resources/imgs/barbell.png',
