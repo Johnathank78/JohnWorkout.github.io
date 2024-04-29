@@ -5,6 +5,8 @@ var isIdle = false;
 var haveWebNotificationsBeenAccepted = false;
 var activeNotification = false;
 
+var notificationWorker = new Worker('/JohnWorkout.github.io/service-worker.js');
+
 function goBack(platform){
     if(current_page == "selection"){
         if(add_state){
@@ -320,19 +322,12 @@ async function resumeApp(){
     };
 };
 
-async function sendWebNotification(title, body, start){
-    if(haveWebNotificationsBeenAccepted){
-        activeNotification = new Notification(title, {
-            body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-            icon: './resources/imgs/appLogo.png'
-        });
-    };
+async function sendWebNotification(title, body, time){
+    if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, time })};
 };
 
 function closeActiveNotification(){
-    if(activeNotification){
-        activeNotification.close();
-    };
+    notificationWorker.postMessage({ action: 'removeAllNotification' });
 };
 
 if(platform == "Mobile"){
