@@ -321,6 +321,7 @@ async function resumeApp(){
 };
 
 async function sendWebNotification(title, body, start){
+    return;
     if(haveWebNotificationsBeenAccepted){
         activeNotification = new Notification(title, {
             body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
@@ -330,6 +331,7 @@ async function sendWebNotification(title, body, start){
 };
 
 function closeActiveNotification(){
+    return;
     if(activeNotification){
         activeNotification.close();
     };
