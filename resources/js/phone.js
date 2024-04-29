@@ -77,104 +77,6 @@ async function loadSoundz(){
     });
 };
 
-async function pauseApp(){
-    isIdle = true;
-
-    let start = false;
-    let title = false;
-    let body = false;
-
-    backgroundTimestamp = new Date().getTime();
-    currentSide = "";
-
-    if(ongoing == "intervall" && !paused){
-        if(intervall_state == 2){
-            currentSide = "I";
-            start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
-            title = textAssets[language]["notification"]["restOver"];
-            body = textAssets[language]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
-
-            sendWebNotification(title, body, start);
-        }else if(intervall_state == 1){
-            currentSide = "W";
-            start = new Date(Date.now() + ((restDat - Xspent) * 1000));
-            start = (iWork_time - Ispent) * 1000;
-            title = textAssets[language]["notification"]["workOver"];
-            body = textAssets[language]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
-
-            sendWebNotification(title, body, start);
-        }
-    }else if(ongoing == "workout"){
-
-        let nextThing = $(".session_next_exercise_name").first().text();
-
-        if(Xtimer){
-            currentSide = "X";
-            start = new Date(Date.now() + ((restDat - Xspent) * 1000));
-            title = textAssets[language]["notification"]["xRestOver"];
-            body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-            sendWebNotification(title, body, start);
-        }
-
-        if(extype == "Bi"){
-            if(Ltimer){
-                currentSide += "L";
-                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-                title = textAssets[language]["notification"]["restOver"];
-                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-                sendWebNotification(title, body, start);
-            }
-        }else if(extype == "Uni"){
-            if(Ltimer && Rtimer){
-                currentSide += "LR";
-
-                let mini = getSmallesRest();
-                nextThing = nextThing.split(" - ")[0] + " - " + mini;
-
-                title = textAssets[language]["notification"]["restOver"];
-                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-                if(mini == textAssets[language]["misc"]["leftInitial"]){
-                    start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-
-                    sendWebNotification(title, body, start);
-                }else if(mini == textAssets[language]["misc"]["rightInitial"]){
-                    start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
-
-                    sendWebNotification(title, body, start);
-                }
-            }else if(Ltimer){
-                currentSide += "L";
-                nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["rightInitial"];
-
-                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-                title = textAssets[language]["notification"]["restOver"];
-                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-                sendWebNotification(title, body, start);
-            }else if(Rtimer){
-                currentSide += "R";
-                nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["leftInitial"];
-
-                start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
-                title = textAssets[language]["notification"]["restOver"];
-                body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-                sendWebNotification(title, body, start);
-            }
-        }else if(extype == "Pause"){
-            currentSide += "L";
-            start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-            title = textAssets[language]["notification"]["breakOver"];
-            body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
-
-            sendWebNotification(title, body, start);
-        };
-    };
-};
-
 async function resumeApp(){
     let hasBeenUpdated = false;
 
@@ -182,7 +84,7 @@ async function resumeApp(){
         await undisplayAndCancelNotification(1234);
         await undisplayAndCancelNotification(1235);
     }else{
-        closeActiveNotification();
+        notificationWorker.postMessage({ action: 'removeAllNotification' });
     }
 
     let elapsedTime = parseInt((new Date().getTime() - backgroundTimestamp) / 1000);
@@ -322,14 +224,6 @@ async function resumeApp(){
     };
 };
 
-async function sendWebNotification(title, body, time){
-    if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, time })};
-};
-
-function closeActiveNotification(){
-    notificationWorker.postMessage({ action: 'removeAllNotification' });
-};
-
 if(platform == "Mobile"){
     App.addListener('backButton', () => {
         goBack(platform);
@@ -341,7 +235,6 @@ if(platform == "Mobile"){
             isIdle = false;
         }else if(!state.isActive && ongoing && (hasStarted || sIntervall)){
             const pauseProcess = await BackgroundTask.beforeExit(async () => {
-
                 isIdle = true;
 
                 let start = false;
@@ -561,7 +454,99 @@ if(platform == "Mobile"){
     document.addEventListener("visibilitychange", async () => {
         if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
             isIdle = true;
-            pauseApp();
+
+            let start = false;
+            let title = false;
+            let body = false;
+
+            backgroundTimestamp = new Date().getTime();
+            currentSide = "";
+
+            if(ongoing == "intervall" && !paused){
+                if(intervall_state == 2){
+                    currentSide = "I";
+                    start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
+                    title = textAssets[language]["notification"]["restOver"];
+                    body = textAssets[language]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
+
+                    if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                }else if(intervall_state == 1){
+                    currentSide = "W";
+                    start = new Date(Date.now() + ((restDat - Xspent) * 1000));
+                    title = textAssets[language]["notification"]["workOver"];
+                    body = textAssets[language]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
+
+                    if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                }
+            }else if(ongoing == "workout"){
+
+                let nextThing = $(".session_next_exercise_name").first().text();
+
+                if(Xtimer){
+                    currentSide = "X";
+                    start = new Date(Date.now() + ((restDat - Xspent) * 1000));
+                    title = textAssets[language]["notification"]["xRestOver"];
+                    body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                    if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                }
+
+                if(extype == "Bi"){
+                    if(Ltimer){
+                        currentSide += "L";
+                        start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+                        title = textAssets[language]["notification"]["restOver"];
+                        body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                        if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                    }
+                }else if(extype == "Uni"){
+                    if(Ltimer && Rtimer){
+                        currentSide += "LR";
+
+                        let mini = getSmallesRest();
+                        nextThing = nextThing.split(" - ")[0] + " - " + mini;
+
+                        title = textAssets[language]["notification"]["restOver"];
+                        body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                        if(mini == textAssets[language]["misc"]["leftInitial"]){
+                            start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+
+                            if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                        }else if(mini == textAssets[language]["misc"]["rightInitial"]){
+                            start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
+
+                            if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                        }
+                    }else if(Ltimer){
+                        currentSide += "L";
+                        nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["rightInitial"];
+
+                        start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+                        title = textAssets[language]["notification"]["restOver"];
+                        body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                        if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                    }else if(Rtimer){
+                        currentSide += "R";
+                        nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["leftInitial"];
+
+                        start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
+                        title = textAssets[language]["notification"]["restOver"];
+                        body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                        if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                    }
+                }else if(extype == "Pause"){
+                    currentSide += "L";
+                    start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+                    title = textAssets[language]["notification"]["breakOver"];
+                    body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
+
+                    if(haveWebNotificationsBeenAccepted){notificationWorker.postMessage({ title, body, start })};
+                };
+            };
         }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
             await resumeApp();
             isIdle = false;
