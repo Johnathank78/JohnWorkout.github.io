@@ -1,9 +1,9 @@
-const CACHE_NAME = 'app-cache-v4.67';
+const CACHE_NAME = 'app-cache-v4.68';
 
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
-            return cache.addAll([
+            const urlsToCache = [
                 '/JohnWorkout.github.io/index.html',
                 '/JohnWorkout.github.io/resources/css/animations.css',
                 '/JohnWorkout.github.io/resources/css/calendar.css',
@@ -118,9 +118,18 @@ self.addEventListener('install', event => {
                 '/JohnWorkout.github.io/resources/js/utility.js',
                 '/JohnWorkout.github.io/resources/js/workoutSession.js',
                 '/JohnWorkout.github.io/resources/sounds/beep.mp3',
-                '/JohnWorkout.github.io/resources/sounds/beep2x3.mp3',
-                '/JohnWorkout.github.io/resources/sounds/beep_test.mp3'
-            ]);
+                '/JohnWorkout.github.io/resources/sounds/beep2x3.mp3'
+            ];
+
+            const cachePromises = urlsToCache.map(url => {
+                return cache.add(url).then(() => {
+                    console.log(`Successfully cached: ${url}`);
+                }).catch(error => {
+                    console.error(`Failed to cache ${url}:`, error);
+                });
+            });
+
+            return Promise.all(cachePromises);
         }).catch(error => {
             console.error('Cache open failed:', error);
         })
@@ -140,7 +149,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-    console.log('Fetching:', event.request.url);
+    console.log('Fetching:', event.request.url);    
     event.respondWith(
         caches.open(CACHE_NAME).then(cache => { 
             return cache.match(event.request).then(response => {
