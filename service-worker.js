@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.65';
+const CACHE_NAME = 'app-cache-v4.66';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -149,7 +149,7 @@ self.addEventListener('fetch', event => {
                     }
                     return networkResponse;
                 }).catch(error => {
-                    console.error('Fetch failed:', error);
+                    console.error('Fetch failed for:', event.request.url, '; Error:', error);
                     return response; // Return cached response if fetch fails
                 });
 
