@@ -149,7 +149,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-    console.log('Fetching:', event.request.url);    
+    console.log('Fetching:', event.request.url);
     event.respondWith(
         caches.open(CACHE_NAME).then(cache => { 
             return cache.match(event.request).then(response => {

@@ -1929,7 +1929,6 @@ $(document).ready(function(){
 
         for (let i = 0; i < remainingExos.length; i++) {
             const exercise = $(remainingExos[i]);
-
             type = $(exercise).find(".session_next_exercise_type").text();
             
             if(type == "Int"){

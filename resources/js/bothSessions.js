@@ -192,14 +192,15 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
         weightLifted += TempweightLifted;
         repsDone += TemprepsDone;
-
+        
         current_history[0][2] += 1;
+
 
         stats_save([timeSpent, workedTime, weightLifted, repsDone, since]);
 
@@ -284,7 +285,7 @@ async function quit_session(failed=false){
 };
 
 function getSessionEndData(){
-    let number = current_history[0][2] + 1;
+    let number = current_history[0][2];
     let outNumber = "";
     let time = 0;
     let performanceGrowth = 0;

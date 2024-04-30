@@ -227,6 +227,7 @@ function get_session_time(session){
 };
 
 function get_session_stats(session){
+    console.log(session)
     let [workedTime, weightLifted, repsDone] = [0, 0, 0, 0];
 
     let type = false;
@@ -257,7 +258,7 @@ function get_session_stats(session){
             };
         }else if(type == "Uni."){
             roundedWeight = unitRound(item[4]);
-            reps = parseInt(item[2]) * parseInt(item[3]);
+            reps = 2 * parseInt(item[2]) * parseInt(item[3]);
             repsDone += reps;
             workedTime += reps * 2.1;
             weightLifted += reps * roundedWeight;
