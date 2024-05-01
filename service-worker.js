@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v4.75';
+const CACHE_NAME = 'app-cache-v4.76';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -151,18 +151,19 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     console.log('Fetching:', event.request.url);
     event.respondWith(
-        caches.open(CACHE_NAME).then(cache => { 
+        caches.open(CACHE_NAME).then(cache => {
             return cache.match(event.request).then(response => {
+                console.log(response ? `Found in cache: ${event.request.url}` : `Not found in cache, fetching: ${event.request.url}`);
                 const fetchPromise = fetch(event.request).then(networkResponse => {
-                    if (event.request.method === 'GET') {
-                        cache.put(event.request, networkResponse.clone()); // Update cache with new response
+                    console.log(`Fetched from network: ${event.request.url}`);
+                    if (event.request.method === 'GET' && networkResponse.ok) {
+                        cache.put(event.request, networkResponse.clone());
                     }
                     return networkResponse;
                 }).catch(error => {
                     console.error('Fetch failed for:', event.request.url, '; Error:', error);
-                    return response; // Return cached response if fetch fails
+                    return response;
                 });
-
                 return response || fetchPromise;
             });
         })
