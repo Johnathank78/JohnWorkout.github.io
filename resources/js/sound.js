@@ -4,7 +4,9 @@ const beep2x3Path = './resources/sounds/beep2x3.mp3';
 var beepPlayer = false;
 var beep2x3Player = false;
 
-function constructPlayer(url, interval, volume = 0.5) {
+function constructPlayer(url, interval, volume = false){
+    volume = muted ? 0 : !volume && !audio_lv ? 0.5 : audio_lv;
+    
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const gainNode = audioCtx.createGain();
     
@@ -77,7 +79,7 @@ function playBeep(player, times){
 
 function audioMouseDownHandler() {
     beepPlayer = constructPlayer(beepPath, 1000);
-    beep2x3Player =  constructPlayer(beep2x3Path, 1000);
+    beep2x3Player = constructPlayer(beep2x3Path, 1000);
     
     if(isWebMobile){
         $(document).off("touchstart", audioMouseDownHandler);
