@@ -258,7 +258,7 @@ function get_session_stats(session){
             };
         }else if(type == "Uni."){
             roundedWeight = unitRound(item[4]);
-            reps = 2 * parseInt(item[2]) * parseInt(item[3]);
+            reps = parseInt(item[2]) * parseInt(item[3]);
             repsDone += reps;
             workedTime += reps * 2.1;
             weightLifted += reps * roundedWeight;

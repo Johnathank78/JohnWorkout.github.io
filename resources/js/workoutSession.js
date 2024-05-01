@@ -1922,6 +1922,8 @@ $(document).ready(function(){
         isRemaningPreviewing = true;
 
         let type = false;
+        let set = false;
+        let name = false;
         let sessionPart = ["W", "name", []];
         let remainingExos = $('.session_next_exercise');
 
@@ -1929,12 +1931,21 @@ $(document).ready(function(){
 
         for (let i = 0; i < remainingExos.length; i++) {
             const exercise = $(remainingExos[i]);
-            type = $(exercise).find(".session_next_exercise_type").text();
+            type = $(exercise).find(".session_next_exerciseType").first().text();
+            set = parseInt($(exercise).find(".session_next_exercise_set").length)
+            name = $(exercise).find(".session_next_exercise_name").first().text().replace(' - '+textAssets[language]["misc"]["rightInitial"], '').replace(' - '+textAssets[language]["misc"]["leftInitial"], '')
             
+            if(type == "Uni" && next_name == name){
+                if(!Ltimer){set += 1};
+                if(!Rtimer){set += 1};
+            }else if(type == "Bi" && next_name == name){
+                if(!Ltimer){set += 1};
+            };
+
             if(type == "Int"){
                 sessionPart[2].push([
                     type+".",
-                    $(exercise).find(".session_next_exercise_name").first().text(),
+                    name,
                     $(exercise).find('.session_next_exercise_work').first().text(),
                     $(exercise).find('.session_next_exercise_rest').first().text(),
                     $(exercise).find(".session_next_exercise_cycle").text()
@@ -1942,8 +1953,8 @@ $(document).ready(function(){
             }else if(type == "Bi"){
                 sessionPart[2].push([
                     type+".",
-                    $(exercise).find(".session_next_exercise_name").first().text(),
-                    $(exercise).find(".session_next_exercise_set").length.toString(),
+                    name,
+                    set,
                     $(exercise).find('.session_next_exercise_reps').first().text(),
                     $(exercise).find('.session_next_exercise_weight').first().text(),
                     get_time_u($(exercise).find('.session_next_exercise_rest').first().text())
@@ -1951,8 +1962,8 @@ $(document).ready(function(){
             }else if(type == "Uni"){
                 sessionPart[2].push([
                     type+".",
-                    $(exercise).find(".session_next_exercise_name").first().text(),
-                    Math.floor($(exercise).find(".session_next_exercise_set").length/2).toString(),
+                    name,
+                    set,
                     $(exercise).find('.session_next_exercise_reps').first().text(),
                     $(exercise).find('.session_next_exercise_weight').first().text(),
                     get_time_u($(exercise).find('.session_next_exercise_rest').first().text())
