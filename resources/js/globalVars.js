@@ -635,7 +635,7 @@ var expanderOpenedHeight = mobile == "IOS" ? "calc(83vh - 65px)" : "calc(90vh - 
 var current_page = "selection";
 var color = null; var mid_color = null; var light_color = null;
 
-/*KONSOLEADD
+
 
 var consoleShown = true;
 var konsole = new Konsole($(".konsole"));
@@ -655,7 +655,7 @@ $(document).on("click", '.konsole_tiret', function(){
     consoleShown = !consoleShown;
 })
 
-KONSOLEADD*/
+
 
 $(document).ready(function(){
     addIMG = $("#addIMG").attr('src');
