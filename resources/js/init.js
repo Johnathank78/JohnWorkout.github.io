@@ -1,5 +1,3 @@
-import Konsole from './Konsole.js
-
 var parameters = false;
 var language = localStorage.getItem("parameterss") !== null ? JSON.parse(localStorage.getItem("parameterss"))[0] : "english";
 var autoSaver = false;

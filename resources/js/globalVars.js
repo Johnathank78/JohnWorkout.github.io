@@ -1,3 +1,5 @@
+import Konsole from './Konsole.js
+
 const platform = "Web";
 const mobile = "Android";
 const isWebMobile = /Mobi/.test(navigator.userAgent);
