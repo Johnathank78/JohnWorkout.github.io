@@ -77,8 +77,10 @@ $(document).ready(function(){
     exercise_reorder = new FlexReorder($(".update_exercice_container")[0]);
     sets_reorder = new FlexReorder($(".session_next_exercises_container")[0]);
 
+    /*
     console.log('Device Width:', window.screen.width);
     console.log('Device Height:', window.screen.height);
     console.log('Device Pixel Ratio:', window.devicePixelRatio);
     console.log('Orientation:', window.orientation);
+    */
 });//readyEnd
