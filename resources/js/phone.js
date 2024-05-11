@@ -571,8 +571,8 @@ if(platform == "Mobile"){
             pauseApp();
         }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
             await resumeApp();
-            beepPlayer = constructPlayer(beepPath, 1000);
-            beep2x3Player = constructPlayer(beep2x3Path, 1000);
+            //HGHADD_beepPlayer = constructPlayer(beepPath, 1000);
+            //HGHADD_beep2x3Player = constructPlayer(beep2x3Path, 1000);
             isIdle = false;
         };
     });
