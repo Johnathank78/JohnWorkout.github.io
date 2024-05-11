@@ -21,8 +21,17 @@ function constructPlayer(url, interval, volume = false){
         gainNode.gain.value = newVolume;
     };
 
+    function suspendAudioContext() {
+        if (audioCtx.state === 'running') {
+            audioCtx.suspend().then(() => {
+                console.log("Audio Context suspended successfully.");
+            }).catch((error) => {
+                console.error("Error suspending Audio Context:", error);
+            });
+        };
+    };
+
     function resumeAudioContext() {
-        console.log(audioCtx.state)
         if (audioCtx.state === 'suspended') {
             audioCtx.resume().then(() => {
                 console.log("Audio Context resumed successfully.");
@@ -79,6 +88,7 @@ function constructPlayer(url, interval, volume = false){
                 }, interval);
             });
         },
+        suspendAudioContext,
         resumeAudioContext
     };
 };

@@ -568,6 +568,8 @@ if(platform == "Mobile"){
     document.addEventListener("visibilitychange", async () => {
         if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
             isIdle = true;
+            beepPlayer.suspendAudioContext();
+            beep2x3Player.suspendAudioContext();
             pauseApp();
         }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
             await resumeApp();
