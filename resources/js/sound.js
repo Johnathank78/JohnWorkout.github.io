@@ -21,6 +21,17 @@ function constructPlayer(url, interval, volume = false){
         gainNode.gain.value = newVolume;
     };
 
+    function resumeAudioContext() {
+        console.log(audioCtx.state)
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume().then(() => {
+                console.log("Audio Context resumed successfully.");
+            }).catch((error) => {
+                console.error("Error resuming Audio Context:", error);
+            });
+        };
+    };
+
     function loadSound(url, callback) {
         const request = new XMLHttpRequest();
         request.open('GET', url, true);
@@ -67,7 +78,8 @@ function constructPlayer(url, interval, volume = false){
                     }
                 }, interval);
             });
-        }
+        },
+        resumeAudioContext
     };
 };
 
