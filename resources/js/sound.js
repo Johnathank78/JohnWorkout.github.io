@@ -86,12 +86,13 @@ function constructPlayer(url, interval, volume = false){
 };
 
 function playBeep(player, times){
-    if(!muted){beepPlayer.setVolume(audio_lv)};
+    if(!muted){player.setVolume(audio_lv)};
     beepPlayer.setTimes(times);
     player.play();
 };
 
 function audioMouseDownHandler() {
+    console.log(audio_lv)
     beepPlayer = constructPlayer(beepPath, 1000);
     beep2x3Player = constructPlayer(beep2x3Path, 1000);
     
