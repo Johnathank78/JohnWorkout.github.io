@@ -23,21 +23,13 @@ function constructPlayer(url, interval, volume = false){
 
     function suspendAudioContext() {
         if (audioCtx.state === 'running') {
-            audioCtx.suspend().then(() => {
-                console.log("Audio Context suspended successfully.");
-            }).catch((error) => {
-                console.error("Error suspending Audio Context:", error);
-            });
+            audioCtx.suspend();
         };
     };
 
     function resumeAudioContext() {
         if (audioCtx.state === 'suspended') {
-            audioCtx.resume().then(() => {
-                console.log("Audio Context resumed successfully.");
-            }).catch((error) => {
-                console.error("Error resuming Audio Context:", error);
-            });
+            audioCtx.resume();
         };
     };
 
