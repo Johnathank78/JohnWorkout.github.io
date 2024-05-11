@@ -86,17 +86,15 @@ function constructPlayer(url, interval, volume = false){
 };
 
 function playBeep(player, times){
-    if(!muted){player.setVolume(audio_lv)};
-    beepPlayer.setTimes(times);
+    player.setTimes(times);
     player.play();
 };
 
 function audioMouseDownHandler() {
-    console.log(audio_lv)
     beepPlayer = constructPlayer(beepPath, 1000);
     beep2x3Player = constructPlayer(beep2x3Path, 1000);
     
-    audio_set(audio_lv);
+    if(!muted){audio_set(audio_lv)}else{audio_set(0)};
 
     if(isWebMobile){
         $(document).off("touchstart", audioMouseDownHandler);
