@@ -291,6 +291,7 @@ function updateCalendarDictItem(key, newKey){
     calendar_save(calendar_dict);
 };
 
+
 function audio_read(){
     let audio_lv = localStorage.getItem("audio_lv");
     let muted = localStorage.getItem("muted");
@@ -303,11 +304,9 @@ function audio_read(){
 
     if(audio_lv === null){
         audio_lv = 0.5;
-        audio_set(audio_lv);
         audio_save(audio_lv);
     }else{
         audio_lv = parseFloat(audio_lv);
-        audio_set(audio_lv);
     };
 
     return [audio_lv, muted];

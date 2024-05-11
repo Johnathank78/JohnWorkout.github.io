@@ -95,6 +95,8 @@ function audioMouseDownHandler() {
     beepPlayer = constructPlayer(beepPath, 1000);
     beep2x3Player = constructPlayer(beep2x3Path, 1000);
     
+    audio_set(audio_lv);
+
     if(isWebMobile){
         $(document).off("touchstart", audioMouseDownHandler);
     }else{
