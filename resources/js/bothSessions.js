@@ -201,7 +201,6 @@ async function quit_session(failed=false){
         
         current_history[0][2] += 1;
 
-
         stats_save([timeSpent, workedTime, weightLifted, repsDone, since]);
 
         if(current_session[0] == "W" && current_history[0][1] == "true"){
@@ -280,6 +279,7 @@ async function quit_session(failed=false){
     $('.session_next_exercise_expander').css("display", "flex");
 
     recovery = false;
+    undoMemory = [];
     localStorage.removeItem("recovery");
     canNowClick("allowed");
 };

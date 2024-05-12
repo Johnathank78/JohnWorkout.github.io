@@ -681,12 +681,28 @@
     bottom: 16px;
     right: 16px;
 
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
     padding: 10px;
 
     cursor: pointer;
     display: none;
+}
+
+.session_undo{
+    z-index: 998;
+    position: absolute;
+
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(246deg) brightness(105%) contrast(103%);
+
+    bottom: 16px;
+    left: 16px;
+
+    width: 18px;
+    height: 18px;
+    padding: 10px;
+
+    cursor: pointer;
 }
 
 .session_current_exercise_name{

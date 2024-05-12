@@ -199,7 +199,7 @@ function update_timer(item, ref, i){
     $(item).text(output);
 };
 
-function get_session_time(session){
+function get_session_time(session, uniFix=false){
     if(session[0] == "I"){
         return (session[4] * (time_unstring(session[2]) + time_unstring(session[3])) - time_unstring(session[3]) + 5);
     }else if(session[0] == "W"){
@@ -216,7 +216,11 @@ function get_session_time(session){
                     total += session[2][i][2] * (time_unstring(session[2][i][3])*2.1 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
                 };
             }else if(session[2][i][0] == "Uni."){
-                total += 2 * (session[2][i][2] * (time_unstring(session[2][i][3])*2.1 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]));
+                if(uniFix){
+                    total += (session[2][i][2] * (time_unstring(session[2][i][3])*2.1 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]));
+                }else{
+                    total += 2 * (session[2][i][2] * (time_unstring(session[2][i][3])*2.1 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]));
+                };
             }else if(session[2][i][0] == "Pause"){
                 if(i != session[2].length - 1){total += time_unstring(session[2][i][1])};
             };
