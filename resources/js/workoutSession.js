@@ -166,10 +166,10 @@ function stopXtimer(manual=false){
 };
 
 function startWorkout(){
-    recovery = [current_session[current_session.length - 1], "" , "", "", ""];
+    recovery = [current_session[current_session.length - 1], "" , "", "", "", []];
 
     TPtimer = setInterval(() => {
-        if(!isIdle){
+        if(!isIdle && hasReallyStarted){
             TemptimeSpent++;
             $(".selection_info_TimeSpent").text(get_time_u(timeFormat(TemptimeSpent)));
 
@@ -328,15 +328,12 @@ function workout(exercises_list){
         hasStarted = true;
         hasReallyStarted = true;
 
-        $('.session_undo').css('display', 'block');
-
         TPtimer = setInterval(() => {
             if(!isIdle){
                 TemptimeSpent++;
                 $(".selection_info_TimeSpent").text(get_time_u(timeFormat(TemptimeSpent)));
 
                 recovery[4][0] = TemptimeSpent;
-                recovery_save(recovery);
             }
         }, 1000);
 
@@ -366,6 +363,9 @@ function workout(exercises_list){
         beforeExercise = recovery[1]['beforeExercise'];
 
         tempNewHistory = recovery[3];
+        undoMemory = recovery[5];
+
+        if(undoMemory.length > 0){$('.session_undo').css('display', 'block')};
 
         if(extype == "Wrm"){
             remaining_sets = 1;
@@ -1041,7 +1041,7 @@ function woIntervallLeave(){
 
     ongoing = "workout";
     udpate_recovery("workout");
-    
+
     next_exercise(true);
 }
 
@@ -1400,6 +1400,30 @@ function dropExo_static(exo){
 
 // UNDO
 
+function recoveryUpdateFromUndo(undoData){
+    tempNewHistory[1] = undoData[1]['TemptimeSpent'];
+
+    recovery[1] = {
+        "extype": undoData[1]['extype'],
+        "next_name": undoData[1]['next_name'],
+        "next_rest": undoData[1]['next_rest'],
+        "LrestTime": undoData[1]['LrestTime'],
+        "RrestTime": undoData[1]['RrestTime'],
+        "next_specs": undoData[1]['next_specs'],
+        "actual_setL": undoData[1]['actual_setL'],
+        "actual_setR": undoData[1]['actual_setR'],
+        "actual_setNb": undoData[1]['actual_setNb'],
+        "beforeExercise": undoData[1]['beforeExercise']
+    };
+    
+    recovery[2] = undoData[0];
+    recovery[3] = undoData[1]['tempNewHistory'];
+    recovery[4] = [undoData[1]['TemptimeSpent'], undoData[1]['TempworkedTime'], undoData[1]['TempweightLifted'], undoData[1]['TemprepsDone']];
+    recovery[5] = undoMemory;
+
+    recovery_save(recovery);
+};
+
 function undoMemorise(way){
     if(way == 'in'){
         let undoData = [$('.session_next_exercises_container').html(), {}];
@@ -1424,7 +1448,7 @@ function undoMemorise(way){
         undoData[1]['TempworkedTime'] =  TempworkedTime;
         undoData[1]['TempweightLifted'] =  TempweightLifted;
         undoData[1]['TemprepsDone'] =  TemprepsDone;
-        undoData[1]['recovery'] =  recovery;
+        undoData[1]['tempNewHistory'] =  tempNewHistory;
         undoData[1]['next_name'] =  next_name;
         undoData[1]['next_specs'] =  next_specs;
         undoData[1]['next_rest'] =  next_rest;
@@ -1434,16 +1458,19 @@ function undoMemorise(way){
         undoData[1]['actual_setL'] =  actual_setL;
         undoData[1]['actual_setNb'] =  actual_setNb;
         undoData[1]['beforeExercise'] =  beforeExercise;
+        
         undoData[1]['LrestLib'] =  $('.Lrest').text();
         undoData[1]['RrestLib'] =  $('.Rrest').text();
-        
+
+
+        $('.session_undo').css('display', 'block');
         undoMemory.push(undoData);
     }else if(way == "out"){
         if(undoMemory.lenght < 1){return};
-
+        
         let undoData = undoMemory[undoMemory.length - 1];
         undoMemory = undoMemory.slice(0, -1);
-
+        
         if(extype != "Uni" && undoData[1]['extype'] == "Uni" || finished && extype == "Uni"){
             $('.session_exercise_Rrest_btn').css("display", "flex");
             updateRestBtnStyle('Uni');
@@ -1452,7 +1479,7 @@ function undoMemorise(way){
         }else{
             if(Lrest){resetTimer("L")};
         };
-
+        
         Ldone = undoData[1]['Ldone'];
         Rdone = undoData[1]['Rdone'];
         Llast = undoData[1]['Llast'];
@@ -1473,7 +1500,7 @@ function undoMemorise(way){
         TempworkedTime = undoData[1]['TempworkedTime'];
         TempweightLifted = undoData[1]['TempweightLifted'];
         TemprepsDone = undoData[1]['TemprepsDone'];
-        recovery = undoData[1]['recovery'];
+        tempNewHistory = undoData[1]['tempNewHistory'];
         next_name = undoData[1]['next_name'];
         next_specs = undoData[1]['next_specs'];
         next_rest = undoData[1]['next_rest'];
@@ -1483,6 +1510,7 @@ function undoMemorise(way){
         actual_setL = undoData[1]['actual_setL'];
         actual_setNb = undoData[1]['actual_setNb'];
         beforeExercise = undoData[1]['beforeExercise'];
+
         $('.Lrest').text(undoData[1]['LrestLib']);
         $('.Rrest').text(undoData[1]['RrestLib']);
 
@@ -1490,7 +1518,7 @@ function undoMemorise(way){
             if(beforeExercise){
                 $('.session_exercise_Rrest_btn').css("display", "none");
                 updateRestBtnStyle('Reset');
-            }else{  
+            }else{
                 if(Ldone){$(".session_exercise_Lrest_btn").css('opacity', '.7')}else{$(".session_exercise_Lrest_btn").css('opacity', '1')};
                 if(Rdone){$(".session_exercise_Rrest_btn").css('opacity', '.7')}else{$(".session_exercise_Rrest_btn").css('opacity', '1')};
             };
@@ -1501,8 +1529,14 @@ function undoMemorise(way){
         $(".session_workout_remaining_sets").text(remaining_sets);
         $('.session_next_exercises_container').html(undoData[0]);
 
-        recovery_save(recovery);
-    }
+        if(!hasReallyStarted){
+            $('.session_undo').css('display', 'none');
+            localStorage.removeItem("recovery");
+        }else{
+            recoveryUpdateFromUndo(undoData);
+            recovery_save(recovery);
+        };
+    };
 };
 
 $(document).ready(function(){
@@ -1784,6 +1818,8 @@ $(document).ready(function(){
             $(".session_hintText").css('text-align', 'left');
         };
     });
+
+    // UNDO;
     
     $(document).on("click", ".session_undo", function(){
         if(!cannotClick){undoMemorise('out')};

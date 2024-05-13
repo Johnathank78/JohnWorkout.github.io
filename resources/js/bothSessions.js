@@ -482,11 +482,13 @@ function udpate_recovery(mode, data=false){
             "actual_setR": actual_setR,
             "actual_setNb": actual_setNb,
             "beforeExercise": beforeExercise
-        }
+        };
         
         recovery[2] = $(".session_next_exercises_container").html();
         recovery[3] = tempNewHistory;
         recovery[4] = [TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone];
+
+        recovery[5] = undoMemory;
 
         recovery_save(recovery);
     }else if(mode == "intervall"){
