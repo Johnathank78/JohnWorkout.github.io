@@ -335,8 +335,8 @@ $(document).ready(function(){
         if(!hasAudioBeenGranted && isWebMobile){
             hasAudioBeenGranted = true;
 
-            //GHADD_beepPlayer = constructPlayer(beepPath, 1000);
-            //GHADD_beep2x3Player = constructPlayer(beep2x3Path, 1000);
+            beepPlayer = constructPlayer(beepPath, 1000);
+            beep2x3Player = constructPlayer(beep2x3Path, 1000);
         };
 
         let item = $(this).closest(".selection_session_tile");
