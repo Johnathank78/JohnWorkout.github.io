@@ -703,6 +703,7 @@
     padding: 10px;
 
     cursor: pointer;
+    display: none;
 }
 
 .session_current_exercise_name{

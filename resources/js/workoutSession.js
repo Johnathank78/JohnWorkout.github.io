@@ -326,6 +326,9 @@ function workout(exercises_list){
     }else{
 
         hasStarted = true;
+        hasReallyStarted = true;
+
+        $('.session_undo').css('display', 'block');
 
         TPtimer = setInterval(() => {
             if(!isIdle){
@@ -862,8 +865,7 @@ function display_info(){
     );
 };
 
-function update_info(update=false, undo=false){
-    //if(!undo){undoMemorise('in')};
+function update_info(update=false){
     if(update){update_info_vars()};
 
     display_info();
@@ -1030,12 +1032,16 @@ function woIntervallLeave(){
     if(platform == "Mobile" && mobile != "IOS"){if(!isSaving){StatusBar.setBackgroundColor({color: color })}};
 
     update_soundSlider();
-
+    
     clearInterval(sIntervall);
+    sIntervall = false;
+
     exit_confirm("dark");
+    infoStyle('session');
 
     ongoing = "workout";
-
+    udpate_recovery("workout");
+    
     next_exercise(true);
 }
 
@@ -1509,7 +1515,10 @@ $(document).ready(function(){
 
         if(hasStarted){undoMemorise('in')};
 
-        if(hasStarted && !hasReallyStarted){hasReallyStarted = true};
+        if(hasStarted && !hasReallyStarted){
+            hasReallyStarted = true;
+            $('.session_undo').css('display', 'block');
+        };
 
         if(!hasStarted){
             startWorkout();
@@ -1577,7 +1586,10 @@ $(document).ready(function(){
 
         if(hasStarted){undoMemorise('in')};
 
-        if(hasStarted && !hasReallyStarted){hasReallyStarted = true};
+        if(hasStarted && !hasReallyStarted){
+            hasReallyStarted = true;
+            $('.session_undo').css('display', 'block');
+        };
 
         if(!Rtimer && !Rdone){
 
@@ -1774,7 +1786,7 @@ $(document).ready(function(){
     });
     
     $(document).on("click", ".session_undo", function(){
-        if(hasReallyStarted && !cannotClick){undoMemorise('out')};
+        if(!cannotClick){undoMemorise('out')};
     });
 
     // SETS PREVIEW && REORDER;

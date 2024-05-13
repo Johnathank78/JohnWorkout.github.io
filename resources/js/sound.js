@@ -5,7 +5,7 @@ var beepPlayer = false;
 var beep2x3Player = false;
 
 function constructPlayer(url, interval, volume = false){
-    volume = muted ? 0 : !volume && !audio_lv ? 0.5 : audio_lv;
+    volume = muted ? 0 : !volume && !audio_lv ? 0.5 : audio_lv * ;
     
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const gainNode = audioCtx.createGain();
@@ -89,22 +89,3 @@ function playBeep(player, times){
     player.setTimes(times);
     player.play();
 };
-
-function audioMouseDownHandler() {
-    beepPlayer = constructPlayer(beepPath, 1000);
-    beep2x3Player = constructPlayer(beep2x3Path, 1000);
-    
-    if(isWebMobile){
-        $(document).off("touchstart", audioMouseDownHandler);
-    }else{
-        $(document).off("mousedown", audioMouseDownHandler);
-    };
-};
-
-$(document).ready(function(){
-    if(isWebMobile){
-        $(document).on("touchstart", audioMouseDownHandler);
-    }else{
-        $(document).on("mousedown", audioMouseDownHandler);
-    };
-});//readyEnd

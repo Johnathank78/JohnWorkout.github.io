@@ -192,7 +192,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -274,6 +274,7 @@ async function quit_session(failed=false){
 
     $(".session_exercise_rest_btn_label").css('display', 'none');
     $(".session_intervall_skip").css("display", 'none');
+    $('.session_undo').css('display', 'none');
     $(".session_intervall_btn_container").css("justify-content", 'flex-end');
     $(".session_current_exercise_specs").css('display', 'flex');
     $('.session_next_exercise_expander').css("display", "flex");
@@ -802,26 +803,6 @@ $(document).ready(function(){
         if(e.target !== this){return};
 
         $('.blurBG').css('display', 'none');
-
-        let session = session_list[getSessionIndexByID(recovery[0])];
-        let history = getSessionHistory(session);
-
-        if(!((session[0] == "W" && (recovery[4][0] <= 90 || isHistoryDayEmpty(recovery[3]))) || session[0] == "I" && recovery[4][0] <= 60)){
-            if(session[0] == "W" && history[0][1] == "true"){
-                history.push(recovery[3]);
-                session_save(session_list);
-            };
-
-            timeSpent += recovery[4][0];
-            workedTime += recovery[4][1];
-            weightLifted += recovery[4][2];
-            repsDone += recovery[4][3];
-
-            stats_set([timeSpent, workedTime, weightLifted, repsDone]);
-            stats_save([timeSpent, workedTime, weightLifted, repsDone, since]);
-        };
-
-        //---------;
 
         localStorage.removeItem("recovery");
         recovery = false;

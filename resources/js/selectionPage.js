@@ -8,6 +8,7 @@ var mouseXSE = false;
 var isSwipingSE = false;
 var userScrollSE = false;
 var currentSEindex = 0;
+var hasAudioBeenGranted = false;
 
 function loadHistorydayz(history, scrollState){
 
@@ -330,6 +331,13 @@ $(document).ready(function(){
 
     $(document).on("click", ".selection_play_btn", async function(){
         if(cannotClick){return};
+
+        if(!hasAudioBeenGranted && isWebMobile){
+            hasAudioBeenGranted = true;
+
+            //GHADD_beepPlayer = constructPlayer(beepPath, 1000);
+            //GHADD_beep2x3Player = constructPlayer(beep2x3Path, 1000);
+        };
 
         let item = $(this).closest(".selection_session_tile");
         let session_List = $(".selection_session_tile");

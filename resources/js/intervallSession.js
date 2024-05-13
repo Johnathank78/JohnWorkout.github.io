@@ -83,46 +83,14 @@ function intervall(from_wo = false){
                         playBeep(beep2x3Player, 1);
 
                         if(from_wo){
-                            $(".session_intervall_container").css("display", "none");
-                            $(".session_continue_btn").css("display", "none");
-                            $('.session_workout_footer').css("display", "flex");
-                            $(".session_workout_container").css("display", "flex");
-                            
-                            $("html").css("background-color", dark_blue)
-
-                            color = dark_blue;
-                            light_color = light_dark_blue;
-                            mid_color = mid_dark_blue;
-                            update_soundSlider();
-
-                            if(platform == "Mobile" && mobile != "IOS"){
-                                StatusBar.setBackgroundColor({color : dark_blue});
-                            };
-
-                            ongoing = "workout";
-
-                            // Finished & recovery;
-                            actual_setL = 1;
-                            udpate_recovery("workout");
-                            if(finished){beforeExercise = false};
-
-                            //--------------------;
-
-                            next_exo = false;
-                            next_exercise(true);
-
-                            clearInterval(sIntervall);
-                            sIntervall = false;
-
-                            exit_confirm("dark");
-                            infoStyle('session');
-
+                            woIntervallLeave();
                             screensaver_toggle(false);
                             return;
                         };
 
                         session_state("end");
                         clearInterval(sIntervall);
+
                         Ifinished = true;
                         sIntervall = false;
                     }else{

@@ -318,7 +318,7 @@ function audio_save(val){
 };
 
 function audio_set(val){
-    let reevaluate = val * 0.32;
+    let reevaluate = val * 0.18;
     if(platform == "Web"){
         beepPlayer.setVolume(reevaluate);
         beep2x3Player.setVolume(reevaluate);

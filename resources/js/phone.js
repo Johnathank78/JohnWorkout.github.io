@@ -18,9 +18,7 @@ function goBack(platform){
         }else if(isExtraOut){
             $($(".selection_session_tile_extra_container")[isExtraOut - 1]).click();
         }else{
-            if(platform == "Web"){
-                window.history.back();
-            }else if (platform == "Mobile"){
+            if(platform == "Mobile"){
                 App.exitApp();
             };
         };
@@ -32,9 +30,13 @@ function goBack(platform){
         }else if(isSaving){
             screensaver_toggle(false);
         }else if(isSetPreviewing){
-            $(".blurBG").click();
+            $('.blurBG').css('display', 'none');
         }else if(isSetPreviewingHint){
-            $(".blurBG").click();
+            $('.blurBG').css('display', 'none');
+        }else if(isRemaningPreviewing){
+            $('.blurBG').css('display', 'none');
+        }else if(notesInp){
+            $('.session_workout_historyNotes_inp').blur();
         }else if(!isXin){
             $(".session_workout_extraTimer_container").click();
         }else if(notesInp){
@@ -45,9 +47,9 @@ function goBack(platform){
             current_page = "session_leave";
         };
     }else if(current_page == "session_leave"){
-        $(".blurBG").click();
+        $('.blurBG').css('display', 'none');
     }else if(current_page == "import"){
-        $(".blurBG").click();
+        $('.blurBG').css('display', 'none');
     }else{
         leave_update();
     };
