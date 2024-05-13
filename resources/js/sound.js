@@ -5,7 +5,7 @@ var beepPlayer = false;
 var beep2x3Player = false;
 
 function constructPlayer(url, interval, volume = false){
-    volume = muted ? 0 : !volume && !audio_lv ? 0.5 : audio_lv * ;
+    volume = muted ? 0 : !volume && !audio_lv ? 0.5 : audio_lv;
     
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const gainNode = audioCtx.createGain();
