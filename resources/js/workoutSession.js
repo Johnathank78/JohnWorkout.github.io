@@ -2016,7 +2016,7 @@ $(document).ready(function(){
 
         // if not rested or skpped, take in count the ongoing set;
 
-        for (let i = 0; i < remainingExos.length; i++) {
+        for (let i = 0; i < remainingExos.length; i++){
             const exercise = $(remainingExos[i]);
             type = $(exercise).find(".session_next_exerciseType").first().text();
             set = parseInt($(exercise).find(".session_next_exercise_set").length);

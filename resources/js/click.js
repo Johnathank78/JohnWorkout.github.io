@@ -162,7 +162,7 @@ $(document).ready(function(){
         $(this).data("completed", false);
 
         $(this).data("color", $(this).css("backgroundColor"));
-
+        
         if(this.getAttribute("darken") === null){
             $(this).data("darkColor", $(this).css("backgroundColor"));
         }else{
