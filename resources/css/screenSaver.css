@@ -15,7 +15,7 @@
     display: none;
 }
 
-.screensaver>*{
+.screensaver>*:not(.lockTouch){
     scale: 1.09;
     color: white;
     opacity: 0.25;
@@ -43,4 +43,34 @@
 .screensaver_Rtimer{
     font-weight: 500;
     font-size: 30px; 
+}
+
+.lockTouch{
+    position: absolute;
+    display: flex;
+
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    justify-content: center;
+    align-items: center;
+
+    width: 50vw;
+    max-width: 250px;
+    height: 30px;
+
+    color: rgb(196, 196, 196);
+    background-color: #2a2c31;
+
+    font-weight: 400;
+    font-size: 17px;
+
+    border-radius: 5px;
+    cursor: pointer;
+
+    display: none;
 }

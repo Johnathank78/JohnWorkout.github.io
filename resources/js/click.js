@@ -1,5 +1,3 @@
-var isReactShowin = false;
-
 function darkenColor(rgbString, value){
     const RGBToHSL = (r, g, b) => {
         r /= 255;
@@ -107,7 +105,7 @@ $(document).ready(function(){
         if($(this).data("onIntervall")){clearInterval($(this).data("onIntervall")); $(this).data("onIntervall", false)};
         if($(this).data("offIntervall")){clearInterval($(this).data("offIntervall")); $(this).data("offIntervall", false)};
 
-        let LC_speed = $(this).data("speed") * 0.5;
+        let LC_speed = $(this).data("speedOut");
         let LC_step = (100/LC_speed)*10;
 
         let LC_color = $(this).data("color");
@@ -175,36 +173,12 @@ $(document).ready(function(){
             $(this).data("speed", 1000);
         };
 
+        if(!isNaI(this.getAttribute("speedOut"))){
+            $(this).data("speedOut", parseInt(this.getAttribute("speedOut")));
+        }else{
+            $(this).data("speedOut", $(this).data("speed") * 0.5);
+        };
+
         $(this).data("counter", 0);
-    });
-
-    $('#target-image').click(function() {
-        const image = this;
-        const imageUrl = $(image).attr('src');
-
-        // Get the position and dimensions of the image
-        const offset = $(image).offset();
-        const width = $(image).width();
-        const height = $(image).height();
-
-        // Create the overlay div
-        const overlay = $('<div></div>').css({
-            position: 'absolute',
-            top: offset.top,
-            left: offset.left,
-            width: width,
-            height: height,
-            background: 'linear-gradient(to right, black, white)',
-            'mask-image': `url(${imageUrl})`,
-            'mask-size': 'contain',
-            'mask-repeat': 'no-repeat',
-            '-webkit-mask-image': `url(${imageUrl})`,
-            '-webkit-mask-size': 'contain',
-            '-webkit-mask-repeat': 'no-repeat',
-            'pointer-events': 'none'
-        });
-
-        // Append the overlay to the body
-        $('body').append(overlay);
     });
 });//readyEnd

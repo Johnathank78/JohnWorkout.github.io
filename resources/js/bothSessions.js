@@ -15,6 +15,7 @@ var slider_width = 0; var dot_width = 0;
 var containerPaddingLeft = 0; var dotBorderWidth = 0;
 var wakeLock = null;
 var mouseX = 0; var mouseY = 0;
+var lockState = true
 
 // Session
 
@@ -733,7 +734,12 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.screensaver', function(e){
+        if($(e.target).is('.lockTouch')){return}
         screensaver_toggle(false);
+    });
+
+    $(document).on('longClicked', '.lockTouch', function(e){
+        $(this).text();
     });
 
     // AUDIO SLIDER;
@@ -796,7 +802,7 @@ $(document).ready(function(){
         $(document).on("mousemove", function(e){sliderMouseMove(e)});
     
         $(document).on("mouseup", function(){sliderMouseUp()});
-    }
+    };
     
 
     // RECOVERY;
