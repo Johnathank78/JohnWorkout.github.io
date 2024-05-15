@@ -177,4 +177,34 @@ $(document).ready(function(){
 
         $(this).data("counter", 0);
     });
+
+    $('#target-image').click(function() {
+        const image = this;
+        const imageUrl = $(image).attr('src');
+
+        // Get the position and dimensions of the image
+        const offset = $(image).offset();
+        const width = $(image).width();
+        const height = $(image).height();
+
+        // Create the overlay div
+        const overlay = $('<div></div>').css({
+            position: 'absolute',
+            top: offset.top,
+            left: offset.left,
+            width: width,
+            height: height,
+            background: 'linear-gradient(to right, black, white)',
+            'mask-image': `url(${imageUrl})`,
+            'mask-size': 'contain',
+            'mask-repeat': 'no-repeat',
+            '-webkit-mask-image': `url(${imageUrl})`,
+            '-webkit-mask-size': 'contain',
+            '-webkit-mask-repeat': 'no-repeat',
+            'pointer-events': 'none'
+        });
+
+        // Append the overlay to the body
+        $('body').append(overlay);
+    });
 });//readyEnd
