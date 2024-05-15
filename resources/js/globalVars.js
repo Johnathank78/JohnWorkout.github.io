@@ -234,7 +234,8 @@ const textAssets = {
             "parameters": "mis à jour",
             "read": "Permission de lecture refusée",
             "write": "Permission d'écriture refusée",
-            "audioBroken": "Contrôle du son non disponible"
+            "audioBroken": "Contrôle du son non disponible",
+            "longClickable": "Appuie longtemps pour valider"
         },
         "sessionEnd": {
             "mainText": {
@@ -543,7 +544,8 @@ const textAssets = {
             "parameters": "updated",
             "read": "Read permission error",
             "write": "Write permission error",
-            "audioBroken": "Sound control not available"
+            "audioBroken": "Sound control not available",
+            "longClickable": "Long press to confirm"
         },
         "sessionEnd": {
             "mainText": {
@@ -673,6 +675,7 @@ $(document).ready(function(){
     timer2IMG = $("#timer2IMG").attr('src');
     tickIMG = $("#tickIMG").attr('src');
     arrowIMG = $("#arrowIMG").attr('src');
+    previewIMG = $('#previewIMG').attr('src');
 
     $("img").attr("draggable", false);
 });//readyEnd

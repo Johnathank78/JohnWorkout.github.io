@@ -15,7 +15,7 @@ var botNotifTO = false;
 var ongoingQueue = false;
 var botNotifQueue = [];
 
-function bottomNotification(from, target, queued=false){
+function bottomNotification(from, target="", queued=false){
 
     if(botNotifTO || ongoingQueue && !queued){
         ongoingQueue = true;
@@ -76,6 +76,15 @@ function bottomNotification(from, target, queued=false){
         $(".bottomNotification_Icon").css('scale', "1");
 
         $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['updated']);
+    }else if(from == "longClick"){
+        $('.bottomNotification_Icon').css('filter', redFilter);
+        $(".bottomNotification_msg").css('color', redText);
+        $('.bottomNotification').css("backgroundColor", redBG);
+
+        $(".bottomNotification_Icon").attr('src', previewIMG);
+
+        $(".bottomNotification_Icon").css('scale', "1.1");
+        $(".bottomNotification_msg").text(textAssets[language]["bottomNotif"]['longClickable']);
     };
 
     setTimeout(() => {summonBottomNotification()}, 300);

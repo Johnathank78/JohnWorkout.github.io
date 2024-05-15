@@ -36,7 +36,7 @@ async function readFromFile(folderName, fileName) {
         const permission = await Filesystem.checkPermissions();
 
         if (permission.publicStorage !== 'granted') {
-            bottomNotification("read", "")
+            bottomNotification("read")
             console.log('L\'autorisation est refusée.');
             return
         }
@@ -333,12 +333,12 @@ $(document).ready(function(){
                     if(downloadTest == "Failed"){
                         if(navigator.canShare({ files })){
                             await navigator.share({ files });
-                            bottomNotification("exported", "");
+                            bottomNotification("exported");
                         } else {
-                            bottomNotification("write", "");
+                            bottomNotification("write");
                         };
                     }else{
-                        bottomNotification("exported", "");
+                        bottomNotification("exported");
                     };
                 };
             };

@@ -130,6 +130,7 @@
             <img src="./resources/imgs/grab.svg" alt="" id="grabIMG">
             <img src="./resources/imgs/next.svg" alt="" id="nextIMG">
             <img src="./resources/imgs/parameters.svg" alt="" id="parametersIMG">
+            <img src="./resources/imgs/preview.png" alt="" id="previewIMG">
             <img src="./resources/imgs/pause.svg" alt="" id="pauseIMG">
             <img src="./resources/imgs/play.svg" alt="" id="playIMG">
             <img src="./resources/imgs/sound_full.svg" alt="" id="sound_fullIMG">
@@ -279,7 +280,7 @@
                 <span class="session_exist_text">Exit the session ?</span>
                 <span class="session_exist_subtext">Your progression will be lost</span>
                 <div class="session_exit_button_container">
-                    <button class="session_exit_btn session_exit_y">Quit</button>
+                    <button darken="10" speed="750" class="session_exit_btn session_exit_y longClickable">Quit</button>
                     <button class="session_exit_btn session_exit_n">Cancel</button>
                 </div>
             </div>
@@ -723,7 +724,7 @@
                     </div>
     
                     <div class="sessions_rests_container">
-                        <div speed="600" class="session_exercise_Lrest_btn longClickable noselect">
+                        <div speed="600" alert="false" class="session_exercise_Lrest_btn longClickable noselect">
                             <div class="session_exercise_Lrest_react rest_react"></div>
                             <span class="session_exercise_rest_btn_label session_btnLabelL">Left</span>
                             <span class="session_exercise_rest_text Lrest">Rest</span>
@@ -731,7 +732,7 @@
                             <input type="text" readonly="readonly" class="timeString session_exercise_restInput Linput">
                         </div>
                         
-                        <div speed="600" class="session_exercise_Rrest_btn longClickable noselect">
+                        <div speed="600" alert="false" class="session_exercise_Rrest_btn longClickable noselect">
                             <div class="session_exercise_Rrest_react rest_react"></div>
                             <span class="session_exercise_rest_btn_label session_btnLabelR">Right</span>
                             <span class="session_exercise_rest_text Rrest">Rest</span>

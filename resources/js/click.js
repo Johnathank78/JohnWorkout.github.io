@@ -1,3 +1,6 @@
+var longClickTS = false;
+var isReactShowin = false;
+
 function darkenColor(rgbString, value){
     const RGBToHSL = (r, g, b) => {
         r /= 255;
@@ -46,6 +49,8 @@ $(document).ready(function(){
         if(!$(this).data("canLongClick")){return};
         if($(this).data("onIntervall")){clearInterval($(this).data("onIntervall")); $(this).data("onIntervall", false)};
         if($(this).data("offIntervall")){clearInterval($(this).data("offIntervall")); $(this).data("offIntervall", false)};
+
+        longClickTS = Date.now();
 
         let LC_speed = $(this).data("speed");
         let LC_step = (100/LC_speed)*10;
@@ -110,6 +115,10 @@ $(document).ready(function(){
 
         let LC_color = $(this).data("color");
         let LC_darkColor = $(this).data("darkColor");
+
+        if(Date.now() - longClickTS < 150 && $(this).data("alert")){
+            bottomNotification("longClick");
+        };
 
         $(this).data("offIntervall", setInterval(() => {
             if($(this).data("counter") > 0){
@@ -177,6 +186,12 @@ $(document).ready(function(){
             $(this).data("speedOut", parseInt(this.getAttribute("speedOut")));
         }else{
             $(this).data("speedOut", $(this).data("speed") * 0.5);
+        };
+
+        if(this.getAttribute("alert") == "false"){
+            $(this).data("alert", false);
+        }else{
+            $(this).data("alert", true);
         };
 
         $(this).data("counter", 0);

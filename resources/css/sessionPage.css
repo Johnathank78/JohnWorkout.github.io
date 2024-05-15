@@ -239,7 +239,7 @@
 }
 
 .bottomNotification{
-    z-index: 999;
+    z-index: 1001;
     position: absolute;
     
     display: flex;

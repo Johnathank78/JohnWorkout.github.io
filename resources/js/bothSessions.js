@@ -15,7 +15,6 @@ var slider_width = 0; var dot_width = 0;
 var containerPaddingLeft = 0; var dotBorderWidth = 0;
 var wakeLock = null;
 var mouseX = 0; var mouseY = 0;
-var isReactShowin = false;
 var lockState = false;
 
 // Session
@@ -712,15 +711,14 @@ function screensaver_set(text=false, time=false, isR=false, isX=false){
 };
 
 $(document).ready(function(){
-    $(".session_exit_btn").on("click", function(e){
+    $(".session_exit_n").on("click", function(e){
         canNowClick("allowed");
+        closePanel('session_cancel');
+    });
 
-        if($(this).text() == textAssets[language]["inSession"]["quit"]){
-            closePanel('session_exit');
-            quit_session(current_session[0] == 'I' && Ifinished === false || current_session[0] == 'W' && finished === false);
-        }else if($(this).text() == textAssets[language]["inSession"]["cancel"]){
-            closePanel('session_cancel');
-        };
+    $('.session_exit_y').on('longClicked', function(e){
+        closePanel('session_exit');
+        quit_session(current_session[0] == 'I' && Ifinished === false || current_session[0] == 'W' && finished === false);
     });
 
     // SCREENSAVER;
