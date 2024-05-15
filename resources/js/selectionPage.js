@@ -332,7 +332,7 @@ $(document).ready(function(){
     $(document).on("click", ".selection_play_btn", async function(){
         if(cannotClick){return};
 
-        if(!hasAudioBeenGranted && isWebMobile){
+        if(!hasAudioBeenGranted){
             hasAudioBeenGranted = true;
 
             beepPlayer = constructPlayer(beepPath, 1000);
