@@ -12,7 +12,8 @@ JohnWorkout est une web-application de musculation, permettant à ses utilisateu
 ## Installation
 
 ### Android (Natif)
-Téléchargez l'APK depuis l'adresse : [APKADRESS]
+Téléchargez l'APK depuis l'adresse : [Workouts.apk](https://drive.google.com/file/d/1BWUjyBbUiRYJo2QFS_jP634gMBag3__D/view?usp=sharing)
+
 Ou installez la en tant que PWA : [johnathank78.github.io/JohnWorkout.github.io/](https://johnathank78.github.io/JohnWorkout.github.io/)
 
 ### iOS (Web)
