@@ -12,6 +12,8 @@ function intervall(from_wo = false){
     session_state('get_ready');
     exit_confirm("light");
 
+    $('.lockTouch').css('display', 'flex');
+
     Ispent = 0;
     playBeep(beepPlayer, 1);
 
@@ -81,6 +83,9 @@ function intervall(from_wo = false){
 
                     if (iCurrent_cycle == 0){
                         playBeep(beep2x3Player, 1);
+
+                        $('.lockTouch').css('display', 'none');
+                        lockState = false;
 
                         if(from_wo){
                             woIntervallLeave();

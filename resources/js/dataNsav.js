@@ -318,20 +318,18 @@ function audio_save(val){
 };
 
 function audio_set(val){
-    let reevaluate = val * 0.7;
-
     if(platform == "Web"){
-        beepPlayer.setVolume(reevaluate);
-        beep2x3Player.setVolume(reevaluate);
+        beep.volume = val;
+        beep2x3.volume = val;
     }else{
         NativeAudio.setVolume({
             assetId: 'beep',
-            volume: reevaluate,
+            volume: val,
         });
 
         NativeAudio.setVolume({
             assetId: 'beep2x3',
-            volume: reevaluate,
+            volume: val,
         });
     };
 

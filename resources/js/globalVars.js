@@ -151,6 +151,8 @@ const textAssets = {
         },
         "screenSaver": {
             "saver": "Economiseur",
+            "lock": "Bloquer",
+            "unlock": "Débloquer"
         },
         "inSession": {
             "noMore": "Plus de séries",
@@ -458,6 +460,8 @@ const textAssets = {
         },
         "screenSaver": {
             "saver": "Saver",
+            "lock": "Lock",
+            "unlock": "Unlock"
         },
         "inSession": {
             "noMore": "No more sets",

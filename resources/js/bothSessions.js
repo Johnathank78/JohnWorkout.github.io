@@ -15,7 +15,8 @@ var slider_width = 0; var dot_width = 0;
 var containerPaddingLeft = 0; var dotBorderWidth = 0;
 var wakeLock = null;
 var mouseX = 0; var mouseY = 0;
-var lockState = true
+var isReactShowin = false;
+var lockState = false;
 
 // Session
 
@@ -193,7 +194,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -739,7 +740,13 @@ $(document).ready(function(){
     });
 
     $(document).on('longClicked', '.lockTouch', function(e){
-        $(this).text();
+        if(lockState){
+            $(this).text(textAssets[language]['screenSaver']['lock']);
+        }else{
+            $(this).text(textAssets[language]['screenSaver']['unlock']);
+        };
+
+        lockState = !lockState;
     });
 
     // AUDIO SLIDER;

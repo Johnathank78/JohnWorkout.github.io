@@ -833,6 +833,8 @@ function changeLanguage(lang, first=false){
     $(".screensaver_Ltimer_prefix").text(textAssets[lang]["misc"]["leftInitial"] + " |");
     $(".screensaver_Rtimer_prefix").text(textAssets[lang]["misc"]["rightInitial"] + " |");
 
+    $(".lockTouch").text(textAssets[language]['screenSaver']['lock'])
+
     $(".session_exist_text").text(textAssets[lang]["inSession"]["exitQuestion"]);
     $(".session_exist_subtext").text(textAssets[lang]["inSession"]["exitDetails"]);
 

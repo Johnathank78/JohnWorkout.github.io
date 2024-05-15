@@ -210,6 +210,11 @@ $(document).ready(function(){
         $(document).on("mousedown", function(e){
             unfocusDivs(e);
         }).on("mouseup", function(e){
+            if(!$(e.target).is('.lockTouch') && lockState){
+                if(e.cancelable){e.preventDefault()};
+                return;
+            };
+            
             if(cannotClick == "fantom"){
                 e.preventDefault();
                 cannotClick = "fantomSkipped";
@@ -221,6 +226,11 @@ $(document).ready(function(){
         $(document).on("touchstart", function(e){
             unfocusDivs(e);
         }).on("touchend", function(e){
+            if(!$(e.target).is('.lockTouch') && lockState){
+                if(e.cancelable){e.preventDefault()};
+                return;
+            };
+            
             if(cannotClick == "fantom"){
                 if(e.cancelable){e.preventDefault()};
                 cannotClick = "fantomSkipped";

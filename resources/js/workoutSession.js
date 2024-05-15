@@ -169,7 +169,7 @@ function startWorkout(){
     recovery = [current_session[current_session.length - 1], "" , "", "", "", []];
 
     TPtimer = setInterval(() => {
-        if(!isIdle && hasReallyStarted){
+        if(!isIdle){
             TemptimeSpent++;
             $(".selection_info_TimeSpent").text(get_time_u(timeFormat(TemptimeSpent)));
 
@@ -1692,6 +1692,7 @@ $(document).ready(function(){
             }else{
                 if($($('.session_next_exercise_type')[1]).text() == "Pause"){
                     update_info_vars(2);
+                    update_pastData();
                     display_info();
                     await Promise.all([
                         dropExo_animated($(".session_next_bigExercise")[0]),
@@ -1699,6 +1700,7 @@ $(document).ready(function(){
                     ]);
                 }else{
                     update_info_vars(1);
+                    update_pastData();
                     display_info();
                     await dropExo_animated($(".session_next_bigExercise")[0]);
                 };

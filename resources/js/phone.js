@@ -28,7 +28,7 @@ function goBack(platform){
         }else if(statOpened){
             $(".selection_info").click();
         }else if(isSaving){
-            screensaver_toggle(false);
+            if(!lockState){screensaver_toggle(false)};
         }else if(isSetPreviewing){
             $('.blurBG').css('display', 'none');
         }else if(isSetPreviewingHint){
