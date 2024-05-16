@@ -238,11 +238,27 @@ function exit_confirm(style){
         $('.session_exist_text, .session_exist_subtext').css('color', 'white');
 
 		$('.footer').css('backgroundColor', 'hsl(251, 23%, 25%)');
+
+        $(".session_exit_y").data("color", $(".session_exit_y").css("backgroundColor"));
+        
+        if($(".session_exit_y")[0].getAttribute("darken") === null){
+            $(".session_exit_y").data("darkColor", $(".session_exit_y").css("backgroundColor"));
+        }else{
+            $(".session_exit_y").data("darkColor", darkenColor($(".session_exit_y").css("backgroundColor"), parseInt($(".session_exit_y")[0].getAttribute("darken"))));
+        };
     }else{
         $('.session_exit_confirm').css("background-color", "white");
         $(".session_exit_n").css({"background-color": color, "color": "white"});
-        $(".session_exit_y").css({"background-color": "rgba(0, 0, 0, 0.1)", "color": "black"});
+        $(".session_exit_y").css({"background-color": "#e5e5e5", "color": "black"});
         $('.session_exist_text, .session_exist_subtext').css('color', 'black');
+
+        $(".session_exit_y").data("color", $(".session_exit_y").css("backgroundColor"));
+        
+        if($(".session_exit_y")[0].getAttribute("darken") === null){
+            $(".session_exit_y").data("darkColor", $(".session_exit_y").css("backgroundColor"));
+        }else{
+            $(".session_exit_y").data("darkColor", darkenColor($(".session_exit_y").css("backgroundColor"), parseInt($(".session_exit_y")[0].getAttribute("darken"))));
+        };
     };
 };
 

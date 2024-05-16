@@ -44,105 +44,113 @@ function darkenColor(rgbString, value){
     return "rgb("+parseInt(rgb[0]).toString()+","+parseInt(rgb[1]).toString()+","+parseInt(rgb[2]).toString()+")";
 };
 
-$(document).ready(function(){
-    $(document).on("mousedown touchstart", ".longClickable", function(e){
-        if(!$(this).data("canLongClick")){return};
-        if($(this).data("onIntervall")){clearInterval($(this).data("onIntervall")); $(this).data("onIntervall", false)};
-        if($(this).data("offIntervall")){clearInterval($(this).data("offIntervall")); $(this).data("offIntervall", false)};
+function longClickDownHandler(){
+    if(!$(this).data("canLongClick")){return};
 
-        longClickTS = Date.now();
+    longClickTS = Date.now();
 
-        let LC_speed = $(this).data("speed");
-        let LC_step = (100/LC_speed)*10;
+    if($(this).data("onIntervall")){clearInterval($(this).data("onIntervall")); $(this).data("onIntervall", false)};
+    if($(this).data("offIntervall")){clearInterval($(this).data("offIntervall")); $(this).data("offIntervall", false)};
 
-        let LC_color = $(this).data("color");
-        let LC_darkColor = $(this).data("darkColor");
+    let LC_speed = $(this).data("speed");
+    let LC_step = (100/LC_speed)*10;
 
-        $(this).data("onIntervall", setInterval(() => {
-            if($(this).data("counter") < 100){
+    let LC_color = $(this).data("color");
+    let LC_darkColor = $(this).data("darkColor");
 
-                $(this).data("counter", $(this).data("counter") + LC_step);
+    $(this).data("onIntervall", setInterval(() => {
+        if($(this).data("counter") < 100){
 
-                if($(this).data("counter") < 50){
-                    $(this).css("background", "linear-gradient(to left, "+LC_color+", "+LC_color+ " "+((100 - $(this).data("counter")) - 1).toString()+"%, "+LC_darkColor+" "+($(this).data("counter") + 1).toString()+"%, "+LC_darkColor+")");
-                }else{
-                    $(this).css("background", "linear-gradient(to right, "+LC_darkColor+", "+LC_darkColor+" "+$(this).data("counter").toString()+"%, "+LC_color+" "+(100 - $(this).data("counter")).toString()+"%, "+LC_color+")");
-                };
+            $(this).data("counter", $(this).data("counter") + LC_step);
 
-            }else if($(this).data("counter") >= 100){
-                $(this).data("completed", true);
+            if($(this).data("counter") < 50){
+                $(this).css("background", "linear-gradient(to left, "+LC_color+", "+LC_color+ " "+((100 - $(this).data("counter")) - 1).toString()+"%, "+LC_darkColor+" "+($(this).data("counter") + 1).toString()+"%, "+LC_darkColor+")");
+            }else{
+                $(this).css("background", "linear-gradient(to right, "+LC_darkColor+", "+LC_darkColor+" "+$(this).data("counter").toString()+"%, "+LC_color+" "+(100 - $(this).data("counter")).toString()+"%, "+LC_color+")");
+            };
 
-                setTimeout(() => {
+        }else if($(this).data("counter") >= 100){
+            $(this).data("completed", true);
 
-                    $(this).css("background", "unset");
-                    $(this).css("backgroundColor", LC_color);
-
-                    $(this).data("counter", 0);
-                    $(this).data("completed", false);
-
-                }, 50);
-
-                let event = new CustomEvent('longClicked', { bubbles: true });
-                this.dispatchEvent(event);
-
-                if(platform == "Mobile"){
-                    Haptics.impact({ style: ImpactStyle.Light });
-                }else if('vibrate' in navigator){
-                    navigator.vibrate(300, 2);
-                };
-
-                clearInterval($(this).data("onIntervall"));
-                $(this).data("onIntervall", false);
-
-                return;
-            }}, 10)
-        );
-    });
-
-    $(document).on("mouseup touchend", ".longClickable", function(e){
-
-        if(!$(this).data("completed") && $(this).data("onIntervall") && $(this).find(".rest_react").length != 0){
-            const customClick = new CustomEvent('fantomClicked', { bubbles: true });
-            $(this).find(".rest_react")[0].dispatchEvent(customClick);
-        }
-
-        if($(this).data("completed")){$(this).data("completed", false);return};
-        if($(this).data("onIntervall")){clearInterval($(this).data("onIntervall")); $(this).data("onIntervall", false)};
-        if($(this).data("offIntervall")){clearInterval($(this).data("offIntervall")); $(this).data("offIntervall", false)};
-
-        let LC_speed = $(this).data("speedOut");
-        let LC_step = (100/LC_speed)*10;
-
-        let LC_color = $(this).data("color");
-        let LC_darkColor = $(this).data("darkColor");
-
-        if(Date.now() - longClickTS < 150 && $(this).data("alert")){
-            bottomNotification("longClick");
-        };
-
-        $(this).data("offIntervall", setInterval(() => {
-            if($(this).data("counter") > 0){
-
-                $(this).data("counter", $(this).data("counter") - LC_step);
-
-                if($(this).data("counter") < 50){
-                    $(this).css("background", "linear-gradient(to left, "+LC_color+", "+LC_color+ " "+((100 - $(this).data("counter")) - 1).toString()+"%, "+LC_darkColor+" "+($(this).data("counter") + 1).toString()+"%, "+LC_darkColor+")");
-                }else{
-                    $(this).css("background", "linear-gradient(to right, "+LC_darkColor+", "+LC_darkColor+" "+$(this).data("counter").toString()+"%, "+LC_color+" "+(100 - $(this).data("counter")).toString()+"%, "+LC_color+")");
-                };
-
-            }else if($(this).data("counter") <= 0){
+            setTimeout(() => {
 
                 $(this).css("background", "unset");
                 $(this).css("backgroundColor", LC_color);
 
-                clearInterval($(this).data("offIntervall"));
-                $(this).data("offIntervall", false);
+                $(this).data("counter", 0);
+                $(this).data("completed", false);
 
-                return
-            }}, 10)
-        )
-    })
+            }, 50);
+
+            let event = new CustomEvent('longClicked', { bubbles: true });
+            this.dispatchEvent(event);
+
+            if(platform == "Mobile"){
+                Haptics.impact({ style: ImpactStyle.Light });
+            }else if('vibrate' in navigator){
+                navigator.vibrate(300, 2);
+            };
+
+            clearInterval($(this).data("onIntervall"));
+            $(this).data("onIntervall", false);
+
+            return;
+        }}, 10)
+    );
+};
+
+function longClickUpHandler(){
+    if(Date.now() - longClickTS < 150 && $(this).data("alert")){
+        bottomNotification("longClick");
+    };
+
+    if(!$(this).data("completed") && $(this).data("onIntervall") && $(this).find(".rest_react").length != 0){
+        const customClick = new CustomEvent('fantomClicked', { bubbles: true });
+        $(this).find(".rest_react")[0].dispatchEvent(customClick);
+    }
+
+    if($(this).data("completed")){$(this).data("completed", false);return};
+    if($(this).data("onIntervall")){clearInterval($(this).data("onIntervall")); $(this).data("onIntervall", false)};
+    if($(this).data("offIntervall")){clearInterval($(this).data("offIntervall")); $(this).data("offIntervall", false)};
+
+    let LC_speed = $(this).data("speedOut");
+    let LC_step = (100/LC_speed)*10;
+
+    let LC_color = $(this).data("color");
+    let LC_darkColor = $(this).data("darkColor");
+
+    $(this).data("offIntervall", setInterval(() => {
+        if($(this).data("counter") > 0){
+
+            $(this).data("counter", $(this).data("counter") - LC_step);
+
+            if($(this).data("counter") < 50){
+                $(this).css("background", "linear-gradient(to left, "+LC_color+", "+LC_color+ " "+((100 - $(this).data("counter")) - 1).toString()+"%, "+LC_darkColor+" "+($(this).data("counter") + 1).toString()+"%, "+LC_darkColor+")");
+            }else{
+                $(this).css("background", "linear-gradient(to right, "+LC_darkColor+", "+LC_darkColor+" "+$(this).data("counter").toString()+"%, "+LC_color+" "+(100 - $(this).data("counter")).toString()+"%, "+LC_color+")");
+            };
+
+        }else if($(this).data("counter") <= 0){
+
+            $(this).css("background", "unset");
+            $(this).css("backgroundColor", LC_color);
+
+            clearInterval($(this).data("offIntervall"));
+            $(this).data("offIntervall", false);
+
+            return
+        }}, 10)
+    );
+};
+
+$(document).ready(function(){
+    if(isWebMobile){
+        $(document).on("touchstart", ".longClickable", longClickDownHandler);
+        $(document).on("touchend", ".longClickable", longClickUpHandler);
+    }else{
+        $(document).on("mousedown", ".longClickable", longClickDownHandler);
+        $(document).on("mouseup", ".longClickable", longClickUpHandler);
+    };
 
     $(document).on("fantomClicked", ".rest_react", function(){
         if(!isReactShowin){

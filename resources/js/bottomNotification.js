@@ -17,7 +17,9 @@ var botNotifQueue = [];
 
 function bottomNotification(from, target="", queued=false){
 
-    if(botNotifTO || ongoingQueue && !queued){
+    if(from == 'longClick' && botNotifTO){
+        return;
+    }else if(botNotifTO || ongoingQueue && !queued){
         ongoingQueue = true;
         botNotifQueue.push([from, target]);
         return;
