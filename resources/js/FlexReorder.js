@@ -235,7 +235,12 @@ class FlexReorder{
             this.container.addEventListener('touchmove', (e) => {
                 let canReorder = true;
 
-                if(this.mobile_longPress){clearTimeout(this.mobile_longPress); this.mobile_longPress = false};
+                if(this.mobile_longPress){
+                    clearTimeout(this.mobile_longPress); 
+                    this.mobile_longPress = false;
+                    this.inputCursorPos = false;
+                };
+
                 if(this.mouse_down){e.preventDefault()};
 
                 this.mouseX = e.touches[0].clientX;
@@ -282,21 +287,18 @@ class FlexReorder{
                 if(this.mobile_longPress){clearTimeout(this.mobile_longPress); this.mobile_longPress = false};
                 if(this.beforeSelectionTimeout){clearTimeout(this.beforeSelectionTimeout); this.beforeSelectionTimeout = false};
 
-                let x = e.changedTouches[0].clientX;
-                let y = e.changedTouches[0].clientY;
-
                 if(this.draggedItem){
                     this.mouseup();
-                }else{
-                    if($(e.target).is('.reorder__input') && !$(e.target).is('.reorder__avoid') && x == this.mouseX && y == this.mouseY){
-                        e.preventDefault();                        
-                        e.target.focus();
-                        e.target.setSelectionRange(this.inputCursorPos, this.inputCursorPos)
+                }else if($(e.target).is('.reorder__input') && !$(e.target).is('.reorder__avoid') && this.inputCursorPos){
+                    e.preventDefault();
+                    e.target.focus();
+                    e.target.setSelectionRange(this.inputCursorPos, this.inputCursorPos);
 
-                        $(e.target).removeClass("reorder__noselect")
-                    }else if($(e.target).closest(".reorder__child").length > 0){
-                        this.selectionAborted();
-                    };
+                    $(e.target).removeClass("reorder__noselect");
+
+                    this.inputCursorPos = false;
+                }else if($(e.target).closest(".reorder__child").length > 0){
+                    this.selectionAborted();
                 };
             });
 

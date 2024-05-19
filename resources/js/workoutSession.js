@@ -1448,7 +1448,7 @@ function undoMemorise(way){
         undoData[1]['TempworkedTime'] =  TempworkedTime;
         undoData[1]['TempweightLifted'] =  TempweightLifted;
         undoData[1]['TemprepsDone'] =  TemprepsDone;
-        undoData[1]['tempNewHistory'] =  tempNewHistory;
+        undoData[1]['tempNewHistory'] = JSON.parse(JSON.stringify(tempNewHistory));
         undoData[1]['next_name'] =  next_name;
         undoData[1]['next_specs'] =  next_specs;
         undoData[1]['next_rest'] =  next_rest;
@@ -1496,7 +1496,7 @@ function undoMemorise(way){
         hasStarted = undoData[1]['hasStarted'];
         lastExo = undoData[1]['lastExo'];
         remaining_sets = undoData[1]['remaining_sets'];
-        TemptimeSpent = undoData[1]['TemptimeSpent'];
+        //TemptimeSpent = undoData[1]['TemptimeSpent'];
         TempworkedTime = undoData[1]['TempworkedTime'];
         TempweightLifted = undoData[1]['TempweightLifted'];
         TemprepsDone = undoData[1]['TemprepsDone'];

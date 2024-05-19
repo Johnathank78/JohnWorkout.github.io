@@ -104,8 +104,8 @@ function deleteHistory(){
 };
 
 $(document).ready(function(){
-    $(document).on("click", ".selection_empty_msg", function(){
-        if(cannotClick){return};
+    $(document).on("click", ".selection_SR_container", function(){
+        if($('.selection_empty_msg').css('display') == "none"){return};
 
         $('.selection_add_option_session').click();
     });

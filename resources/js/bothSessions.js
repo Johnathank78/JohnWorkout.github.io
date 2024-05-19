@@ -272,7 +272,8 @@ async function quit_session(failed=false){
     $(".Lrest, Rrest").css("display", "block");
     $(".session_exercise_Lrest_btn").css("cursor", "pointer");
     $(".session_exercise_Rrest_btn").css("cursor", "pointer");
-
+    
+    $('.lockTouch').css('display', 'none');
     $(".session_exercise_rest_btn_label").css('display', 'none');
     $(".session_intervall_skip").css("display", 'none');
     $('.session_undo').css('display', 'none');
@@ -359,7 +360,7 @@ function fillSessionEnd(failed){
         let secondTile = $('.chrono');
         let thirdTile = $('.lift');
 
-        if(time === false && weight === false){
+        if(time === false && weight === false || parseInt(number.match(/\d+/)[0], 10) == 1){
             $(firstTile).css('display', 'flex');
             $(secondTile).css('display', 'none');
             $(thirdTile).css('display', 'none');

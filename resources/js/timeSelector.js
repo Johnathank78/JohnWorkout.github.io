@@ -115,16 +115,16 @@ function timeSelectorUpdateTarget(classs){
 $(document).ready(function(){
     $(document).on('click', '.timeSelectorBtn_up', function(e){
         let input = $(this).parent().find(".timeSelectorInput");
-        updateTimeSelectorVal(input, -1);
+        updateTimeSelectorVal(input, 1);
     });
 
     $(document).on('click', '.timeSelectorBtn_down', function(e){
         let input = $(this).parent().find(".timeSelectorInput");
-        updateTimeSelectorVal(input, 1);
+        updateTimeSelectorVal(input, -1);
     });
 
     $(document).on('click', '.timeSelectorSubmit', function(e){
-        if(isEditing){$(isEditing).blur(); isEditing = false; return};
+        //if(isEditing){$(isEditing).blur(); isEditing = false; return};
         let hours = parseInt($('.timeSelectorHours').find(".timeSelectorInput").val());
         let minutes = parseInt($('.timeSelectorMinutes').find(".timeSelectorInput").val());
         let seconds = parseInt($('.timeSelectorSeconds').find(".timeSelectorInput").val());
