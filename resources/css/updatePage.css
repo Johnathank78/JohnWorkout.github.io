@@ -15,6 +15,17 @@
     display: none;
 }
 
+.update_backArrow{
+    position: absolute;
+    left: 20px;
+    top: 20px;
+
+    width: 40px;
+    height: 40px;
+
+    display: none;
+}
+
 .update_tile{
     position: relative;
 
@@ -510,12 +521,10 @@
 }
 
 .update_data_tile_info_container{
-    width: 50%;
+    width: 30%;
     height: 45px;
 
     line-height: 45px;
-
-    background-color: #4C5368;
     border-radius: 10px;
 }
 
@@ -529,7 +538,7 @@
     flex-shrink: 0;
     
     height: 45px;
-    width: calc(50% - 7.5px);
+    width: calc(70% - 7.5px);
     
     border-radius: 10px;
     background-color: #4C5368;
@@ -917,6 +926,7 @@
     text-align: center;
     font-size: 18px;
     font-weight: 500;
+    cursor: pointer;
 }
 
 .update_workout_data_type:disabled{

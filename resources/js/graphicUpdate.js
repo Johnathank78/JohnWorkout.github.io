@@ -67,6 +67,7 @@ function resize_update(){
 };
 
 function update_pageReset(){
+    $('.update_backArrow').css('display', 'none');
     $(".update_name_tile, .udpate_reminder_body, .update_intervall_container").css("pointer-events", "all");
 
     $(".update_workout_container, .update_intervall_container, .update_reminder_container, .update_schedule_container, .update_history_container").css("display", "none");
@@ -85,6 +86,8 @@ function update_pageReset(){
 };
 
 function update_pageFormat(from){
+
+    $('.update_backArrow').css('display', 'block');
 
     $(".update_page").css("display", "flex");
     $(".selection_page").css("display", "none");

@@ -676,6 +676,7 @@ $(document).ready(function(){
     tickIMG = $("#tickIMG").attr('src');
     arrowIMG = $("#arrowIMG").attr('src');
     previewIMG = $('#previewIMG').attr('src');
+    backArrowIMG = $('#backArrowIMG').attr('src');
 
     $("img").attr("draggable", false);
 });//readyEnd
