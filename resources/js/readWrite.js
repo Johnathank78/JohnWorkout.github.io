@@ -222,6 +222,9 @@ $(document).ready(function(){
                     localStorage.removeItem("calendar_shown");
 
                     session_list = session_read(temp);
+                    
+                    sessionSchemeVarsReset();
+
                     session_pusher(session_list);
 
                     updateCalendar(session_list);
@@ -262,6 +265,8 @@ $(document).ready(function(){
                         localStorage.removeItem("calendar_shown");
 
                         session_list = session_read(temp);
+                        sessionSchemeVarsReset();
+
                         session_pusher(session_list);
 
                         updateCalendar(session_list);

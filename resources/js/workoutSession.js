@@ -1541,7 +1541,7 @@ function undoMemorise(way){
 
 $(document).ready(function(){
     restDat = localStorage.getItem("restDat") ? parseInt(localStorage.getItem("restDat")) : 60;
-    XleftPos = parseInt($('.session_workout_extraTimer_container').css('left').split("px")[0]);
+    XleftPos = $('.session_workout_extraTimer_container').getStyleValue('left');
     
     $(".session_exercise_Lrest_btn").on("click", function(){
         if(LrestLongClicked){LrestLongClicked = false; return};

@@ -357,7 +357,7 @@ function get_time(ref){
     };
 };
 
-function get_time_u(ref){
+function get_time_u(ref, getList=false){
     if(isNaI(ref) && !isNaI(ref.substring(ref.length - 1, ref.length))){ref += "s"};
     ref = time_unstring(ref);
 
@@ -375,7 +375,7 @@ function get_time_u(ref){
     minutes = (minutes.length == 1 && minutes != 0 && ref > 3600) ? "0"+minutes : minutes;
     secondes = (secondes.length == 1 && secondes != 0 && ref > 60) ? "0"+secondes : secondes;
 
-    return  (years != 0 ? years+textAssets[language]["misc"]["yearAbbrTimeString"] : "")+(weeks != 0 ? weeks+"w" : "")+(days != 0 ? days+textAssets[language]["misc"]["dayAbbrTimeString"] : "")+(hours != 0 ? hours+"h" : "")+(minutes != 0 ? minutes+"m" : "")+((secondes != 0 || ref < 60) ? secondes+"s" : "");
+    if(getList){return [parseInt(years), parseInt(weeks), parseInt(days), parseInt(hours), parseInt(minutes), parseInt(secondes)]}else{return (years != 0 ? years+textAssets[language]["misc"]["yearAbbrTimeString"] : "")+(weeks != 0 ? weeks+"w" : "")+(days != 0 ? days+textAssets[language]["misc"]["dayAbbrTimeString"] : "")+(hours != 0 ? hours+"h" : "")+(minutes != 0 ? minutes+"m" : "")+((secondes != 0 || ref < 60) ? secondes+"s" : "")};
 };
 
 function time_unstring(strr, getList=false){
@@ -549,9 +549,9 @@ function getContractedType(type){
     };
 };
 
-function getSessionIndexByID(id){
-    for(let i=0; i<session_list.length; i++){
-        if(session_list[i][session_list[i].length - 1] == id){
+function getSessionIndexByID(data, id){
+    for(let i=0; i<data.length; i++){
+        if(data[i][data[i].length - 1] == id){
             return i;
         };
     };
@@ -689,7 +689,7 @@ function unitRound(val){
 };
 
 function updateWeightUnits(data, from, to){
-    for (let i = 0; i < data.length; i++) {
+    for(let i = 0; i < data.length; i++){
         let session = data[i];
         if(session[0] == "W"){
             let exercises = session[2];
@@ -706,7 +706,6 @@ function updateWeightUnits(data, from, to){
 };
 
 function weightUnitgroup(val, unit){
-
     val = convertToUnit(val, "kg", unit);
 
     if(unit == "kg"){
@@ -753,6 +752,7 @@ function changeLanguage(lang, first=false){
     $($(".selection_info_item_title")[1]).text(textAssets[lang]["stats"]["workedTime"]);
     $($(".selection_info_item_title")[2]).text(textAssets[lang]["stats"]["weightLifted"]);
     $($(".selection_info_item_title")[3]).text(textAssets[lang]["stats"]["repsDone"]);
+    $($(".selection_info_item_title")[4]).text(textAssets[lang]["stats"]["sessionMissed"]);
     $(".selection_infoStart_title").text(textAssets[lang]["stats"]["since"]);
 
     $(".selection_infoStart_value").text(formatDate(since));

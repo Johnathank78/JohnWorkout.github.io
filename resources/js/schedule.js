@@ -87,8 +87,8 @@ function getSessionIndexByNotificationID(id){
 
     id = id.toString();
 
-    let tryWeek = getSessionIndexByID(id.slice(1, -1));
-    let tryDay = getSessionIndexByID(id.slice(0, -1));
+    let tryWeek = getSessionIndexByID(session_list, id.slice(1, -1));
+    let tryDay = getSessionIndexByID(session_list, id.slice(0, -1));
 
     if (tryWeek !== false){
         if(getScheduleScheme(session_list[tryWeek]) == "Week"){

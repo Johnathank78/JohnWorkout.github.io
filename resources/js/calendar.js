@@ -2,9 +2,10 @@ var updateCalendarPage = 1;
 var calendarState = false;
 var calenderParamsState = false;
 var previewShown = false;
+var actualRowDay = false;
+var focusShown = false;
 
 function updateCalendar(data){
-
     let end = 20;
 
     let min = 1800;
@@ -51,14 +52,15 @@ function updateCalendar(data){
         if(i == end){$(".selection_page_calendar_header_M").last().text(textAssets[language]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]])};
 
         $($(dayz)[i]).text(tempDate.getDate());
+        $($(dayz)[i]).data('time', zeroAM(tempDate).getTime());
     };
 
     //-------------;
 
     for(let i=0; i<data.length; i++){
-        if(isScheduled(data[i]) && calendar_dict[data[i][1]]){
+        if(isScheduled(data[i])){
             let schedule = data[i][data[i].length - 2];
-            let scheduleDateData = wasScheduledToday(schedule, data[i][1]);
+            let scheduleDateData = wasScheduledToday(schedule, data[i][data[i].length - 1]);
 
             if(schedule[1][0] == "Day"){
                 let scheduleDate = zeroAM(new Date(scheduleDateData[2][1]));
@@ -90,30 +92,45 @@ function updateCalendar(data){
                         };
 
                         let dayInd = nbdayz - pageOffeset;
+                        let match = findChanged(todaysDate.getTime(), ["from", data[i][data[i].length - 1]])["element"];
 
-                        alpha = parseFloat(get_session_time(data[i])/min);
-                        if(alpha < 0.15){alpha = 0.15};
+                        if(match){
+                            let newData = data[getSessionIndexByID(data, match['to'])];
+                            alpha = parseFloat(get_session_time(newData)/min);
 
-                        if($($(dayz)[dayInd]).css('backgroundColor').includes("rgba")){
-                            let actual_alpha = $($(dayz)[dayInd]).css('backgroundColor').split(",");
-
-                            actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
-                            $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
+                            $($(dayz)[dayInd]).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
                         }else{
-                            if($($(dayz)[dayInd]).css('backgroundColor') == "rgb(76, 83, 104)"){
-                                $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
-                            };
+                            alpha = parseFloat(get_session_time(data[i])/min);
+                            $($(dayz)[dayInd]).data("sList").push([[data[i][data[i].length - 1], data[i][1]], [schedule[1][2], schedule[1][3]]]);
                         };
 
-                        $($(dayz)[dayInd]).data("sList").push(data[i][1]);
+                        if(alpha < 0.15){alpha = 0.15};
 
+                        if((!match && calendar_dict[data[i][1]]) || (match && !sessionDone[1][match['to']])){
+                            if($($(dayz)[dayInd]).css('backgroundColor').includes("rgba")){
+                                let actual_alpha = $($(dayz)[dayInd]).css('backgroundColor').split(",");
+
+                                actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
+                                $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
+                            }else{
+                                if($($(dayz)[dayInd]).css('backgroundColor') == "rgb(76, 83, 104)"){
+                                    $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
+                                };
+                            };
+
+                            if(match && scheduleDate.getTime() == todaysDate.getTime()){
+                                sessionToBeDone[1][match['to']] = true;
+                            }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
+                                sessionToBeDone[1][data[i][data[i].length - 1]] = true;
+                            };
+                        };
                     };
 
                     nbdayz += schedule[1][1];
                 };
             }else if(schedule[1][0] == "Week"){
                 for(let z=0; z<schedule[2].length; z++){
-                    let scheduleDateData = wasScheduledToday(schedule, data[i][1], z);
+                    let scheduleDateData = wasScheduledToday(schedule, data[i][data[i].length - 1], z);
 
                     let scheduleDate = zeroAM(new Date(scheduleDateData[2][z][1]));
 
@@ -143,23 +160,38 @@ function updateCalendar(data){
                             };
 
                             let dayInd = nbdayz - pageOffeset;
+                            let match = findChanged(todaysDate.getTime(), ["from", data[i][data[i].length - 1]])["element"];
 
-                            alpha = parseFloat(get_session_time(data[i])/min);
-                            if(alpha < 0.15){alpha = 0.15};
+                            if(match){
+                                let newData = data[getSessionIndexByID(data, match['to'])];
+                                alpha = parseFloat(get_session_time(newData)/min);
 
-                            if($($(dayz)[dayInd]).css('backgroundColor').includes("rgba")){
-                                let actual_alpha = $($(dayz)[dayInd]).css('backgroundColor').split(",");
-
-                                actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
-                                $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
+                                $($(dayz)[dayInd]).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
                             }else{
-                                if($($(dayz)[dayInd]).css('backgroundColor') == "rgb(76, 83, 104)"){
-                                    $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
-                                };
+                                alpha = parseFloat(get_session_time(data[i])/min);
+                                $($(dayz)[dayInd]).data("sList").push([[data[i][data[i].length - 1], data[i][1]], [schedule[1][2], schedule[1][3]]]);
                             };
 
-                            $($(dayz)[dayInd]).data("sList").push(data[i][1]);
+                            if(alpha < 0.15){alpha = 0.15};
 
+                            if((!match && calendar_dict[data[i][1]]) || (match && !sessionDone[1][match['to']])){
+                                if($($(dayz)[dayInd]).css('backgroundColor').includes("rgba")){
+                                    let actual_alpha = $($(dayz)[dayInd]).css('backgroundColor').split(",");
+    
+                                    actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
+                                    $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
+                                }else{
+                                    if($($(dayz)[dayInd]).css('backgroundColor') == "rgb(76, 83, 104)"){
+                                        $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
+                                    };
+                                };
+
+                                if(match && scheduleDate.getTime() == todaysDate.getTime()){
+                                    sessionToBeDone[1][match['to']] = true;
+                                }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
+                                    sessionToBeDone[1][data[i][data[i].length - 1]] = true;
+                                };
+                            };
                         };
 
                         nbdayz += schedule[1][1] * 7;
@@ -168,10 +200,12 @@ function updateCalendar(data){
             };
         };
     };
+
+    sessionToBeDone_save(sessionToBeDone);
 };
 
-function wasScheduledToday(data, name, z=false){
-    if(sessionsDone[1].includes(name) || hasBeenShifted[1].includes(name)){
+function wasScheduledToday(data, id, z=false){
+    if(sessionDone[1][id] || hasBeenShifted[1][id]){
         return data;
     };
 
@@ -221,7 +255,7 @@ async function shiftPlusOne(){
                     if(input[i][0] == "R" && data[1][1] == 1){continue};
                     isShifted = true;
 
-                    let scheduleSave = wasScheduledToday(data, input[1]);
+                    let scheduleSave = wasScheduledToday(data, input[input.length - 1]);
 
                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
 
@@ -251,7 +285,7 @@ async function shiftPlusOne(){
                     isShifted = true;
 
                     for(let z=0; z<data[2].length; z++){
-                        let scheduleSave = wasScheduledToday(data, input[i][1], z);
+                        let scheduleSave = wasScheduledToday(data, input[i][input[i].length - 1], z);
 
                         let idx = (z+1).toString() + id.slice(1, id.length);
                         if(platform == "Mobile"){await undisplayAndCancelNotification(idx)};
@@ -278,9 +312,9 @@ async function shiftPlusOne(){
                         };
                     };
                 };
-                
-                if(!hasBeenShifted[1].includes(input[i][1]) && input[i][0] != "R"){
-                    hasBeenShifted[1].push(input[i][1]);
+
+                if(input[i][0] != "R"){
+                    hasBeenShifted[1][input[i][input[i].length - 1]] = true;
                 };
             };
         };
@@ -300,6 +334,35 @@ async function shiftPlusOne(){
     if(platform == "Mobile"){
         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
     };
+};
+
+function findChanged(time, data){
+    let type = data[0];
+    let val = data[1];
+
+    for(let i = 0; i < sessionSwapped.length; i++){
+        if(sessionSwapped[i]["time"] === time && sessionSwapped[i][type] === val) {
+            return { element: sessionSwapped[i], index: i };
+        };
+    };
+
+    return false;
+};
+
+function sortSlist(a, b){
+    const timeA = a[1];
+	const timeB = b[1];
+	const hoursA = parseInt(timeA[0], 10);
+	const minutesA = parseInt(timeA[1], 10);
+	const hoursB = parseInt(timeB[0], 10);
+	const minutesB = parseInt(timeB[1], 10);
+	
+    if (hoursA < hoursB) return -1;
+	if (hoursA > hoursB) return 1;
+	if (minutesA < minutesB) return -1;
+	if (minutesA > minutesB) return 1;
+	
+    return 0;
 };
 
 $(document).ready(function(){
@@ -380,87 +443,214 @@ $(document).ready(function(){
         updateCalendar(session_list);
     });
 
-    $(document).on('click', '.selection_page_calendar_row_day', function(e){
-        let sList = $(this).data("sList");
+    $(".selection_dayPreview_header").on('scroll', function(e){
+        $('.selection_dayPreview_body').scrollLeft($(this).scrollLeft());
+    });
 
-        if(previewShown && previewShown === this){
-            $('.selection_page_calendar_previewBox_triangleTip, .selection_page_calendar_previewBox_body').css('display', 'none');
+    $(".selection_dayPreview_body").on('scroll', function(){
+        $('.selection_dayPreview_header').scrollLeft($(this).scrollLeft());
+    }); 
 
-            canNowClick("calendar");
-            previewShown = false;
+    $(document).on('click', '.selection_dayPreview_focusExchangeBtn', async function(){
+        let dayInd = $(this).data('dayInd');
+        let idFrom = $(this).data('idFrom');
+        let idTo = $('.selection_dayPreview_focusforChange').val();
+        let time = $(actualRowDay).data('time');
+        
+        let match = findChanged($(".selection_page_calendar_row_day").eq(dayInd).data("time"), ["to", idFrom]);
 
-            return;
-        };
-
-        if(sList.length > 0){
-            if(sList.length == 1){
-                $(".selection_page_calendar_previewBox_body").css('grid-gap', 'unset');
-            }else{
-                $(".selection_page_calendar_previewBox_body").css('grid-gap', '10px');
-            };
-
-            // FILLING;
-            $(".selection_page_calendar_previewBox_body").children().remove();
-            for(let i=0; i<sList.length; i++){
-                $(".selection_page_calendar_previewBox_body").append('<span class="selection_page_calendar_previewItem">'+sList[i]+'</span>');
-            };
-
-            // PLACING;
-            let offset = $(this).position();
-            let index = $(".selection_page_calendar_row").index($(this).parent());
-
-            let triX = 0; let triY = 0; let boxX = 0; let boxY = 0;
-
-            let leftSide = 0;
-            let rightSide = $('.selection_page_calendar_main').width();
-
-            $('.selection_page_calendar_previewBox_triangleTip, .selection_page_calendar_previewBox_body').css('display', 'flex');
-            $('.selection_page_calendar_previewBox_body').scrollLeft(0);
-
-            if(index == 2){
-                $(".selection_page_calendar_previewBox_triangleTip").removeClass("selection_page_calendar_previewBox_triangleUP").addClass("selection_page_calendar_previewBox_triangleBOTTOM");
-
-                boxY = offset.top - $(".selection_page_calendar_previewBox_body").outerHeight() - 12 - 5;
-                triX = offset.left + ($(this).width() - 24)/2;
-
-                triY = boxY + $(".selection_page_calendar_previewBox_body").outerHeight();
-                boxX = triX - ($(".selection_page_calendar_previewBox_body").outerWidth() - 24)/2;
-
-            }else{
-                $(".selection_page_calendar_previewBox_triangleTip").removeClass("selection_page_calendar_previewBox_triangleBOTTOM").addClass("selection_page_calendar_previewBox_triangleUP");
-
-                boxY = offset.top + $(this).outerHeight() + 12 + 5;
-                triX = offset.left + ($(this).width() - 24)/2;
-
-                triY = boxY - $(this).outerHeight() + 12 + 2;
-                boxX = triX - ($(".selection_page_calendar_previewBox_body").outerWidth() - 24)/2;
-            };
-
-            if(boxX < leftSide){
-                boxX = leftSide - 8;
-            }else if(boxX + $(".selection_page_calendar_previewBox_body").outerWidth() > rightSide){
-                boxX = rightSide - $(".selection_page_calendar_previewBox_body").outerWidth() + 8;
-            };
-
-            // APPLYING;
-
-            $(".selection_page_calendar_previewBox_triangleTip").css({
-                left: triX + "px",
-                top: triY + "px"
-            });
-
-            $(".selection_page_calendar_previewBox_body").css({
-                left: boxX + "px",
-                top: boxY + "px"
-            });
-
-            cannotClick = "rowDay";
-            previewShown = this;
+        if(match && match["element"]["from"] == idTo){
+            sessionSwapped.splice(match["index"], 1);
+            bottomNotification("exchanged");
+        }else if(match && match["element"]["from"] != idTo){
+            match["element"]["to"] = idTo;
+            bottomNotification("exchanged");
         }else{
-            $('.selection_page_calendar_previewBox_triangleTip, .selection_page_calendar_previewBox_body').css('display', 'none');
-
-            canNowClick("calendar");
-            previewShown = false;
+            sessionSwapped.push({
+                "from": idFrom,
+                "to": idTo,
+                "on": dayInd,
+                "page": updateCalendarPage,
+                "time": time
+            });
+            bottomNotification("exchanged");
         };
+
+        sessionToBeDone[1][idFrom] = false;
+
+        if(platform == "Mobile"){
+            // let session = session_list[getSessionIndexByID(session_list, idTo)];
+            // let schedule = isScheduled(session);
+
+            // let pending = getIDListFromNotificationArray(await LocalNotifications.getPending());
+            
+            // await scheduleId(start, 0, schedule, session[1], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session)), session[session.length - 1] + "9", "session");
+        };
+
+        sessionSwapped_save(sessionSwapped);
+        updateCalendar(session_list);
+
+        $('.selection_dayPreview_item').eq($(this).data('elemId')).data('id', idTo);
+        $('.selection_dayPreview_item').eq($(this).data('elemId')).text(session_list[getSessionIndexByID(session_list, idTo)][1]);
+        
+        $('.selection_dayPreview_focus').css('display', 'none');
+        focusShown = false;
+    });
+
+    $(document).on('click', '.selection_dayPreview_item', function(){
+        let optString = '<option value="[idVAL]">[sessionVAL]</option>';
+        let beforeList = get_time_u($(this).data('time'), true);
+        let afterList = get_time_u($(this).data('time') + Math.ceil(get_session_time(session_list[getSessionIndexByID(session_list, $(this).data("id"))])), true);
+        let number = false;
+
+        $('.selection_dayPreview_focusforChange').children().remove();
+
+        let dayList = $('.selection_page_calendar_row_day').filter((_, el) => $(el).data("sList").length > 0 && $(el).data("sList")[0][0][0] == $(this).data("id"));
+        let numberOfDays = dayList.length
+        let dayIndex = $(dayList).index(actualRowDay)
+
+        number = getSessionHistory(session_list[getSessionIndexByID(session_list, $(this).data("id"))])[0][2] + (dayIndex + 1) + (updateCalendarPage - 1) * numberOfDays;
+
+        session_list.forEach(session => {
+            if(session[session.length - 1] != $(this).data("id")){
+                $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session[session.length - 1]).replace('[sessionVAL]', session[1])))
+            };
+        });
+
+        $('.selection_dayPreview_focusTitle, .selection_dayPreview_focusToChange').text($(this).text());
+        $('.selection_dayPreview_focusSubTitle').text("n°"+number);
+
+        $('.selection_dayPreview_focusTime_before').text((beforeList[3].toString().length > 1 ? beforeList[3] : "0" + beforeList[3])+ 'h' + (beforeList[4].toString().length > 1 ? beforeList[4] : "0" + beforeList[4]));
+        $('.selection_dayPreview_focusTime_after').text((afterList[3].toString().length > 1 ? afterList[3] : "0" + afterList[3]) + 'h' + (afterList[4].toString().length > 1 ? afterList[4] : "0" + afterList[4]));
+
+        $('.selection_dayPreview_focusExchangeBtn').data("idFrom", $(this).data("id"));
+        $('.selection_dayPreview_focusExchangeBtn').data("elemId", $('.selection_dayPreview_item').index(this));
+        $('.selection_dayPreview_focusExchangeBtn').data("dayInd", $('.selection_page_calendar_row_day').index(actualRowDay));
+
+        cannotClick = 'focus';
+        focusShown = true;
+        
+        $(".selection_dayPreview_focus").css('top', $('.selection_dayPreview_header').outerHeight() + $('.selection_dayPreview_body').getStyleValue('height') + 15 + "px");
+        $('.selection_dayPreview_focus').css('display', 'flex');
+    });
+
+    $(document).on('click', '.selection_page_calendar_row_day', function(e){
+        actualRowDay = this;
+
+        let sList = $(this).data("sList");
+        sList.sort(sortSlist);
+
+        let Ydata = false;
+
+        $('.selection_dayPreview_itemContainer').css('height', "unset");
+        $('.selection_dayPreview_itemContainer').children().remove();
+        $('.selection_dayPreview_mainLine').children(".scheduledItem").remove();
+        $('.selection_dayPreview_focusforChange').children().remove();
+
+        let dataString = '<div class="selection_dayPreview_circleContainer scheduledItem" style="left: [leftVAL]px;"><span class="selection_dayPreview_time">[timeVAL]</span><div class="selection_dayPreview_circle"></div></div>';
+        let sessionString = '<span class="selection_dayPreview_item" style="left: [leftVAL]px; top: [topVAL]px;">[spanVAL]</span>';
+        let dashedString = '<div class="selection_dayPreview_dashedLine" style="left: [leftVAL]; width: [widthVAL];"></div>';
+
+        let clonedDataString = false;
+        let calculatedOffset = false;
+
+        let itemToAdd = false;
+        
+        let itemHeight = false;
+        let initialHeight = 20;
+        let maxHeight = 70;
+
+        let smallestTime = 0;
+
+        sList.forEach(arr => {
+
+            // Draw SessionItems & dotsNtimes
+
+            calculatedOffset = time_unstring(arr[1][0]+"h"+ arr[1][1]+"m") / 3600 * 150;
+            Ydata = $('.selection_dayPreview_item').filter((_, el) => $(el).getStyleValue('left') >= calculatedOffset - 150);
+
+            if(Ydata.length > 0){
+                itemHeight = Math.max(...$(Ydata).map((_, el) => parseInt($(el).css('top'))).get()) + 50;
+            }else{
+                itemHeight = initialHeight;
+            };
+
+            itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]))
+            
+            $(itemToAdd).data('id', arr[0][0]);
+            $(itemToAdd).data('time', time_unstring(arr[1][0]+"h"+ arr[1][1]+"m"));
+
+            
+            $('.selection_dayPreview_itemContainer').append(itemToAdd);
+
+            if(itemHeight + 50 > maxHeight){
+                maxHeight = itemHeight + 50;
+                $('.selection_dayPreview_itemContainer').css('height', maxHeight);
+            };
+
+            if(calculatedOffset % 150 != 0){
+
+                if(calculatedOffset % 150 < 50 || calculatedOffset % 150 > 110){
+                    clonedDataString = dataString.replace('[timeVAL]', ' ');
+                }else{
+                    clonedDataString = dataString.replace('[timeVAL]', arr[1][0]+"h"+ arr[1][1]);
+                };
+
+                if(!(calculatedOffset % 150 < 15 || calculatedOffset % 150 > 135)){
+                    $(".selection_dayPreview_mainLine").append($(clonedDataString.replace('[leftVAL]', calculatedOffset)));
+                };
+            };
+        });
+
+        // ---------------
+
+        // Draw dashedLine
+
+        let groupedNodes = {};
+        $('.selection_dayPreview_item').each(function() {
+            const leftValue = $(this).getStyleValue('left');
+            if (!groupedNodes[leftValue]) {
+                groupedNodes[leftValue] = [];
+            }
+
+            groupedNodes[leftValue].push(this);
+        });
+
+        let lowestNodes = [];
+        $.each(groupedNodes, function(leftValue, nodesInGroup) {
+            let highestNode = nodesInGroup[0];
+            $(nodesInGroup).each(function() {
+                if ($(this).getStyleValue('top') < $(highestNode).getStyleValue('left')) {
+                    highestNode = this;
+                }
+            });
+
+            lowestNodes.push(highestNode);
+        });
+
+        lowestNodes.forEach(node => {
+            let left = $(node).getStyleValue("left");
+            let top = $(node).getStyleValue("top");
+            $('.selection_dayPreview_itemContainer').prepend(dashedString.replace('[leftVAL]', (left + 9)+"px").replace('[widthVAL]', (top + 50)+"px"))
+        });
+
+        // ---------------
+        
+        previewShown = true;
+        smallestTime = Math.min(...$(".selection_dayPreview_item").map((_, el) =>  Math.trunc($(el).data('time') / 3600)));
+
+        $('.selection_dayPreview_focus').css('display', 'none');
+        showBlurPage('selection_dayPreview_page');
+
+        if(new Date().getHours() >= smallestTime){
+            $('.selection_dayPreview_header').scrollLeft(new Date().getHours() * 150);
+            $('.selection_dayPreview_body').scrollLeft(new Date().getHours() * 150);
+        }else{
+            $('.selection_dayPreview_header').scrollLeft(smallestTime * 150);
+            $('.selection_dayPreview_body').scrollLeft(smallestTime * 150);
+        };
+        
+        $('.selection_dayPreview_body').scrollTop(0);
+        $('.selection_dayPreview_item').scrollLeft(0);
     });
 });//readyEnd

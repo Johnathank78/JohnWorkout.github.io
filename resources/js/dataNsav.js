@@ -1,47 +1,34 @@
-function sessionDone_read(){
-    let data = localStorage.getItem("session_done");
+function emptySessionScheme(){
+    let out = [Date.now(), {}];
 
-    if (data === null || data == ""){
-        data = [Date.now(), []];
-        localStorage.setItem("session_done", JSON.stringify(data));
+    session_list.forEach(session => {
+        out[1][session[session.length - 1]] = false
+    });
 
-        return data;
-    };
-
-    data = JSON.parse(data);
-
-    if(formatDate(zeroAM(new Date(data[0]))) != formatDate(zeroAM(new Date(Date.now())))){
-        data = [Date.now(), []];
-        localStorage.setItem("session_done", JSON.stringify(data));
-    };
-
-    return data;
+    return out
 };
 
-function sessionDone_save(data){
-    localStorage.setItem("session_done", JSON.stringify(data));
+function cleanSessionScheme(drop){
+    delete sessionDone[1][drop];
+    delete hasBeenShifted[1][drop];
+    delete sessionToBeDone[1][drop];
 };
 
-function updateSessionDone(mode, key, newKey = false){
+function sessionSchemeVarsReset(){
+    hasBeenShifted = emptySessionScheme();
+    sessionSwapped = emptySessionScheme();
+    sessionToBeDone = emptySessionScheme();
 
-    if(mode == "update"){
-        for (let i = 0; i < sessionsDone[1].length; i++){
-            if(sessionsDone[1][i] == key){
-                sessionsDone[1][i] = newKey;
-            };
-        };
-    }else if(mode == "remove"){
-        let filtered = [];
-        for (let i = sessionsDone[1].length - 1; i >= 0; i--){
-            if(sessionsDone[1][i] != key){
-                filtered.push(sessionsDone[1][i]);
-            };
-        };
 
-        sessionsDone[1] = filtered;
-    };
+    hasBeenShifted_save(hasBeenShifted);
+    sessionSwapped_save(sessionSwapped);
+    sessionToBeDone_save(sessionToBeDone);
+};
 
-    sessionDone_save(sessionsDone);
+function enlargeSessionScheme(id){
+    sessionDone[1][id] = false;
+    hasBeenShifted[1][id] = false;
+    sessionToBeDone[1][id] = false;
 };
 
 
@@ -51,7 +38,7 @@ function stats_read(set=false){
     if(set){data = set};
 
     if(data == "" || data === null){
-        data = [0,0,0,0,zeroAM(new Date(Date.now())).getTime()];
+        data = [0,0,0,0,zeroAM(new Date(Date.now())).getTime(), 0];
         stats_save(data);
     }else{
         data = JSON.parse(data);
@@ -60,11 +47,12 @@ function stats_read(set=false){
         data[1] = parseInt(data[1]);
         data[2] = parseFloat(data[2]);
         data[3] = parseInt(data[3]);
+        data[4] = parseInt(data[4]);
 
-        if(data.length == 4){
-            data.push(parseInt(localStorage.getItem("stats_since")));
+        if(data.length == 5){
+            data.push(0);
         }else{
-            data[4] = parseInt(data[4]);
+            data[5] = parseInt(data[5]);
         };
     };
 
@@ -85,6 +73,7 @@ function stats_set(data){
     $(".selection_info_WeightLifted").text(weightUnitgroup(data[2], weightUnit));
     $(".selection_info_RepsDone").text(parseInt(data[3]));
     $(".selection_infoStart_value").text(formatDate(data[4]));
+    $(".selection_info_Missed").text(parseInt(data[5]));
 };
 
 
@@ -162,7 +151,6 @@ function session_read(set=false){
             updateWeightUnits(data[0], previousWeightUnit, weightUnit);
         };
 
-        updateCalendar(data[0]);
         return data[0];
     };
 };
@@ -287,7 +275,6 @@ function updateCalendarDictItem(key, newKey){
     calendar_dict[newKey] = calendar_dict[key];
     delete calendar_dict[key];
 
-    updateSessionDone("update", key, newKey);
     calendar_save(calendar_dict);
 };
 
@@ -355,7 +342,7 @@ function recovery_read(){
         data = JSON.parse(data);
 
         showBlurPage("selection_recovery_page");
-        $(".selection_recovery_subText1").text(session_list[getSessionIndexByID(data[0])][1]);
+        $(".selection_recovery_subText1").text(session_list[getSessionIndexByID(session_list, data[0])][1]);
 
         return data;
     };
@@ -367,11 +354,36 @@ function recovery_save(data){
 };
 
 
+function sessionDone_read(){
+    let data = localStorage.getItem("session_done");
+
+    if (data === null || data == ""){
+        data = emptySessionScheme();
+        localStorage.setItem("session_done", JSON.stringify(data));
+
+        return data;
+    };
+
+    data = JSON.parse(data);
+
+    if(formatDate(zeroAM(new Date(data[0]))) != formatDate(zeroAM(new Date(Date.now())))){
+        data = emptySessionScheme();
+        localStorage.setItem("session_done", JSON.stringify(data));
+    };
+
+    return data;
+};
+
+function sessionDone_save(data){
+    localStorage.setItem("session_done", JSON.stringify(data));
+};
+
+
 function hasBeenShifted_read(){
     let data = localStorage.getItem("hasBeenShifted");
 
     if (data === null || data == ""){
-        data = [Date.now(), []];
+        data = emptySessionScheme();
         localStorage.setItem("hasBeenShifted", JSON.stringify(data));
 
         return data;
@@ -380,7 +392,7 @@ function hasBeenShifted_read(){
     data = JSON.parse(data);
 
     if(formatDate(zeroAM(new Date(data[0]))) != formatDate(zeroAM(new Date(Date.now())))){
-        data = [Date.now(), []];
+        data = emptySessionScheme();
         localStorage.setItem("hasBeenShifted", JSON.stringify(data));
     };
 
@@ -391,24 +403,71 @@ function hasBeenShifted_save(data){
     localStorage.setItem("hasBeenShifted", JSON.stringify(data));
 };
 
-function updateHasBeenShifted(mode, key, newKey = false){
 
-    if(mode == "update"){
-        for (let i = 0; i < hasBeenShifted[1].length; i++){
-            if(hasBeenShifted[1][i] == key){
-                hasBeenShifted[1][i] = newKey;
-            };
-        };
-    }else if(mode == "remove"){
-        let filtered = [];
-        for (let i = hasBeenShifted[1].length - 1; i >= 0; i--){
-            if(hasBeenShifted[1][i] != key){
-                filtered.push(hasBeenShifted[1][i]);
-            };
-        };
-
-        hasBeenShifted[1] = filtered;
+function sessionSwapped_read(){
+    let data = localStorage.getItem("sessionSwapped");
+    let now = zeroAM(new Date(Date.now())).getTime();
+    if (data === null || data == ""){
+        localStorage.setItem("sessionSwapped", JSON.stringify([]));
+        return [];
     };
-    
-    hasBeenShifted_save(hasBeenShifted);
+
+    data = JSON.parse(data);
+
+    data.forEach(swap => {
+        if(swap['time'] < now){
+            delete swap;
+        };
+    });
+
+    return data;
+};
+
+function sessionSwapped_save(data){
+    localStorage.setItem("sessionSwapped", JSON.stringify(data));
+    return;
+};
+
+
+function sessionToBeDone_read(){
+    let data = localStorage.getItem("sessionToBeDone");
+
+    if (data === null || data == ""){
+        data = emptySessionScheme();
+        localStorage.setItem("sessionToBeDone", JSON.stringify(data));
+
+        return data;
+    };
+
+    data = JSON.parse(data);
+
+    if(formatDate(zeroAM(new Date(data[0]))) != formatDate(zeroAM(new Date(Date.now())))){
+
+        //GET MISSED SESSION NB
+
+        let sessionDone = localStorage.getItem("session_done");
+
+        if(!(sessionDone === null || sessionDone == "")){
+            sessionDone = JSON.parse(sessionDone);
+            Object.keys(data[1]).forEach(function(key){
+                if(data[1][key] && !sessionDone[1][key]){
+                    nbMissed += 1;
+                };
+            });
+        };
+
+        stats_set([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
+        stats_save([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
+
+        // --------------------
+
+        data = emptySessionScheme();
+        localStorage.setItem("sessionToBeDone", JSON.stringify(data));
+    };
+
+    return data;
+};
+
+function sessionToBeDone_save(data){
+    localStorage.setItem("sessionToBeDone", JSON.stringify(data));
 };

@@ -1,22 +1,5 @@
 var originalVal = $.fn.val;
 
-function resizeArea(area){
-	area.style.height = 0;
-	area.style.height = (area.scrollHeight - 20) + "px";
-};
-
-function resizeInput(input){
-	let fontSize = $(input).css('fontSize').split("px")[0];
-
-	if(input.value.length == 0){
-		input.style.width = fontSize/1.615384 - fontSize/22.702702 + fontSize/4 + 'px';
-	}else if(input.value.length >= 3){
-		input.style.width = ((3) * ((fontSize/1.615384) - fontSize/22.702702) + fontSize/4) + 'px';
-	}else{
-		input.style.width = ((input.value.length) * ((fontSize/1.615384) - fontSize/22.702702) + fontSize/4) + 'px';
-	};
-};
-
 String.prototype.format = function(){
     let output = "";
     let text = this;
@@ -273,10 +256,31 @@ jQuery.fn.virtualAreaHeight = function() {
     return height;
 };
 
-$.fn.val = function(){
+jQuery.fn.getStyleValue = function(prop){
+    return parseFloat(this.css(prop).replace('px', ''));
+};
+
+jQuery.fn.val = function(){
     var result = originalVal.apply(this, arguments);
     if(this.hasClass('resizingInp')){
         resizeInput(this[0]);
     };
     return result;
+};
+
+function resizeArea(area){
+	area.style.height = 0;
+	area.style.height = (area.scrollHeight - 20) + "px";
+};
+
+function resizeInput(input){
+	let fontSize = $(input).getStyleValue('fontSize');
+
+	if(input.value.length == 0){
+		input.style.width = fontSize/1.615384 - fontSize/22.702702 + fontSize/4 + 'px';
+	}else if(input.value.length >= 3){
+		input.style.width = ((3) * ((fontSize/1.615384) - fontSize/22.702702) + fontSize/4) + 'px';
+	}else{
+		input.style.width = ((input.value.length) * ((fontSize/1.615384) - fontSize/22.702702) + fontSize/4) + 'px';
+	};
 };

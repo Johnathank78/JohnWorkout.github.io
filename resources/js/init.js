@@ -21,13 +21,17 @@ var TemptimeSpent = false;
 var TempworkedTime = false;
 var TempweightLifted = false;
 var TemprepsDone = false;
+var nbMissed = false;
 
 var session_list = false;
 var reminder_list = false;
 var calendar_dict = false;
-var sessionsDone = false;
+var sessionDoneSAV = false;
+var sessionDone = false;
 var hasBeenShifted = false;
 var recovery = false;
+var sessionSwapped = false;
+var sessionToBeDone = false;
 
 var session_reorder = false; var reminder_reorder = false; var exercise_reorder = false; var sets_reorder = false;
 
@@ -36,21 +40,26 @@ $(document).ready(function(){
     exercisesHTML = exercise_tile();
 
     [audio_lv, muted] = audio_read();
-    [timeSpent, workedTime, weightLifted, repsDone, since] = stats_read();
+    [timeSpent, workedTime, weightLifted, repsDone, since, nbMissed] = stats_read();
     [TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone] = [0,0,0,0];
 
     session_list = [];
     reminder_list = [];
 
     calendar_dict = {};
-    sessionsDone = sessionDone_read();
-    hasBeenShifted = hasBeenShifted_read();
 
     session_list = session_read();
     reminder_list = reminder_read();
 
+    sessionToBeDone = sessionToBeDone_read();
+    sessionDone = sessionDone_read();
+    sessionSwapped = sessionSwapped_read();
+    hasBeenShifted = hasBeenShifted_read();
+
     session_pusher(session_list);
     reminder_pusher(reminder_list);
+    
+    updateCalendar(session_list);
 
     deleteHistory();
 

@@ -161,6 +161,7 @@ async function launchSession(index){
     if(keepAwake){keepAwakeToggle(true)};
 
     $(".selection_infoStart").css("display", "none");
+    $(".selection_info_item").eq(4).css("display", "none");
     window.history.pushState("session", "");
 };
 
@@ -182,6 +183,7 @@ async function quit_session(failed=false){
     BehindExerciseContainer(true);
 
     $(".selection_infoStart").css("display", "flex");
+    $(".selection_info_item").eq(4).css("display", "flex");
     $(".screensaver").click();
 
     if(platform == "Mobile"){
@@ -193,7 +195,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -202,7 +204,7 @@ async function quit_session(failed=false){
         
         current_history[0][2] += 1;
 
-        stats_save([timeSpent, workedTime, weightLifted, repsDone, since]);
+        stats_save([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
 
         if(current_session[0] == "W" && current_history[0][1] == "true"){
             tempNewHistory[1] = TemptimeSpent;
@@ -210,12 +212,10 @@ async function quit_session(failed=false){
             session_save(session_list);
         };
 
-        // Notification related;
+        sessionDone[1][current_session[current_session.length - 1]] = true;
+        sessionDone_save(sessionDone);
 
-        if(!sessionsDone[1].includes(current_session[1])){
-            sessionsDone[1].push(current_session[1]);
-            sessionDone_save(sessionsDone);
-        };
+        // Notification related;
 
         if(isScheduled(current_session)){
             let id = await getPendingId(current_session[current_session.length - 1], current_session[current_session.length - 2][1][0]);
@@ -232,7 +232,7 @@ async function quit_session(failed=false){
         fillSessionEnd(failed);
     };
 
-    stats_set([timeSpent, workedTime, weightLifted, repsDone, since]);
+    stats_set([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
     updateCalendar(session_list);
 
     
@@ -508,7 +508,7 @@ function update_soundSlider(pos=false){
 
     slider_width = $('.session_volume_slider_bar').width() - dot_width + dotBorderWidth/2;
 
-    left_edge = parseInt($('.session_volume_slider_bar').css("left").split("px")[0]) + containerPaddingLeft - dotBorderWidth/2;
+    left_edge = $('.session_volume_slider_bar').getStyleValue('left') + containerPaddingLeft - dotBorderWidth/2;
     right_edge = slider_width + left_edge;
 
     if(!pos){
@@ -575,7 +575,7 @@ function updateDotPos(){
 };
 
 function generateDotPos(mouseX){
-    return mouseX - $(".session_volume_slider_bar").offset().left + parseInt($(".session_volume_slider_bar").css("left").split("px")[0]) + dot_width/2 - 2;
+    return mouseX - $(".session_volume_slider_bar").offset().left + $(".session_volume_slider_bar").getStyleValue("left") + dot_width/2 - 2;
 };
 
 function sliderMouseDown(e, that){
@@ -751,7 +751,7 @@ $(document).ready(function(){
     // AUDIO SLIDER;
 
     dot_width = parseInt($(".session_volume_slider_dot").outerWidth());
-    containerPaddingLeft = parseInt($('.session_volume_slider_container').css("padding-left").split("px")[0]);
+    containerPaddingLeft = $('.session_volume_slider_container').getStyleValue("padding-left");
     dotBorderWidth = 5;
 
     $(document).on("click", ".sessions_sound_icon", function(){
@@ -824,6 +824,6 @@ $(document).ready(function(){
 
     $(document).on('click', ".selection_recovery_page_btn_y", function(){
         $('.blurBG').css('display', 'none');
-        launchSession(getSessionIndexByID(recovery[0]));
+        launchSession(getSessionIndexByID(session_list, recovery[0]));
     });
 });//readyEnd

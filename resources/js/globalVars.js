@@ -4,7 +4,8 @@ const isWebMobile = /Mobi/.test(navigator.userAgent);
 const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches;
 
 var addIMG = false; var binIMG = false; var editIMG = false; var grabIMG = false; var pauseIMG = false; var playIMG = false; var sound_fullIMG = false; 
-var sound_midIMG = false; var sound_lowIMG = false; var sound_offIMG = false; var timer2IMG = false; var tickIMG = false; var arrowIMG = false;
+var sound_midIMG = false; var sound_lowIMG = false; var sound_offIMG = false; var timer2IMG = false; var tickIMG = false; var arrowIMG = false; 
+var previewIMG = false; var backArrowIMG = false; var exchangeIMG = false;
 
 const green = "#1DBC60"; const orange = "#E67E22"; const red = "#E74C3C"; const blue = "#477DB3"; const yellow ="#FFCD02"; const dark_blue = "#1F1C2D"; const black = "#000000";
 const mid_green = "#4AC980"; const mid_orange = "#EB984E"; const mid_red = "#EC7063"; const mid_yellow = "#FFE167"; const mid_blue = "#6c97c2"; const mid_dark_blue = "#29293F";
@@ -62,6 +63,7 @@ const textAssets = {
             "workedTime" : "Temps sous tension",
             "weightLifted" : "Charge soulevée",
             "repsDone" : "Répétitions effectuées",
+            "sessionMissed": "Séance manquées",
             "since" : "Depuis le",
         },
         "preferences": {
@@ -235,7 +237,8 @@ const textAssets = {
             "read": "Permission de lecture refusée",
             "write": "Permission d'écriture refusée",
             "audioBroken": "Contrôle du son non disponible",
-            "longClickable": "Appuie longtemps pour valider"
+            "longClickable": "Appuie longtemps pour valider",
+            "exchanged": "Séance échangé avec succès"
         },
         "sessionEnd": {
             "mainText": {
@@ -372,6 +375,7 @@ const textAssets = {
             "workedTime" : "Worked time",
             "weightLifted" : "Weight lifted",
             "repsDone" : "Reps done",
+            "sessionMissed": "Missed sessions",
             "since" : "Since",
         },
         "preferences": {
@@ -545,7 +549,8 @@ const textAssets = {
             "read": "Read permission error",
             "write": "Write permission error",
             "audioBroken": "Sound control not available",
-            "longClickable": "Long press to confirm"
+            "longClickable": "Long press to confirm",
+            "exchanged": "Session successfully exchanged"
         },
         "sessionEnd": {
             "mainText": {
@@ -677,6 +682,7 @@ $(document).ready(function(){
     arrowIMG = $("#arrowIMG").attr('src');
     previewIMG = $('#previewIMG').attr('src');
     backArrowIMG = $('#backArrowIMG').attr('src');
+    exchangeIMG = $('#exchangeIMG').attr('src');
 
     $("img").attr("draggable", false);
 });//readyEnd

@@ -87,6 +87,15 @@ function bottomNotification(from, target="", queued=false){
 
         $(".bottomNotification_Icon").css('scale', "1.1");
         $(".bottomNotification_msg").text(textAssets[language]["bottomNotif"]['longClickable']);
+    }else if(from == "exchanged"){
+        $('.bottomNotification_Icon').css('filter', greenFilter);
+        $(".bottomNotification_msg").css('color', greenText);
+        $('.bottomNotification').css("backgroundColor", greenBG);
+
+        $(".bottomNotification_Icon").css('scale', "1");
+        $(".bottomNotification_Icon").attr('src', tickIMG);
+
+        $(".bottomNotification_msg").text(textAssets[language]["bottomNotif"]['exchanged']);
     };
 
     setTimeout(() => {summonBottomNotification()}, 300);

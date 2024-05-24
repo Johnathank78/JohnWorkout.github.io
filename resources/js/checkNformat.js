@@ -119,53 +119,52 @@ function unfocusDivs(e){
         }, 200);
 
         canNowClick();
-    }
+    };
 
     if(notTargeted(e.target, ".session_workout_extraTimer_container") && !$(e.target).is(".screensaver, .screensaver_text, .screensaver_timer") && !isXin){
         closePanel("xin");
         canNowClick();
-    }
+    };
 
     if(notTargeted(e.target, ".selection_parameters, .selection_parameters_page") && rotation_state && !timeInputShown) {
         closePanel("parameters");
         canNowClick();
-    }
+    };
 
     if(notTargeted(e.target, ".session_next_exercises_container") && current_page == "session" && ncState && !$(e.target).is($(".blurBG"))){
         closePanel("expander");
         canNowClick();
-    }
-
-    if(notTargeted(e.target, ".selection_page_calendar, .main_title_block") && current_page == "selection" && calendarState){
-        closePanel("calendar");
-        canNowClick();
-    }
+    };
 
     if(notTargeted(e.target, ".session_workout_historyNotes_inp") && notesInp && current_page == "session"){
         closePanel("historyNotes");
         canNowClick();
-    }
+    };
 
     if(notTargeted(e.target, ".session_current_exercise_specs_details_inp") && cannotClick == "workout_inp"){
         canNowClick();
-    }
+    };
 
     if(notTargeted(e.target, ".selection_add_container, .selection_add_btn") && add_state && current_page == "selection"){
         closePanel("addContainer");
         canNowClick();
-    }
+    };
 
-    if(notTargeted(e.target, '.selection_page_calendar_previewBox_triangleTip, .selection_page_calendar_previewBox_body, .selection_page_calendar_row_day') && previewShown){
+    if(notTargeted(e.target, '.selection_page_calendar_previewBox_triangleTip, .selection_page_calendar_previewBox_body, .selection_page_calendar_row_day') && calendarState){
         $('.selection_page_calendar_previewBox_triangleTip, .selection_page_calendar_previewBox_body').css('display', 'none');
 
-        if(notTargeted(e.target, ".selection_page_calendar, .main_title_block")){
-            previewShown = false;
+        if(notTargeted(e.target, ".selection_page_calendar, .main_title_block") && !previewShown){
             calendarState = false;
+
+            closePanel("calendar");
             canNowClick();
-        }else{
-            previewShown = false;
-            canNowClick("calendar");
         };
+    };
+
+    if(notTargeted(e.target, ".selection_dayPreview_page") && previewShown && current_page == "selection"){
+        $('.blurBG').css('display', 'none');
+        previewShown = false;
+        canNowClick();
     };
 
     if(notTargeted(e.target, '.timeSelectorBody') && timeInputShown){

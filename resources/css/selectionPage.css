@@ -201,8 +201,310 @@
     display: none;
 }
 
-.selection_recovery_page{
+.selection_dayPreview_page{
+    position: relative;
 
+    display: flex;
+    flex-direction: column;
+
+    width: 80%;
+    max-width: 550px;
+
+    min-height: 120px;
+
+    font-size: 21px;
+    font-weight: 700;
+    text-align: left;
+    background-color: #262837;
+
+    border-radius: 8px;
+    display: none;
+}
+
+.selection_dayPreview_header{
+    position: relative;
+
+    height: 67px;
+    width: 100%;
+
+    border-radius: 8px;
+
+    overflow-y: hidden;
+    overflow-x: scroll;
+
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.selection_dayPreview_header::-webkit-scrollbar{
+    display: none;
+}
+
+.selection_dayPreview_mainLine{
+    position: absolute;
+    
+    top: 55px;
+    left: 20px;
+
+    width: 3600px;
+    height: 4px;
+
+    background-color: white;
+}
+
+.selection_dayPreview_circleContainer{
+    position: absolute;
+    
+    display: flex;
+    flex-direction: column;
+
+    height: 45px;
+    
+    justify-content: flex-end;
+    align-items: flex-start;
+
+    gap: 10px;
+    top: -36px;
+}
+
+.selection_dayPreview_time{
+    font-size: 18px;
+}
+
+.selection_dayPreview_circle{
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background-color: white;
+}
+
+.selection_dayPreview_body{
+    width: 100%;
+
+    overflow: hidden;   
+    overflow: scroll;
+
+    min-height: 70px;
+    max-height: 120px;
+
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.selection_dayPreview_body::-webkit-scrollbar{
+    display: none;
+}
+
+.selection_dayPreview_itemContainer{
+    position: relative;
+
+    left: 20px;
+
+    width: 3600px;
+    min-height: 70px;
+}
+
+.selection_dayPreview_focus{
+    position: absolute;
+
+    display: flex;
+    flex-direction: column;
+
+    height: 170px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: none;
+}
+
+.selection_dayPreview_focusHeader{
+    display: flex;
+    flex-direction: row;
+
+    gap: 30px;
+    justify-content: space-between;
+    align-items: center;
+
+    min-width: 120px;
+    height: 35px;
+    
+    padding: 12px 20px;
+
+    background-color: #484C66;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.selection_dayPreview_focusHeader_leftBlock{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.selection_dayPreview_focusSubTitle{
+    font-size: 18px;
+    font-weight: 500;
+    opacity: .7;
+}
+
+.selection_dayPreview_focusHeader_rightBlock{
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+
+    align-items: center;
+
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.selection_dayPreview_focusTimeArrow{
+    filter: invert(1) brightness(2);
+    width: 15px;
+    height: 15px;
+}
+
+.selection_dayPreview_focusExchange{
+    filter: invert(1) brightness(2);
+    width: 25px;
+    height: 25px;
+}
+
+.selection_dayPreview_focusBody{
+    width: 100%;
+    height: calc(100%);
+    background-color: #303344;
+
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.selection_dayPreview_focusTitle{
+    max-width: 100px;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.selection_dayPreview_focusBody_wrapper{
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: calc(100% - 40px);
+
+    padding: 20px 0;
+
+    gap: 20px;
+    align-items: center;
+}
+
+.selection_dayPreview_focusBody_wrapperFirstRow{
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+
+    width: 87%;
+    
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selection_dayPreview_focusToChange{
+    text-align: center;
+    line-height: 30px;
+    
+    background-color: #484C66;
+    width: calc(32% - 20px);
+    height: 30px;
+
+    padding: 0 10px;
+
+    font-size: 17px;
+    font-weight: 500;
+
+    border-radius: 8px;
+}
+
+.selection_dayPreview_focusforChange{
+    display: flex;
+    
+    justify-content: center;
+    align-content: center;
+    
+    background-color: #484C66;
+    width: 32%;
+    height: 30px;
+
+    padding: 0 10px;
+
+    font-size: 17px;
+    font-weight: 500;
+
+    border-radius: 8px;
+    border: none;
+
+    cursor: pointer;
+}
+
+.selection_dayPreview_focusExchangeBtn{
+    text-align: center;
+    line-height: 30px;
+
+    background-color: #1799d3;
+    width: 87%;
+    height: 30px;
+
+    font-size: 18px;
+    font-weight: 500;
+
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.selection_dayPreview_focusExchangeBtn:active{
+    background-color: hsl(199, 80%, 55%);
+}
+
+.selection_dayPreview_item{
+    position: absolute;
+    
+    display: flex;
+    align-items: center;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    padding: 0 8px;
+    
+    width: 60px;
+    height: 30px;
+
+    font-size: 16px;
+    font-weight: 500;
+
+    background-color: rgb(29, 188, 96);
+    border-radius: 5px;
+
+    overflow: scroll;
+    cursor: pointer;
+}
+
+.selection_dayPreview_dashedLine{
+    position: absolute;
+    border-bottom: 3px dashed white;
+
+    height: 4px;
+
+    top: -30px;
+
+    transform-origin: left;
+    transform: rotate(90deg);
+}
+
+.selection_recovery_page{
     display: flex;
     flex-direction: column;
     align-items: flex-start;

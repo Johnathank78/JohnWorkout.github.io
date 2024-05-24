@@ -273,7 +273,7 @@ function parametersChecknUpdate(){
 
         if(weightUnit != previousWeightUnit){
             exercisesHTML = exercisesHTML.replaceAll('placeholder="' + previousWeightUnit + '"', 'placeholder="' + weightUnit + '"');
-            stats_set([timeSpent, workedTime, weightLifted, repsDone]);
+            stats_set([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
             updateWeightUnits(session_list, previousWeightUnit, weightUnit);
         };
 

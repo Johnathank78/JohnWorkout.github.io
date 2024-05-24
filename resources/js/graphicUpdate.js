@@ -269,7 +269,7 @@ function BehindExerciseContainer(shown){
     if(!shown){
 
         let scrollHeight = $(".session_next_exercises_container")[0].scrollHeight + 30 + $(".session_workout_footer_firstRow").height();
-        let maxHeight = (($(window).height()*0.87) - 65) + 2 * parseFloat($(".session_next_exercises_container").css("padding").split("px")[0]) + 30 + $(".session_workout_footer_firstRow").height();
+        let maxHeight = (($(window).height()*0.87) - 65) + 2 * $(".session_next_exercises_container").getStyleValue("padding") + 30 + $(".session_workout_footer_firstRow").height();
         let virtualHeight = (scrollHeight < maxHeight) ? $(window).height() - scrollHeight : $(window).height() - maxHeight;
 
         let header_bottomBorder = $('.session_header').offset().top + $(".session_header").outerHeight() + 30;
