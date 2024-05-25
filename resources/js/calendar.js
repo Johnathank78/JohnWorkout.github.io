@@ -446,21 +446,29 @@ $(document).ready(function(){
     let isSyncingHeader = false;
     let isSyncingBody = false;
 
-    $(".selection_dayPreview_header").on('scroll', function() {
-        if (!isSyncingHeader) {
-            isSyncingBody = true;
-            $('.selection_dayPreview_body').scrollLeft($(this).scrollLeft());
-            requestAnimationFrame(() => isSyncingBody = false);
-        }
-    });
+    const header = $(".selection_dayPreview_header");
+    const body = $(".selection_dayPreview_body");
 
-    $(".selection_dayPreview_body").on('scroll', function() {
-        if (!isSyncingBody) {
-            isSyncingHeader = true;
-            $('.selection_dayPreview_header').scrollLeft($(this).scrollLeft());
-            requestAnimationFrame(() => isSyncingHeader = false);
+    const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    };
+
+    const syncScroll = (source, target, isSyncingSource, setIsSyncingSource, setIsSyncingTarget) => {
+        if (!isSyncingSource) {
+            setIsSyncingTarget(true);
+            requestAnimationFrame(() => {
+                target.scrollLeft(source.scrollLeft());
+                setIsSyncingTarget(false);
+            });
         }
-    });
+    };
+
+    header.on('scroll', debounce(() => syncScroll(header, body, isSyncingHeader, val => isSyncingHeader = val, val => isSyncingBody = val), 10));
+    body.on('scroll', debounce(() => syncScroll(body, header, isSyncingBody, val => isSyncingBody = val, val => isSyncingHeader = val), 10));
 
     $(document).on('click', '.selection_dayPreview_focusExchangeBtn', async function(){
         let dayInd = $(this).data('dayInd');
