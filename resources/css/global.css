@@ -11,6 +11,8 @@
 
 html{
     background-color: #1F1C2D;
+
+    overscroll-behavior: none;
 }
 
 body{
@@ -20,6 +22,8 @@ body{
     left: 0;
     right: 0;
     overflow: hidden;
+
+    overscroll-behavior: none;
 }
 
 span{
