@@ -365,6 +365,24 @@ function sortSlist(a, b){
     return 0;
 };
 
+function getClosestElement(currentTime) {
+    let closestElement = false;
+    let smallestDifference = Infinity;
+  
+    $(".selection_dayPreview_item").each(function() {
+        const elementTime = $(this).data('time');
+    
+        const timeDifference = Math.abs(currentTime - elementTime);
+  
+        if (timeDifference < smallestDifference) {
+            closestElement = $(this);
+            smallestDifference = timeDifference;
+        };
+    });
+  
+    return closestElement;
+};
+
 function checkDisplayState(){
     let closestR = $(".selection_dayPreview_item").filter((_, el) => {
         let left = $(el).getStyleValue('left');
@@ -504,8 +522,6 @@ $(document).ready(function(){
         let distance = $(closest).eq(0).getStyleValue('left') - $('.selection_dayPreview_body').scrollLeft();
         let speed = distance < 1500 ? (distance/700) * 500 : 1000;
 
-        console.log(distance, speed);
-
         if(closest.length > 0){
             $('.selection_dayPreview_body').animate({
                 scrollLeft: $(closest).eq(0).getStyleValue('left')
@@ -640,8 +656,6 @@ $(document).ready(function(){
         let initialHeight = 20;
         let maxHeight = 70;
 
-        let smallestTime = 0;
-
         sList.forEach(arr => {
 
             // Draw SessionItems & dotsNtimes
@@ -717,7 +731,6 @@ $(document).ready(function(){
         // ---------------
         
         previewShown = true;
-        smallestTime = Math.min(...$(".selection_dayPreview_item").map((_, el) =>  Math.trunc($(el).data('time') / 3600)));
 
         $('.selection_dayPreview_focus').css('display', 'none');
         showBlurPage('selection_dayPreview_page');
@@ -728,13 +741,21 @@ $(document).ready(function(){
             $('.selection_dayPreview_noSession').css('display', 'none');
         };
 
-        if(new Date().getHours() >= smallestTime){
-            $('.selection_dayPreview_header').scrollLeft(new Date().getHours() * 150);
-            $('.selection_dayPreview_body').scrollLeft(new Date().getHours() * 150);
-        }else{
-            $('.selection_dayPreview_header').scrollLeft(smallestTime * 150);
+        let now = new Date()
+        let time = now.getHours() * 3600 + now.getMinutes() * 60;
+
+        let closestElement = getClosestElement(time);
+        let smallestTime = Math.trunc($(closestElement).data('time') / 3600);
+
+        if(closestElement){
             $('.selection_dayPreview_body').scrollLeft(smallestTime * 150);
+            $('.selection_dayPreview_header').scrollLeft(smallestTime * 150);
+        }else{
+            $('.selection_dayPreview_body').scrollLeft(new Date().getHours() * 150);
+            $('.selection_dayPreview_header').scrollLeft(new Date().getHours() * 150);
         };
+
+        checkDisplayState();
         
         $('.selection_dayPreview_body').scrollTop(0);
         $('.selection_dayPreview_item').scrollLeft(0);
