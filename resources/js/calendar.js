@@ -443,23 +443,24 @@ $(document).ready(function(){
         updateCalendar(session_list);
     });
 
-    $(".selection_dayPreview_header").on('scroll', function(e){
-        let event = new CustomEvent('automaticScroll', { bubbles: true });
-        $('.selection_dayPreview_body')[0].dispatchEvent(event);
+    let isSyncingHeader = false;
+    let isSyncingBody = false;
+
+    $(".selection_dayPreview_header").on('scroll', function() {
+        if (!isSyncingHeader) {
+            isSyncingBody = true;
+            $('.selection_dayPreview_body').scrollLeft($(this).scrollLeft());
+        }
+        isSyncingHeader = false;
     });
 
-    $(".selection_dayPreview_body").on('scroll', function(){
-        let event = new CustomEvent('automaticScroll', { bubbles: true });
-        $('.selection_dayPreview_header')[0].dispatchEvent(event);
-    }); 
-
-    $(".selection_dayPreview_header").on('automaticScroll', function(e){
-        $(this).scrollLeft($('.selection_dayPreview_body').scrollLeft());
+    $(".selection_dayPreview_body").on('scroll', function() {
+        if (!isSyncingBody) {
+            isSyncingHeader = true;
+            $('.selection_dayPreview_header').scrollLeft($(this).scrollLeft());
+        }
+        isSyncingBody = false;
     });
-
-    $(".selection_dayPreview_body").on('automaticScroll', function(){
-        $(this).scrollLeft($('.selection_dayPreview_header').scrollLeft());
-    }); 
 
     $(document).on('click', '.selection_dayPreview_focusExchangeBtn', async function(){
         let dayInd = $(this).data('dayInd');
