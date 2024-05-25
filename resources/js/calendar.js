@@ -444,11 +444,21 @@ $(document).ready(function(){
     });
 
     $(".selection_dayPreview_header").on('scroll', function(e){
-        $('.selection_dayPreview_body').scrollLeft($(this).scrollLeft());
+        let event = new CustomEvent('automaticScroll', { bubbles: true });
+        $('.selection_dayPreview_body')[0].dispatchEvent(event);
     });
 
     $(".selection_dayPreview_body").on('scroll', function(){
-        $('.selection_dayPreview_header').scrollLeft($(this).scrollLeft());
+        let event = new CustomEvent('automaticScroll', { bubbles: true });
+        $('.selection_dayPreview_header')[0].dispatchEvent(event);
+    }); 
+
+    $(".selection_dayPreview_header").on('automaticScroll', function(e){
+        $(this).scrollLeft($('.selection_dayPreview_body').scrollLeft());
+    });
+
+    $(".selection_dayPreview_body").on('automaticScroll', function(){
+        $(this).scrollLeft($('.selection_dayPreview_header').scrollLeft());
     }); 
 
     $(document).on('click', '.selection_dayPreview_focusExchangeBtn', async function(){

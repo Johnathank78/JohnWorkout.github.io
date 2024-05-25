@@ -219,8 +219,6 @@
 
     border-radius: 8px;
     display: none;
-
-    -webkit-overflow-scrolling: touch;
 }
 
 .selection_dayPreview_header{
