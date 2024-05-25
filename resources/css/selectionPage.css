@@ -284,6 +284,8 @@
     overflow: hidden;   
     overflow: scroll;
 
+    -webkit-overflow-scrolling: auto;
+
     min-height: 70px;
     max-height: 120px;
 
@@ -302,8 +304,6 @@
 
     width: 3600px;
     min-height: 70px;
-
-    -webkit-overflow-scrolling: auto;
 }
 
 .selection_dayPreview_focus{

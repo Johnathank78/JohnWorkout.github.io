@@ -143,6 +143,122 @@ function longClickUpHandler(){
     );
 };
 
+// ----
+
+function setupCustomScrollSync(headerSelector, bodySelector) {
+    // Ensure that native scrolling is disabled for both horizontal and vertical scrolling
+    const header = document.querySelector(headerSelector);
+    const body = document.querySelector(bodySelector);
+
+    header.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    header.style.webkitOverflowScrolling = 'auto';
+    body.style.webkitOverflowScrolling = 'auto';
+
+    let startX, startY, scrollLeftHeader, scrollLeftBody, scrollTopBody, isDragging = false, lastX, lastY, velocityX = 0, velocityY = 0;
+    const friction = 0.95; // Deceleration factor
+
+    // Common function to update scroll positions
+    function syncScroll(positionX, positionY) {
+        header.scrollLeft = positionX;
+        body.scrollLeft = positionX;
+        body.scrollTop = positionY;
+    }
+
+    // Mouse and touch event handlers for manual scroll control
+    function onMouseDown(e) {
+        isDragging = true;
+        startX = e.pageX - header.offsetLeft;
+        startY = e.pageY - body.offsetTop;
+        scrollLeftHeader = header.scrollLeft;
+        scrollLeftBody = body.scrollLeft;
+        scrollTopBody = body.scrollTop;
+        lastX = startX;
+        lastY = startY;
+        velocityX = 0;
+        velocityY = 0;
+    }
+
+    function onMouseMove(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - header.offsetLeft;
+        const y = e.pageY - body.offsetTop;
+        const walkX = (x - startX);
+        const walkY = (y - startY);
+        velocityX = (x - lastX);
+        velocityY = (y - lastY);
+        lastX = x;
+        lastY = y;
+        syncScroll(scrollLeftHeader - walkX, scrollTopBody - walkY);
+    }
+
+    function onMouseUp() {
+        isDragging = false;
+        applyInertia();
+    }
+
+    function onTouchStart(e) {
+        isDragging = true;
+        startX = e.touches[0].pageX - header.offsetLeft;
+        startY = e.touches[0].pageY - body.offsetTop;
+        scrollLeftHeader = header.scrollLeft;
+        scrollLeftBody = body.scrollLeft;
+        scrollTopBody = body.scrollTop;
+        lastX = startX;
+        lastY = startY;
+        velocityX = 0;
+        velocityY = 0;
+    }
+
+    function onTouchMove(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.touches[0].pageX - header.offsetLeft;
+        const y = e.touches[0].pageY - body.offsetTop;
+        const walkX = (x - startX);
+        const walkY = (y - startY);
+        velocityX = (x - lastX);
+        velocityY = (y - lastY);
+        lastX = x;
+        lastY = y;
+        syncScroll(scrollLeftHeader - walkX, scrollTopBody - walkY);
+    }
+
+    function onTouchEnd() {
+        isDragging = false;
+        applyInertia();
+    }
+
+    function applyInertia() {
+        if (Math.abs(velocityX) > 0.1 || Math.abs(velocityY) > 0.1) {
+            velocityX *= friction;
+            velocityY *= friction;
+            syncScroll(header.scrollLeft - velocityX, body.scrollTop - velocityY);
+            requestAnimationFrame(applyInertia);
+        }
+    }
+
+    // Event listeners for header and body
+    header.addEventListener('mousedown', onMouseDown);
+    header.addEventListener('mousemove', onMouseMove);
+    header.addEventListener('mouseup', onMouseUp);
+    header.addEventListener('mouseleave', onMouseUp);
+
+    body.addEventListener('mousedown', onMouseDown);
+    body.addEventListener('mousemove', onMouseMove);
+    body.addEventListener('mouseup', onMouseUp);
+    body.addEventListener('mouseleave', onMouseUp);
+
+    header.addEventListener('touchstart', onTouchStart);
+    header.addEventListener('touchmove', onTouchMove);
+    header.addEventListener('touchend', onTouchEnd);
+
+    body.addEventListener('touchstart', onTouchStart);
+    body.addEventListener('touchmove', onTouchMove);
+    body.addEventListener('touchend', onTouchEnd);
+}
+
 $(document).ready(function(){
     if(isWebMobile){
         $(document).on("touchstart", ".longClickable", longClickDownHandler);
@@ -204,4 +320,6 @@ $(document).ready(function(){
 
         $(this).data("counter", 0);
     });
+
+    setupCustomScrollSync('.selection_dayPreview_header', '.selection_dayPreview_body');
 });//readyEnd
