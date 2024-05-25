@@ -741,6 +741,7 @@ function changeLanguage(lang, first=false){
     $($(".selection_page_calendar_header_M")[1]).text(textAssets[lang]["misc"]["abrMonthLabels"][getKeyByValue(textAssets[previousLanguage]["misc"]["abrMonthLabels"], $($(".selection_page_calendar_header_M")[1]).text())]);
 
     $(".selection_page_calendar_noSession").text(textAssets[lang]["calendar"]["emptyMessage"]);
+    $(".selection_dayPreview_noSession").text(textAssets[lang]["calendar"]["emptyMessage"]);
 
     $($(".update_schedule_span")[0]).text(textAssets[lang]["updatePage"]["on"]);
     $($(".update_schedule_span")[1]).text(textAssets[lang]["updatePage"]["at"]);

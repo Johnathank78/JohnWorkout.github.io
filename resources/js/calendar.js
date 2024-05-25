@@ -365,6 +365,32 @@ function sortSlist(a, b){
     return 0;
 };
 
+function checkDisplayState(){
+    let closestR = $(".selection_dayPreview_item").filter((_, el) => {
+        let left = $(el).getStyleValue('left');
+        let bound = $('.selection_dayPreview_body').scrollLeft() + $('.selection_dayPreview_body').width() - 50;
+        return left > bound;
+    });
+
+    if(closestR.length > 0){
+        $('.selection_dayPreview_seekingArrowRight').css('display', 'block');
+    }else{
+        $('.selection_dayPreview_seekingArrowRight').css('display', 'none');
+    };
+
+    let closestL = $(".selection_dayPreview_item").filter((_, el) => {
+        let left = $(el).getStyleValue('left');
+        let bound = $('.selection_dayPreview_body').scrollLeft();
+        return left < bound;
+    });
+
+    if(closestL.length > 0){
+        $('.selection_dayPreview_seekingArrowLeft').css('display', 'block');
+    }else{
+        $('.selection_dayPreview_seekingArrowLeft').css('display', 'none');
+    };
+};
+
 $(document).ready(function(){
     $(document).on("click", ".main_title_block" , function(){
         if(!isAbleToClick("calendar")){return};
@@ -453,16 +479,56 @@ $(document).ready(function(){
         if (!isSyncingHeader) {
             isSyncingBody = true;
             body.scrollLeft(header.scrollLeft());
-        }
+        };
         isSyncingHeader = false;
+        checkDisplayState();
     });
 
     body.on('scroll', function() {
         if (!isSyncingBody) {
             isSyncingHeader = true;
             header.scrollLeft(body.scrollLeft());
-        }
+        };
         isSyncingBody = false;
+        checkDisplayState();
+    });
+
+    $('.selection_dayPreview_seekingArrowRight').on('click', function(){
+        let closest = $(".selection_dayPreview_item").filter((_, el) => {
+            let left = $(el).getStyleValue('left');
+            let bound = $('.selection_dayPreview_body').scrollLeft() + $('.selection_dayPreview_body').width() - 50;
+
+            return left > bound;
+        });
+
+        let distance = $(closest).eq(0).getStyleValue('left') - $('.selection_dayPreview_body').scrollLeft();
+        let speed = distance < 1500 ? (distance/700) * 500 : 1000;
+
+        console.log(distance, speed);
+
+        if(closest.length > 0){
+            $('.selection_dayPreview_body').animate({
+                scrollLeft: $(closest).eq(0).getStyleValue('left')
+            }, speed);
+        };
+    });
+
+    $('.selection_dayPreview_seekingArrowLeft').on('click', function(){
+        let closest = $(".selection_dayPreview_item").filter((_, el) => {
+            let left = $(el).getStyleValue('left');
+            let bound = $('.selection_dayPreview_body').scrollLeft();
+
+            return left < bound;
+        });
+
+        let distance = $('.selection_dayPreview_body').scrollLeft() - $(closest).eq(0).getStyleValue('left');
+        let speed = distance < 1500 ? (distance/700) * 500 : 1000;
+
+        if(closest.length > 0){
+            $('.selection_dayPreview_body').animate({
+                scrollLeft: $(closest).eq(0).getStyleValue('left')
+            }, speed);
+        };
     });
 
     $(document).on('click', '.selection_dayPreview_focusExchangeBtn', async function(){
@@ -655,6 +721,12 @@ $(document).ready(function(){
 
         $('.selection_dayPreview_focus').css('display', 'none');
         showBlurPage('selection_dayPreview_page');
+    
+        if($('.selection_dayPreview_item').length == 0){
+            $('.selection_dayPreview_noSession').css('display', 'inline-block');
+        }else{
+            $('.selection_dayPreview_noSession').css('display', 'none');
+        };
 
         if(new Date().getHours() >= smallestTime){
             $('.selection_dayPreview_header').scrollLeft(new Date().getHours() * 150);
