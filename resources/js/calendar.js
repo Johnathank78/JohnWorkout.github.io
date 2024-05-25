@@ -373,7 +373,7 @@ function getClosestElement(currentTime) {
         const elementTime = $(this).data('time');
         const timeDifference = Math.abs(currentTime - elementTime);
         
-        if (timeDifference < smallestDifference && (!sessionDone[1][$(this).data("id")] && $(actualRowDay).data('time') == zeroAM(new Date()).getTime())){
+        if (timeDifference < smallestDifference && (!sessionDone[1][$(this).data("id")])){
             closestElement = $(this);
             smallestDifference = timeDifference;
         };
@@ -381,6 +381,22 @@ function getClosestElement(currentTime) {
   
     return closestElement;
 };
+
+function getSmallestElement() {
+    let smallestElement = false;
+    let smallestTime = Infinity;
+  
+    $(".selection_dayPreview_item").each(function() {
+      const elementTime = $(this).data('time');
+  
+        if(elementTime < smallestTime){
+            smallestElement = $(this);
+            smallestTime = elementTime;
+        };
+    });
+  
+    return smallestElement;
+  }
 
 function checkDisplayState(){
     let closestR = $(".selection_dayPreview_item").filter((_, el) => {
@@ -742,11 +758,17 @@ $(document).ready(function(){
 
         let now = new Date()
         let time = now.getHours() * 3600 + now.getMinutes() * 60;
+        let focusElement = false
 
-        let closestElement = getClosestElement(time);
-        let smallestTime = Math.trunc($(closestElement).data('time') / 3600);
+        if($(actualRowDay).data('time') == zeroAM(new Date()).getTime()){
+            focusElement = getClosestElement(time);
+        }else{
+            focusElement = getSmallestElement();
+        };
+        
+        let smallestTime = Math.trunc($(focusElement).data('time') / 3600);
 
-        if(closestElement){
+        if(focusElement){
             $('.selection_dayPreview_body').scrollLeft(smallestTime * 150);
             $('.selection_dayPreview_header').scrollLeft(smallestTime * 150);
         }else{
