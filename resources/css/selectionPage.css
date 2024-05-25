@@ -289,8 +289,6 @@
 
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
-
-    -webkit-overflow-scrolling: auto;
 }
 
 .selection_dayPreview_body::-webkit-scrollbar{
@@ -304,6 +302,8 @@
 
     width: 3600px;
     min-height: 70px;
+
+    -webkit-overflow-scrolling: auto;
 }
 
 .selection_dayPreview_focus{
