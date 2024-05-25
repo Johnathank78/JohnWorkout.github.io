@@ -287,13 +287,16 @@
     max-height: 120px;
 
     -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-
-    overscroll-behavior: none;
+    scrollbar-width: none;  /* Firefox */   
 }
 
 .selection_dayPreview_body::-webkit-scrollbar{
     display: none;
+}
+
+.selection_dayPreview_header, .selection_dayPreview_body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 .selection_dayPreview_itemContainer{

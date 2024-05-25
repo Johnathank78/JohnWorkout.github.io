@@ -449,26 +449,21 @@ $(document).ready(function(){
     const header = $(".selection_dayPreview_header");
     const body = $(".selection_dayPreview_body");
 
-    const debounce = (func, wait) => {
-        let timeout;
-        return (...args) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-    };
-
-    const syncScroll = (source, target, isSyncingSource, setIsSyncingSource, setIsSyncingTarget) => {
-        if (!isSyncingSource) {
-            setIsSyncingTarget(true);
-            requestAnimationFrame(() => {
-                target.scrollLeft(source.scrollLeft());
-                setIsSyncingTarget(false);
-            });
+    header.on('scroll', function() {
+        if (!isSyncingHeader) {
+            isSyncingBody = true;
+            body.scrollLeft(header.scrollLeft());
         }
-    };
+        isSyncingHeader = false;
+    });
 
-    header.on('scroll', debounce(() => syncScroll(header, body, isSyncingHeader, val => isSyncingHeader = val, val => isSyncingBody = val), 10));
-    body.on('scroll', debounce(() => syncScroll(body, header, isSyncingBody, val => isSyncingBody = val, val => isSyncingHeader = val), 10));
+    body.on('scroll', function() {
+        if (!isSyncingBody) {
+            isSyncingHeader = true;
+            header.scrollLeft(body.scrollLeft());
+        }
+        isSyncingBody = false;
+    });
 
     $(document).on('click', '.selection_dayPreview_focusExchangeBtn', async function(){
         let dayInd = $(this).data('dayInd');
