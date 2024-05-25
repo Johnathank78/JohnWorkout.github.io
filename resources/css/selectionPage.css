@@ -281,16 +281,15 @@
 .selection_dayPreview_body{
     width: 100%;
 
-    overflow: hidden;   
     overflow: scroll;
-
-    -webkit-overflow-scrolling: auto;
 
     min-height: 70px;
     max-height: 120px;
 
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+
+    overscroll-behavior: none;
 }
 
 .selection_dayPreview_body::-webkit-scrollbar{
@@ -317,7 +316,6 @@
     left: 50%;
 
     transform: translateX(-50%);
-
     display: none;
 }
 
