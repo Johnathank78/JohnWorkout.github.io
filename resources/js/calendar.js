@@ -446,20 +446,43 @@ $(document).ready(function(){
     let isSyncingHeader = false;
     let isSyncingBody = false;
 
-    $(".selection_dayPreview_header").on('scroll', function() {
-        if (!isSyncingHeader) {
-            isSyncingBody = true;
-            $('.selection_dayPreview_body').scrollLeft($(this).scrollLeft());
+    let headerScrollLeft = 0;
+    let bodyScrollLeft = 0;
+
+    // Function to sync header scroll position
+    function syncHeaderScroll() {
+        if (isSyncingHeader) {
+            $('.selection_dayPreview_body').scrollLeft(headerScrollLeft);
+            isSyncingHeader = false;
         }
-        isSyncingHeader = false;
+        requestAnimationFrame(syncHeaderScroll);
+    }
+
+    // Function to sync body scroll position
+    function syncBodyScroll() {
+        if (isSyncingBody) {
+            $('.selection_dayPreview_header').scrollLeft(bodyScrollLeft);
+            isSyncingBody = false;
+        }
+        requestAnimationFrame(syncBodyScroll);
+    }
+
+    // Initialize the synchronization loop
+    requestAnimationFrame(syncHeaderScroll);
+    requestAnimationFrame(syncBodyScroll);
+
+    $(".selection_dayPreview_header").on('scroll', function() {
+        if (!isSyncingBody) {
+            isSyncingHeader = true;
+            headerScrollLeft = $(this).scrollLeft();
+        }
     });
 
     $(".selection_dayPreview_body").on('scroll', function() {
-        if (!isSyncingBody) {
-            isSyncingHeader = true;
-            $('.selection_dayPreview_header').scrollLeft($(this).scrollLeft());
+        if (!isSyncingHeader) {
+            isSyncingBody = true;
+            bodyScrollLeft = $(this).scrollLeft();
         }
-        isSyncingBody = false;
     });
 
     $(document).on('click', '.selection_dayPreview_focusExchangeBtn', async function(){
