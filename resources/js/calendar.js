@@ -371,10 +371,9 @@ function getClosestElement(currentTime) {
   
     $(".selection_dayPreview_item").each(function() {
         const elementTime = $(this).data('time');
-    
         const timeDifference = Math.abs(currentTime - elementTime);
-  
-        if (timeDifference < smallestDifference) {
+        
+        if (timeDifference < smallestDifference && (!sessionDone[1][$(this).data("id")] && $(actualRowDay).data('time') == zeroAM(new Date()).getTime())){
             closestElement = $(this);
             smallestDifference = timeDifference;
         };
