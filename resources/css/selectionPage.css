@@ -289,6 +289,8 @@
 
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+
+    -webkit-overflow-scrolling: auto;
 }
 
 .selection_dayPreview_body::-webkit-scrollbar{
