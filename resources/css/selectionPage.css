@@ -326,6 +326,8 @@
 
     filter: invert(1) brightness(2);
     cursor: pointer;
+
+    display: none;
 }
 
 .selection_dayPreview_seekingArrowRight{
@@ -342,6 +344,8 @@
 
     filter: invert(1) brightness(2);
     cursor: pointer;
+
+    display: none;
 }
 
 

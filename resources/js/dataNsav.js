@@ -413,12 +413,7 @@ function sessionSwapped_read(){
     };
 
     data = JSON.parse(data);
-
-    data.forEach(swap => {
-        if(swap['time'] < now){
-            delete swap;
-        };
-    });
+    data = data.filter(swap => swap['time'] >= now);
 
     return data;
 };
