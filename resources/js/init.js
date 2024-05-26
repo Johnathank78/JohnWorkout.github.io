@@ -52,12 +52,14 @@ $(document).ready(async function(){
     reminder_list = reminder_read();
 
     await rescheduler();
-    
+
     sessionToBeDone = sessionToBeDone_read();
     sessionDone = sessionDone_read();
     sessionSwapped = sessionSwapped_read();
     hasBeenShifted = hasBeenShifted_read();
-    
+
+    console.log(sessionToBeDone)
+    console.log(sessionDone)
     
     session_pusher(session_list);
     reminder_pusher(reminder_list);

@@ -9,7 +9,7 @@ $(document).ready(function(){
                 if(isSaving && lockState){return};
                 window.history.back();
             }else{
-                $(".main_page").clicks();
+                $(".update_backArrow").click();
             };
         };
     });

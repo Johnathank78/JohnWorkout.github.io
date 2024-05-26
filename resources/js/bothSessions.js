@@ -195,7 +195,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 0)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;

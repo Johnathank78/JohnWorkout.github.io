@@ -792,6 +792,4 @@ $(document).ready(function(){
         $('.selection_dayPreview_body').scrollTop(0);
         $('.selection_dayPreview_item').scrollLeft(0);
     });
-
-    console.log(nbSessionScheduled(Date.now() + 7 * 86400 * 1000))
 });//readyEnd

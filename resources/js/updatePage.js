@@ -240,9 +240,12 @@ $(document).ready(function(){
 
             if(reminderOrSession == "session"){
                 delete calendar_dict[update_current_item[1]];
+
+                sessionToBeDone[update_current_item[update_current_item.length - 1]] = false;
                 hasBeenShifted[1][update_current_item[update_current_item.length - 1]];
 
                 session_save(session_list);
+                sessionToBeDone_save(sessionToBeDone);
                 calendar_save(calendar_dict);
 
                 calendar_read(session_list);

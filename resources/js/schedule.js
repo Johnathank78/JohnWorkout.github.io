@@ -204,7 +204,7 @@ async function uniq_reschedulerSESSION(id){
                 await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session_list[index][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
             };
         };
-    } catch (error) {
+    }catch (error) {
         console.error(error);
     };
 
