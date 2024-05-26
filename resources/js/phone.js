@@ -559,11 +559,6 @@ if(platform == "Mobile"){
 
                 BackgroundTask.finish({ pauseProcess });
             });
-        }
-
-        if(state.isActive && current_page == "selection"){
-            await rescheduler();
-            updateCalendar(session_list);
         };
     });
 }else{

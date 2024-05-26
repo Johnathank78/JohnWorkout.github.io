@@ -427,7 +427,6 @@ async function rescheduler(){
 
     await reschedulerCORE(session_list);
     session_save(session_list);
-    updateCalendar(session_list);
 
     //-------------;
 

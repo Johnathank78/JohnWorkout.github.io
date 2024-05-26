@@ -439,14 +439,21 @@ function sessionToBeDone_read(){
     if(formatDate(zeroAM(new Date(data[0]))) != formatDate(zeroAM(new Date(Date.now())))){
 
         //GET MISSED SESSION NB
-
+        
         let sessionDone = localStorage.getItem("session_done");
+        let elapsedTime = daysBetweenTimestamps(data[0], Date.now());
 
+        if(elapsedTime > 1){
+            nbMissed += nbSessionScheduled();
+        };
+        
         if(!(sessionDone === null || sessionDone == "")){
             sessionDone = JSON.parse(sessionDone);
             Object.keys(data[1]).forEach(function(key){
-                if(data[1][key] && !sessionDone[1][key]){
+                if(data[1][key] && !sessionDone[1][key] && elapsedTime == 1){
                     nbMissed += 1;
+                }else if(data[1][key] && sessionDone[1][key] && elapsedTime > 1){
+                    nbMissed -= 1;
                 };
             });
         };

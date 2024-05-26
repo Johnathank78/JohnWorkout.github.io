@@ -196,6 +196,7 @@
 
             <div class="selection_dayPreview_page noselect">
                 <div class="selection_dayPreview_header">
+                    <span class="selection_dayPreview_date"></span>
                     <div class="selection_dayPreview_mainLine">
                         <div class="selection_dayPreview_circleContainer" style="left: 0px;">
                             <span class="selection_dayPreview_time">00h00</span>
@@ -320,8 +321,15 @@
                 </div>
                 <div class="selection_dayPreview_body">
                     <div class="selection_dayPreview_itemContainer"></div>
-                    <img src="./resources/imgs/arrow.png" class="selection_dayPreview_seekingArrowLeft" alt="arrow">
-                    <img src="./resources/imgs/arrow.png" class="selection_dayPreview_seekingArrowRight" alt="arrow">
+
+                    <div class="selection_dayPreview_seekingArrowContainer selection_dayPreview_seekingArrowContainerLeft">
+                        <img src="./resources/imgs/arrow.png" class="selection_dayPreview_seekingArrowLeft" alt="arrow">
+                    </div>
+
+                    <div class="selection_dayPreview_seekingArrowContainer selection_dayPreview_seekingArrowContainerRight">
+                        <img src="./resources/imgs/arrow.png" class="selection_dayPreview_seekingArrowRight" alt="arrow">
+                    </div>
+
                     <span class="selection_dayPreview_noSession">No session scheduled</span>
                 </div>
                 <div class="selection_dayPreview_focus">

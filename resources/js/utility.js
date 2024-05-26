@@ -286,6 +286,45 @@ function showBlurPage(className){
     $(".blurBG").css("display", "flex");
 };
 
+function nbSessionScheduled(){
+    let count = 0;
+    let vsDate = zeroAM(new Date()).getTime() - 86400 * 1000;
+
+    session_list.forEach(session => {
+        let scheduleType = isScheduled(session);
+        let scheduleData = false;
+        let scheduleOffset = false;
+        let elapsedDays = false;
+
+        let scheduledDate = false;
+
+        if(scheduleType == "Day"){
+            scheduleData = session[session.length - 2];
+            scheduleOffset = scheduleData[1][1];
+
+            scheduledDate = zeroAM(new Date(scheduleData[2][1])).getTime();
+            elapsedDays = -daysBetweenTimestamps(vsDate, scheduledDate);
+            
+            if(elapsedDays > 0){
+                count += Math.floor(elapsedDays / scheduleOffset);
+            };
+        }else if(scheduleType == "Week"){
+            scheduleData = session[session.length - 2];
+            scheduleOffset = scheduleData[1][1] * 7;
+            scheduleData[2].forEach(day => {
+                scheduledDate = zeroAM(new Date(day[1])).getTime();
+                elapsedDays = -daysBetweenTimestamps(vsDate, scheduledDate);
+
+                if(elapsedDays > 0){
+                    count += Math.floor(elapsedDays / scheduleOffset);
+                };
+            });
+        };
+    });
+
+    return count
+};
+
 // History
 
 function getSessionHistory(session){
@@ -492,6 +531,10 @@ function parseDate(dateString) {
     month -= 1;
 
     return new Date(year, month, day);
+};
+
+function daysBetweenTimestamps(timestamp1, timestamp2) {
+    return Math.ceil(timestamp2 - timestamp1) / (60 * 60 * 24) / 1000;
 };
 
 // Notification

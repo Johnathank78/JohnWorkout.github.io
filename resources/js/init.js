@@ -35,7 +35,7 @@ var sessionToBeDone = false;
 
 var session_reorder = false; var reminder_reorder = false; var exercise_reorder = false; var sets_reorder = false;
 
-$(document).ready(function(){
+$(document).ready(async function(){
     parameters = parameters_read();
     exercisesHTML = exercise_tile();
 
@@ -51,16 +51,18 @@ $(document).ready(function(){
     session_list = session_read();
     reminder_list = reminder_read();
 
+    await rescheduler();
+    
     sessionToBeDone = sessionToBeDone_read();
     sessionDone = sessionDone_read();
     sessionSwapped = sessionSwapped_read();
     hasBeenShifted = hasBeenShifted_read();
-
+    
+    
     session_pusher(session_list);
     reminder_pusher(reminder_list);
     
     updateCalendar(session_list);
-
     deleteHistory();
 
     recovery = recovery_read();

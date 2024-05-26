@@ -224,7 +224,7 @@
 .selection_dayPreview_header{
     position: relative;
 
-    height: 67px;
+    height: 105px;
     width: 100%;
 
     border-radius: 8px;
@@ -236,6 +236,17 @@
     scrollbar-width: none;  /* Firefox */
 }
 
+.selection_dayPreview_date{
+    position: fixed;
+
+    margin-left: 20px;
+    margin-top: 15px;
+
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+}
+
 .selection_dayPreview_header::-webkit-scrollbar{
     display: none;
 }
@@ -243,7 +254,7 @@
 .selection_dayPreview_mainLine{
     position: absolute;
     
-    top: 55px;
+    top: 90px;
     left: 20px;
 
     width: 3600px;
@@ -305,7 +316,7 @@
     left: 50%;
     top: 50%;
 
-    transform: translate(-50%, 50%);
+    transform: translate(-50%, 140%);
     color: rgba(255, 255, 255, .2);
     
     font-size: 22px;
@@ -313,41 +324,53 @@
 }
 
 .selection_dayPreview_seekingArrowLeft{
-    position: absolute;
-
     width: 15px;
     height: 15px;
-    
-    top: 50%;
-    transform: translateY(50%) rotate(90deg);
-    left: 10px;
 
-    padding: 5px;
-
+    transform: rotate(90deg);
     filter: invert(1) brightness(2);
-    cursor: pointer;
 
-    display: none;
+    margin-left: -2px;
 }
 
 .selection_dayPreview_seekingArrowRight{
+    width: 15px;
+    height: 15px;
+
+    filter: invert(1) brightness(2);
+    transform: rotate(-90deg);
+
+    margin-left: 2px;
+}
+
+.selection_dayPreview_seekingArrowContainer{
     position: absolute;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     width: 15px;
     height: 15px;
     
     top: 50%;
-    transform: translateY(50%) rotate(-90deg);
-    right: 10px;
 
-    padding: 5px;
+    transform: translateY(100%);
 
-    filter: invert(1) brightness(2);
+    padding: 8px;
     cursor: pointer;
 
-    display: none;
+    background-color: rgb(76, 83, 104);
+    border-radius: 999px;
 }
 
+.selection_dayPreview_seekingArrowContainerLeft{
+    left: 7px;
+}
+
+.selection_dayPreview_seekingArrowContainerRight{
+    right: 7px;
+}
 
 .selection_dayPreview_itemContainer{
     position: relative;
