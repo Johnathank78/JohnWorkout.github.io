@@ -195,7 +195,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 0)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -218,7 +218,7 @@ async function quit_session(failed=false){
         // Notification related;
 
         if(isScheduled(current_session)){
-            let id = await getPendingId(current_session[current_session.length - 1], current_session[current_session.length - 2][1][0]);
+            let id = await getTodayPendingId(current_session[current_session.length - 1], getScheduleScheme(current_session));
 
             if(platform == "Mobile"){
                 await undisplayAndCancelNotification(id);

@@ -1,3 +1,47 @@
+function isWeekNotifToday(id){
+    let sessionID = id.slice(1, -1);
+    let session = session_list[getSessionIndexByID(session_list, sessionID)];
+    let today = zeroAM(new Date()).getTime();
+
+    let notifData = session[session.length - 2][2][id.toString()[0] - 1]
+    return zeroAM(new Date(notifData[1])).getTime() == today;
+};
+
+function isIdIncludedToday(arr, sessionId, every){
+
+    let filteredArr = arr.filter((id) => (every == "Day" ? id.slice(0, -1) : id.slice(1, -1)) == sessionId);
+    let result = false;
+
+    if(every == "Day"){
+        return filteredArr[0];
+    }else if(every == "Week"){
+        filteredArr.forEach(id => {
+            if(isWeekNotifToday(id)){
+                result = id;
+            };
+        });
+    };
+
+    return result ? result : filteredArr[filteredArr.length - 1];
+};
+
+async function getTodayPendingId(sessionID, every){
+    let pending = platform == "Mobile" ? getIDListFromNotificationArray(await LocalNotifications.getPending()) : getPendingIdListWEB();
+    let realID = isIdIncludedToday(pending, sessionID, every);
+
+    if(realID){
+        return realID;
+    }else{
+        if(every == "Day"){
+            return sessionID + "1";
+        }else if(every == "Week"){
+            return "1" + sessionID + "1";
+        };
+    };
+};
+
+//-------------;
+
 function getIDListFromNotificationArray(arr){
     let out = [];
 
@@ -30,14 +74,8 @@ function getPendingIdListWEB(){
 };
 
 function isIdincluded(arr, sessionId, every){
-
-    for(let i=0; i<arr.length; i++){
-        if((every == "Day" ? arr[i].slice(0, -1) : arr[i].slice(1, -1)) == sessionId){
-            return arr[i];
-        };
-    };
-
-    return false;
+    let filteredArr = arr.filter((id) => (every == "Day" ? id.slice(0, -1) : id.slice(1, -1)) == sessionId)
+    if(filteredArr.length > 0 ){return filteredArr[0];}else{return false}
 };
 
 async function isShown(sessionId, every){
@@ -50,7 +88,6 @@ async function isShown(sessionId, every){
 };
 
 async function getPendingId(sessionID, every){
-
     let pending = platform == "Mobile" ? getIDListFromNotificationArray(await LocalNotifications.getPending()) : getPendingIdListWEB();
     let realID = isIdincluded(pending, sessionID, every);
 
@@ -63,7 +100,6 @@ async function getPendingId(sessionID, every){
             return "1" + sessionID + "1";
         };
     };
-
 };
 
 async function getShownId(sessionID, every){
@@ -153,59 +189,55 @@ function isNotificationAnticipated(timestamp, hours, minutes){
 //-------------;
 
 async function uniq_reschedulerSESSION(id){
-    try {
-        let index = false;
-        let data = false;
+    let index = false;
+    let data = false;
 
-        index = getSessionIndexByNotificationID(id);
-        data = session_list[index][session_list[index].length - 2];
+    index = getSessionIndexByNotificationID(id);
+    data = session_list[index][session_list[index].length - 2];
 
-        let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
+    let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
 
-        if(data[1][0] == "Day"){
-            id = id.slice(-1) == "1" ? id.slice(0, -1) + "2" : id.slice(0, -1) + "1";
+    if(data[1][0] == "Day"){
+        id = id.slice(-1) == "1" ? id.slice(0, -1) + "2" : id.slice(0, -1) + "1";
 
-            data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+        data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
-            if(Date.now() <= data[2][1] && data[2][1] - Date.now() < 12*3600*1000){
-                data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0], 1);
-            }else{
-                data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0]);
-            };
-
-            if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
-                data[2][1] -= toSubstract;
-            };
-
-            data[2][0] = dayofweek[new Date(data[2][1]).getDay()];
-
-            if(platform == "Mobile"){
-                await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session_list[index][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
-            };
-
-        }else if(data[1][0] == "Week"){
-            let z = parseInt(id.slice(0, 1)) - 1;
-
-            id = id.slice(-1) == "1" ? id.slice(0, -1) + "2" : id.slice(0, -1) + "1";
-
-            data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-
-            if(Date.now() <= data[2][z][1] && data[2][z][1] - Date.now() < 12*3600*1000){
-                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0], 1);
-            }else{
-                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0]);
-            };
-
-            if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
-                data[2][z][1] -= toSubstract;
-            };
-
-            if(platform == "Mobile"){
-                await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session_list[index][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
-            };
+        if(Date.now() <= data[2][1] && !sessionToBeDone[1][session_list[index][session_list[index].length - 1]]){
+            data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0], 1);
+        }else{
+            data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0]);
         };
-    }catch (error) {
-        console.error(error);
+
+        if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
+            data[2][1] -= toSubstract;
+        };
+
+        data[2][0] = dayofweek[new Date(data[2][1]).getDay()];
+
+        if(platform == "Mobile"){
+            await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session_list[index][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
+        };
+
+    }else if(data[1][0] == "Week"){
+        let z = parseInt(id.slice(0, 1)) - 1;
+
+        id = id.slice(-1) == "1" ? id.slice(0, -1) + "2" : id.slice(0, -1) + "1";
+
+        data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+
+        if(Date.now() <= data[2][z][1] && !sessionToBeDone[1][session_list[index][session_list[index].length - 1]]){
+            data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0], 1);
+        }else{
+            data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0]);
+        };
+
+        if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
+            data[2][z][1] -= toSubstract;
+        };
+
+        if(platform == "Mobile"){
+            await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session_list[index][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
+        };
     };
 
     if(platform == "Mobile"){
@@ -296,7 +328,7 @@ async function shiftSchedule(session, toSubstract){
         let data = session[session.length - 2];
 
         if(platform == "Mobile"){
-            await undisplayAndCancelNotification(await getPendingId(session[session.length - 1], getScheduleScheme(session)));
+            await removeAllNotifsFromSession(session);
         };
 
         let idx = await getShownId(session[session.length - 1].toString(), data[1][0]);

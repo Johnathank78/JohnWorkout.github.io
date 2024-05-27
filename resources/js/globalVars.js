@@ -63,7 +63,7 @@ const textAssets = {
             "workedTime" : "Temps sous tension",
             "weightLifted" : "Charge soulevée",
             "repsDone" : "Répétitions effectuées",
-            "sessionMissed": "Séance manquées",
+            "sessionMissed": "Séances manquées",
             "since" : "Depuis le",
         },
         "preferences": {

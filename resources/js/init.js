@@ -57,9 +57,6 @@ $(document).ready(async function(){
     sessionDone = sessionDone_read();
     sessionSwapped = sessionSwapped_read();
     hasBeenShifted = hasBeenShifted_read();
-
-    console.log(sessionToBeDone)
-    console.log(sessionDone)
     
     session_pusher(session_list);
     reminder_pusher(reminder_list);

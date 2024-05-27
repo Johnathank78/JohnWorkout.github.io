@@ -26,7 +26,9 @@ function updateCalendar(data){
             outlineOffset: "2px"
         });
 
-        for(let i=0; i<today; i++){$($(dayz)[i]).css('opacity', ".25")};
+        for(let i=0; i<today; i++){
+            $($(dayz)[i]).css('opacity', ".25");
+        };
     }else{
         $($(dayz)[today]).css({
             outline: "unset",
@@ -36,10 +38,13 @@ function updateCalendar(data){
 
     // SET DAYS VALS;
 
-    let tempDate = new Date();
+    let tempDate = zeroAM(new Date());
     let dateSub = dayofweek_conventional.indexOf(dayofweek[tempDate.getDay()]);
+    
     tempDate.setDate(tempDate.getDate() + (updateCalendarPage - 1) * 21 - dateSub);
     $(dayz).first().text(tempDate.getDate());
+
+    $(dayz).first().data('time', tempDate.getTime());
 
     for(let i=1; i<end+1; i++){
         tempDate.setDate(tempDate.getDate() + 1);
@@ -52,15 +57,16 @@ function updateCalendar(data){
         if(i == end){$(".selection_page_calendar_header_M").last().text(textAssets[language]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]])};
 
         $($(dayz)[i]).text(tempDate.getDate());
-        $($(dayz)[i]).data('time', zeroAM(tempDate).getTime());
+        $($(dayz)[i]).data('time', tempDate.getTime());
     };
 
     //-------------;
 
     for(let i=0; i<data.length; i++){
         if(isScheduled(data[i])){
+            let id = data[i][data[i].length - 1];
             let schedule = data[i][data[i].length - 2];
-            let scheduleDateData = wasScheduledToday(schedule, data[i][data[i].length - 1]);
+            let scheduleDateData = wasScheduledToday(schedule);
 
             if(schedule[1][0] == "Day"){
                 let scheduleDate = zeroAM(new Date(scheduleDateData[2][1]));
@@ -98,23 +104,29 @@ function updateCalendar(data){
                             let newData = data[getSessionIndexByID(data, match['to'])];
                             alpha = parseFloat(get_session_time(newData)/min);
 
-                            $($(dayz)[dayInd]).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
+                            $(dayz).eq(dayInd).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
                         }else{
                             alpha = parseFloat(get_session_time(data[i])/min);
-                            $($(dayz)[dayInd]).data("sList").push([[data[i][data[i].length - 1], data[i][1]], [schedule[1][2], schedule[1][3]]]);
+                            $(dayz).eq(dayInd).data("sList").push([[data[i][data[i].length - 1], data[i][1]], [schedule[1][2], schedule[1][3]]]);
                         };
 
                         if(alpha < 0.15){alpha = 0.15};
 
-                        if((!match && calendar_dict[data[i][1]]) || (match && !sessionDone[1][match['to']])){
-                            if($($(dayz)[dayInd]).css('backgroundColor').includes("rgba")){
-                                let actual_alpha = $($(dayz)[dayInd]).css('backgroundColor').split(",");
+                        if((!match
+                            && ((calendar_dict[data[i][1]] && !sessionDone[1][id])
+                            || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today))) 
+                        || (match 
+                            && (!sessionDone[1][match['to']] 
+                            || (sessionDone[1][match['to']] && nbdayz != today)))
+                        ){
+                            if($(dayz).eq(dayInd).css('backgroundColor').includes("rgba")){
+                                let actual_alpha = $(dayz).eq(dayInd).css('backgroundColor').split(",");
 
                                 actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
-                                $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
+                                $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
                             }else{
-                                if($($(dayz)[dayInd]).css('backgroundColor') == "rgb(76, 83, 104)"){
-                                    $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
+                                if($(dayz).eq(dayInd).css('backgroundColor') == "rgb(76, 83, 104)"){
+                                    $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
                                 };
                             };
 
@@ -130,8 +142,8 @@ function updateCalendar(data){
                 };
             }else if(schedule[1][0] == "Week"){
                 for(let z=0; z<schedule[2].length; z++){
-                    let scheduleDateData = wasScheduledToday(schedule, data[i][data[i].length - 1], z);
-
+                    let scheduleDateData = wasScheduledToday(schedule, z);
+                    
                     let scheduleDate = zeroAM(new Date(scheduleDateData[2][z][1]));
 
                     let pageOffeset = ((end + 1) * (updateCalendarPage - 1));
@@ -160,29 +172,35 @@ function updateCalendar(data){
                             };
 
                             let dayInd = nbdayz - pageOffeset;
-                            let match = findChanged(todaysDate.getTime(), ["from", data[i][data[i].length - 1]])["element"];
+                            let match = findChanged($(dayz).eq(dayInd).data('time'), ["from", id])["element"];
 
                             if(match){
                                 let newData = data[getSessionIndexByID(data, match['to'])];
                                 alpha = parseFloat(get_session_time(newData)/min);
 
-                                $($(dayz)[dayInd]).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
+                                $(dayz).eq(dayInd).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
                             }else{
                                 alpha = parseFloat(get_session_time(data[i])/min);
-                                $($(dayz)[dayInd]).data("sList").push([[data[i][data[i].length - 1], data[i][1]], [schedule[1][2], schedule[1][3]]]);
+                                $(dayz).eq(dayInd).data("sList").push([[data[i][data[i].length - 1], data[i][1]], [schedule[1][2], schedule[1][3]]]);
                             };
 
                             if(alpha < 0.15){alpha = 0.15};
 
-                            if((!match && calendar_dict[data[i][1]]) || (match && !sessionDone[1][match['to']])){
-                                if($($(dayz)[dayInd]).css('backgroundColor').includes("rgba")){
-                                    let actual_alpha = $($(dayz)[dayInd]).css('backgroundColor').split(",");
+                            if((!match
+                                && ((calendar_dict[data[i][1]] && !sessionDone[1][id])
+                                || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today))) 
+                            || (match
+                                && (!sessionDone[1][match['to']] 
+                                || (sessionDone[1][match['to']] && nbdayz != today)))
+                            ){
+                                if($(dayz).eq(dayInd).css('backgroundColor').includes("rgba")){
+                                    let actual_alpha = $(dayz).eq(dayInd).css('backgroundColor').split(",");
     
                                     actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
-                                    $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
+                                    $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
                                 }else{
-                                    if($($(dayz)[dayInd]).css('backgroundColor') == "rgb(76, 83, 104)"){
-                                        $($(dayz)[dayInd]).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
+                                    if($(dayz).eq(dayInd).css('backgroundColor') == "rgb(76, 83, 104)"){
+                                        $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
                                     };
                                 };
 
@@ -204,11 +222,7 @@ function updateCalendar(data){
     sessionToBeDone_save(sessionToBeDone);
 };
 
-function wasScheduledToday(data, id, z=false){
-    if(sessionDone[1][id] || hasBeenShifted[1][id]){
-        return data;
-    };
-
+function wasScheduledToday(data, z=false){
     let clonedData = JSON.parse(JSON.stringify(data));
 
     if (z !== false) {
@@ -255,7 +269,7 @@ async function shiftPlusOne(){
                     if(input[i][0] == "R" && data[1][1] == 1){continue};
                     isShifted = true;
 
-                    let scheduleSave = wasScheduledToday(data, input[input.length - 1]);
+                    let scheduleSave = wasScheduledToday(data);
 
                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
 
@@ -285,7 +299,7 @@ async function shiftPlusOne(){
                     isShifted = true;
 
                     for(let z=0; z<data[2].length; z++){
-                        let scheduleSave = wasScheduledToday(data, input[i][input[i].length - 1], z);
+                        let scheduleSave = wasScheduledToday(data, z);
 
                         let idx = (z+1).toString() + id.slice(1, id.length);
                         if(platform == "Mobile"){await undisplayAndCancelNotification(idx)};
@@ -576,7 +590,7 @@ $(document).ready(function(){
         let idFrom = $(this).data('idFrom');
         let idTo = $('.selection_dayPreview_focusforChange').val();
         let time = $(actualRowDay).data('time');
-        
+
         let match = findChanged($(".selection_page_calendar_row_day").eq(dayInd).data("time"), ["to", idFrom]);
 
         if(match && match["element"]["from"] == idTo){
@@ -599,12 +613,17 @@ $(document).ready(function(){
         sessionToBeDone[1][idFrom] = false;
 
         if(platform == "Mobile"){
-            // let session = session_list[getSessionIndexByID(session_list, idTo)];
-            // let schedule = isScheduled(session);
+            let sessionFrom = session_list[getSessionIndexByID(session_list, idFrom)];
+            let sessionto = session_list[getSessionIndexByID(session_list, idTo)];
+            let pending = await getPendingId(idFrom, getScheduleScheme(sessionFrom));
 
-            // let pending = getIDListFromNotificationArray(await LocalNotifications.getPending());
+            let start = new Date(time);
             
-            // await scheduleId(start, 0, schedule, session[1], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session)), session[session.length - 1] + "9", "session");
+            start.setHours($(this).data("hourMinutes")[0]);
+            start.setMinutes($(this).data("hourMinutes")[1]);
+
+            undisplayAndCancelNotification(pending);
+            await scheduleId(start, 0, "Day", sessionto[1], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), idTo + "9", "session");
         };
 
         sessionSwapped_save(sessionSwapped);
@@ -618,6 +637,8 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.selection_dayPreview_item', function(){
+        if($(this).css('backgroundColor') == 'rgb(76, 83, 104)'){return};
+        
         let optString = '<option value="[idVAL]">[sessionVAL]</option>';
         let beforeList = get_time_u($(this).data('time'), true);
         let afterList = get_time_u($(this).data('time') + Math.ceil(get_session_time(session_list[getSessionIndexByID(session_list, $(this).data("id"))])), true);
@@ -637,13 +658,14 @@ $(document).ready(function(){
             };
         });
 
-        $('.selection_dayPreview_focusTitle, .selection_dayPreview_focusToChange').text($(this).text());
+        $('.selection_dayPreview_focusTitle').text($(this).text());
         $('.selection_dayPreview_focusSubTitle').text("n°"+number);
 
         $('.selection_dayPreview_focusTime_before').text((beforeList[3].toString().length > 1 ? beforeList[3] : "0" + beforeList[3])+ 'h' + (beforeList[4].toString().length > 1 ? beforeList[4] : "0" + beforeList[4]));
         $('.selection_dayPreview_focusTime_after').text((afterList[3].toString().length > 1 ? afterList[3] : "0" + afterList[3]) + 'h' + (afterList[4].toString().length > 1 ? afterList[4] : "0" + afterList[4]));
 
         $('.selection_dayPreview_focusExchangeBtn').data("idFrom", $(this).data("id"));
+        $('.selection_dayPreview_focusExchangeBtn').data("hourMinutes", [beforeList[3], beforeList[4]]);
         $('.selection_dayPreview_focusExchangeBtn').data("elemId", $('.selection_dayPreview_item').index(this));
         $('.selection_dayPreview_focusExchangeBtn').data("dayInd", $('.selection_page_calendar_row_day').index(actualRowDay));
 
@@ -670,7 +692,7 @@ $(document).ready(function(){
         $('.selection_dayPreview_focusforChange').children().remove();
 
         let dataString = '<div class="selection_dayPreview_circleContainer scheduledItem" style="left: [leftVAL]px;"><span class="selection_dayPreview_time">[timeVAL]</span><div class="selection_dayPreview_circle"></div></div>';
-        let sessionString = '<span class="selection_dayPreview_item" style="left: [leftVAL]px; top: [topVAL]px;">[spanVAL]</span>';
+        let sessionString = '<span class="selection_dayPreview_item" style="left: [leftVAL]px; top: [topVAL]px; background-color: [bgVAL]">[spanVAL]</span>';
         let dashedString = '<div class="selection_dayPreview_dashedLine" style="left: [leftVAL]; width: [widthVAL];"></div>';
 
         let clonedDataString = false;
@@ -695,7 +717,11 @@ $(document).ready(function(){
                 itemHeight = initialHeight;
             };
 
-            itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]))
+            if(sessionDone[1][arr[0][0]] && sessionToBeDone[1][arr[0][0]] && $(actualRowDay).data("time") == zeroAM(new Date()).getTime()){
+                itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(76, 83, 104)'))
+            }else{
+                itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(29, 188, 96)'))
+            };
             
             $(itemToAdd).data('id', arr[0][0]);
             $(itemToAdd).data('time', time_unstring(arr[1][0]+"h"+ arr[1][1]+"m"));
