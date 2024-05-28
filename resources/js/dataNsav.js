@@ -221,15 +221,7 @@ function calendar_read(data){
     let dict = localStorage.getItem("calendar_shown");
 
     if (dict === null || dict == "" || data.length == 0){
-        dict = {};
-
-        for(let i=0; i<data.length; i++){
-            if(isScheduled(data[i])){
-                dict[data[i][1]] = true;
-            };
-        };
-
-        calendar_save(dict);
+        dict = calendar_reset(data);
     }else{
         dict = JSON.parse(dict);
     };
@@ -269,6 +261,18 @@ function calendar_read(data){
 function calendar_save(data){
     localStorage.setItem("calendar_shown", JSON.stringify(data));
     return;
+};
+
+function calendar_reset(data){
+    dict = {};
+
+    for(let i=0; i<data.length; i++){
+        if(isScheduled(data[i])){
+            dict[data[i][1]] = true;
+        };
+    };
+
+    return dict;
 };
 
 function updateCalendarDictItem(key, newKey){

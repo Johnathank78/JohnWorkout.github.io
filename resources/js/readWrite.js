@@ -224,8 +224,11 @@ $(document).ready(function(){
                     session_list = session_read(temp);
                     
                     sessionSchemeVarsReset();
-
                     session_pusher(session_list);
+
+                    calendar_dict = calendar_reset(session_list);
+                    calendar_save(calendar_dict);
+                    calendar_read(session_list)
 
                     updateCalendar(session_list);
                     updateWeightUnits(session_list, previousWeightUnit, weightUnit);
@@ -265,10 +268,12 @@ $(document).ready(function(){
                         session_list = session_read(temp);
                         sessionSchemeVarsReset();
 
+                        calendar_dict = calendar_reset(session_list);
+                        calendar_save(calendar_dict);
+                        calendar_read(session_list)
+
                         session_pusher(session_list);
-
                         updateCalendar(session_list);
-
                         
                         updateWeightUnits(session_list, previousWeightUnit, weightUnit);
                         session_save(session_list);
