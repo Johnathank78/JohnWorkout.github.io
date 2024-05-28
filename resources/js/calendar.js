@@ -590,8 +590,9 @@ $(document).ready(function(){
         let idFrom = $(this).data('idFrom');
         let idTo = $('.selection_dayPreview_focusforChange').val();
         let time = $(actualRowDay).data('time');
-
+        
         let match = findChanged($(".selection_page_calendar_row_day").eq(dayInd).data("time"), ["to", idFrom]);
+        let previousID = match ? match["element"]["to"] : idFrom;
 
         if(match && match["element"]["from"] == idTo){
             sessionSwapped.splice(match["index"], 1);
@@ -613,17 +614,27 @@ $(document).ready(function(){
         sessionToBeDone[1][idFrom] = false;
 
         if(platform == "Mobile"){
-            let sessionFrom = session_list[getSessionIndexByID(session_list, idFrom)];
+            let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
             let sessionto = session_list[getSessionIndexByID(session_list, idTo)];
-            let pending = await getPendingId(idFrom, getScheduleScheme(sessionFrom));
+            let schedule = isScheduled(sessionto);
 
             let start = new Date(time);
-            
             start.setHours($(this).data("hourMinutes")[0]);
             start.setMinutes($(this).data("hourMinutes")[1]);
+            start = new Date(start.getTime() - toSubstract);
 
-            undisplayAndCancelNotification(pending);
-            await scheduleId(start, 0, "Day", sessionto[1], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), idTo + "9", "session");
+            undisplayAndCancelNotification("9" + previousID + "1");
+
+            if(!match || (match && match["element"]["from"] != idTo)){
+                let notifToId = "9" + idTo + "1"
+
+                await scheduleId(start, 0, "Day", sessionto[1]+" | "+schedule[1][2]+":"+schedule[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, "session");
+            }else if(match && match["element"]["from"] == idTo){
+                let scheme = getScheduleScheme(sessionto);
+                let notifToId = getNotifFirstIdChar(sessionto) + sessionto[sessionto.length - 1] + "1";
+
+                await scheduleId(start, 0, scheme, sessionto[1]+" | "+schedule[1][2]+":"+schedule[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, "session");
+            };
         };
 
         sessionSwapped_save(sessionSwapped);
@@ -653,7 +664,7 @@ $(document).ready(function(){
         number = getSessionHistory(session_list[getSessionIndexByID(session_list, $(this).data("id"))])[0][2] + (dayIndex + 1) + (updateCalendarPage - 1) * numberOfDays;
 
         session_list.forEach(session => {
-            if(session[session.length - 1] != $(this).data("id")){
+            if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session[session.length - 1])){
                 $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session[session.length - 1]).replace('[sessionVAL]', session[1])))
             };
         });

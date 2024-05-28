@@ -51,17 +51,18 @@ $(document).ready(async function(){
     session_list = session_read();
     reminder_list = reminder_read();
 
-    await rescheduler();
-
     sessionToBeDone = sessionToBeDone_read();
     sessionDone = sessionDone_read();
     sessionSwapped = sessionSwapped_read();
     hasBeenShifted = hasBeenShifted_read();
+
+    await rescheduler();
     
     session_pusher(session_list);
     reminder_pusher(reminder_list);
     
     updateCalendar(session_list);
+    session_save(session_list);
     deleteHistory();
 
     recovery = recovery_read();

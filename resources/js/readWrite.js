@@ -245,7 +245,7 @@ $(document).ready(function(){
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
                     temp = await readFromFile("Workout", 'stats.txt');
 
-                    [timeSpent, workedTime, weightLifted, repsDone, since] = stats_read(temp);
+                    [timeSpent, workedTime, weightLifted, repsDone, since, nbMissed] = stats_read(temp);
                 };
 
                 if(schedule){scheduler()};
@@ -261,8 +261,6 @@ $(document).ready(function(){
                     };
                     if(checked.filter($('#selection_saveLoad_sl')).length > 0 && localFiles[i].name == "session_list.txt"){
                         temp = await localFiles[i].text();
-
-                        localStorage.removeItem("calendar_shown");
 
                         session_list = session_read(temp);
                         sessionSchemeVarsReset();
@@ -288,7 +286,7 @@ $(document).ready(function(){
                     };
                     if(checked.filter($('#selection_saveLoad_st')).length > 0 && localFiles[i].name == "stats.txt"){
                         temp = await localFiles[i].text();
-                        [timeSpent, workedTime, weightLifted, repsDone, since] = stats_read(temp);
+                        [timeSpent, workedTime, weightLifted, repsDone, since, nbMissed] = stats_read(temp);
                     };
 
                     if(schedule){scheduler()};
@@ -310,7 +308,7 @@ $(document).ready(function(){
                     writeToFile(parameters, "Workout", "parameters.txt");
                 };
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
-                    writeToFile([timeSpent, workedTime, weightLifted, repsDone, since], "Workout", "stats.txt");
+                    writeToFile([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed], "Workout", "stats.txt");
                 };
                 
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
@@ -329,7 +327,7 @@ $(document).ready(function(){
                     files.push(new File([JSON.stringify(parameters)], "parameters.txt", { type: "text/plain" }));
                 };
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
-                    files.push(new File([JSON.stringify([timeSpent, workedTime, weightLifted, repsDone, since])], "stats.txt", { type: "text/plain" }));
+                    files.push(new File([JSON.stringify([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed])], "stats.txt", { type: "text/plain" }));
                 };
                 
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){

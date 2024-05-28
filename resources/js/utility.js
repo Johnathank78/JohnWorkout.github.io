@@ -288,10 +288,10 @@ function showBlurPage(className){
 
 function nbSessionScheduled(){
     let count = 0;
-    let vsDate = zeroAM(new Date()).getTime() - 86400 * 1000;
+    let vsDate = zeroAM(new Date()).getTime();
 
     session_list.forEach(session => {
-        let scheduleType = isScheduled(session);
+        let scheduleType = getScheduleScheme(session);
         let scheduleData = false;
         let scheduleOffset = false;
         let elapsedDays = false;
@@ -306,7 +306,7 @@ function nbSessionScheduled(){
             elapsedDays = -daysBetweenTimestamps(vsDate, scheduledDate);
             
             if(elapsedDays > 0){
-                count += Math.floor(elapsedDays / scheduleOffset);
+                count += Math.ceil(elapsedDays / scheduleOffset);
             };
         }else if(scheduleType == "Week"){
             scheduleData = session[session.length - 2];
@@ -316,7 +316,7 @@ function nbSessionScheduled(){
                 elapsedDays = -daysBetweenTimestamps(vsDate, scheduledDate);
 
                 if(elapsedDays > 0){
-                    count += Math.floor(elapsedDays / scheduleOffset);
+                    count += Math.ceil(elapsedDays / scheduleOffset);
                 };
             });
         };
@@ -562,7 +562,7 @@ function smallestAvailableId(){
 function isScheduled(item){
     if(item[item.length - 2].constructor.name == "Array"){
         if(item[item.length - 2][0] == "Notif"){
-            return item[item.length - 2][1][0];
+            return item[item.length - 2];
         }else{
             return false;
         };
@@ -613,24 +613,24 @@ function getReminderIndexByID(id){
 };
 
 function getNotifFirstIdChar(session){
-    let data = session[session.length - 2];
+    let data = isScheduled(session);
+    let todaysDate = zeroAM(new Date()).getTime();
 
-    if(data[1][0] == "Week"){
-        let temp = [];
-        let today = dayofweek[new Date(Date.now()).getDay()];
-
+    if(data && getScheduleScheme(session) == "Week"){
         for(let i=0; i<data[2].length; i++){
-            temp.push(data[2][i][0]);
-        };
-
-        for(let i=0; i<temp.length; i++){
-            if(today == temp[i]){
-                return (i+1).toString();
+            if(todaysDate == zeroAM(new Date(data[2][i][1])).getTime()){
+                return "2"+(i+1).toString();
             };
         };
-
-    }else if(data[1][0] == "Day"){
-        return "";
+        return "9"
+    }else if(data && getScheduleScheme(session) == "Day"){
+        if(todaysDate == zeroAM(new Date(data[2][1])).getTime()){
+            return "1";
+        }else{
+            return "9"
+        };
+    }else{
+        return "9";
     };
 };
 

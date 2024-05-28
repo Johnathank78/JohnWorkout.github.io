@@ -45,7 +45,7 @@ async function launchSession(index){
     current_session = session_list[index];
 
     if(platform == "Mobile"){
-        let shown = await isShown(current_session[current_session.length - 1], isScheduled(current_session));
+        let shown = await isShown(current_session[current_session.length - 1], getScheduleScheme(current_session));
 
         if(shown){
             let id = getNotifFirstIdChar(current_session) + current_session[current_session.length - 1] + shown.slice(-1);
@@ -824,6 +824,8 @@ $(document).ready(function(){
 
     $(document).on('click', ".selection_recovery_page_btn_y", function(){
         $('.blurBG').css('display', 'none');
+        beepPlayer = constructPlayer(beepPath, 1000);
+        beep2x3Player = constructPlayer(beep2x3Path, 1000);
         launchSession(getSessionIndexByID(session_list, recovery[0]));
     });
 });//readyEnd

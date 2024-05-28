@@ -1,5 +1,5 @@
 function emptySessionScheme(){
-    let out = [Date.now(), {}];
+    let out = [zeroAM(new Date()).getTime(), {}];
 
     session_list.forEach(session => {
         out[1][session[session.length - 1]] = false
@@ -16,12 +16,12 @@ function cleanSessionScheme(drop){
 
 function sessionSchemeVarsReset(){
     hasBeenShifted = emptySessionScheme();
-    sessionSwapped = emptySessionScheme();
+    sessionDone = emptySessionScheme();
     sessionToBeDone = emptySessionScheme();
 
 
     hasBeenShifted_save(hasBeenShifted);
-    sessionSwapped_save(sessionSwapped);
+    sessionDone_save(sessionDone);
     sessionToBeDone_save(sessionToBeDone);
 };
 
@@ -366,7 +366,7 @@ function sessionDone_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(zeroAM(new Date(data[0]))) != formatDate(zeroAM(new Date(Date.now())))){
+    if(formatDate(new Date(data[0])) != formatDate(zeroAM(new Date()))){
         data = emptySessionScheme();
         localStorage.setItem("session_done", JSON.stringify(data));
     };
@@ -391,7 +391,7 @@ function hasBeenShifted_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(zeroAM(new Date(data[0]))) != formatDate(zeroAM(new Date(Date.now())))){
+    if(formatDate(new Date(data[0])) != formatDate(zeroAM(new Date()))){
         data = emptySessionScheme();
         localStorage.setItem("hasBeenShifted", JSON.stringify(data));
     };
@@ -436,19 +436,20 @@ function sessionToBeDone_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(zeroAM(new Date(data[0]))) != formatDate(zeroAM(new Date(Date.now())))){
+    if(formatDate(new Date(data[0])) != formatDate(zeroAM(new Date()))){
 
         //GET MISSED SESSION NB
         
         let sessionDone = localStorage.getItem("session_done");
-        let elapsedTime = daysBetweenTimestamps(data[0], Date.now());
+        let elapsedTime = daysBetweenTimestamps(data[0], zeroAM(new Date()).getTime());
 
         if(elapsedTime > 1){
-            nbMissed += nbSessionScheduled();
+            nbMissed += nbSessionScheduled(data[0]);
         };
-        
+
         if(!(sessionDone === null || sessionDone == "")){
             sessionDone = JSON.parse(sessionDone);
+
             Object.keys(data[1]).forEach(function(key){
                 if(data[1][key] && !sessionDone[1][key] && elapsedTime == 1){
                     nbMissed += 1;
@@ -464,7 +465,7 @@ function sessionToBeDone_read(){
         // --------------------
 
         data = emptySessionScheme();
-        localStorage.setItem("sessionToBeDone", JSON.stringify(data));
+        sessionToBeDone_save(data)
     };
 
     return data;
