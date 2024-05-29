@@ -71,7 +71,7 @@ function getPendingIdListWEB(){
                 for (let z = 0; z < data[2].length; z++) {
                     if(data[2][z][1] > Date.now() - toSubstract){
                         out.push("2" + (z+1) + comboList[i][comboList[i].length - 1] + "1");
-                    }
+                    };
                 };
             };
         };
@@ -433,11 +433,6 @@ async function rescheduler(){
                         if(!pending.includes("2" + (z+1).toString() + idy + "1") && !pending.includes("2" + (z+1).toString() + idy + "2")){
                             let id = idx.slice(-1) == "1" ? "2" + (z+1).toString() + idy + "2" : "2" + (z+1).toString() + idy + "1";
                             let isAnticipated = isNotificationAnticipated(data[2][z][1], data[1][2], data[1][3]);
-
-                            let temp = new Date();
-                            let filter = temp.getDate();
-
-                            if(filter == 30 || filter == 29){continue};
 
                             data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 

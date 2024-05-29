@@ -446,9 +446,10 @@ function sessionToBeDone_read(){
         
         let sessionDone = localStorage.getItem("session_done");
         let elapsedTime = daysBetweenTimestamps(data[0], zeroAM(new Date()).getTime());
+        let count = 0;
 
         if(elapsedTime > 1){
-            nbMissed += nbSessionScheduled(data[0]);
+            count += nbSessionScheduled(data[0]);
         };
 
         if(!(sessionDone === null || sessionDone == "")){
@@ -456,12 +457,14 @@ function sessionToBeDone_read(){
 
             Object.keys(data[1]).forEach(function(key){
                 if(data[1][key] && !sessionDone[1][key] && elapsedTime == 1){
-                    nbMissed += 1;
+                    count += 1;
                 }else if(data[1][key] && sessionDone[1][key] && elapsedTime > 1){
-                    nbMissed -= 1;
+                    count -= 1;
                 };
             });
         };
+
+        nbMissed += count;
 
         stats_set([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
         stats_save([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);

@@ -18,7 +18,7 @@ function updateCalendar(data){
     let today = dayofweek_conventional.indexOf(dayofweek[new Date().getDay()]);
     let todaysDate = zeroAM(new Date());
 
-    $(dayz).each(function(i){$($(dayz)[i]).data("sList", [])});
+    $(dayz).each(function(i){$(dayz).eq(i).data("sList", [])});
 
     if(updateCalendarPage == 1){
         $($(dayz)[today]).css({
@@ -27,7 +27,7 @@ function updateCalendar(data){
         });
 
         for(let i=0; i<today; i++){
-            $($(dayz)[i]).css('opacity', ".25");
+            $(dayz).eq(i).css('opacity', ".25");
         };
     }else{
         $($(dayz)[today]).css({
@@ -44,7 +44,11 @@ function updateCalendar(data){
     tempDate.setDate(tempDate.getDate() + (updateCalendarPage - 1) * 21 - dateSub);
     $(dayz).first().text(tempDate.getDate());
 
-    $(dayz).first().data('time', tempDate.getTime());
+    if(today > 0 && updateCalendarPage == 1){
+        $(dayz).first().data("time", false);
+    }else{
+        $(dayz).first().data('time', tempDate.getTime());
+    };
 
     for(let i=1; i<end+1; i++){
         tempDate.setDate(tempDate.getDate() + 1);
@@ -56,8 +60,13 @@ function updateCalendar(data){
 
         if(i == end){$(".selection_page_calendar_header_M").last().text(textAssets[language]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]])};
 
-        $($(dayz)[i]).text(tempDate.getDate());
-        $($(dayz)[i]).data('time', tempDate.getTime());
+        $(dayz).eq(i).text(tempDate.getDate());
+
+        if(i >= today || updateCalendarPage != 1){
+            $(dayz).eq(i).data('time', tempDate.getTime());
+        }else{
+            $(dayz).eq(i).data("time", false);
+        }
     };
 
     //-------------;
@@ -207,7 +216,7 @@ function updateCalendar(data){
                                 if(match && scheduleDate.getTime() == todaysDate.getTime()){
                                     sessionToBeDone[1][match['to']] = true;
                                 }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
-                                    sessionToBeDone[1][data[i][data[i].length - 1]] = true;
+                                    sessionToBeDone[1][id] = true;
                                 };
                             };
                         };
@@ -586,12 +595,11 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.selection_dayPreview_focusExchangeBtn', async function(){
-        let dayInd = $(this).data('dayInd');
         let idFrom = $(this).data('idFrom');
         let idTo = $('.selection_dayPreview_focusforChange').val();
         let time = $(actualRowDay).data('time');
         
-        let match = findChanged($(".selection_page_calendar_row_day").eq(dayInd).data("time"), ["to", idFrom]);
+        let match = findChanged(time, ["to", idFrom]);
         let previousID = match ? match["element"]["to"] : idFrom;
 
         if(match && match["element"]["from"] == idTo){
@@ -604,14 +612,12 @@ $(document).ready(function(){
             sessionSwapped.push({
                 "from": idFrom,
                 "to": idTo,
-                "on": dayInd,
-                "page": updateCalendarPage,
                 "time": time
             });
             bottomNotification("exchanged");
         };
 
-        sessionToBeDone[1][idFrom] = false;
+        sessionToBeDone[1][previousID] = false;
 
         if(platform == "Mobile"){
             let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
@@ -688,8 +694,9 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.selection_page_calendar_row_day', function(e){
+        if(!$(this).data('time')){return};
         actualRowDay = this;
-
+        
         $('.selection_dayPreview_date').text(extractDate($(this).data('time')))
 
         let sList = $(this).data("sList");
