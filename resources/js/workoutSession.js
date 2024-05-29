@@ -591,8 +591,9 @@ function workout(exercises_list){
                 };
             };
         }else if(extype == "Pause"){
+            dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
             next_exercise(true);
-        }
+        };
 
         if(noMore){
             if($('.session_next_exercises_container').find('.flex_break').length == 0){
@@ -770,6 +771,7 @@ async function next_exercise(first){
             udpate_recovery("workout");
         }else if(extype == "Pause"){
             updateRestBtnStyle('Reset');
+            
             if(lastExo){
                 dropSet_static($(".session_next_exercise_set").first());
             }else{
@@ -780,7 +782,7 @@ async function next_exercise(first){
 
         if(extype == "Pause" || extype == "Int"){
             $(".session_exercise_rest_btn_label").css('display', 'none');
-            update_info();
+            update_info(true);
         };
 
         check_lastSet();
@@ -828,10 +830,10 @@ function update_info_vars(index = 0) {
 
         if ($(".session_next_exercise_name").length != 1) {
             if ($(nextExo).find(".session_next_exercise_type").eq(0).text() == "Int") {
-                let temp = [$(nextExo).find(".session_next_exercise_cycle").eq(0).text(), $(nextExo).find(".session_next_exercise_work").eq(0).text(), $(nextExo).find(".session_next_exercise_rest").eq(0).text()];
+                let temp = [$(".session_next_exercise_cycle").eq(0).text(), $(".session_next_exercise_work").eq(0).text(), $(".session_next_exercise_rest").eq(0).text()];
                 next_specs = textAssets[language]["inSession"]["next"] + " : " + temp[0] + " x " + get_time_u(temp[1]) + " x " + get_time_u(temp[2]);
             } else {
-                next_specs = textAssets[language]["inSession"]["next"] + " : " + unitRound($(nextExo).find(".session_next_exercise_weight").eq(0).text()) + weightUnit;
+                next_specs = textAssets[language]["inSession"]["next"] + " : " + unitRound($(".session_next_exercise_weight").eq(0).text()) + weightUnit;
             }
         } else {
             next_specs = "";
