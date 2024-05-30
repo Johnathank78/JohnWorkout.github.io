@@ -429,6 +429,7 @@ function checkDisplayState(){
     });
 
     if(closestR.length > 0){
+        $('.seekNbR').text(closestR.length);
         $('.selection_dayPreview_seekingArrowContainerRight').css('display', 'flex');
     }else{
         $('.selection_dayPreview_seekingArrowContainerRight').css('display', 'none');
@@ -441,6 +442,7 @@ function checkDisplayState(){
     });
 
     if(closestL.length > 0){
+        $('.seekNbL').text(closestL.length);
         $('.selection_dayPreview_seekingArrowContainerLeft').css('display', 'flex');
     }else{
         $('.selection_dayPreview_seekingArrowContainerLeft').css('display', 'none');
@@ -727,7 +729,7 @@ $(document).ready(function(){
             // Draw SessionItems & dotsNtimes
 
             calculatedOffset = time_unstring(arr[1][0]+"h"+ arr[1][1]+"m") / 3600 * 150;
-            Ydata = $('.selection_dayPreview_item').filter((_, el) => $(el).getStyleValue('left') >= calculatedOffset - 150);
+            Ydata = $('.selection_dayPreview_item').filter((_, el) => $(el).getStyleValue('left') >= calculatedOffset - 90);
 
             if(Ydata.length > 0){
                 itemHeight = Math.max(...$(Ydata).map((_, el) => parseInt($(el).css('top'))).get()) + 50;
@@ -754,7 +756,7 @@ $(document).ready(function(){
 
             if(calculatedOffset % 150 != 0){
 
-                if(calculatedOffset % 150 < 50 || calculatedOffset % 150 > 110){
+                if(calculatedOffset % 150 < 60 || calculatedOffset % 150 > 90){
                     clonedDataString = dataString.replace('[timeVAL]', ' ');
                 }else{
                     clonedDataString = dataString.replace('[timeVAL]', arr[1][0]+"h"+ arr[1][1]);
