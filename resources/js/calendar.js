@@ -429,11 +429,21 @@ function checkDisplayState(){
     });
 
     if(closestR.length > 0){
-        $('.seekNbR').text(closestR.length);
+        
         $('.selection_dayPreview_seekingArrowContainerRight').css('display', 'flex');
     }else{
         $('.selection_dayPreview_seekingArrowContainerRight').css('display', 'none');
     };
+
+    let closestUnfinishedR = closestR.filter((_, el) => $(el).css('backgroundColor') == "rgb(29, 188, 96)");
+
+    if(closestUnfinishedR.length > 0){
+        $('.seekNbR').text(closestUnfinishedR.length);
+        $('.seekNbR').css('display', 'flex');
+    }else{
+        $('.seekNbR').css('display', 'none');
+    };
+
 
     let closestL = $(".selection_dayPreview_item").filter((_, el) => {
         let left = $(el).getStyleValue('left');
@@ -446,6 +456,16 @@ function checkDisplayState(){
         $('.selection_dayPreview_seekingArrowContainerLeft').css('display', 'flex');
     }else{
         $('.selection_dayPreview_seekingArrowContainerLeft').css('display', 'none');
+    };
+
+    
+    let closestUnfinishedL = closestL.filter((_, el) => $(el).css('backgroundColor') == "rgb(29, 188, 96)"); 
+
+    if(closestUnfinishedL.length > 0){
+        $('.seekNbL').text(closestUnfinishedL.length);
+        $('.seekNbL').css('display', 'flex');
+    }else{
+        $('.seekNbL').css('display', 'none');
     };
 };
 
@@ -560,7 +580,7 @@ $(document).ready(function(){
         checkDisplayState();
     });
 
-    $('.selection_dayPreview_seekingArrowRight').on('click', function(){
+    $('.selection_dayPreview_seekingArrowRight, .seekNbR').on('click', function(){
         let closest = $(".selection_dayPreview_item").filter((_, el) => {
             let left = $(el).getStyleValue('left');
             let bound = $('.selection_dayPreview_body').scrollLeft() + $('.selection_dayPreview_body').width() - 50;
@@ -578,7 +598,7 @@ $(document).ready(function(){
         };
     });
 
-    $('.selection_dayPreview_seekingArrowLeft').on('click', function(){
+    $('.selection_dayPreview_seekingArrowLeft, .seekNbL').on('click', function(){
         let closest = $(".selection_dayPreview_item").filter((_, el) => {
             let left = $(el).getStyleValue('left');
             let bound = $('.selection_dayPreview_body').scrollLeft();

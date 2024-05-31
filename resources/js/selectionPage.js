@@ -8,7 +8,7 @@ var mouseXSE = false;
 var isSwipingSE = false;
 var userScrollSE = false;
 var currentSEindex = 0;
-var hasAudioBeenGranted = false;
+var hasAudioBeenInitiated = false;
 
 function loadHistorydayz(history, scrollState){
 
@@ -332,8 +332,8 @@ $(document).ready(function(){
     $(document).on("click", ".selection_play_btn", async function(){
         if(cannotClick){return};
 
-        if(!hasAudioBeenGranted){
-            hasAudioBeenGranted = true;
+        if(!hasAudioBeenInitiated){
+            hasAudioBeenInitiated = true;
 
             beepPlayer = constructPlayer(beepPath, 1000);
             beep2x3Player = constructPlayer(beep2x3Path, 1000);
