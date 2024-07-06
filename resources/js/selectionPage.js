@@ -288,8 +288,9 @@ $(document).ready(function(){
                             showHint(".update_workoutList_container");
                         }else{
                             $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5], "", elementData[2][i][6]]));
-                            $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                         };
+                        
+                        $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                     }else{
                         if(elementData[2][i].length == 8){
                             $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5], elementData[2][i][6], elementData[2][i][7]]));
