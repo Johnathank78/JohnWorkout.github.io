@@ -5,7 +5,7 @@ const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches;
 
 var addIMG = false; var binIMG = false; var editIMG = false; var grabIMG = false; var pauseIMG = false; var playIMG = false; var sound_fullIMG = false; 
 var sound_midIMG = false; var sound_lowIMG = false; var sound_offIMG = false; var timer2IMG = false; var tickIMG = false; var arrowIMG = false; 
-var previewIMG = false; var backArrowIMG = false; var exchangeIMG = false;
+var previewIMG = false; var backArrowIMG = false; var exchangeIMG = false; var linkIMG = false;
 
 const green = "#1DBC60"; const orange = "#E67E22"; const red = "#E74C3C"; const blue = "#477DB3"; const yellow ="#FFCD02"; const dark_blue = "#1F1C2D"; const black = "#000000";
 const mid_green = "#4AC980"; const mid_orange = "#EB984E"; const mid_red = "#EC7063"; const mid_yellow = "#FFE167"; const mid_blue = "#6c97c2"; const mid_dark_blue = "#29293F";
@@ -14,6 +14,7 @@ const light_orange = "#f2bc8c"; const light_green = "#65e79b"; const light_red =
 const dayofweek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthofyear = ["Jan","Feb","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"];
 const dayofweek_conventional = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const timeUnit = 250;
 
 const textAssets = {
     "french": {
@@ -103,14 +104,21 @@ const textAssets = {
             "no": "Non",
             "yes": "Oui",
         },
+        "deleteHistoryConfirm": {
+            "confirm": "Confirmer",
+            "subText1": "Tu t'apprêtes à supprimer ",
+            "subText2": " jours d'historique pour toujours ! Es-tu sûr ?"
+        },
         "sessionItem": {
             "schedule": "Programmer",
             "history": "Historique",
             "addASession": "Créer une séance"
         },
         "updatePage": {
+            "linkWith": "Lier avec",
             "name": "Nom",
             "reminderBody": "Corps du Rappel",
+            "or": "ou",
             "on": "A partir de",
             "at": "A",
             "every": "Tout les",
@@ -125,6 +133,7 @@ const textAssets = {
             "rest": "Repos",
             "emptyHistory": "Pas encore d'historique",
             "disabledHistory": "L'historique est désactivé",
+            "today": "Aujourd'hui",
             "temporalityChoices": {
                 "day": "Jour",
                 "week": "Semaine"
@@ -137,6 +146,7 @@ const textAssets = {
                 "name": "Nom",
                 "sets": "Séries",
                 "reps": "Reps",
+                "weight": "Charge",
                 "rest": "Repos",
                 "body": "Coprs",
                 "hint": "Indication",
@@ -194,8 +204,8 @@ const textAssets = {
             "updatePage": {
                 "nameAlreadyUsed": "Nom déjà utilisé",
                 "fillAllEntries": "Remplissez toutes les entrées",
-                "intNumericOnly": "Cycle et Travail doivent être numérique",
-                "restTimeOnly": "Repos doit être temporel",
+                "intNumericOnly": "Cycle doit être numérique",
+                "restTimeOnly": "Travail et Repos doivent être temporel",
                 "restGreater": "Repos doit être supérieur à 4s",
                 "workGreater": "Travail doit être supérieur à 5s",
                 "workRestTooBig": "Travail ou Repos bien trop grand",
@@ -209,7 +219,8 @@ const textAssets = {
                 "goToSleep": "Tu peux également faire une sieste",
                 "breakNumeric": "Pause doit être temporel",
                 "consecutiveBreak": "Les pauses consécutives ne servent à rien",
-                "zeroBreak": "Pause trop petite"
+                "zeroBreak": "Pause trop petite",
+                "illegalBreaks": "Les pauses doivent être en millieu de séance"
             },
             "schedule": {
                 "hoursMinNumeric": "Heure, Minute et Nombre doivent être numérique",
@@ -386,7 +397,7 @@ const textAssets = {
             "keepHistory": "Keep history",
             "forEver" : "Forever",
             "sDays" : "7 Days",
-            "oMonth" : "1 Months",
+            "oMonth" : "1 Month",
             "tMonth" : "3 Months",
             "sMonth" : "6 Months",
             "oYear" : "1 Year",
@@ -415,14 +426,21 @@ const textAssets = {
             "no": "No",
             "yes": "Yes",
         },
+        "deleteHistoryConfirm": {
+            "confirm": "Confirm",
+            "subText1": "You are about to delete ",
+            "subText2": "days of history forever ! Are you sure ?"
+        },
         "sessionItem": {
             "schedule": "Schedule",
             "history": "History",
             "addASession": "Create a session"
         },
         "updatePage": {
+            "linkWith": "Link with",
             "name": "Name",
             "reminderBody": "Reminder body",
+            "or": "or",
             "on": "From",
             "at": "At",
             "every": "Every",
@@ -437,6 +455,7 @@ const textAssets = {
             "rest": "Rest",
             "emptyHistory": "No history yet",
             "disabledHistory": "History is disabled",
+            "today": "Today",
             "temporalityChoices": {
                 "day": "Day",
                 "week": "Week"
@@ -449,6 +468,7 @@ const textAssets = {
                 "name": "Name",
                 "sets": "Sets",
                 "reps": "Reps",
+                "weight": "Weight",
                 "rest": "Rest",
                 "body": "Body",
                 "hint": "Hint",
@@ -506,8 +526,8 @@ const textAssets = {
             "updatePage": {
                 "nameAlreadyUsed": "Name already used",
                 "fillAllEntries": "Fill all entries",
-                "intNumericOnly": "Cycle and Work only support numeric values",
-                "restTimeOnly": "Rest only support time values",
+                "intNumericOnly": "Cycle only support numeric values",
+                "restTimeOnly": "Work and Rest only support time values",
                 "restGreater": "Rest has to be greater that 4s",
                 "workGreater": "Work has to be greater than 5s",
                 "workRestTooBig": "Work or Rest time value way too big",
@@ -521,7 +541,8 @@ const textAssets = {
                 "goToSleep": "You might as well go to sleep",
                 "breakNumeric": "Breaks only support time values",
                 "consecutiveBreak": "There is no point in consecutive breaks",
-                "zeroBreak": "Break too small"
+                "zeroBreak": "Break too small",
+                "illegalBreaks": "Breaks got to be in the middle of the workout"
             },
             "schedule": {
                 "hoursMinNumeric": "Hours, Minutes and Count only support numeric values",
@@ -629,7 +650,7 @@ const textAssets = {
                 },
                 "weight": {
                     "more": "% heavier",
-                    "less": "% lighter",
+                    "less": "% less",
                     "even": "as much"
                 }
             },
@@ -683,6 +704,7 @@ $(document).ready(function(){
     previewIMG = $('#previewIMG').attr('src');
     backArrowIMG = $('#backArrowIMG').attr('src');
     exchangeIMG = $('#exchangeIMG').attr('src');
+    exchangeIMG = $('#linkIMG').attr('src');
 
     $("img").attr("draggable", false);
 });//readyEnd

@@ -94,7 +94,12 @@ async function pauseApp(){
             title = textAssets[language]["notification"]["restOver"];
             body = textAssets[language]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
 
-            sendWebNotification(title, body, start);
+            if(haveWebNotificationsBeenAccepted){
+                activeNotification = new Notification(title, {
+                    body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            };
         }else if(intervall_state == 1){
             currentSide = "W";
             start = new Date(Date.now() + ((restDat - Xspent) * 1000));
@@ -102,7 +107,12 @@ async function pauseApp(){
             title = textAssets[language]["notification"]["workOver"];
             body = textAssets[language]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
 
-            sendWebNotification(title, body, start);
+            if(haveWebNotificationsBeenAccepted){
+                activeNotification = new Notification(title, {
+                    body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            };
         }
     }else if(ongoing == "workout"){
 
@@ -114,7 +124,12 @@ async function pauseApp(){
             title = textAssets[language]["notification"]["xRestOver"];
             body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-            sendWebNotification(title, body, start);
+            if(haveWebNotificationsBeenAccepted){
+                activeNotification = new Notification(title, {
+                    body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            };
         }
 
         if(extype == "Bi"){
@@ -124,7 +139,12 @@ async function pauseApp(){
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-                sendWebNotification(title, body, start);
+                if(haveWebNotificationsBeenAccepted){
+                    activeNotification = new Notification(title, {
+                        body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                        icon: './resources/imgs/appLogo.png'
+                    });
+                };
             }
         }else if(extype == "Uni"){
             if(Ltimer && Rtimer){
@@ -139,11 +159,21 @@ async function pauseApp(){
                 if(mini == textAssets[language]["misc"]["leftInitial"]){
                     start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
 
-                    sendWebNotification(title, body, start);
+                    if(haveWebNotificationsBeenAccepted){
+                activeNotification = new Notification(title, {
+                    body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            };
                 }else if(mini == textAssets[language]["misc"]["rightInitial"]){
                     start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
 
-                    sendWebNotification(title, body, start);
+                    if(haveWebNotificationsBeenAccepted){
+                        activeNotification = new Notification(title, {
+                            body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                            icon: './resources/imgs/appLogo.png'
+                        });
+            };
                 }
             }else if(Ltimer){
                 currentSide += "L";
@@ -153,7 +183,12 @@ async function pauseApp(){
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-                sendWebNotification(title, body, start);
+                if(haveWebNotificationsBeenAccepted){
+                    activeNotification = new Notification(title, {
+                        body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                        icon: './resources/imgs/appLogo.png'
+                    });
+                };
             }else if(Rtimer){
                 currentSide += "R";
                 nextThing.split(" - ")[0] + " - " + textAssets[language]["misc"]["leftInitial"];
@@ -162,7 +197,12 @@ async function pauseApp(){
                 title = textAssets[language]["notification"]["restOver"];
                 body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-                sendWebNotification(title, body, start);
+                if(haveWebNotificationsBeenAccepted){
+                    activeNotification = new Notification(title, {
+                        body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                        icon: './resources/imgs/appLogo.png'
+                    });
+                };
             }
         }else if(extype == "Pause"){
             currentSide += "L";
@@ -170,7 +210,12 @@ async function pauseApp(){
             title = textAssets[language]["notification"]["breakOver"];
             body = textAssets[language]["inSession"]["next"] + " : " + nextThing;
 
-            sendWebNotification(title, body, start);
+            if(haveWebNotificationsBeenAccepted){
+                activeNotification = new Notification(title, {
+                    body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
+                    icon: './resources/imgs/appLogo.png'
+                });
+            };
         };
     };
 };
@@ -182,7 +227,7 @@ async function resumeApp(){
         await undisplayAndCancelNotification(1234);
         await undisplayAndCancelNotification(1235);
     }else{
-        closeActiveNotification();
+        if(activeNotification){activeNotification.close()};
     }
 
     let elapsedTime = parseInt((new Date().getTime() - backgroundTimestamp) / 1000);
@@ -225,117 +270,13 @@ async function resumeApp(){
         };
     };
 
-    if(currentSide.includes("I")){
+    if(currentSide.includes("I") || currentSide.includes("W")){
         hasBeenUpdated = true;
         Ispent += elapsedTime;
-
-        if(iRest_time - Ispent <= 0){
-            Ispent = 0;
-            intervall_state = 1;
-            session_state("work");
-
-            update_timer($(".session_intervall_timer"), iWork_time, 0);
-            update_timer($(".screensaver_Ltimer"), iWork_time, 0);
-        }else{
-            update_timer($(".session_intervall_timer"), iRest_time, Ispent);
-            update_timer($(".screensaver_Ltimer"), iRest_time, Ispent);
-        };
-    };
-
-    if(currentSide.includes("W")){
-        hasBeenUpdated = true;
-        Ispent += elapsedTime;
-
-        if(iWork_time - Ispent <= 0){
-            iCurrent_cycle--;
-
-            TempworkedTime += iWork_time;
-            TemprepsDone += iWork_time/2.1;
-            stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
-
-            if(!extype && iCurrent_cycle != 0){
-                udpate_recovery("intervall", iCurrent_cycle);
-            }else if(extype && iCurrent_cycle != 0){
-                recovery[1][0][2][0] = iCurrent_cycle;
-                recovery_save(recovery);
-            };
-
-            if (iCurrent_cycle == 0){
-                beep2x3Play();
-
-                if(extype){
-                    $(".session_intervall_container").css("display", "none");
-                    $(".session_continue_btn").css("display", "none");
-                    $('.session_workout_footer').css("display", "flex");
-                    $(".session_workout_container").css("display", "flex");
-
-                    color = dark_blue;
-                    light_color = light_dark_blue;
-                    mid_color = mid_dark_blue;
-                    update_soundSlider();
-
-                    if(platform == "Mobile" && mobile != "IOS"){
-                        StatusBar.setBackgroundColor({color : dark_blue});
-                    };
-
-                    ongoing = "workout";
-
-                    // Finished & recovery;
-                    actual_setL = 1;
-                    udpate_recovery("workout");
-                    if(finished){beforeExercise = false};
-                    //--------------------;
-
-                    next_exo = false;
-                    next_exercise(true);
-
-                    clearInterval(sIntervall);
-                    sIntervall = false;
-
-                    exit_confirm("dark");
-                    infoStyle('session');
-
-                    screensaver_toggle(false);
-                    return;
-                };
-
-                session_state("end");
-                clearInterval(sIntervall);
-                sIntervall = false;
-            }else{
-                Ispent = 0;
-                intervall_state = 2;
-                session_state("Rest");
-
-                update_timer($(".session_intervall_timer"), iRest_time, 0);
-                update_timer($(".screensaver_Ltimer"), iRest_time, 0);
-            };
-        }else{
-            update_timer($(".session_intervall_timer"), iWork_time, Ispent);
-            update_timer($(".screensaver_Ltimer"), iWork_time, Ispent);
-        };
-
     };
 
     if(hasBeenUpdated){
         TemptimeSpent += elapsedTime;
-    };
-};
-
-async function sendWebNotification(title, body, start){
-    return;
-    if(haveWebNotificationsBeenAccepted){
-        activeNotification = new Notification(title, {
-            body: textAssets[language]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-            icon: './resources/imgs/appLogo.png'
-        });
-    };
-};
-
-function closeActiveNotification(){
-    return;
-    if(activeNotification){
-        activeNotification.close();
     };
 };
 

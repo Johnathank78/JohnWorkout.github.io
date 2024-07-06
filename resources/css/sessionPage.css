@@ -394,7 +394,7 @@
     
     background-color: #FFE167;
     
-    border: solid 5px #FFFFFF;
+    border: solid 7px #FFFFFF;
     border-radius: 500px;   
     cursor: pointer;     
     
@@ -474,7 +474,8 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: flex-end;
+
+    justify-content: space-between;
     
     width: calc(100% - 50px);
     height: auto;
@@ -491,7 +492,7 @@
     position: absolute;
 
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     align-items: center;
 
     gap: 3px;
@@ -597,6 +598,11 @@
     height: auto;
 }
 
+.session_intervall_next_icon{
+    width: 19px;
+    height: auto;
+}
+
 .session_workout_next_btn{
     width: 60px;
     height: 60px;
@@ -604,7 +610,15 @@
     background-color: #29293F;
 }
 
-.session_workout_next_btn:active{
+.session_intervall_next_btn{
+    width: 50px;
+    height: 50px;
+    
+    background-color: #29293F;
+    display: none;
+}
+
+.session_workout_next_btn:active, .session_intervall_next_btn:active{
     background-color: #343450;
 }
 
@@ -633,9 +647,8 @@
     height: 50px;
     width: 50px;
     
+    align-self: flex-end;
     background-color: #FFE167;
-    
-    display: none;
 }
 
 .session_workout_container{
@@ -734,6 +747,10 @@
     gap: 6px;
 }
 
+.session_current_exercise_specs_pause{
+    word-wrap: break-word;
+    white-space: pre-wrap !important;
+}
 
 .session_current_exercise_specs > *{    
     color: #34344F;
@@ -1123,7 +1140,7 @@
     display: block;
 }   
 
-.session_next_exercise_type, .session_next_exercise_weight, .session_next_exercise_reps, .session_next_exercise_rest, .session_next_exercise_cycle, .session_next_exercise_work, .session_next_exerciseType, .session_setPreviewId, .session_setExerciseId{
+.session_next_exercise_type, .session_next_exercise_id, .session_exercise_id, .session_next_exercise_weight, .session_next_exercise_reps, .session_next_exercise_rest, .session_next_exercise_intervallData, .session_next_exerciseType, .session_setPreviewId, .session_setExerciseId{
     display: none;
 }
 

@@ -671,8 +671,7 @@ $(document).ready(function(){
         $('.selection_dayPreview_item').eq($(this).data('elemId')).data('id', idTo);
         $('.selection_dayPreview_item').eq($(this).data('elemId')).text(session_list[getSessionIndexByID(session_list, idTo)][1]);
         
-        $('.selection_dayPreview_focus').css('display', 'none');
-        focusShown = false;
+        closePanel('focus');
     });
 
     $(document).on('click', '.selection_dayPreview_item', function(){

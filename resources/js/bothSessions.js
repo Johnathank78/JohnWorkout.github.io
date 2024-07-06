@@ -58,13 +58,12 @@ async function launchSession(index){
     $(".session_volume_slider_container").css("display", "flex");
     $(".session_volume_slider_dot").css("display", "block");
 
+    $('.session_intervall_btn_container').css('justify-content', 'flex-end');
+
     $(".session_header_secondRow").append($(".selection_info_page"));
 
     if(current_session[0] == "I"){
-        let tempCurrent_cycle = 0;
-        
         ongoing = "intervall";
-
         current_history = getSessionHistory(current_session);
 
         if(recovery){
@@ -73,7 +72,7 @@ async function launchSession(index){
             TempweightLifted = recovery[4][2];
             TemprepsDone = recovery[4][3];
 
-            tempCurrent_cycle = parseInt(recovery[1]);
+            tempNewHistory = recovery[3];
 
             stats_set([TemptimeSpent,TempworkedTime,TempweightLifted,TemprepsDone]);
         }else{
@@ -82,29 +81,24 @@ async function launchSession(index){
             TempweightLifted = 0;
             TemprepsDone = 0;
 
-            tempCurrent_cycle = parseInt(current_session[4]);
-
             stats_set([0,0,0,0,since]);
+
+            tempNewHistory = [Date.now(), 0, []];
+            tempNewHistory[2] = generateIntervallHistory(current_session)
         };
 
         $('.session_workout_footer').css("display", "none");
         $(".session_workout_container").css("display", "none");
         $(".session_intervall_container").css("display", "block");
-        $(".session_play_pause_btn").css("display", "flex");
 
         TPtimer = setInterval(() => {
             if(!isIdle){
                 TemptimeSpent++;
                 $(".selection_info_TimeSpent").text(get_time_u(timeFormat(TemptimeSpent)));
             };
-        }, 1000);
+        }, timeUnit);
 
-        iCurrent_cycle = tempCurrent_cycle;
-        iWork_time = time_unstring(current_session[2]);
-        iRest_time = time_unstring(current_session[3]);
-
-        intervall(false);
-
+        intervall(current_session[2]);
     }else if(current_session[0] == "W"){
         $('.session_exercise_Lrest_btn').data("canLongClick", false);
         $('.session_exercise_Rrest_btn').data("canLongClick", false);
@@ -114,9 +108,6 @@ async function launchSession(index){
         $(".session_intervall_container").css("display", "none");
         $('.session_workout_footer').css("display", "flex");
         $(".session_workout_container").css("display", "flex");
-
-        $(".session_intervall_btn_container").css("justify-content", 'space-between');
-        $(".session_intervall_skip").css("display", 'flex !important');
 
         exit_confirm("dark");
 
@@ -169,6 +160,10 @@ async function quit_session(failed=false){
     current_page = "selection";
 
     audio_set(0);
+    
+    beepPlayer = null;
+    beep2x3Player = null;
+
     color = dark_blue;
 
     infoStyle("selection");
@@ -195,7 +190,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 0)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -206,10 +201,10 @@ async function quit_session(failed=false){
 
         stats_save([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
 
-        if(current_session[0] == "W" && current_history[0][1] == "true"){
+        if(current_history[0][1] == "true"){
             tempNewHistory[1] = TemptimeSpent;
             current_history.push(tempNewHistory);
-            session_save(session_list);
+            //session_save(session_list);
         };
 
         sessionDone[1][current_session[current_session.length - 1]] = true;
@@ -256,6 +251,7 @@ async function quit_session(failed=false){
     extype = false; next_exo = false; finished = false; hasReallyStarted = false;
     ongoing = false; hasStarted = false; lastExo = false;
     beforeExercise = false; noMore = false; Ifinished = false;
+    iCurrent_cycle = false; iActualCycle = false;
 
     if(paused){
         $(".selection_icon_play_pause").attr("src", pauseIMG);
@@ -272,12 +268,12 @@ async function quit_session(failed=false){
     $(".Lrest, Rrest").css("display", "block");
     $(".session_exercise_Lrest_btn").css("cursor", "pointer");
     $(".session_exercise_Rrest_btn").css("cursor", "pointer");
+    $(".session_intervall_btn_container").css("display", "flex");
+    $('.session_intervall_next_btn').css('display', 'none');
     
     $('.lockTouch').css('display', 'none');
     $(".session_exercise_rest_btn_label").css('display', 'none');
-    $(".session_intervall_skip").css("display", 'none');
     $('.session_undo').css('display', 'none');
-    $(".session_intervall_btn_container").css("justify-content", 'flex-end');
     $(".session_current_exercise_specs").css('display', 'flex');
     $('.session_next_exercise_expander').css("display", "flex");
 
@@ -315,30 +311,82 @@ function getSessionEndData(){
     if(current_history[0][1] === "false" || current_history.length == 1){
         return [outNumber, false, false]
     };
-    
+
     if (current_history[current_history.length - 1][1] === 0) {
         if (TemptimeSpent === 0) {
             performanceGrowth = 0;
-        } else {
+        }else{
             performanceGrowth = 100;
-        }
-    } else {
+        };
+    }else{
         performanceGrowth = Math.round(((current_history[current_history.length - 1][1] - TemptimeSpent) / current_history[current_history.length - 1][1]) * 100);
     };
-    
-    time = Math.max(Math.min(performanceGrowth, Infinity), -100);
+
+    if(current_session[0] == "W"){time = Math.max(Math.min(performanceGrowth, Infinity), -100)};
 
     for(const exo of current_history[current_history.length - 1][2]){
-        for (const set of exo[2]) {
-            weight += set[0] * set[1]
+        if(exo.length == 4){ // NOT INT 
+            for (const set of exo[2]){
+                weight += set[0] * set[1]
+            };
         };
     };
 
     weight = weight == 0 ? false : Math.round((TempweightLifted - weight) / weight) * 100;
-    return [outNumber, time, weight]
+    time = time == 0 ? false : time;
+
+    return [outNumber, time, weight];
 };
 
 function fillSessionEnd(failed){
+
+    function changeElemNode(data){
+        let out = false;
+        let title = data[1]["name"];
+        let type = data[1]["type"]
+        
+        let sets = data[1]["sets"];
+        let reps = data[1]["reps"];
+        let weight = data[1]["weight"];
+        
+        let oldSets = data[1]["oldSets"];
+        let oldReps = data[1]["oldReps"];
+        let oldWeight = data[1]["oldWeight"];
+
+        
+        let biElem = $('<div class="selection_sessionFinished_suggested_optGroup"><span class="selection_sessionFinished_suggested_optGroupTitle"></span><div class="selection_sessionFinished_suggested_optItem"><input type="checkbox" class="selection_sessionFinished_suggested_optCheck"><span class="selection_sessionFinished_suggested_optText"></span></div><div class="selection_sessionFinished_suggested_optItem"><input type="checkbox" class="selection_sessionFinished_suggested_optCheck"><span class="selection_sessionFinished_suggested_optText"></span></div><div class="selection_sessionFinished_suggested_optItem"><input type="checkbox" class="selection_sessionFinished_suggested_optCheck"><span class="selection_sessionFinished_suggested_optText"></span></div></div>');
+        
+        if(type == "Bi." || type == "Uni."){
+            out = $(biElem).clone();
+
+            $(out).find('.selection_sessionFinished_suggested_optGroupTitle').text(title);
+            
+            if(sets !== undefined){
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").data("data", ["sets", sets]);
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").text(textAssets[language]['updatePage']['placeHolders']['sets'] +" : "+ oldSets + " -> " + sets);
+            }else{
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").parent().remove();
+            };
+
+            if(reps !== undefined){
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").data("data", ["reps", reps]);
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").text(textAssets[language]['updatePage']['placeHolders']['reps'] +" : "+ oldReps + " -> " + reps);
+            }else{
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").parent().remove();
+            };
+            
+            if(weight !== undefined){
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").data("data", ["weight", weight]);
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").text(textAssets[language]['updatePage']['placeHolders']['weight'] +" : "+ oldWeight + weightUnit + " -> " + weight + weightUnit);
+            }else{
+                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").parent().remove();
+            };
+        };
+
+        $(out).data('id', data[0]);
+
+        return out
+    };
 
     if(failed){
         $(".selection_sessionFinished_subPage:not('.failed')").css('display', 'none');
@@ -356,9 +404,13 @@ function fillSessionEnd(failed){
         $(failedTile).find('.selection_sessionFinished_subText').text(textAssets[language]["sessionEnd"]["subText"]["failed"][randomFailedSub])
     }else{
         let [number, time, weight] = getSessionEndData();
+        let changes = generateSuggestedChanges(tempNewHistory);
+        let changesFilled = Object.keys(changes).length > 0;
+
         let firstTile = $('.finished');
         let secondTile = $('.chrono');
         let thirdTile = $('.lift');
+        let forthTile = $('.suggestedChanges');
 
         if(time === false && weight === false || parseInt(number.match(/\d+/)[0], 10) == 1){
             $(firstTile).css('display', 'flex');
@@ -366,25 +418,45 @@ function fillSessionEnd(failed){
             $(thirdTile).css('display', 'none');
 
             $('.selection_sessionFinished').css('paddingBottom', '30px');
-            $('.selection_sessionFinished_navigator').css('display', 'none');
+
+            if(changesFilled){
+                $('.selection_sessionFinished_navigator_indicator').eq(2).css('display', 'none');
+                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
+            }else{
+                $('.selection_sessionFinished_navigator').css('display', 'none');
+                $('.selection_sessionFinished_navigator_indicator').css('display', 'none');
+            };
+
         }else if(weight === false){
             $(firstTile).css('display', 'flex');
             $(secondTile).css('display', 'flex');
             $(thirdTile).css('display', 'none');
             
             $('.selection_sessionFinished').css('paddingBottom', '45px');
-            $('.selection_sessionFinished_navigator_indicator:last').css('display', 'none');
             $('.selection_sessionFinished_navigator').css('display', 'flex');
+            
+            if(changesFilled){
+                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
+            }else{
+                $('.selection_sessionFinished_navigator_indicator').eq(2).css('display', 'none');
+                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
+            };
         }else{
             $(firstTile).css('display', 'flex');
             $(secondTile).css('display', 'flex');
             $(thirdTile).css('display', 'flex');
-
+            
             $('.selection_sessionFinished').css('paddingBottom', '45px');
-            $('.selection_sessionFinished_navigator_indicator').css('display', 'block');
+
+            if(changesFilled){
+                $('.selection_sessionFinished_navigator_indicator').css('display', 'block');
+            }else{
+                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
+            };
+
             $('.selection_sessionFinished_navigator').css('display', 'flex');
         };
-
+        
         $('.failed').css('display', 'none');
         $('.selection_sessionFinishedBody').animate({ scrollLeft: $('.finished').position().left }, 1);
 
@@ -461,29 +533,166 @@ function fillSessionEnd(failed){
             $($(thirdTile).find('.selection_sessionFinished_subTextInterest')[0]).text(textAssets[language]["sessionEnd"]["interestWord"]["weight"]["even"]);
             $($(thirdTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['ATLT']);
         };
+
+        // Forth Tile
+        if(changesFilled){
+            $(forthTile).css('display', 'flex');
+            $('.selection_sessionFinished_suggestedBody').children().remove();
+            Object.keys(changes).forEach(function(key){
+                $('.selection_sessionFinished_suggestedBody').append(changeElemNode([key, changes[key]]));
+            });
+        }else{
+            $(forthTile).css('display', 'none');
+            $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
+        };
     };
 
     congrats_shown = true;
     showBlurPage('selection_sessionFinished');
 };
 
+function generateIntervallHistory(session){
+    let out = new Array();
+
+    session[2].forEach(exo => {
+        if(exo[0] == "Int."){
+            out.push([exo[1], [exo[2], exo[3], exo[4]], Array.from({ length: exo[2] }, () => [])]);
+        };
+    });
+
+    return out;
+};
+
+function generateSuggestedChanges(history){
+    let last_id = -1;
+    let suggestedData = {};
+
+    if(current_session[0] == "W"){
+        history[2].forEach(exo => {
+            let id = exo[exo.length - 1].replace(/_(1|2)/g, "");
+
+            if(id == last_id){return}else{last_id = id};
+
+            let type = current_session[2][getExoIndexById(current_session, id)][0];
+            let name = false;
+            let setList = false;
+            let newSets = false;
+
+            if(type == "Uni."){
+                name = exo[0].slice(0, -4);
+                setList = mergeHistoryExo(history, id);
+                newSets = Math.floor(setList.length / 2);
+            }else{
+                name = exo[0]
+                setList = exo[2];
+                newSets = exo[2].length;
+            };
+
+            if(type == "Bi." || type == "Uni."){
+                
+                let repsMean = Math.ceil(exo[2].map(item => item[0]).reduce((acc, val) => acc + val, 0) / exo[2].length); 
+                let weightMean = roundToNearestHalf(exo[2].map(item => item[1]).reduce((acc, val) => acc + val, 0) / exo[2].length);
+        
+                if(repsMean != parseInt(exo[1][1]) || weightMean != parseFloat(exo[1][2])){
+                    
+                    suggestedData[id] = {
+                        "name": name,
+                        "type": type
+                    };
+    
+                    if(newSets != parseInt(exo[1][0])){
+                        suggestedData[id]['sets'] = newSets;
+                        suggestedData[id]['oldSets'] = parseInt(exo[1][0]);
+                    };
+        
+                    if(repsMean != parseInt(exo[1][1])){
+                        suggestedData[id]['reps'] = repsMean;
+                        suggestedData[id]['oldReps'] = parseInt(exo[1][1]);
+                    };
+                    
+                    if(weightMean != parseFloat(exo[1][2])){
+                        suggestedData[id]['weight'] = weightMean;
+                        suggestedData[id]['oldWeight'] = parseFloat(exo[1][2]);
+                    };
+                };
+            }else if(type == "Int."){
+                
+            };
+        });
+    };
+
+    return suggestedData;
+};
+
 // Recovery
 
-function udpate_recovery(mode, data=false){
+function recovery_init(mode){
     if(mode == "workout"){
-        tempNewHistory[1] = TemptimeSpent;
+        recovery = [current_session[current_session.length - 1], "" , "", "", "", []];
 
         recovery[1] = {
-            "extype": extype,
-            "next_name": next_name,
-            "next_rest": next_rest,
-            "LrestTime": LrestTime,
-            "RrestTime": RrestTime,
-            "next_specs": next_specs,
-            "actual_setL": actual_setL,
-            "actual_setR": actual_setR,
-            "actual_setNb": actual_setNb,
-            "beforeExercise": beforeExercise
+            "extype": false,
+            "next_id": false,
+            "next_name": false,
+            "next_rest": false,
+            "LrestTime": false,
+            "RrestTime": false,
+            "next_specs": false,
+            "actual_setL": false,
+            "actual_setR": false,
+            "actual_setNb": false,
+            "beforeExercise": false,
+            "hasIntervallStarted": false,
+            "intervallData": false,
+            "iCurrent_cycle": false,
+            "iActualCycle": false,
+            "currentExoIndex": false
+        };
+        
+        recovery[2] = false;
+        recovery[3] = false;
+        recovery[4] = [false, false, false, false];
+
+        recovery[5] = undoMemory;
+    }else if(mode == "intervall"){
+        recovery = [current_session[current_session.length - 1], "" , "", "", ""];
+
+        recovery[1] = {
+            "hasIntervallStarted": false,
+            "intervallData": false,
+            "iCurrent_cycle": false,
+            "iActualCycle": false,
+            "currentExoIndex": false,
+            "Ifinished": false
+        };
+
+        recovery[3] = false;
+        recovery[4] = [false, false, false, false];
+    };
+};
+
+function udpate_recovery(mode, data=false){
+    tempNewHistory[1] = TemptimeSpent;
+    
+    if(mode == "workout"){
+
+        recovery[1]["extype"] = extype;
+        recovery[1]["next_id"] = next_id;
+        recovery[1]["next_name"] = next_name;
+        recovery[1]["next_rest"] = next_rest;
+        recovery[1]["LrestTime"] = LrestTime;
+        recovery[1]["RrestTime"] = RrestTime;
+        recovery[1]["next_specs"] = next_specs;
+        recovery[1]["actual_setL"] = actual_setL;
+        recovery[1]["actual_setR"] = actual_setR;
+        recovery[1]["actual_setNb"] = actual_setNb;
+        recovery[1]["beforeExercise"] = beforeExercise;
+
+        if(data){
+            recovery[1]["intervallData"] = data;
+            recovery[1]["iCurrent_cycle"] = iCurrent_cycle;
+            recovery[1]["iActualCycle"] = iActualCycle;
+            recovery[1]["currentExoIndex"] = currentExoIndex;
         };
         
         recovery[2] = $(".session_next_exercises_container").html();
@@ -491,13 +700,18 @@ function udpate_recovery(mode, data=false){
         recovery[4] = [TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone];
 
         recovery[5] = undoMemory;
-
-        recovery_save(recovery);
     }else if(mode == "intervall"){
-        recovery[1] = data;
+        recovery[1]["intervallData"] = data;
+        recovery[1]["iCurrent_cycle"] = iCurrent_cycle;
+        recovery[1]["iActualCycle"] = iActualCycle;
+        recovery[1]["currentExoIndex"] = currentExoIndex;
+        recovery[1]["Ifinished"] = Ifinished;
+
+        recovery[3] = tempNewHistory;
         recovery[4] = [TemptimeSpent - 5, TempworkedTime, TempweightLifted, TemprepsDone];
-        recovery_save(recovery);
     };
+
+    recovery_save(recovery);
 };
 
 // SoundBar
@@ -813,7 +1027,7 @@ $(document).ready(function(){
 
     // RECOVERY;
 
-    $(document).on('click', ".selection_recovery_page_btn_n", function(e){
+    $(document).on('click', ".selection_recovery_btn_n", function(e){
         if(e.target !== this){return};
 
         $('.blurBG').css('display', 'none');
@@ -822,10 +1036,43 @@ $(document).ready(function(){
         recovery = false;
     });
 
-    $(document).on('click', ".selection_recovery_page_btn_y", function(){
+    $(document).on('click', ".selection_recovery_btn_y", function(){
         $('.blurBG').css('display', 'none');
         beepPlayer = constructPlayer(beepPath, 1000);
         beep2x3Player = constructPlayer(beep2x3Path, 1000);
         launchSession(getSessionIndexByID(session_list, recovery[0]));
+    });
+
+
+    // SUGGESTED 
+
+    $('.selection_sessionFinished_suggestedBtn').on('click', function(){
+        $('.selection_sessionFinished_suggested_optGroup').each((_, item) => {
+            let id = $(item).data('id');
+
+            $(item).find(".selection_sessionFinished_suggested_optText").each((_, line) => {
+                let data = $(line).data('data');
+                let type = data[0];
+                let val = data[1];
+
+                let exoID = getExoIndexById(current_session, id);
+
+                if($(line).parent().find(".selection_sessionFinished_suggested_optCheck").is(':checked')){
+                    if(type == "sets"){
+                        current_session[2][exoID][2] = val;
+                    }else if(type == "reps"){
+                        current_session[2][exoID][3] = val;
+                    }else if(type == "weight"){
+                        current_session[2][exoID][4] = val;
+                    };
+                };
+            });
+        });
+
+        bottomNotification("updated", current_session[1]);
+        session_save(session_list);
+
+        closePanel('congrats');
+        canNowClick();
     });
 });//readyEnd

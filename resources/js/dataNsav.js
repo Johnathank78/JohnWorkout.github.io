@@ -134,10 +134,10 @@ function parameters_save(data){
 };
 
 
-function session_read(set=false){
+function session_read(set=false){ 
     let data = localStorage.getItem("sessions_list");
 
-    if(set){data = set; $(".selection_session_container").children().remove();};
+    if(set){data = set; $(".selection_session_container").children().remove()};
 
     if (data === null || data == ""){
         calendar_dict = calendar_read([]);
@@ -146,6 +146,71 @@ function session_read(set=false){
         data = JSON.parse(data);
         calendar_dict = calendar_read(data[0]);
         previousWeightUnit = data[1];
+
+        // NEW FIX
+
+        let corr = {};
+        
+        data[0].forEach((session, index) => {
+            let newSession = false;
+
+            if(session[0] == "I" && session.length > 6){
+                if(isScheduled(session)){
+                    newSession = ["I", session[1], [['Int.', session[1], parseInt(session[4]), session[2], session[3]]], session[5], session[6], session[7]];
+                }else{
+                    newSession = ["I", session[1], [['Int.', session[1], parseInt(session[4]), session[2], session[3]]], session[5], session[6]];
+                };
+
+                data[0][index] = newSession;
+            };
+
+            if(session[0] == "W"){
+                let newExo = false;
+                let one = false;
+                let two = false;
+
+                session[2].forEach((exo, exoInd) => {
+                    if(exo[0] != "Pause"){corr[exo[1]] = (exoInd+1).toString()};
+
+                    if(exo[0] == "Int." && exo.length > 4 && (isNaI(exo[exo.length - 1]) || !Array.isArray(exo[2]))){
+                        one = true;
+                        newExo = ["Int.", exo[1], [['Int.', exo[1], parseInt(exo[4]), exo[2], exo[3]]], (exoInd+1).toString()];
+                    }else if((exo[0] != "Int." && exo[0] != "Pause") && isNaI(exo[exo.length - 1])){
+                        two = true;
+                        newExo = [...exo, (exoInd+1).toString()];
+                    };
+
+                    if(exo[0] != "Pause" && (one || two)){
+                        data[0][index][2][exoInd] = newExo;
+                    };
+                });
+            };
+
+        });
+
+        data[0].forEach((session) => {
+            let history = getSessionHistory(session);
+
+            if(session[0] == "W"){
+                history.forEach((day, dayInd) => {
+                    if(Array.isArray(day[2])){
+                        day[2].forEach((exo, exoInd) => {
+                            if(isNaI(exo[exo.length - 1][0])){
+                                let name = exo[0].replace(" - L", "").replace(" - R", "")
+                                let suffix = exo[0].endsWith(" - L") ? "_1" : exo[0].endsWith(" - R") ? "_2" : "";
+                                let match = corr[name] === undefined ? "999" : corr[name];
+
+                                history[dayInd][2][exoInd].push(match + suffix);
+                            };
+    
+                            if(exo[1][0] == '1' && (exo[1][1] == '1' || exo[1][1] == '0') && exo[1][2] == '0'){
+                                history[dayInd][2].splice(exoInd, 1);
+                            };
+                        });
+                    };
+                });
+            };
+        });
 
         if(previousWeightUnit != weightUnit){
             updateWeightUnits(data[0], previousWeightUnit, weightUnit);
@@ -264,7 +329,7 @@ function calendar_save(data){
 };
 
 function calendar_reset(data){
-    dict = {};
+    let dict = {};
 
     for(let i=0; i<data.length; i++){
         if(isScheduled(data[i])){
@@ -344,6 +409,26 @@ function recovery_read(){
     }else{
 
         data = JSON.parse(data);
+        
+        let sessionIndex = getSessionIndexByID(session_list, data[0])
+
+        if(session_list[sessionIndex][0] == "I"){
+            if(data[1]['Ifinished']){
+                ongoing = "intervall";
+                
+                current_session = session_list[sessionIndex];
+                current_history = getSessionHistory(current_session);
+
+                TemptimeSpent = data[4][0];
+                TempworkedTime = data[4][1];
+                TempweightLifted = data[4][2];
+                TemprepsDone = data[4][3];
+                tempNewHistory = data[3];
+
+                quit_session();
+                return data;
+            };
+        };
 
         showBlurPage("selection_recovery_page");
         $(".selection_recovery_subText1").text(session_list[getSessionIndexByID(session_list, data[0])][1]);
@@ -411,6 +496,7 @@ function hasBeenShifted_save(data){
 function sessionSwapped_read(){
     let data = localStorage.getItem("sessionSwapped");
     let now = zeroAM(new Date(Date.now())).getTime();
+    
     if (data === null || data == ""){
         localStorage.setItem("sessionSwapped", JSON.stringify([]));
         return [];

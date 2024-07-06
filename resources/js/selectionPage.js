@@ -9,6 +9,7 @@ var isSwipingSE = false;
 var userScrollSE = false;
 var currentSEindex = 0;
 var hasAudioBeenInitiated = false;
+var deleteHistoryConfirmShown = false;
 
 function loadHistorydayz(history, scrollState){
 
@@ -46,6 +47,17 @@ function update_toggle(){
     });
 };
 
+function showHint(classs){
+    $(classs).children().last().find('.update_workout_expandRow').css("transform", "rotate(180deg)");
+    $(classs).children().last().find('.udpate_workout_hint_txtarea').css('display', 'inline-block');
+    $(classs).children().last().find(".update_workout_data_lablel").css('opacity', '1');
+    resizeArea($(classs).children().last().find('.udpate_workout_hint_txtarea')[0]);
+};
+
+function isIntervallLinked(data){
+    return !Array.isArray(data[2]);
+};
+
 $(document).ready(function(){
     // HEADERS BTN;
 
@@ -81,6 +93,45 @@ $(document).ready(function(){
         };
     });
 
+    $('.selection_parameters_deleteafter').on('change', function(){
+        let order = {"7 Days": 1, "1 Month": 2, "3 Month": 3, "6 Month": 4, "1 Year": 5, "For ever": 6};
+        let set = new Set();
+
+        if(order[deleteAfter] > order[$(this).val()]){
+            session_list.forEach(session => {
+                getSessionHistory(session).forEach(historyDay => {
+                    if(historyDay[0] != 'state'){
+                        if(historyDay[0] < subtractTime($(this).val()).getTime()){
+                            set.add(historyDay[0]);
+                        };
+                    };
+                }); 
+            });
+
+            let nbDeleted = set.size;
+
+            if(nbDeleted > 0){
+                deleteHistoryConfirmShown = true;
+                
+                if(nbDeleted == 1){
+                    $('.selection_deleteHistoryConfirm_subText3').text($('.selection_deleteHistoryConfirm_subText3').text().replace('days', 'day').replace('jours', 'jour'))
+                };
+
+                $(".selection_deleteHistoryConfirm_subText2").text(nbDeleted);
+                showBlurPage("selection_deleteHistoryConfirm_page");
+            };
+
+        };
+    });
+
+    $('.selection_deleteHistoryConfirm_btn').on('click', function(){
+        if($(this).is('.selection_deleteHistoryConfirm_btn_n')){
+            $('.selection_parameters_deleteafter').val(deleteAfter);
+        };
+
+        closePanel('deleteHistoryConfirm');
+    });
+
     $(document).on("click", '.info_icon', function(){
         if(!isAbleToClick("stat")){return};
 
@@ -95,10 +146,9 @@ $(document).ready(function(){
         };
     });
 
-
     // MAIN BTNS;
 
-    $(document).on("click", ".selection_add_option_session", function(){
+    $(".selection_add_option_session").on("click", function(){
 
         reminderOrSession = "session";
         current_page = "add";
@@ -106,18 +156,10 @@ $(document).ready(function(){
 
         selected_mode = add_mode_save;
 
-        if(selected_mode == "I"){
-            update_pageFormat("addIN");
-        }else if(selected_mode == "W"){
-            update_pageFormat("addWO");
-        };
-
         $(".update_data_name").val(add_name_save);
-        $(".update_intervall_data_cycle").val(add_cycle_save);
-        $(".update_intervall_data_work").val(add_work_save);
-        $(".update_intervall_data_rest").val(add_rest_save);
 
-        $(".update_exercice_container").html(exercisesHTML);
+        $(".update_intervallList_container").html(intervallHTML);
+        $(".update_workoutList_container").html(exercisesHTML);
 
         $('.update_workout_item').css({
             opacity: 1,
@@ -131,16 +173,16 @@ $(document).ready(function(){
             height: 45
         });
 
-        if($('.update_workout_item').length + $('.update_exercise_pause_item').length > 1){
-            $(".update_workout_item_cross_container").css("display", "flex");
-        }else{
-            $(".update_workout_item_cross_container").css("display", "none");
-        };
+        $(".update_workoutList_container").scrollTop($(".update_workoutList_container").prop('scrollHeight'));
 
-        $(".update_exercice_container").scrollTop($(".update_exercice_container").prop('scrollHeight'));
+        if(selected_mode == "I"){
+            update_pageFormat("addIN");
+        }else if(selected_mode == "W"){
+            update_pageFormat("addWO");
+        };
     });
 
-    $(document).on("click", ".selection_add_option_reminder", function(){
+    $(".selection_add_option_reminder").on("click", function(){
 
         reminderOrSession = "reminder";
         update_pageFormat("addRM");
@@ -152,7 +194,7 @@ $(document).ready(function(){
         $(".udpate_reminder_body_txtarea").val(add_reminder_body_save).change();
     });
 
-    $(document).on("click", '.selection_add_btn', function(){
+    $('.selection_add_btn').on("click", function(){
         if(!isAbleToClick("addContainer")){return};
 
         if(!add_state){
@@ -175,6 +217,7 @@ $(document).ready(function(){
 
         let item = $(e.target).closest(".selection_session_tile, .selection_reminder_tile");
         let session_List = false;
+        let elementData = false;
 
         if($(item).hasClass("selection_session_tile")){
             reminderOrSession = "session";
@@ -182,68 +225,86 @@ $(document).ready(function(){
             session_List = $(".selection_session_tile");
             update_current_item = $(this).closest(".selection_session_tile");
             update_current_index = $(session_List).index(update_current_item);
-
-            if(session_list[update_current_index][0] == "I"){
+            elementData = session_list[update_current_index];
+            
+            $(".update_data_name").val(elementData[1]);
+            
+            if(elementData[0] == "I"){
                 update_pageFormat("editIN");
-
+                
                 selected_mode = "I";
+                $(".update_intervallList_container").html("");
 
-                $(".update_data_name").val(session_list[update_current_index][1]);
-                $(".update_intervall_data_cycle").val(session_list[update_current_index][4]);
-                $(".update_intervall_data_work").val(session_list[update_current_index][2]);
-                $(".update_intervall_data_rest").val(session_list[update_current_index][3]);
+                for(let i=0;i<elementData[2].length;i++){
+                    if(elementData[2][i][0] == "Int."){
+                        if(elementData[2][i].length == 6){
+                            $(".update_intervallList_container").append(Iintervall_tile([elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5]]));
+                            showHint(".update_intervallList_container");
+                        }else{
+                            $(".update_intervallList_container").append(Iintervall_tile([elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], ""]));
+                        };
 
-            }else if(session_list[update_current_index][0] == "W"){
+                        manageIntervallRestInputVisibility($(".update_intervallList_container").children().last().find('.update_workout_intervall_data_cycle'));
+                    }else if(elementData[2][i][0] == "Pause"){
+                        $(".update_intervallList_container").append(pause_tile(elementData[2][i][1]));
+                    }
+                };
+
+                $(".update_intervallList_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
+            }else if(elementData[0] == "W"){
                 update_pageFormat("editWO");
 
                 selected_mode = "W";
+                $(".update_workoutList_container").html("");
 
-                $(".update_data_name").val(session_list[update_current_index][1]);
+                for(let i=0;i<elementData[2].length;i++){
+                    if(elementData[2][i][0] == "Pause"){
+                        $(".update_workoutList_container").append(pause_tile(elementData[2][i][1]));
+                    }else if(elementData[2][i][0] == "Int."){
+                        if(isIntervallLinked(elementData[2][i])){ // IS LINKED
+                            let intName = session_list[getSessionIndexByID(session_list, elementData[2][i][1])][1];
 
-                $(".update_exercice_container").html("");
-                for(let i=0;i<session_list[update_current_index][2].length;i++){
-                    if(session_list[update_current_index][2][i][0] == "Pause"){
-                        $(".update_exercice_container").append(pause_tile(session_list[update_current_index][2][i][1]));
-                    }else if(session_list[update_current_index][2][i][0] == "Int."){
-                        if(session_list[update_current_index][2][i].length == 6){
-                            $(".update_exercice_container").append(exercise_tile([session_list[update_current_index][2][i][0], session_list[update_current_index][2][i][1], session_list[update_current_index][2][i][2], session_list[update_current_index][2][i][3], session_list[update_current_index][2][i][4], session_list[update_current_index][2][i][5]]));
-                            $(".update_exercice_container").children().last().find('.update_workout_expandRow').css("transform", "rotate(180deg)");
-                            $(".update_exercice_container").children().last().find('.udpate_workout_hint_txtarea').css('display', 'inline-block');
-                            resizeArea($(".update_exercice_container").children().last().find('.udpate_workout_hint_txtarea')[0]);
-                            $(".update_exercice_container").children().last().find(".update_workout_data_lablel").css('opacity', '1');
-                        }else{
-                            $(".update_exercice_container").append(exercise_tile([session_list[update_current_index][2][i][0], session_list[update_current_index][2][i][1], session_list[update_current_index][2][i][2], session_list[update_current_index][2][i][3], session_list[update_current_index][2][i][4], ""]));
+                            if(elementData[2][i].length == 4){ // HINT
+                                $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], intName, elementData[2][i][2], elementData[2][i][3]]));
+                                $(".update_workoutList_container").children().last().data('data', elementData[2][i].slice(0, -2));
+                                showHint(".update_workoutList_container");
+                            }else{ // NO HINT
+                                $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], intName, "", elementData[2][i][2]]));
+                                $(".update_workoutList_container").children().last().data('data', elementData[2][i].slice(0, -1));
+                            };
+                        }else{ // IS CREATED
+                            if(elementData[2][i].length == 5){ // HINT
+                                $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][3], elementData[2][i][4]]));
+                                $(".update_workoutList_container").children().last().data('data', elementData[2][i].slice(0, -2));
+                                showHint(".update_workoutList_container");
+                            }else{ // NO HINT
+                                $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], "", elementData[2][i][3]]));
+                                $(".update_workoutList_container").children().last().data('data', elementData[2][i].slice(0, -1));
+                            };
                         };
-                    }else if(session_list[update_current_index][2][i][0] == "Wrm."){
-                        if(session_list[update_current_index][2][i].length == 7){
-                            $(".update_exercice_container").append(exercise_tile([session_list[update_current_index][2][i][0], session_list[update_current_index][2][i][1], session_list[update_current_index][2][i][2], session_list[update_current_index][2][i][3], session_list[update_current_index][2][i][4], session_list[update_current_index][2][i][5], session_list[update_current_index][2][i][6]]));
-                            $(".update_exercice_container").children().last().find('.update_workout_expandRow').css("transform", "rotate(180deg)");
-                            $(".update_exercice_container").children().last().find('.udpate_workout_hint_txtarea').css('display', 'inline-block');
-                            $(".update_exercice_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
-                            resizeArea($(".update_exercice_container").children().last().find('.udpate_workout_hint_txtarea')[0]);
-                            $(".update_exercice_container").children().last().find(".update_workout_data_lablel").css('opacity', '1');
+                    }else if(elementData[2][i][0] == "Wrm."){
+                        if(elementData[2][i].length == 8){
+                            $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5], elementData[2][i][6], elementData[2][i][7]]));
+                            showHint(".update_workoutList_container");
                         }else{
-                            $(".update_exercice_container").append(exercise_tile([session_list[update_current_index][2][i][0], session_list[update_current_index][2][i][1], session_list[update_current_index][2][i][2], session_list[update_current_index][2][i][3], session_list[update_current_index][2][i][4], session_list[update_current_index][2][i][5], ""]));
-                            $(".update_exercice_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
+                            $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5], "", elementData[2][i][6]]));
+                            $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                         };
                     }else{
-                        if(session_list[update_current_index][2][i].length == 7){
-                            $(".update_exercice_container").append(exercise_tile([session_list[update_current_index][2][i][0], session_list[update_current_index][2][i][1], session_list[update_current_index][2][i][2], session_list[update_current_index][2][i][3], session_list[update_current_index][2][i][4], session_list[update_current_index][2][i][5], session_list[update_current_index][2][i][6]]));
-                            $(".update_exercice_container").children().last().find('.update_workout_expandRow').css("transform", "rotate(180deg)");
-                            $(".update_exercice_container").children().last().find('.udpate_workout_hint_txtarea').css('display', 'inline-block');
-                            resizeArea($(".update_exercice_container").children().last().find('.udpate_workout_hint_txtarea')[0]);
-                            $(".update_exercice_container").children().last().find(".update_workout_data_lablel").css('opacity', '1');
+                        if(elementData[2][i].length == 8){
+                            $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5], elementData[2][i][6], elementData[2][i][7]]));
+                            showHint(".update_workoutList_container");
                         }else{
-                            $(".update_exercice_container").append(exercise_tile([session_list[update_current_index][2][i][0], session_list[update_current_index][2][i][1], session_list[update_current_index][2][i][2], session_list[update_current_index][2][i][3], session_list[update_current_index][2][i][4], session_list[update_current_index][2][i][5], ""]));
+                            $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5], "", elementData[2][i][6]]));
                         };
                     };
 
-                    if(session_list[update_current_index][2].length> 1){
+                    if(elementData[2].length> 1){
                         $(".update_workout_item_cross").css("opacity", "1");
                     };
                 };
 
-                $(".update_exercice_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
+                $(".update_workoutList_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
             };
         }else if($(item).hasClass("selection_reminder_tile")){
             update_pageFormat("editRM");
@@ -253,12 +314,13 @@ $(document).ready(function(){
             session_List = $(".selection_reminder_tile");
             update_current_item = $(this).closest(".selection_reminder_tile");
             update_current_index = $(session_List).index(update_current_item);
+            elementData = reminder_list[update_current_index];
 
-            $(".update_data_name").val(reminder_list[update_current_index][1]);
-            $(".udpate_reminder_body_txtarea").val(reminder_list[update_current_index][2]).change();
+            $(".update_data_name").val(elementData[1]);
+            $(".udpate_reminder_body_txtarea").val(elementData[2]).change();
         };
 
-        $(".update_exercice_container").scrollTop(0);
+        $(".update_workoutList_container").scrollTop(0);
     });
 
     $(document).on("click", ".selection_bin_btn", function(e){
@@ -269,6 +331,7 @@ $(document).ready(function(){
 
         let item = $(e.target).closest(".selection_session_tile, .selection_reminder_tile");
         let session_List = false;
+        let elementData = false;
 
         if($(item).hasClass("selection_session_tile")){
             reminderOrSession = 'session';
@@ -276,38 +339,57 @@ $(document).ready(function(){
             let session_List = $(".selection_session_tile");
             update_current_item = $(this).closest(".selection_session_tile");
             update_current_index = $(session_List).index(update_current_item);
+            elementData = session_list[update_current_index];
 
-            if(session_list[update_current_index][0] == "I"){
+            if(elementData[0] == "I"){
                 update_pageFormat("deleteIN");
 
                 selected_mode = "I";
+                $(".update_data_name").val(elementData[1]);
+                $(".update_intervallList_container").html("");
+                
+                for(let i=0;i<elementData[2].length;i++){
+                    if(elementData[2][i][0] == "Int."){
+                        $(".update_intervallList_container").append(Iintervall_tile([elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], ""]));
+                    }else if(elementData[2][i][0] == "Pause"){
+                        $(".update_intervallList_container").append(pause_tile(elementData[2][i][1]));
+                    }
+                };
 
-                $(".update_data_name").val(session_list[update_current_index][1]);
-                $(".update_intervall_data_cycle").val(session_list[update_current_index][4]);
-                $(".update_intervall_data_work").val(session_list[update_current_index][2]);
-                $(".update_intervall_data_rest").val(session_list[update_current_index][3]);
+                $('.udpate_workout_hint_txtarea, .update_workout_expandRowContainer').css("display", "none");
+                $('.update_workout_item').css('padding-bottom', "20px");
+                $(".update_workout_item, .update_exercise_pause_item").css("pointer-events", "none");
+                $('.update_workout_item_cross_container, .update_workout_item_grab_container').css("display", "none");
 
-            }else if(session_list[update_current_index][0] == "W"){
+            }else if(elementData[0] == "W"){
                 update_pageFormat("deleteWO");
 
                 selected_mode = "W";
 
-                $(".update_data_name").val(session_list[update_current_index][1]);
+                $(".update_data_name").val(elementData[1]);
 
-                $(".update_exercice_container").html("");
+                $(".update_workoutList_container").html("");
 
-                for(let i=0;i<session_list[update_current_index][2].length;i++){
-                    if(session_list[update_current_index][2][i][0] == "Pause"){
-                        $(".update_exercice_container").append(pause_tile(session_list[update_current_index][2][i][1]));
-                    }else if(session_list[update_current_index][2][i][0] == "Wrm."){
-                        $(".update_exercice_container").append(exercise_tile([session_list[update_current_index][2][i][0], session_list[update_current_index][2][i][1], session_list[update_current_index][2][i][2], session_list[update_current_index][2][i][3], session_list[update_current_index][2][i][4], session_list[update_current_index][2][i][5]]));
-                        $(".update_exercice_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
+                for(let i=0;i<elementData[2].length;i++){
+                    if(elementData[2][i][0] == "Pause"){
+                        $(".update_workoutList_container").append(pause_tile(elementData[2][i][1]));
+                    }else if(elementData[2][i][0] == "Wrm."){
+                        $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5]]));
+                        $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
+                    }else if(elementData[2][i][0] == "Int."){
+                        if(isIntervallLinked(elementData[2][i])){ // IS LINKED
+                            let intName = session_list[getSessionIndexByID(session_list, elementData[2][i][1])][1];
+                            $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], intName, ""]));
+                        }else{ // IS CREATED
+                            $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], ""]));
+                        };
                     }else{
-                        $(".update_exercice_container").append(exercise_tile([session_list[update_current_index][2][i][0], session_list[update_current_index][2][i][1], session_list[update_current_index][2][i][2], session_list[update_current_index][2][i][3], session_list[update_current_index][2][i][4], session_list[update_current_index][2][i][5]]));
+                        $(".update_workoutList_container").append(exercise_tile([elementData[2][i][0], elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5]]));
                     };
                 };
 
-                $('.udpate_workout_hint_txtarea, .update_workout_expandRowContainer').css("display", "none");
+                $('.update_workout_data_type').prop('disabled', true);
+                $('.udpate_workout_hint_txtarea, .update_workout_expandRowContainer, .update_workout_intervallIMG').css("display", "none");
                 $('.update_workout_item').css('padding-bottom', "20px");
                 $(".update_workout_item, .update_exercise_pause_item").css("pointer-events", "none");
                 $('.update_workout_item_cross_container, .update_workout_item_grab_container').css("display", "none");
@@ -321,23 +403,24 @@ $(document).ready(function(){
             session_List = $(".selection_reminder_tile");
             update_current_item = $(this).closest(".selection_reminder_tile");
             update_current_index = $(session_List).index(update_current_item);
+            elementData = reminder_list[update_current_index];
 
             $(".update_data_name").val(reminder_list[update_current_index][1]);
             $(".udpate_reminder_body_txtarea").val(reminder_list[update_current_index][2]).change();
         };
 
-        $(".update_exercice_container").scrollTop(0);
+        $(".update_workoutList_container").scrollTop(0);
     });
 
     $(document).on("click", ".selection_play_btn", async function(){
         if(cannotClick){return};
 
-        if(!hasAudioBeenInitiated){
-            hasAudioBeenInitiated = true;
-
-            beepPlayer = constructPlayer(beepPath, 1000);
-            beep2x3Player = constructPlayer(beep2x3Path, 1000);
-        };
+        // if(!hasAudioBeenInitiated){
+        //     hasAudioBeenInitiated = true;
+        // };
+        
+        beepPlayer = constructPlayer(beepPath, 1000);
+        beep2x3Player = constructPlayer(beep2x3Path, 1000);
 
         let item = $(this).closest(".selection_session_tile");
         let session_List = $(".selection_session_tile");
@@ -395,25 +478,21 @@ $(document).ready(function(){
         let historyScrollState = 0;
         let session_List = $(".selection_session_tile");
         let that = $(e.target).closest(".selection_session_tile");
-        let index = $(session_List).index(that);
+        update_current_index = $(session_List).index(that);
 
-        $(".update_data_name").val(session_list[index][1]);
+        $(".update_data_name").val(session_list[update_current_index][1]);
         $(that).find(".selection_session_tile_extra_container").click();
 
         $(".update_history_container_day, .update_history_loadMore_btn").remove();
 
         update_pageFormat("history");
 
-        current_history = getSessionHistory(session_list[index]);
+        current_history = getSessionHistory(session_list[update_current_index]);
 
         $(".update_history_count").text(current_history[0][2]);
         $(".update_history_count").css('display', 'flex');
 
-        if(session_list[index][0] == "I"){
-            $('.history_toggle').css('display', 'none');
-        }else{
-            $('.history_toggle').css('display', 'flex')
-        };
+        $('.history_toggle').css('display', 'flex')
 
         // toggle;
         $(".history_toggle").attr("state", current_history[0][1]);
@@ -619,10 +698,13 @@ $(document).ready(function(){
     // SESSION END TILE
 
     $('.selection_sessionFinishedBody').on('scroll', function(e){
-        if($(this).scrollLeft() == 440){
+        if($(this).scrollLeft() == 780){
+            $('.selection_sessionFinished_navigator_indicator').css('opacity', '0.5');
+            $($('.selection_sessionFinished_navigator_indicator')[3]).css('opacity', '1');
+        }else if($(this).scrollLeft() == 520){
             $('.selection_sessionFinished_navigator_indicator').css('opacity', '0.5');
             $($('.selection_sessionFinished_navigator_indicator')[2]).css('opacity', '1');
-        }else if($(this).scrollLeft() == 220){
+        }else if($(this).scrollLeft() == 260){
             $('.selection_sessionFinished_navigator_indicator').css('opacity', '0.5');
             $($('.selection_sessionFinished_navigator_indicator')[1]).css('opacity', '1');
         }else if($(this).scrollLeft() == 0){

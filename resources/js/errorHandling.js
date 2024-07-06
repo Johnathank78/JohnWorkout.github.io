@@ -13,22 +13,22 @@ function iserror(name, cycle, work, rest, from){
         };
     };
 
-    if((name == "" || cycle == "" || work == "" || rest == "") || (!work && !rest)){
+    if((name === "" || cycle === "" || work === "" || rest === "")){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["fillAllEntries"]);
         return true;
     };
-    if(isNaI(cycle) || isNaI(work) || !work){
+    if(isNaI(cycle)){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["intNumericOnly"]);
         return true;
     };
-    if(isNaI(rest) || !rest){
+    if(isNaI(rest) || rest === false || isNaI(work) || work === false){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["restTimeOnly"]);
         return true;
     };
-    if(parseInt(rest) < 5){
+    if(parseInt(rest) < 5 && cycle > 1){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["restGreater"]);
         return true;
@@ -57,6 +57,86 @@ function iserror(name, cycle, work, rest, from){
     return false;
 };
 
+function iserror_int(mname, from){
+
+    if(from == 0){
+        let name_List = [...getSession_order(), ...getReminder_order()];
+        if(name_List.includes(mname) && (current_page == "edit" ? $(update_current_item).find(".selection_session_name").text() != mname : true)){
+            $(".update_error_container").css("display", "block");
+            $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["nameAlreadyUsed"]);
+            return true;
+        };
+    };
+
+    if(mname == ""){
+        $(".update_error_container").css("display", "block");
+        $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["fillAllEntries"]);
+        return true;
+    };
+
+    let items = $(".update_intervallList_container").children();
+    
+    let name = false;
+    let cycle = false;
+    let work = false;
+    let rest = false;
+    let interror = false;
+    let type = false;
+
+    for(let i=0;i<items.length;i++){
+        type = getContractedType($(items[i]).find(".update_workout_data_type").val());
+
+        if(type == "Int."){
+            name = $(items[i]).find(".update_workout_data_name").val();
+            cycle = $(items[i]).find(".update_workout_intervall_data_cycle").val();
+            work = $(items[i]).find(".update_workout_intervall_data_work").val();
+            rest = $(items[i]).find(".update_workout_intervall_data_rest").val();
+    
+            interror = iserror(name, cycle, work, rest, 1);
+        }else if(type == "Pause"){
+            rest = time_unstring($(items[i]).find(".update_workout_data_pausetime").val());
+
+            if(i>0 && $(items[i-1]).find(".update_workout_data_type").text() == "Pause"){
+                $(".update_error_container").css("display", "block");
+                $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["consecutiveBreak"]);
+                return true;
+            };
+
+            if(i == 0 || i == items.length - 1){
+                $(".update_error_container").css("display", "block");
+                $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["illegalBreaks"]);
+                return true;
+            };
+
+            if(rest == ""){
+                $(".update_error_container").css("display", "block");
+                $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["fillAllEntries"]);
+                return true;
+            };
+
+            if(isNaI(rest)){
+                $(".update_error_container").css("display", "block");
+                $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["breakNumeric"]);
+                return true;
+            };
+            
+            if(parseInt(rest) >= 3600){
+                $(".update_error_container").css("display", "block");
+                $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["goToSleep"]);
+                return true;
+            };
+            
+            if(parseInt(rest) == 0){
+                $(".update_error_container").css("display", "block");
+                $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["zeroBreak"]);
+                return true;
+            };
+        };
+    };
+
+    return (false || interror);
+};
+
 function iserror_exo(mname, from){
 
     if(from == 0){
@@ -75,18 +155,16 @@ function iserror_exo(mname, from){
     };
 
     let name = "";
-    let items = $(".update_exercice_container").children();
+    let items = $(".update_workoutList_container").children();
     let interror = false;
     let type = false;
     let sets = false;
     let reps = false;
     let weight = false;
     let rest = false;
-    let work = false;
-    let cycle = false;
 
     for(let i=0;i<items.length;i++){
-        type = getContractedType($(items[i]).find(".update_workout_data_type").text());
+        type = getContractedType($(items[i]).find(".update_workout_data_type").val());
         if(type == "Bi." || type == "Uni."){
             name = $(items[i]).find(".update_workout_data_name").val();
             sets = $(items[i]).find(".update_workout_data_sets").val();
@@ -124,13 +202,10 @@ function iserror_exo(mname, from){
                 $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["goToSleep"]);
                 return true;
             };
-        }else if(type == "Int."){
-            name = $(items[i]).find(".update_workout_data_name").val();
-            work = $(items[i]).find(".update_workout_intervall_data_work").val();
-            rest = $(items[i]).find(".update_workout_intervall_data_rest").val();
-            cycle = $(items[i]).find(".update_workout_intervall_data_cycle").val();
-
-            interror = iserror(name, cycle, work, rest, 1);
+        }else if(type == "Int." && $(items[i]).data('data') === undefined){
+            $(".update_error_container").css("display", "block");
+            $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["fillAllEntries"]);
+            return true;
         }else if(type == "Pause"){
             rest = time_unstring($(items[i]).find(".update_workout_data_pausetime").val());
 
@@ -140,21 +215,30 @@ function iserror_exo(mname, from){
                 return true;
             };
 
+            if(i == 0 || i == items.length - 1){
+                $(".update_error_container").css("display", "block");
+                $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["illegalBreaks"]);
+                return true;
+            };
+
             if(rest == ""){
                 $(".update_error_container").css("display", "block");
                 $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["fillAllEntries"]);
                 return true;
             };
+
             if(isNaI(rest)){
                 $(".update_error_container").css("display", "block");
                 $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["breakNumeric"]);
                 return true;
             };
+
             if(parseInt(rest) >= 3600){
                 $(".update_error_container").css("display", "block");
                 $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["goToSleep"]);
                 return true;
             };
+
             if(parseInt(rest) == 0){
                 $(".update_error_container").css("display", "block");
                 $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["zeroBreak"]);

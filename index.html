@@ -145,6 +145,7 @@
             <img src="./resources/imgs/clock.png" alt="" id="clockIMG">
             <img src="./resources/imgs/barbell.png" alt="" id="barbellIMG">
             <img src="./resources/imgs/backArrow.png" alt="" id="backArrowIMG">
+            <img src="./resources/imgs/link.png" alt="" id="linkIMG">
         </div>
 
         <div class="IOSbacker noselect"></div>
@@ -357,15 +358,28 @@
                 </div>
             </div>
 
+            <div class="selection_deleteHistoryConfirm_page">
+                <span class="selection_deleteHistoryConfirm_headerText">Confirm</span>
+                <span>
+                    <span class="selection_deleteHistoryConfirm_subText selection_deleteHistoryConfirm_subText1">You are about to delete </span>
+                    <span class="selection_deleteHistoryConfirm_subText selection_deleteHistoryConfirm_subText2"></span>
+                    <span class="selection_deleteHistoryConfirm_subText selection_deleteHistoryConfirm_subText3"> day of history, are you sure ?</span>
+                </span>
+                <div class="selection_deleteHistoryConfirm_btnContainer">
+                    <button class="selection_deleteHistoryConfirm_btn selection_deleteHistoryConfirm_btn_y">Yes</button>
+                    <button class="selection_deleteHistoryConfirm_btn selection_deleteHistoryConfirm_btn_n">No</button>
+                </div>
+            </div>
+
             <div class="selection_recovery_page">
                 <span class="selection_recovery_headerText">Recovery</span>
                 <span>
                     <span class="selection_recovery_subText selection_recovery_subText1">[W] PDT</span>
                     <span class="selection_recovery_subText selection_recovery_subText2"> unexpectedly stopped, resume it ?</span>
                 </span>
-                <div class="selection_recovery_page_btnContainer">
-                    <button class="selection_recovery_page_btn selection_recovery_page_btn_n">No</button>
-                    <button class="selection_recovery_page_btn selection_recovery_page_btn_y">Yes</button>
+                <div class="selection_recovery_btnContainer">
+                    <button class="selection_recovery_btn selection_recovery_btn_n">No</button>
+                    <button class="selection_recovery_btn selection_recovery_btn_y">Yes</button>
                 </div>
             </div>
 
@@ -429,9 +443,16 @@
                             </span>
                         </div>
                     </div>
+
+                    <div class="selection_sessionFinished_subPage suggestedChanges">
+                        <span class="selection_sessionFinished_Title">Suggested changes</span>
+                        <div class="selection_sessionFinished_suggestedBody"></div>
+                        <button class="selection_sessionFinished_suggestedBtn">Update</button>
+                    </div>
                 </div>
 
                 <div class="selection_sessionFinished_navigator">
+                    <div class="selection_sessionFinished_navigator_indicator"></div>
                     <div class="selection_sessionFinished_navigator_indicator"></div>
                     <div class="selection_sessionFinished_navigator_indicator"></div>
                     <div class="selection_sessionFinished_navigator_indicator"></div>
@@ -516,7 +537,7 @@
         
         
         <div class="main_page">
-            <img src="./resources/imgs/backArrow.png" class="update_backArrow" alt="goBack">
+            <img src="./resources/imgs/backArrow.png" class="update_backArrow noselect" alt="goBack">
 
             <div class="selection_page">
                 
@@ -571,9 +592,6 @@
                         <div class="selection_page_calendar noselect">
         
                             <div class="selection_page_calendar_main">
-        
-                                <div class="selection_page_calendar_previewBox_triangleTip"></div>
-                                <div class="selection_page_calendar_previewBox_body"></div>
         
                                 <div class="selection_page_calendar_header">
                                     <div class="selection_page_calendar_headerMonths">
@@ -728,6 +746,16 @@
                     <div class="update_mode_select update_mode_intervall">Intervall</div>
                     <div class="update_mode_select update_mode_workout">Workout</div>
                 </div>
+                
+                <div class="update_tile_link noselect">
+                    <span class="update_linkWith">Link with</span>
+                    <select name="intervallSession" class="update_intervallLink"></select>
+                    <button class="update_linkBtn"><img src="./resources/imgs/link.png" alt="link" class="update_linkIMG"></button>
+                </div>
+
+                <div class="flex_break"></div>
+                <span class="linkNcreateSeparator noselect">OR</span>
+                <div class="flex_break"></div>
 
                 <div class="update_tile_header">
                     <div class="update_tile_header_left">
@@ -739,22 +767,11 @@
                 </div>
                 
                 <div class="update_workout_container">
-                    <div class="update_exercice_container"></div>
+                    <div class="update_workoutList_container"></div>
                 </div>
 
                 <div class="update_intervall_container">
-                    <div class="update_data_block">
-                        <div class="update_data_tile_info_container"><span class="update_data_tile_info noselect">Cycle</span></div>
-                        <input value="" type="tel" class="strictlyNumeric update_data_tile update_intervall_data_cycle">
-                    </div>
-                    <div class="update_data_block">
-                        <div class="update_data_tile_info_container"><span class="update_data_tile_info noselect">Work</span></div>
-                        <input value="" type="text" readonly="readonly" class="timeString update_data_tile update_intervall_data_work">
-                    </div>
-                    <div class="update_data_block">
-                        <div class="update_data_tile_info_container"><span class="update_data_tile_info noselect">Rest</span></div>
-                        <input value="" type="text" readonly="readonly" class="timeString update_data_tile update_intervall_data_rest">
-                    </div>
+                    <div class="update_intervallList_container"></div>
                 </div>
 
                 <div class="update_reminder_container">
@@ -853,7 +870,7 @@
                 <span class="session_remaining_cycle"></span>
                 <button class="session_continue_btn">Continue</button>
                 <div class="session_intervall_btn_container">
-                    <button class="selection_round_btn session_workout_next_btn session_intervall_skip"><img src="./resources/imgs/next.svg" alt="" class="session_workout_next_icon"></button>
+                    <button class="selection_round_btn session_intervall_next_btn"><img src="./resources/imgs/next.svg" alt="" class="session_intervall_next_icon"></button>
                     <button class="selection_round_btn session_play_pause_btn"><img src="./resources/imgs/pause.svg" draggable=False alt="" class="selection_icon_play_pause"></button>
                 </div>
             </div>
@@ -869,6 +886,10 @@
                 </div>
 
                 <div class="session_workout_extraTimer_container noselect">
+                    <diV class="session_workout_tiret_hitBox">
+                        <div class="session_workout_tiret"></div>
+                    </diV>
+                    
                     <div class="session_workout_Xtimer_container">
                         <span class="session_workout_Xtimer Xtimer">1:00</span>
                         <div class="session_workout_Xtimer_container_sdrow">
@@ -876,10 +897,6 @@
                             <div class="session_workout_plus">+</div>
                         </div>
                     </div>
-
-                    <diV class="session_workout_tiret_hitBox">
-                        <div class="session_workout_tiret"></div>
-                    </diV>
                 </div>
                 
                 <div class="session_body">

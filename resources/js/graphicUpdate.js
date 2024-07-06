@@ -83,6 +83,9 @@ function update_pageReset(){
 
     $('.history_toggle').css('display', "none");
     $(".update_history_count").css('display', 'none');
+
+    $('.update_tile_link').css('display', 'none')
+    $('.linkNcreateSeparator').css('display', 'none')
 };
 
 function update_pageFormat(from){
@@ -101,6 +104,7 @@ function update_pageFormat(from){
         $(".update_btn").text(textAssets[language]["updatePage"]["update"]);
     }else if(from == "editIN"){
         $(".update_intervall_container").css("display", "flex");
+        $(".update_workout_button_container, .update_workout_add, .update_workout_pause").css("display", "flex");
 
         $(".update_btn").css("background-color", "#1799d3");
         $(".update_btn").text(textAssets[language]["updatePage"]["update"]);
@@ -119,6 +123,12 @@ function update_pageFormat(from){
         $(".update_workout_container").css("display", "flex");
         $(".update_tile_overHeader, .update_workout_button_container, .update_workout_add, .update_workout_pause").css("display", "flex");
         $('.update_tile_header').css('border-radius', '0px 0px 10px 10px');
+        
+        if($(".update_workoutList_container").find('.update_workout_item').length + $(".update_workoutList_container").find('.update_exercise_pause_item').length > 1){
+            $(".update_workoutList_container").find(".update_workout_item_cross_container").css("display", "flex");
+        }else{
+            $(".update_workoutList_container").find(".update_workout_item_cross_container").css("display", "none");
+        };
 
         $(".update_btn").css("background-color", green);
         $(".update_btn").text(textAssets[language]["updatePage"]["create"]);
@@ -126,12 +136,20 @@ function update_pageFormat(from){
         $('.update_mode_intervall').css("background-color", "#262837");
         $('.update_mode_workout').css("background-color", "#34374b");
 
+        $(".update_workout_button_container, .update_workout_add, .update_workout_pause").css("display", "flex");
+
         closePanel("addContainer");
         canNowClick("allowed");
 
         $(".update_intervall_container").css("display", "flex");
         $(".update_tile_overHeader").css("display", "flex");
         $('.update_tile_header').css('border-radius', '0px 0px 10px 10px');
+
+        if($(".update_intervallList_container").find('.update_workout_item').length + $(".update_intervallList_container").find('.update_exercise_pause_item').length > 1){
+            $(".update_intervallList_container").find(".update_workout_item_cross_container").css("display", "flex");
+        }else{
+            $(".update_intervallList_container").find(".update_workout_item_cross_container").css("display", "none");
+        };
 
         $(".update_btn").css("background-color", green);
         $(".update_btn").text(textAssets[language]["updatePage"]["create"]);
@@ -181,6 +199,24 @@ function update_pageFormat(from){
 
         $(".update_btn_container").css("display", "none");
         $(".update_history_container").css("display", "flex");
+    }else if(from == "intCREATION"){
+        $('.update_tile_link').css('display', 'flex');
+        $(".update_intervall_container").css("display", "flex");
+        $(".update_workout_button_container, .update_workout_add, .update_workout_pause").css("display", "flex");
+
+        $('.linkNcreateSeparator').css('display', 'inline-block');
+        
+        $(".update_btn").css("backgroundColor", green);
+        $(".update_btn").text(textAssets[language]["updatePage"]["create"]);
+    }else if(from == "intUPDATE"){
+        $('.update_tile_link').css('display', 'flex');
+        $(".update_intervall_container").css("display", "flex");
+        $(".update_workout_button_container, .update_workout_add, .update_workout_pause").css("display", "flex");
+
+        $('.linkNcreateSeparator').css('display', 'inline-block');
+        
+        $(".update_btn").css("background-color", "#1799d3");
+        $(".update_btn").text(textAssets[language]["updatePage"]["update"]);
     };
 };
 

@@ -16,7 +16,15 @@ $(document).ready(function(){
 
     $(document).on("keypress", function(e){
         if(e.which == 122){rescheduler()};
-        if(e.which === 97 && ongoing){isIdle = !isIdle};
+        if(e.which === 97 && ongoing){
+            if(isIdle){
+                resumeApp();
+                isIdle = false;
+            }else{
+                isIdle = true
+                pauseApp();
+            };
+        };
         if(ongoing == "workout"){
             if(!notesInp){
                 if(e.which === 32){

@@ -141,9 +141,14 @@ function findDifferentCharacter(str1, str2) {
     return false;
 };
 
-function isNaI(string){
-    return !/^\d+$/.test(string);
-};
+function isNaI(input) {
+    if (typeof input === 'number') {
+        input = input.toString();
+    } else if (typeof input !== 'string') {
+        return true;
+    }
+    return !/^-?\d+$/.test(input);
+}
 
 function smoothScroll(item, speed, offset){
     function getFirstScrollableParent(element) {
@@ -201,14 +206,34 @@ function update_timer(item, ref, i){
 
 function get_session_time(session, uniFix=false){
     if(session[0] == "I"){
-        return (session[4] * (time_unstring(session[2]) + time_unstring(session[3])) - time_unstring(session[3]) + 5);
+        let total = 5;
+
+        for(let i=0;i<session[2].length;i++){
+            if(session[2][i][0] == "Int."){
+                total += session[2][i][2] * (time_unstring(session[2][i][3]) + time_unstring(session[2][i][4])) - time_unstring(session[2][i][4]);
+            }else if(session[2][i][0] == "Pause"){
+                total += time_unstring(session[2][i][1]);
+            };
+        };
+
+        return total;
     }else if(session[0] == "W"){
 
         let total = 0;
 
         for(let i=0;i<session[2].length;i++){
             if(session[2][i][0] == "Int."){
-                total += session[2][i][4] * (time_unstring(session[2][i][2]) + time_unstring(session[2][i][3])) - time_unstring(session[2][i][3]) + 5;
+                if(isIntervallLinked(session[2][i])){ // IS LINKED
+                    total += get_session_time(session_list[getSessionIndexByID(session_list, session[2][i][1])]);
+                }else{ // IS CREATED
+                    for(let z=0;z<session[2][i][2].length;z++){
+                        if(session[2][i][2][z][0] == "Int."){
+                            total += session[2][i][2][z][2] * (time_unstring(session[2][i][2][z][3]) + time_unstring(session[2][i][2][z][4])) - time_unstring(session[2][i][2][z][4]);
+                        }else if(session[2][i][2][z][0] == "Pause"){
+                            total += time_unstring(session[2][i][2][z][1]);
+                        };
+                    };
+                };
             }else if(session[2][i][0] == "Bi."){
                 if(session[2][i][1].includes("Alt.")){
                     total += session[2][i][2] * (time_unstring(session[2][i][3])*4.2 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
@@ -230,14 +255,48 @@ function get_session_time(session, uniFix=false){
     };
 };
 
+function get_session_exoCount(session){
+    let nb_exo = 0;
+
+    for(let i=0;i<session[2].length;i++){
+        if(session[0] == "I"){
+            if(session[2][i][0] == "Int."){
+                nb_exo += 1;
+            };
+        }else if(session[0] == "W"){
+            if(session[2][i][0] == "Int."){
+                if(isIntervallLinked(session[2][i])){
+                    nb_exo += session_list[getSessionIndexByID(session_list, session[2][i][1])][2].filter(el => el[0] == "Int.").length;
+                }else{
+                    nb_exo += session[2][i].filter(el => el[0] == "Int.").length;
+                };
+            }else if(session[2][i][0] != "Pause" && session[2][i][0] != "Wrm."){
+                nb_exo += 1;
+            };
+        };
+
+    };
+
+    return nb_exo;
+};
+
+function refresh_session_tile(){
+    let data = $('.selection_session_tile');
+
+    session_list.forEach((session, index) => {
+        $(data[index]).find('.selection_session_totaltime').text(get_time(get_session_time(session)));
+        $(data[index]).find('.selection_session_cycle').text(get_session_exoCount(session) + " Exercises");
+    });
+};
+
 function get_session_stats(session){
-    console.log(session)
     let [workedTime, weightLifted, repsDone] = [0, 0, 0, 0];
 
     let type = false;
     let item = false;
     let reps = false;
     let roundedWeight = false;
+    let exoList = false;
     
     for(let i=0;i<session[2].length;i++){
         
@@ -245,9 +304,22 @@ function get_session_stats(session){
         item = session[2][i];
         
         if(type == "Pause"){continue};
+
         if(type == "Int."){
-            repsDone += parseInt(item[4]) * (time_unstring(item[2]) / 2.1);
-            workedTime += parseInt(item[4]) * time_unstring(item[2]);
+
+            if(isIntervallLinked(session[2][i])){
+                exoList = session_list[getSessionIndexByID(session_list, session[2][i][1])][2];
+            }else{
+                exoList = item[2];
+            };
+
+            for(let z=0;z<exoList.length;z++){
+                if(exoList[z][0] == "Int."){
+                    repsDone += parseInt(exoList[z][2]) * (time_unstring(exoList[z][3]) / 2.1);
+                    workedTime += parseInt(exoList[z][2]) * time_unstring(exoList[z][3])
+                };
+            };
+
         }else if(type == "Bi."){
             roundedWeight = unitRound(item[4]);
             reps = parseInt(item[2]) * parseInt(item[3]);
@@ -339,7 +411,15 @@ function isHistoryDayEmpty(historyDay){
     let count = 0;
 
     for(let z=0; z<historyDay[2].length; z++){
-        count += historyDay[2][z][2].length;
+        if(historyDay[2][z].length == 2){
+            historyDay[2][z][1].forEach(intExo => {
+                if(intExo.length == 3){
+                    count += intExo[2].reduce((acc, arr) => acc + arr.length, 0)
+                };
+            });
+        }else{
+            count += historyDay[2][z][2].length;
+        };
     };
 
     return count == 0;
@@ -355,9 +435,9 @@ function getLastHistoryDay(history){
     };
 };
 
-function getHistoryIndex(history, name){
+function getHistoryIndex(history, id){
     for(let i=0;i<history[2].length;i++){
-        if(history[2][i][0] == name){
+        if(history[2][i][history[2][i].length - 1] == id){
             return i;
         };
     };
@@ -365,7 +445,78 @@ function getHistoryIndex(history, name){
     return -1;
 };
 
+function smallestAvailableExoId(){
+
+    let idList = [0];
+    
+    $('.update_workoutList_container').find(".update_workout_item").each((index, item) => {
+        if($(item).attr('id') !== undefined){
+            idList.push(parseInt($(item).attr('id')));
+        };
+    });
+
+    let max = Math.max(...idList);
+
+    for(let i=1; i<max; i++){
+        if(!idList.includes(i)){
+            return i.toString();
+        };
+    };
+
+    return (max + 1).toString();
+};
+
+function getExoIndexById(session, id){
+    let out = false;
+
+    session[2].forEach((item, index) => {
+        if(item[item.length -1] == id.replace(/_(1|2)/g, "")){
+            out = parseInt(index);
+        };
+    });
+
+    return out;
+};
+
+function mergeHistoryExo(history, id){
+    let out = [];
+
+    history[2].forEach((item) => {
+        if(item[item.length -1].replace(/_(1|2)/g, "") == id){
+            out.push(item);
+        };
+    });
+    
+    return [...out[0][2], ...out[1][2]];
+}
+
 // Time
+
+function subtractTime(key){
+    const today = new Date();
+
+    switch (key) {
+        case "7 Days":
+            today.setDate(today.getDate() - 7);
+            break;
+        case "1 Month":
+            today.setMonth(today.getMonth() - 1);
+            break;
+        case "3 Month":
+            today.setMonth(today.getMonth() - 3);
+            break;
+        case "6 Month":
+            today.setMonth(today.getMonth() - 6);
+            break;
+        case "1 Year":
+            today.setFullYear(today.getFullYear() - 1);
+            break;
+        default:
+            throw new Error("Invalid key provided");
+    }
+
+    return today;
+};
 
 function get_time(ref){
 
@@ -418,7 +569,6 @@ function get_time_u(ref, getList=false){
 };
 
 function time_unstring(strr, getList=false){
-
     if(strr == ""){
         if(getList){
             return [0, 0, 0, 0, 0, 0];
@@ -758,6 +908,11 @@ function weightUnitgroup(val, unit){
     };
 };
 
+function roundToNearestHalf(num) {
+    return Math.round(num * 2) / 2;
+};
+  
+
 // Language
 
 function changeLanguage(lang, first=false){
@@ -849,6 +1004,9 @@ function changeLanguage(lang, first=false){
 
     $(".selection_add_option_session").text(textAssets[lang]["updatePage"]["itemTypeChoices"]["session"]);
     $(".selection_add_option_reminder").text(textAssets[lang]["updatePage"]["itemTypeChoices"]["reminder"]);
+    
+    $(".linkNcreateSeparator").text(textAssets[lang]["updatePage"]["or"].toUpperCase());
+    $(".update_linkWith").text(textAssets[lang]["updatePage"]["linkWith"]);
 
     $(".update_name_info").text(textAssets[lang]["updatePage"]["name"]);
     $($(".update_data_tile_info")[0]).text(textAssets[lang]["updatePage"]["cycle"]);
@@ -892,9 +1050,18 @@ function changeLanguage(lang, first=false){
 
     $('.selection_recovery_headerText').text(textAssets[lang]["recovery"]["recovery"]);
     $('.selection_recovery_subText2').text(textAssets[lang]["recovery"]["subText2"]);
+    
+    $($('.selection_recovery_btn')[0]).text(textAssets[lang]["recovery"]["no"]);
+    $($('.selection_recovery_btn')[1]).text(textAssets[lang]["recovery"]["yes"]);
 
-    $($('.selection_recovery_page_btn')[0]).text(textAssets[lang]["recovery"]["no"]);
-    $($('.selection_recovery_page_btn')[1]).text(textAssets[lang]["recovery"]["yes"]);
+    // DeleteHistoryConfirm
+
+    $('.selection_deleteHistoryConfirm_headerText').text(textAssets[lang]["deleteHistoryConfirm"]["confirm"]);
+    $('.selection_deleteHistoryConfirm_subText1').text(textAssets[lang]["deleteHistoryConfirm"]["subText1"]);
+    $('.selection_deleteHistoryConfirm_subText3').text(textAssets[lang]["deleteHistoryConfirm"]["subText2"]);
+
+    $($('.selection_deleteHistoryConfirm_btn')[0]).text(textAssets[lang]["recovery"]["yes"]);
+    $($('.selection_deleteHistoryConfirm_btn')[1]).text(textAssets[lang]["recovery"]["no"]);
 
     // Remaining stats
 
@@ -908,19 +1075,24 @@ function changeLanguage(lang, first=false){
 };
 
 function updateExerciseHTML(prev, next){
+    let htmlString = false
     if(exercisesHTML !== undefined){
-        exercisesHTML = exercisesHTML.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["name"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["name"] + '"');
-        exercisesHTML = exercisesHTML.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["sets"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["sets"] + '"');
-        exercisesHTML = exercisesHTML.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["reps"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["reps"] + '"');
-        exercisesHTML = exercisesHTML.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["rest"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["rest"] + '"');
-        exercisesHTML = exercisesHTML.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["cycle"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["cycle"] + '"');
-        exercisesHTML = exercisesHTML.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["work"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["work"] + '"');
-        exercisesHTML = exercisesHTML.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["rest"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["rest"] + '"');
-        exercisesHTML = exercisesHTML.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["hint"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["hint"] + '"');
-        exercisesHTML = exercisesHTML.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Bi."], textAssets[next]["updatePage"]["exerciseTypes"]["Bi."]);
-        exercisesHTML = exercisesHTML.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Uni."], textAssets[next]["updatePage"]["exerciseTypes"]["Uni."]);
-        exercisesHTML = exercisesHTML.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Int."], textAssets[next]["updatePage"]["exerciseTypes"]["Int."]);
-        exercisesHTML = exercisesHTML.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Wrm."], textAssets[next]["updatePage"]["exerciseTypes"]["Wrm."]);
+        htmlString = $(exercisesHTML).html();
+
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["name"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["name"] + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["sets"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["sets"] + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["reps"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["reps"] + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["rest"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["rest"] + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["cycle"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["cycle"] + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["work"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["work"] + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["rest"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["rest"] + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["hint"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["hint"] + '"');
+        htmlString = htmlString.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Bi."], textAssets[next]["updatePage"]["exerciseTypes"]["Bi."]);
+        htmlString = htmlString.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Uni."], textAssets[next]["updatePage"]["exerciseTypes"]["Uni."]);
+        htmlString = htmlString.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Int."], textAssets[next]["updatePage"]["exerciseTypes"]["Int."]);
+        htmlString = htmlString.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Wrm."], textAssets[next]["updatePage"]["exerciseTypes"]["Wrm."]);
+    
+        exercisesHTML = $(htmlString);
     };
 };
 

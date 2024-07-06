@@ -48,12 +48,12 @@
     z-index: 998;
     position: relative;
 
-    width: calc(260px - 40px);
+    width: calc(260px);
 
     gap: 15px;
  
     background-color: #262837;
-    padding: 50px 20px 45px 20px;
+    padding: 20px 0 45px 0;
 
     border-radius: 10px;
 }
@@ -128,10 +128,105 @@
     gap: 35px;
 }
 
-.selection_sessionFinished_textContainer{
+.suggestedChanges{
+    gap: 20px;
+    justify-content: unset;
+    height: unset;
+}
+
+.selection_sessionFinished_Title{
+    font-size: 23px;
+    font-weight: 500;
+}
+
+.selection_sessionFinished_suggestedBody{
     display: flex;
     flex-direction: column;
 
+    align-items: center;
+
+    gap: 15px;
+
+    width: calc(100% - 40px);
+    max-height: 145px;
+
+    border-radius: 8px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.selection_sessionFinished_suggestedBody::-webkit-scrollbar{
+    display: none;
+}
+
+.selection_sessionFinished_suggested_optGroup{
+    display: flex;
+
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+
+    width: calc(100% - 30px);
+    padding: 15px;
+
+    background-color: #34394C;
+    border-radius: 8px;
+}
+
+.selection_sessionFinished_suggested_optGroupTitle{
+    font-size: 18px;
+    font-weight: 500;
+
+    margin-bottom: 5px;
+}
+
+.selection_sessionFinished_suggested_optItem{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    cursor: pointer;
+}
+
+.selection_sessionFinished_suggested_optText{
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.selection_sessionFinished_suggested_optCheck{
+    width: 15px;
+    height: 17px;
+
+    cursor: pointer;
+}
+
+.selection_sessionFinished_suggestedBtn{
+    position: absolute;
+
+    bottom: 5px;
+
+    width: calc(100% - 40px);
+    height: 28px;
+    
+    background-color: #1799d3;
+    border-color: transparent;
+
+    font-size: 15px;
+    
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+
+.selection_sessionFinished_textContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
 
     gap: 10px;
@@ -150,7 +245,7 @@
     overflow: unset;
     
     font-size: 15px;
-    width: 100%;
+    width: 90%;
 }
 
 .selection_sessionFinished_subTextPart, .failedSubText{
@@ -183,6 +278,7 @@
 
 .selection_sessionFinished_img{
     width: 100px;
+    margin-top: 30px;
 }
 
 .selection_empty_msg{
@@ -607,7 +703,7 @@
     transform: rotate(90deg);
 }
 
-.selection_recovery_page{
+.selection_recovery_page, .selection_deleteHistoryConfirm_page{
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -628,7 +724,7 @@
     display: none;
 }
 
-.selection_recovery_subText{
+.selection_recovery_subText, .selection_deleteHistoryConfirm_subText{
     font-size: 19px;
     font-weight: 500;
 
@@ -637,14 +733,14 @@
 
 }
 
-.selection_recovery_subText1{
+.selection_recovery_subText1, .selection_deleteHistoryConfirm_subText2{
     opacity: 1;
 
     font-size: 19px;
     font-weight: 500;
 }
 
-.selection_recovery_page_btnContainer{    
+.selection_recovery_btnContainer, .selection_deleteHistoryConfirm_btnContainer{    
     display: flex;
     flex-direction: row;
     gap: 15px;
@@ -653,7 +749,7 @@
     margin-top: 10px;
 }
 
-.selection_recovery_page_btn{
+.selection_recovery_btn, .selection_deleteHistoryConfirm_btn{
     width: 85px;
     height: 35px;
 
@@ -669,12 +765,12 @@
     cursor: pointer;
 }
 
-.selection_recovery_page_btn_y{
+.selection_recovery_btn_y, .selection_deleteHistoryConfirm_btn_n{
     background-color: #FFFFFF;
     color: black;
 }
 
-.selection_recovery_page_btn_n{
+.selection_recovery_btn_n, .selection_deleteHistoryConfirm_btn_y{
     background-color: hsl(240, 21%, 35%);
 }
 

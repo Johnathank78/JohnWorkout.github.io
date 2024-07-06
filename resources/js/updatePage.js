@@ -7,10 +7,11 @@ var historyDOM = false;
 var selected_mode = "W";
 var add_mode_save = "W";
 var add_name_save = "";
-var add_cycle_save = "";
-var add_work_save = "";
-var add_rest_save = "";
 var add_reminder_body_save = "";
+
+var currentIntervallItem = false;
+var previousPage = false;
+var creationNameSAV = false;
 
 var dayInd = 0;
 var exoInd = 0;
@@ -27,11 +28,8 @@ function leave_update(){
         });
 
         if(reminderOrSession == "session"){
-            add_cycle_save = $(".update_intervall_data_cycle").val();
-            add_work_save = $(".update_intervall_data_work").val();
-            add_rest_save = $(".update_intervall_data_rest").val();
-
-            exercisesHTML = $(".update_exercice_container").html();
+            intervallHTML = $(".update_intervallList_container").html();
+            exercisesHTML = $(".update_workoutList_container").html();
         }else{
             add_reminder_body_save = $(".udpate_reminder_body_txtarea").val();
         };
@@ -49,48 +47,20 @@ function leave_update(){
 };
 
 function deleteHistory(){
-    if(deleteAfter == "For ever"){return};
+    if(deleteAfter === "For ever"){return};
 
-    for (let sessionIndex = 0; sessionIndex < session_list.length; sessionIndex++) {
+    const deleteAfterDate = subtractTime(deleteAfter).getTime();
+
+    for(let sessionIndex = 0; sessionIndex < session_list.length; sessionIndex++){
         let session = session_list[sessionIndex];
-        let deleteAfterTime = false;
-
-        switch(deleteAfter){
-            case "7 Days":;
-                deleteAfterTime = time_unstring("7"+textAssets[language]["misc"]["dayAbbrTimeString"]) * 1000;
-                break;
-
-            case "1 Month":;
-                deleteAfterTime = time_unstring("4w") * 1000;
-                break;
-
-            case "3 Month":;
-                deleteAfterTime = time_unstring("12w") * 1000;
-                break;
-
-            case "6 Month":;
-                deleteAfterTime = time_unstring("24w") * 1000;
-                break;
-
-            case "1 Year":;
-                deleteAfterTime = time_unstring("1"+textAssets[language]["misc"]["yearAbbrTimeString"]) * 1000;
-                break;
-
-            default:;
-                break;
-        };
 
         let currentHistory = getSessionHistory(session);
-
         let filteredHistory = [currentHistory[0]];
-        let splitted = false; let timeStamp = false;
 
-        let todayTimeStamp = zeroAM(new Date()).getTime();
+        for(let i = 1; i < currentHistory.length; i++){
+            let timeStamp = currentHistory[i][0];
 
-        for (let i = 1; i < currentHistory.length; i++){
-            timeStamp = currentHistory[i][0];
-
-            if(todayTimeStamp - timeStamp < deleteAfterTime){
+            if(timeStamp > deleteAfterDate){
                 filteredHistory.push(currentHistory[i]);
             };
         };
@@ -99,6 +69,38 @@ function deleteHistory(){
             session[session.length - 3] = filteredHistory;
         }else{
             session[session.length - 2] = filteredHistory;
+        };
+    };
+};
+
+function leaveIntervallEdit(){
+    $(".update_name_info").text(textAssets[language]["updatePage"]["name"]);
+    $(".update_data_name").val(creationNameSAV);
+
+    update_pageReset();
+    update_pageFormat(previousPage == "edit" ? "editWO" : "addWO");
+
+    current_page = previousPage;
+}
+
+function manageIntervallRestInputVisibility(elem){
+    let item = $(elem).parent().parent().find('.update_workout_intervall_data_rest').parent();
+    let visibility = $(item).css('display') == "block";
+    let val = false;
+
+    if(!isNaI($(elem).val())){
+        val = parseInt($(elem).val());
+        
+        if(val > 1 && !visibility){
+            if($(item).find(".update_workout_intervall_data_rest").val() == "0s"){
+                $(item).find(".update_workout_intervall_data_rest").val("")
+            };
+            $(item).css('display', 'block');
+        }else if(val <= 1 && visibility){
+            if($(item).find(".update_workout_intervall_data_rest").val() == ""){
+                $(item).find(".update_workout_intervall_data_rest").val("0s")
+            };
+            $(item).css('display', 'none');
         };
     };
 };
@@ -156,40 +158,38 @@ $(document).ready(function(){
 
         update_pageReset();
         update_pageFormat("addIN");
-        return;
-
-        $(".update_tile").animate({
-            height: "137px",
-        },{
-            duration : 200
-        });
     });
 
     $(".update_workout_add").on("click", function(){
-        let speed = parseInt(($(".update_exercice_container").prop('scrollHeight') - $(".update_exercice_container").scrollTop()))/1410*700;
+        let classs = selected_mode == 'I' || current_page == "intervallEdit" ? '.update_intervallList_container' : '.update_workoutList_container';
+        let tile = selected_mode == 'I' || current_page == "intervallEdit" ? Iintervall_tile() : exercise_tile();
+        let speed = parseInt(($(classs).prop('scrollHeight') - $(classs).scrollTop()))/1410*700;
 
-        $(".update_exercice_container").animateFullScrollDown(speed, () => {
-            $(".update_exercice_container").animateAppend(exercise_tile(), 101, -70, 350, true);
+        $(classs).animateFullScrollDown(speed, () => {
+            $(classs).animateAppend(tile, 101, -70, 350, true);
 
             let scrollInterval = setInterval(() => {
-                $(".update_exercice_container").scrollTop($(".update_exercice_container").prop('scrollHeight'));
+                $(classs).scrollTop($(classs).prop('scrollHeight'));
             }, 1);
 
             setTimeout(() => {
                 clearInterval(scrollInterval);
+                $(classs).css("display", "flex");
                 $(".update_workout_item_cross_container").css("display", "flex");
             }, 350);
         });
+
     });
 
     $(".update_workout_pause").on("click", function(){
-        let speed = parseInt(($(".update_exercice_container").prop('scrollHeight') - $(".update_exercice_container").scrollTop()))/1410*700;
+        let classs = selected_mode == 'I' || current_page == "intervallEdit" ? '.update_intervallList_container' : '.update_workoutList_container';
+        let speed = parseInt(($(".update_workoutList_container").prop('scrollHeight') - $(".update_workoutList_container").scrollTop()))/1410*700;
 
-        $(".update_exercice_container").animateFullScrollDown(speed, () => {
-            $(".update_exercice_container").animateAppend(pause_tile(), 50, -55, 350, false);
+        $(classs).animateFullScrollDown(speed, () => {
+            $(classs).animateAppend(pause_tile(), 50, -55, 350, false);
 
             let scrollInterval = setInterval(() => {
-                $(".update_exercice_container").scrollTop($(".update_exercice_container").prop('scrollHeight'));
+                $(classs).scrollTop($(classs).prop('scrollHeight'));
             }, 1);
 
             setTimeout(() => {
@@ -200,9 +200,11 @@ $(document).ready(function(){
     });
 
     $(document).on("click", ".update_workout_item_cross_container",function(){
-        if($(".update_workout_item_cross_container").length > 1){
-            if($(".update_workout_item_cross_container").length == 2){
-                $(".update_workout_item_cross_container").css("display", "none");
+        let classs = selected_mode == 'I' || current_page == "intervallEdit" ? '.update_intervallList_container' : '.update_workoutList_container';
+
+        if($(classs).find(".update_workout_item_cross_container").length > 1){
+            if($(classs).find(".update_workout_item_cross_container").length == 2){
+                $(classs).find(".update_workout_item_cross_container").css("display", "none");
                 $(this.closest(".update_workout_item")).animateRemove(-70, 350);
                 $(this.closest(".update_exercise_pause_item")).animateRemove(-55, 350);
             }else{
@@ -214,20 +216,127 @@ $(document).ready(function(){
 
     $(document).on("change", ".update_workout_data_type", function(){
         if($(this).val() == textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]){
+            $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
+            $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_data_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_intervall_data_container").css("display", "none");
         }else if($(this).val() == textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]){
+            $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
+            $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_data_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_intervall_data_container").css("display", "none");
         }else if($(this).val() == textAssets[language]["updatePage"]["exerciseTypes"]["Int."]){
-            $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "flex");
-            $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_data_container").css("display", "none");
-            $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_intervall_data_container").css("display", "flex");
+            $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "flex");
+            $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "none");
+            $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "none");
         }else if($(this).val() == textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]){
+            $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
+            $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "none");
         };
+    });
+
+    $(document).on("click", '.update_workout_intervallEdit_container', function(){
+        $(".update_name_info").text(textAssets[language]["updatePage"]["create"]);
+        
+        previousPage = current_page;
+        current_page = "intervallEdit";
+
+        currentIntervallItem = $(this).closest('.update_workout_item');
+        creationNameSAV = $(".update_data_name").val();
+
+        update_pageReset();
+        
+        let optString = '<option value="[idVAL]">[sessionVAL]</option>';
+        let disabled = false;
+
+        $('.update_intervallLink').children().remove();
+        $('.update_intervallList_container').html("");
+        
+        if(session_list.filter(session => session[0] == "I").length > 0){
+            $('.update_intervallLink').prop('disabled', false);
+
+            session_list.forEach(session => {
+                if(session[0] == 'I'){
+                    $('.update_intervallLink').append($(optString.replace('[idVAL]', session[session.length - 1]).replace('[sessionVAL]', session[1])))
+                };
+            });
+        }else{
+            disabled = true;
+
+            $('.update_intervallLink').prop('disabled', true);
+            $('.update_linkBtn').css({
+                backgroundColor: '#34394C',
+                opacity: .4
+            });
+
+            $('.update_intervallLink').append($(optString.replace('[idVAL]', "999").replace('[sessionVAL]', 'No Intervall session registered')))
+        };
+
+        let elementData = $(currentIntervallItem).data('data');
+
+        if(elementData){
+            if(isIntervallLinked(elementData)){
+                $('.update_linkBtn').css({
+                    backgroundColor: green,
+                    opacity: 1
+                });
+
+                $('.update_intervallLink option[value="'+elementData[1]+'"]').prop('selected', true);
+
+                $(".update_data_name").val("");
+                $('.update_intervallList_container').append(Iintervall_tile());
+                update_pageFormat('intCREATION');
+            }else{
+                if(!disabled){
+                    $('.update_linkBtn').css({
+                        backgroundColor: '#34394C',
+                        opacity: 1
+                    });
+                };
+
+                $(".update_intervallList_container").html("");
+                $(".update_data_name").val(elementData[1]);
+                
+                for(let i=0;i<elementData[2].length;i++){
+                    if(elementData[2][i][0] == "Int."){
+                        if(elementData[2][i].length == 6){
+                            $(".update_intervallList_container").append(Iintervall_tile([elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], elementData[2][i][5]]));
+                            showHint(".update_intervallList_container");
+                        }else{
+                            $(".update_intervallList_container").append(Iintervall_tile([elementData[2][i][1], elementData[2][i][2], elementData[2][i][3], elementData[2][i][4], ""]));
+                        };
+
+                        manageIntervallRestInputVisibility($(".update_intervallList_container").children().last().find('.update_workout_intervall_data_cycle'));
+                    }else if(elementData[2][i][0] == "Pause"){
+                        $(".update_intervallList_container").append(pause_tile(elementData[2][i][1]));
+                    }
+                };
+                
+                update_pageFormat('intUPDATE');
+            };
+            
+            $(".update_intervallList_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
+        }else{
+            $(".update_data_name").val("");
+            $('.update_intervallList_container').append(Iintervall_tile());
+            $(".update_intervallList_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
+            update_pageFormat('intCREATION');
+        };
+    });
+
+    $(".update_linkBtn").on("click", async function(){
+        if(session_list.filter(session => session[0] == "I").length == 0){return};
+
+        let session = session_list[getSessionIndexByID(session_list, $('.update_intervallLink').val())];
+        let data = ["Int.", session[session.length - 1]];
+
+        $(currentIntervallItem).data('data', data);
+        $(currentIntervallItem).find('.update_workout_intervallName').text(session[1]);
+
+        leaveIntervallEdit();
     });
 
     $(".update_schedule_bin").on("click", async function(){
@@ -275,10 +384,11 @@ $(document).ready(function(){
 
     });
 
-    // HISTORY;
+    $(document).on('input change', '.update_workout_intervall_data_cycle', function(){manageIntervallRestInputVisibility(this)});
+
+    // HISTORY
 
     $(document).on("click", ".update_history_container_day", function(e){
-
         let state = $(this).find('.update_history_container_exercise').length > 0;
         if(!state){smoothScroll($(this), 300, -5)};
 
@@ -324,7 +434,11 @@ $(document).ready(function(){
                 };
 
                 for(let z=2; z<historyDOM[dayInd][1][exoInd].length;z++){
-                    $(exo).animateAppend($($(historyDOM[dayInd][1][exoInd])[z]), 38, -15, 400, true);
+                    if($(exo).find('.udpate_history_workTitle').length > 0){
+                        $(exo).animateAppend($($(historyDOM[dayInd][1][exoInd])[z]), 25, -15, 400, true);
+                    }else{
+                        $(exo).animateAppend($($(historyDOM[dayInd][1][exoInd])[z]), 38, -15, 400, true);
+                    };
                 };
 
             };
@@ -383,8 +497,8 @@ $(document).ready(function(){
         workedTime += reps*2.1;
     });
 
-    // UPDATE;
-
+    // UPDATE
+    
     $(document).on("click", ".update_btn", async function(e){
         if(current_page == "edit"){
 
@@ -397,19 +511,42 @@ $(document).ready(function(){
                 beforeUpdateHash = SHA256(session_list[update_current_index].toString());
 
                 if(session_list[update_current_index][0] == "I"){
-                    let new_cycle = $(".update_intervall_data_cycle").val();
-                    let new_work = $(".update_intervall_data_work").val();
-                    let new_rest = $(".update_intervall_data_rest").val();
+                    let ex_name = false;
+                    let cycle = false;
+                    let work = false;
+                    let rest = false;
+                    let hint = false;
+                    let type = false;
 
-                    let error = iserror(new_name, new_cycle, new_work, new_rest, 0);
+                    let error = iserror_int(new_name, 0);
 
                     if(!error){
                         let nameSav = session_list[update_current_index][1];
-
+                        
                         session_list[update_current_index][1] = new_name;
-                        session_list[update_current_index][2] = get_time_u(new_work);
-                        session_list[update_current_index][3] = get_time_u(new_rest);
-                        session_list[update_current_index][4] = new_cycle;
+                        session_list[update_current_index][2] = new Array();
+                        exercises = $(".update_intervallList_container").children();
+
+                        for(let i=0;i<exercises.length;i++){
+                            type = getContractedType($(exercises[i]).find(".update_workout_data_type").val());
+
+                            if(type == "Int."){
+                                ex_name = $(exercises[i]).find(".update_workout_data_name").val().format();
+                                cycle = $(exercises[i]).find(".update_workout_intervall_data_cycle").val();
+                                work = $(exercises[i]).find(".update_workout_intervall_data_work").val();
+                                rest = $(exercises[i]).find(".update_workout_intervall_data_rest").val();
+                                hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
+                                
+                                if(hint == ""){ 
+                                    session_list[update_current_index][2].push([type, ex_name, parseInt(cycle), work, rest]);
+                                }else{
+                                    session_list[update_current_index][2].push([type, ex_name, parseInt(cycle), work, rest, hint]);
+                                };
+                            }else if(type == "Pause"){
+                                rest = $(exercises[i]).find(".update_workout_data_pausetime").val();
+                                session_list[update_current_index][2].push([type, rest]);
+                            };
+                        };
 
                         if(isScheduled(session_list[update_current_index])){
                             let id = await getPendingId(session_list[update_current_index][session_list[update_current_index].length - 1], getScheduleScheme(session_list[update_current_index]));
@@ -423,7 +560,8 @@ $(document).ready(function(){
                             calendar_read(session_list);
                         };
 
-                        $(update_current_item).html($(session_tile(["I", new_name, get_time_u(new_work), get_time_u(new_rest), new_cycle])).html());
+                        $(update_current_item).html($(session_tile(session_list[update_current_index])).html());
+                        refresh_session_tile();
                         session_save(session_list);
 
                         $(".selection_info").css("display", "block");
@@ -445,8 +583,6 @@ $(document).ready(function(){
                     let reps = false;
                     let weight = false;
                     let rest = false;
-                    let work = false;
-                    let cycle = false;
                     let hint = false;
 
                     if(!error){
@@ -455,24 +591,19 @@ $(document).ready(function(){
                         let nameSav = session_list[update_current_index][1];
                         session_list[update_current_index][1] = new_name;
                         session_list[update_current_index][2] = new Array();
-                        exercises = $(".update_exercice_container").children();
+                        exercises = $(".update_workoutList_container").children();
 
                         for(let i=0;i<exercises.length;i++){
                             type = getContractedType($(exercises[i]).find(".update_workout_data_type").val());
 
                             if(type == "Int."){
-                                ex_name = $(exercises[i]).find(".update_workout_data_name").val().format();
-                                cycle = $(exercises[i]).find(".update_workout_intervall_data_cycle").val();
-                                work = $(exercises[i]).find(".update_workout_intervall_data_work").val();
-                                rest = $(exercises[i]).find(".update_workout_intervall_data_rest").val();
                                 hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
-
+                                
                                 if(hint == ""){
-                                    session_list[update_current_index][2].push([type, ex_name, get_time_u(work), get_time_u(rest), cycle]);
+                                    session_list[update_current_index][2].push([...$(exercises[i]).data('data'), $(exercises[i]).attr('id')]);
                                 }else{
-                                    session_list[update_current_index][2].push([type, ex_name, get_time_u(work), get_time_u(rest), cycle, hint]);
+                                    session_list[update_current_index][2].push([...$(exercises[i]).data('data'), hint, $(exercises[i]).attr('id')]);
                                 };
-
                             }else if(type == "Bi." || type == "Uni."){
                                 ex_name = $(exercises[i]).find(".update_workout_data_name").val().format();
                                 sets = $(exercises[i]).find(".update_workout_data_sets").val();
@@ -482,9 +613,9 @@ $(document).ready(function(){
                                 hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
 
                                 if(hint == ""){
-                                    session_list[update_current_index][2].push([type, ex_name, sets, reps, weight, get_time_u(rest)]);
+                                    session_list[update_current_index][2].push([type, ex_name, sets, reps, weight, get_time_u(rest), $(exercises[i]).attr('id')]);
                                 }else{
-                                    session_list[update_current_index][2].push([type, ex_name, sets, reps, weight, get_time_u(rest), hint]);
+                                    session_list[update_current_index][2].push([type, ex_name, sets, reps, weight, get_time_u(rest), hint, $(exercises[i]).attr('id')]);
                                 };
 
                             }else if(type == "Wrm."){
@@ -492,9 +623,9 @@ $(document).ready(function(){
                                 hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
 
                                 if(hint == ""){
-                                    session_list[update_current_index][2].push([type, ex_name, 0, 0, 0, get_time_u(0)]);
+                                    session_list[update_current_index][2].push([type, ex_name, 0, 0, 0, get_time_u(0), $(exercises[i]).attr('id')]);
                                 }else{
-                                    session_list[update_current_index][2].push([type, ex_name, 0, 0, 0, get_time_u(0), hint]);
+                                    session_list[update_current_index][2].push([type, ex_name, 0, 0, 0, get_time_u(0), hint, $(exercises[i]).attr('id')]);
                                 };
                             }else if(type == "Pause"){
                                 rest = $(exercises[i]).find(".update_workout_data_pausetime").val();
@@ -548,7 +679,6 @@ $(document).ready(function(){
             update_pageReset();
 
             if(beforeUpdateHash != afterUpdateHash){bottomNotification("updated", new_name)};
-
             current_page = "selection";
 
         }else if(current_page == "add"){
@@ -558,20 +688,44 @@ $(document).ready(function(){
                 let newID = smallestAvailableId();
 
                 if(selected_mode == "I"){
-                    let new_cycle = $(".update_intervall_data_cycle").val();
-                    let new_work = $(".update_intervall_data_work").val();
-                    let new_rest = $(".update_intervall_data_rest").val();
+                    let ex_name = false;
+                    let cycle = false;
+                    let work = false;
+                    let rest = false;
+                    let hint = false;
+                    let type = false;
 
-                    let error = iserror(new_name, new_cycle, new_work, new_rest, 0);
+                    let error = iserror_int(new_name, 0);
 
                     if(!error){
                         add_name_save = "";
-                        add_cycle_save = "";
-                        add_work_save = "";
-                        add_rest_save = "";
-                        add_reminder_body_save = "";
+                        intervallHTML = Iintervall_tile();
 
-                        let new_session = ["I", new_name, get_time_u(new_work), get_time_u(new_rest), new_cycle, [["state", 'false', 0]], newID];
+                        new_session = ["I", new_name, [], [["State", "true", 0]], newID];
+                        exercises = $(".update_intervallList_container").children();
+
+                        for(let i=0;i<exercises.length;i++){
+
+                            type = getContractedType($(exercises[i]).find(".update_workout_data_type").val());
+
+                            if(type == "Int."){
+                                ex_name = $(exercises[i]).find(".update_workout_data_name").val().format();
+                                cycle = $(exercises[i]).find(".update_workout_intervall_data_cycle").val();
+                                work = $(exercises[i]).find(".update_workout_intervall_data_work").val();
+                                rest = $(exercises[i]).find(".update_workout_intervall_data_rest").val();
+                                hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
+                                
+                                if(hint == ""){ 
+                                    new_session[2].push([type, ex_name, parseInt(cycle), work, rest]);
+                                }else{
+                                    new_session[2].push([type, ex_name, parseInt(cycle), work, rest, hint]);
+                                };
+                            }else if(type == "Pause"){
+                                rest = $(exercises[i]).find(".update_workout_data_pausetime").val();
+                                session_list[update_current_index][2].push([type, rest]);
+                            };
+                        };
+
                         $(".selection_session_container").append(session_tile(new_session));
                         session_list.push(new_session);
                         
@@ -594,9 +748,7 @@ $(document).ready(function(){
                     let sets = false;
                     let reps = false;
                     let weight = false;
-                    let rest = false;
-                    let work = false;
-                    let cycle = false;
+                    let rest = false;   
                     let pause = false;
                     let hint = false;
 
@@ -604,27 +756,20 @@ $(document).ready(function(){
                         $(".selection_empty_msg").css("display", "none");
 
                         add_name_save = "";
-                        add_cycle_save = "";
-                        add_work_save = "";
-                        add_rest_save = "";
-                        add_reminder_body_save = "";
 
                         new_session = ["W", new_name, [], [["State", "true", 0]], newID];
-                        exercises = $(".update_exercice_container").children();
+                        exercises = $(".update_workoutList_container").children();
 
                         for(let i=0;i<exercises.length;i++){
                             type = getContractedType($(exercises[i]).find(".update_workout_data_type").val());
-                            if(type == "Int."){
-                                ex_name = $(exercises[i]).find(".update_workout_data_name").val().format();
-                                cycle = $(exercises[i]).find(".update_workout_intervall_data_cycle").val();
-                                work = $(exercises[i]).find(".update_workout_intervall_data_work").val();
-                                rest = $(exercises[i]).find(".update_workout_intervall_data_rest").val();
-                                hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
 
+                            if(type == "Int."){
+                                hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
+                                
                                 if(hint == ""){
-                                    new_session[2].push([type, ex_name, get_time_u(work), get_time_u(rest), cycle]);
+                                    new_session[2].push([...$(exercises[i]).data('data'), $(exercises[i]).attr('id')]);
                                 }else{
-                                    new_session[2].push([type, ex_name, get_time_u(work), get_time_u(rest), cycle, hint]);
+                                    new_session[2].push([...$(exercises[i]).data('data'), hint, $(exercises[i]).attr('id')]);
                                 };
                             }else if(type == "Bi." || type == "Uni."){
                                 ex_name = $(exercises[i]).find(".update_workout_data_name").val().format();
@@ -635,9 +780,9 @@ $(document).ready(function(){
                                 hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
 
                                 if(hint == ""){
-                                    new_session[2].push([type, ex_name, sets, reps, weight, get_time_u(rest)]);
+                                    new_session[2].push([type, ex_name, sets, reps, weight, get_time_u(rest), $(exercises[i]).attr('id')]);
                                 }else{
-                                    new_session[2].push([type, ex_name, sets, reps, weight, get_time_u(rest), hint]);
+                                    new_session[2].push([type, ex_name, sets, reps, weight, get_time_u(rest), hint, $(exercises[i]).attr('id')]);
                                 };
 
                             }else if(type == "Wrm."){
@@ -645,9 +790,9 @@ $(document).ready(function(){
                                 hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
 
                                 if(hint == ""){
-                                    new_session[2].push([type, ex_name, 0, 0, 0, get_time_u(0)]);
+                                    new_session[2].push([type, ex_name, 0, 0, 0, get_time_u(0), $(exercises[i]).attr('id')]);
                                 }else{
-                                    new_session[2].push([type, ex_name, 0, 0, 0, get_time_u(0), hint]);
+                                    new_session[2].push([type, ex_name, 0, 0, 0, get_time_u(0), hint, $(exercises[i]).attr('id')]);
                                 };
                             }else if(type == "Pause"){
                                 pause = $(exercises[i]).find(".update_workout_data_pausetime").val();
@@ -675,10 +820,6 @@ $(document).ready(function(){
                 let error = iserrorReminder(new_name, new_body, 0);
 
                 if(!error){
-                    add_name_save = "";
-                    add_cycle_save = "";
-                    add_work_save = "";
-                    add_rest_save = "";
                     add_reminder_body_save = "";
 
                     let new_session = ["R", new_name, new_body, smallestAvailableId()];
@@ -706,6 +847,29 @@ $(document).ready(function(){
 
                 if(platform == "Mobile"){
                     await removeAllNotifsFromSession(session_list[update_current_index]);
+                };
+                
+                if(session_list[update_current_index][0] == "I"){
+                    let toDelete = [];
+
+                    session_list.forEach((session, index) => {
+                        if(session[0] == "W"){
+                            session[2].forEach((exo, exoInd) => {
+                                if(isIntervallLinked(exo) && exo[1] == id){
+                                    toDelete.push([index, exoInd]);
+                                    if(exoInd > 0 && session[2][exoInd - 1][0] == "Pause"){
+                                        toDelete.push([index, exoInd - 1]);
+                                    };
+                                };
+                            });
+                        };
+                    });
+
+                    toDelete.forEach((data) => {
+                        session_list[data[0]][2] = session_list[data[0]][2].delete(data[1]);
+                    });
+
+                    refresh_session_tile();
                 };
 
                 delete calendar_dict[update_current_item[1]];
@@ -908,6 +1072,49 @@ $(document).ready(function(){
             if(beforeUpdateHash != afterUpdateHash){bottomNotification("scheduled", update_current_item[1])};
 
             current_page = "selection";
+        }else if(current_page == "intervallEdit"){
+            let new_name = $('.update_data_name').val().format();
+            let type = false;
+            let ex_name = false;
+            let cycle = false;
+            let work = false;
+            let rest = false;
+            let hint = false;
+
+            let error = iserror_int(new_name, 1);
+
+            if(!error){
+                let data = ["Int.", new_name, []];
+                let exercises = $('.update_intervallList_container').children();
+                
+                for(let i=0;i<exercises.length;i++){
+                    type = getContractedType($(exercises[i]).find(".update_workout_data_type").val());
+
+                    if(type == "Int."){
+                        ex_name = $(exercises[i]).find(".update_workout_data_name").val().format();
+                        cycle = $(exercises[i]).find(".update_workout_intervall_data_cycle").val();
+                        work = $(exercises[i]).find(".update_workout_intervall_data_work").val();
+                        rest = $(exercises[i]).find(".update_workout_intervall_data_rest").val();
+                        hint = $(exercises[i]).find(".udpate_workout_hint_txtarea").val();
+                        
+                        if(hint == ""){
+                            data[2].push([type, ex_name, parseInt(cycle), work, rest]);
+                        }else{
+                            data[2].push([type, ex_name, parseInt(cycle), work, rest, hint]);
+                        };
+                    }else if(type == "Pause"){
+                        rest = $(exercises[i]).find(".update_workout_data_pausetime").val();
+                        data[2].push([type, rest]);
+                    };
+                };
+    
+                $(currentIntervallItem).data('data', data);
+                $(currentIntervallItem).find('.update_workout_intervallName').text($('.update_data_name').val());
+    
+                leaveIntervallEdit();
+            }else{
+                return;
+            };
         };
 
         manageHomeContainerStyle();
@@ -919,6 +1126,8 @@ $(document).ready(function(){
 
         if(notTargeted(e.target, ".update_page", ".blurBG") && ['edit', 'add', 'schedule', 'history', "delete"].includes(current_page)){
             leave_update();
+        }else if(current_page == "intervallEdit"){
+            leaveIntervallEdit();
         };
 
         canNowClick("allowed");

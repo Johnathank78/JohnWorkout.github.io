@@ -1,88 +1,131 @@
 var cannotClick = false;
 
 function closePanel(src, notAnimated=false){
-    if(src == "calendar"){
-        $(".selection_page_calendar").css("display", 'none');
-        $(".selection_page_calendar_second").css("display", 'none');
-        $(".selection_page_calendar_main").css("display", 'flex');
-        calenderParamsState = false;
-        calendarState = false;
-    }else if(src == "stat"){
-        statOpened = false;
-        $('.selection_info_page').css("display", "none");
-    }else if(src == "parameters"){
-        if(parametersChecknUpdate()){
-            $(".selection_parameters_page").css("display", "none");
+    switch(src){
+        case "calendar":
+            $(".selection_page_calendar").css("display", 'none');
+            $(".selection_page_calendar_second").css("display", 'none');
+            $(".selection_page_calendar_main").css("display", 'flex');
+            calenderParamsState = false;
+            calendarState = false;
+            break;
 
-            $(".selection_parameters").animate(
-                { deg: 0 },
-                {
-                  duration: 250,
-                  step: function(now) {
-                    $(this).css({ transform: 'rotate(' + now + 'deg)' });
-                  }
-                }
-            );
+        case "stat":
+            statOpened = false;
+            $('.selection_info_page').css("display", "none");
+            break;
 
-            rotation_state = false
-        }
-    }else if(src == "addContainer"){
-        $(".selection_add_container").css("display", 'none');
-        add_state = false;
-    }else if(src == "expander"){
-        $(".session_next_exercises_container").css("maxHeight", "calc(19vh - 45px)");
-        BehindExerciseContainer(true);
-        ncState = false;
-    }else if(src == "xin"){
-        isXin = true;
-        if(notAnimated){
-            $('.session_workout_extraTimer_container').css("left", XleftPos);
-            $('.session_workout_Xtimer_container').css("display", 'none');
-        }else{
-            $('.session_workout_extraTimer_container').animate({
-                left: XleftPos,
-            }, 200, function(){
-                $('.session_workout_Xtimer_container').css("display", 'none')
-            });
-        };
-    }else if(src == "historyNotes"){
-        $(".session_workout_historyNotes_container").css("display", "none");
-        $(".session_workout_footer, .session_body, .session_header, .session_workout_extraTimer_container, .selection_info").css("display", "flex");
+        case "parameters":
+            if(parametersChecknUpdate()){
+                $(".selection_parameters_page").css("display", "none");
 
-        notesInp = false;
-    }else if(src == "timeSelector"){
-        timeInputShown = false;
-        $('.blurBG').css('display', 'none');
-        timeSelectorUpdateTarget($(".timeSelectorSubmit").data("target"));
-    }else if(src == "session_cancel"){
-        current_page = "session";
-        window.history.pushState("session", "");
-        $('.blurBG').css('display', 'none');
-    }else if(src == "session_exit"){
-        current_page = "selection";
-        $('.blurBG').css('display', 'none');
-    }else if(src == "hint"){
-        isSetPreviewingHint = false;
-        $('.blurBG').css('display', 'none');
-    }else if(src == "setPreview"){
-        isSetPreviewing = false;
-        $('.blurBG').css('display', 'none');
-    }else if(src == "remaining"){
-        isRemaningPreviewing = false;
-        $('.blurBG').css('display', 'none');
-    }else if(src == "import"){
-        current_page = "selection";
-        if(platform == "Web"){$("#folder").val("")};
-        $('.blurBG').css('display', 'none');
-        canNowClick('allowed')
-    }else if(src == "congrats"){
-        congrats_shown = false;
-        canNowClick();
-        $('.blurBG').css('display', 'none');
-        $('.selection_sessionFinishedBody').scrollLeft(0);
-        $('.selection_sessionFinished_navigator_indicator').css('opacity', '0.5');
-        $($('.selection_sessionFinished_navigator_indicator')[0]).css('opacity', '1');
-    };
+                $(".selection_parameters").animate(
+                    { deg: 0 },
+                    {
+                        duration: 250,
+                        step: function(now){
+                            $(this).css({ transform: 'rotate(' + now + 'deg)' });
+                        }
+                    }
+                );
+
+                rotation_state = false;
+            }
+            break;
+
+        case "addContainer":
+            $(".selection_add_container").css("display", 'none');
+            add_state = false;
+            break;
+
+        case "expander":
+            $(".session_next_exercises_container").css("maxHeight", "calc(19vh - 45px)");
+            BehindExerciseContainer(true);
+            ncState = false;
+            break;
+
+        case "xin":
+            isXin = true;
+            if(notAnimated){
+                $('.session_workout_extraTimer_container').css("left", XleftPos);
+                $('.session_workout_Xtimer_container').css("display", 'none');
+            } else {
+                $('.session_workout_extraTimer_container').animate({
+                    left: XleftPos,
+                }, 200, function(){
+                    $('.session_workout_Xtimer_container').css("display", 'none');
+                });
+            }
+            break;
+
+        case "historyNotes":
+            $(".session_workout_historyNotes_container").css("display", "none");
+            $(".session_workout_footer, .session_body, .session_header, .session_workout_extraTimer_container, .selection_info").css("display", "flex");
+            notesInp = false;
+            break;
+
+        case "timeSelector":
+            timeInputShown = false;
+            $('.blurBG').css('display', 'none');
+            timeSelectorUpdateTarget($(".timeSelectorSubmit").data("target"));
+            break;
+
+        case "session_cancel":
+            current_page = "session";
+            window.history.pushState("session", "");
+            $('.blurBG').css('display', 'none');
+            break;
+
+        case "session_exit":
+            current_page = "selection";
+            $('.blurBG').css('display', 'none');
+            break;
+
+        case "hint":
+            isSetPreviewingHint = false;
+            $('.blurBG').css('display', 'none');
+            break;
+
+        case "setPreview":
+            isSetPreviewing = false;
+            $('.blurBG').css('display', 'none');
+            break;
+
+        case "remaining":
+            isRemaningPreviewing = false;
+            $('.blurBG').css('display', 'none');
+            break;
+
+        case "import":
+            current_page = "selection";
+            if(platform == "Web"){$("#folder").val("")};
+            $('.blurBG').css('display', 'none');
+            canNowClick('allowed');
+            break;
+
+        case "congrats":
+            congrats_shown = false;
+            canNowClick();
+            $('.blurBG').css('display', 'none');
+            $('.selection_sessionFinishedBody').scrollLeft(0);
+            $('.selection_sessionFinished_navigator_indicator').css('opacity', '0.5');
+            $($('.selection_sessionFinished_navigator_indicator')[0]).css('opacity', '1');
+            break;
+
+        case "focus":
+            $('.selection_dayPreview_focus').css('display', 'none');
+            focusShown = false;
+            break;
+
+        case "deleteHistoryConfirm":
+            $('.blurBG').css('display', 'none');
+            deleteHistoryConfirmShown = false;
+            break;
+
+        default:
+            console.warn(`Unknown src: ${src}`);
+            break;
+    }
 };
 
 function isAbleToClick(from){
@@ -126,12 +169,12 @@ function unfocusDivs(e){
         canNowClick();
     };
 
-    if(notTargeted(e.target, ".selection_parameters, .selection_parameters_page") && rotation_state && !timeInputShown) {
+    if(notTargeted(e.target, ".selection_parameters, .selection_parameters_page") && rotation_state && !timeInputShown && !deleteHistoryConfirmShown){
         closePanel("parameters");
         canNowClick();
     };
 
-    if(notTargeted(e.target, ".session_next_exercises_container") && current_page == "session" && ncState && !$(e.target).is($(".blurBG"))){
+    if(notTargeted(e.target, ".session_next_exercises_container, .session_setPreviewBody ") && current_page == "session" && ncState && !$(e.target).is($(".blurBG"))){
         closePanel("expander");
         canNowClick();
     };
@@ -150,19 +193,16 @@ function unfocusDivs(e){
         canNowClick();
     };
 
-    if(notTargeted(e.target, '.selection_page_calendar_previewBox_triangleTip, .selection_page_calendar_previewBox_body, .selection_page_calendar_row_day') && calendarState){
-        $('.selection_page_calendar_previewBox_triangleTip, .selection_page_calendar_previewBox_body').css('display', 'none');
+    if(notTargeted(e.target, ".selection_page_calendar, .main_title_block") && !previewShown  && calendarState){
+        calendarState = false;
 
-        if(notTargeted(e.target, ".selection_page_calendar, .main_title_block") && !previewShown){
-            calendarState = false;
-
-            closePanel("calendar");
-            canNowClick();
-        };
+        closePanel("calendar");
+        canNowClick();
     };
 
     if(notTargeted(e.target, ".selection_dayPreview_page") && previewShown && current_page == "selection"){
         $('.blurBG').css('display', 'none');
+
         previewShown = false;
         canNowClick();
     };
@@ -200,6 +240,11 @@ function unfocusDivs(e){
 
     if(notTargeted(e.target, '.selection_sessionFinished') && congrats_shown){
         closePanel('congrats');
+        canNowClick();
+    };
+
+    if(notTargeted(e.target, '.selection_sessionFinished') && focusShown){
+        closePanel('focus');
         canNowClick();
     };
 };
@@ -254,7 +299,7 @@ $(document).ready(function(){
         cannotClick = "workout_inp";
     });
 
-    $(document).on('contextmenu', '.strictlyNumeric, .strictlyFloatable, .update_schedule_input_hours, .update_schedule_input_minutes, .timeString', function(e) {
+    $(document).on('contextmenu', '.strictlyNumeric, .strictlyFloatable, .update_schedule_input_hours, .update_schedule_input_minutes, .timeString', function(e){
         e.preventDefault();
     });
 
@@ -303,7 +348,7 @@ $(document).ready(function(){
             };
 
             if($(this).is(".strictlyFloatable")){
-                if (!txt.match(/[0-9.]/)) {
+                if(!txt.match(/[0-9.]/)){
                     $(this).val(deleteFromStr(actual_state, pos));
                 };
             };
@@ -325,7 +370,7 @@ $(document).ready(function(){
                     $(this).val(deleteFromStr(actual_state, pos));
                 };
 
-                if (!txt.match(/[0123456789ywdhms]/)) {
+                if(!txt.match(/[0123456789ywdhms]/)){
                     $(this).val(deleteFromStr(actual_state, pos));
                 };
             };
