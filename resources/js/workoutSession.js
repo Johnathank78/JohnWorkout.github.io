@@ -800,64 +800,73 @@ async function next_exercise(first){
     };
 };
 
+function getIntervallSpecs(nextExo){
+    intervallData = JSON.parse($(nextExo).find(".session_next_exercise_intervallData").eq(0).text());
+    
+    let workRest = [0, 0];
+    intervallData.forEach(exo => {
+        if(exo[0] == "Int."){
+            workRest[0] += (exo[2] * time_unstring(exo[3]));
+            workRest[1] += (exo[2] - 1) * time_unstring(exo[4]);
+        }else if(exo[0] == "Pause"){
+            workRest[1] += time_unstring(exo[1]);
+        };
+    });
+
+    if(workRest[1] > 0){
+        return textAssets[language]["inSession"]["next"] + " : " + "\nWork : " + get_time_u(workRest[0]) + "\n" + "Rest : " + get_time_u(workRest[1]);
+    }else{
+        return textAssets[language]["inSession"]["next"] + " : " + "\nWork : " + get_time_u(workRest[0]);
+    };
+};
+
 function update_info_vars(index = 0) {
     let nextExo = $('.session_next_exercise')[index];
     let extype = $(nextExo).find(".session_next_exerciseType").eq(0).text();
 
-    if (extype == "Wrm") {
+    if(extype == "Wrm"){
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
         next_specs = [0, 0];
         next_rest = 0;
         $(".session_current_exercise_specs, .session_current_exercise_specs_before").css('display', 'none');
     }else{
         $(".session_current_exercise_specs").css('display', 'flex');
-    }
+    };
 
-    if (extype == 'Uni') {
+    if (extype == 'Uni'){
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text().split(' - ' + textAssets[language]["misc"]["rightInitial"])[0];
         next_specs = [$(nextExo).find(".session_next_exercise_reps").eq(0).text(), unitRound($(nextExo).find(".session_next_exercise_weight").eq(0).text())];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
 
         LrestTime = next_rest;
         RrestTime = next_rest;
-    } else if (extype == "Bi") {
+    }else if (extype == "Bi"){
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
         next_specs = [$(nextExo).find(".session_next_exercise_reps").eq(0).text(), unitRound($(nextExo).find(".session_next_exercise_weight").eq(0).text())];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
 
         LrestTime = next_rest;
-    } else if (extype == "Int") {
-        intervallData = JSON.parse($(".session_next_exercise_intervallData").eq(0).text());
+    }else if (extype == "Int"){
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
+        next_specs = getIntervallSpecs(nextExo);
+    }else if (extype == "Pause"){
+        let adjacentExo = $('.session_next_exercise').eq(index + 1);
         
-        let workRest = [0, 0];
-        intervallData.forEach(exo => {
-            if(exo[0] == "Int."){
-                workRest[0] += (exo[2] * time_unstring(exo[3]));
-                workRest[1] += (exo[2] - 1) * time_unstring(exo[4]);
-            }else if(exo[0] == "Pause"){
-                workRest[1] += time_unstring(exo[1]);
-            };
-        });
-
-        next_specs = "Work : " + get_time_u(workRest[0]) + "\n" + "Rest : " + get_time_u(workRest[1]);
-    } else if (extype == "Pause") {
         next_name = textAssets[language]["updatePage"]["break"];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
 
         LrestTime = next_rest;
 
-        if($(".session_next_exercise_name").length != 1) {
-            if ($(nextExo).find(".session_next_exercise_type").eq(0).text() == "Int") {
-                let temp = [$(".session_next_exercise_cycle").eq(0).text(), $(".session_next_exercise_work").eq(0).text(), $(".session_next_exercise_rest").eq(0).text()];
-                next_specs = textAssets[language]["inSession"]["next"] + " : " + temp[0] + " x " + get_time_u(temp[1]) + " x " + get_time_u(temp[2]);
-            } else {
+        if($(".session_next_exercise_name").length != 1){   
+            if($(adjacentExo).find(".session_next_exerciseType").eq(0).text() == "Int") {
+                next_specs = getIntervallSpecs(adjacentExo);
+            }else{
                 next_specs = textAssets[language]["inSession"]["next"] + " : " + unitRound($(".session_next_exercise_weight").eq(0).text()) + weightUnit;
-            }
+            };
         }else{
             next_specs = "";
         };
-    }
+    };
 };
 
 function update_specs(reps, weight){

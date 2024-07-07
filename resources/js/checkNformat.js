@@ -243,7 +243,7 @@ function unfocusDivs(e){
         canNowClick();
     };
 
-    if(notTargeted(e.target, '.selection_sessionFinished') && focusShown){
+    if(notTargeted(e.target, '.selection_dayPreview_focus') && focusShown){
         closePanel('focus');
         canNowClick();
     };
