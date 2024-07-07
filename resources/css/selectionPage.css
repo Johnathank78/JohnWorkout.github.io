@@ -724,20 +724,34 @@
     display: none;
 }
 
+.selection_recovery_masterSpann, .selection_deleteHistoryConfirm_masterSpann{
+    display: inline;
+    white-space: normal;
+    word-break: break-word;
+}
+
 .selection_recovery_subText, .selection_deleteHistoryConfirm_subText{
+    display: inline;
     font-size: 19px;
     font-weight: 500;
 
     opacity: .6;
-    white-space: normal;
 
+    white-space: normal;
+    word-break: inherit;
+    text-align: left;
 }
 
-.selection_recovery_subText1, .selection_deleteHistoryConfirm_subText2{
+.selection_recovery_subText1, .selection_deleteHistoryConfirm_subText3{
     opacity: 1;
 
     font-size: 19px;
     font-weight: 500;
+}
+
+.selection_recovery_subText3 , .selection_deleteHistoryConfirm_subText4, .selection_deleteHistoryConfirm_subText5{
+    display: inline;
+    white-space: nowrap;
 }
 
 .selection_recovery_btnContainer, .selection_deleteHistoryConfirm_btnContainer{    

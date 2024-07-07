@@ -190,7 +190,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 0)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -204,7 +204,7 @@ async function quit_session(failed=false){
         if(current_history[0][1] == "true"){
             tempNewHistory[1] = TemptimeSpent;
             current_history.push(tempNewHistory);
-            //session_save(session_list);
+            session_save(session_list);
         };
 
         sessionDone[1][current_session[current_session.length - 1]] = true;
@@ -354,32 +354,31 @@ function fillSessionEnd(failed){
         let oldWeight = data[1]["oldWeight"];
 
         
-        let biElem = $('<div class="selection_sessionFinished_suggested_optGroup"><span class="selection_sessionFinished_suggested_optGroupTitle"></span><div class="selection_sessionFinished_suggested_optItem"><input type="checkbox" class="selection_sessionFinished_suggested_optCheck"><span class="selection_sessionFinished_suggested_optText"></span></div><div class="selection_sessionFinished_suggested_optItem"><input type="checkbox" class="selection_sessionFinished_suggested_optCheck"><span class="selection_sessionFinished_suggested_optText"></span></div><div class="selection_sessionFinished_suggested_optItem"><input type="checkbox" class="selection_sessionFinished_suggested_optCheck"><span class="selection_sessionFinished_suggested_optText"></span></div></div>');
-        
+        let biElem = $('<div class="selection_sessionFinished_suggested_optGroup"><span class="selection_sessionFinished_suggested_optGroupTitle"></span></div>');
+        let optElem = $('<div class="selection_sessionFinished_suggested_optItem"><input type="checkbox" class="selection_sessionFinished_suggested_optCheck"><span class="selection_sessionFinished_suggested_optText"></span></div>');
+
+
         if(type == "Bi." || type == "Uni."){
             out = $(biElem).clone();
 
             $(out).find('.selection_sessionFinished_suggested_optGroupTitle').text(title);
             
             if(sets !== undefined){
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").data("data", ["sets", sets]);
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").text(textAssets[language]['updatePage']['placeHolders']['sets'] +" : "+ oldSets + " -> " + sets);
-            }else{
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").parent().remove();
+                $(out).append($(optElem).clone());
+                $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["sets", sets]);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[language]['updatePage']['placeHolders']['sets'] +" : "+ oldSets + " -> " + sets);
             };
 
             if(reps !== undefined){
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").data("data", ["reps", reps]);
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").text(textAssets[language]['updatePage']['placeHolders']['reps'] +" : "+ oldReps + " -> " + reps);
-            }else{
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").parent().remove();
+                $(out).append($(optElem).clone());
+                $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["reps", reps]);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[language]['updatePage']['placeHolders']['reps'] +" : "+ oldReps + " -> " + reps);
             };
             
             if(weight !== undefined){
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").data("data", ["weight", weight]);
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").text(textAssets[language]['updatePage']['placeHolders']['weight'] +" : "+ oldWeight + weightUnit + " -> " + weight + weightUnit);
-            }else{
-                $(out).find(".selection_sessionFinished_suggested_optText:empty:first").parent().remove();
+                $(out).append($(optElem).clone());
+                $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["weight", weight]);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[language]['updatePage']['placeHolders']['weight'] +" : "+ oldWeight + weightUnit + " -> " + weight + weightUnit);
             };
         };
 
@@ -1074,5 +1073,9 @@ $(document).ready(function(){
 
         closePanel('congrats');
         canNowClick();
+    });
+
+    $(document).on("click", '.selection_sessionFinished_suggested_optText', function(){
+        $(this).parent().find("input").click();
     });
 });//readyEnd

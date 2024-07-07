@@ -100,14 +100,17 @@ const textAssets = {
         },
         "recovery": {
             "recovery": "Sauvegarde",
-            "subText2": " s'est arrêté de manière inattendue, reprendre ?",
+            "subText2": " s'est arrêté de manière inattendue.",
+            "subText3": "Reprendre ?",
             "no": "Non",
             "yes": "Oui",
         },
         "deleteHistoryConfirm": {
             "confirm": "Confirmer",
-            "subText1": "Tu t'apprêtes à supprimer ",
-            "subText2": " jours d'historique pour toujours ! Es-tu sûr ?"
+            "subText1": "Tu t'apprêtes à supprimer",
+            "subText2": "jours d'historique",
+            "subText4": "pour toujours !",
+            "subText5": "Es-tu sûr ?",
         },
         "sessionItem": {
             "schedule": "Programmer",
@@ -422,14 +425,17 @@ const textAssets = {
         },
         "recovery": {
             "recovery": "Recovery",
-            "subText2": " unexpectedly stopped, resume it ?",
+            "subText2": " unexpectedly stopped.",
+            "subText2": "Resume it ?",
             "no": "No",
             "yes": "Yes",
         },
         "deleteHistoryConfirm": {
             "confirm": "Confirm",
-            "subText1": "You are about to delete ",
-            "subText2": "days of history forever ! Are you sure ?"
+            "subText1": "You are about to delete",
+            "subText2": "days of history",
+            "subText4": "forever !",
+            "subText5": "Are you sure ?",
         },
         "sessionItem": {
             "schedule": "Schedule",

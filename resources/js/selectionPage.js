@@ -114,10 +114,10 @@ $(document).ready(function(){
                 deleteHistoryConfirmShown = true;
                 
                 if(nbDeleted == 1){
-                    $('.selection_deleteHistoryConfirm_subText3').text($('.selection_deleteHistoryConfirm_subText3').text().replace('days', 'day').replace('jours', 'jour'))
+                    $('.selection_deleteHistoryConfirm_subText4').text($('.selection_deleteHistoryConfirm_subText4').text().replace('days', 'day').replace('jours', 'jour'));
                 };
 
-                $(".selection_deleteHistoryConfirm_subText2").text(nbDeleted);
+                $(".selection_deleteHistoryConfirm_subText3").text(nbDeleted);
                 showBlurPage("selection_deleteHistoryConfirm_page");
             };
 

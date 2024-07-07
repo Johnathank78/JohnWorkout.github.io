@@ -1050,6 +1050,7 @@ function changeLanguage(lang, first=false){
 
     $('.selection_recovery_headerText').text(textAssets[lang]["recovery"]["recovery"]);
     $('.selection_recovery_subText2').text(textAssets[lang]["recovery"]["subText2"]);
+    $('.selection_recovery_subText3').text(textAssets[lang]["recovery"]["subText3"]);
     
     $($('.selection_recovery_btn')[0]).text(textAssets[lang]["recovery"]["no"]);
     $($('.selection_recovery_btn')[1]).text(textAssets[lang]["recovery"]["yes"]);
@@ -1058,7 +1059,9 @@ function changeLanguage(lang, first=false){
 
     $('.selection_deleteHistoryConfirm_headerText').text(textAssets[lang]["deleteHistoryConfirm"]["confirm"]);
     $('.selection_deleteHistoryConfirm_subText1').text(textAssets[lang]["deleteHistoryConfirm"]["subText1"]);
-    $('.selection_deleteHistoryConfirm_subText3').text(textAssets[lang]["deleteHistoryConfirm"]["subText2"]);
+    $('.selection_deleteHistoryConfirm_subText2').text(textAssets[lang]["deleteHistoryConfirm"]["subText2"]);
+    $('.selection_deleteHistoryConfirm_subText4').text(textAssets[lang]["deleteHistoryConfirm"]["subText4"]);
+    $('.selection_deleteHistoryConfirm_subText5').text(textAssets[lang]["deleteHistoryConfirm"]["subText5"]);
 
     $($('.selection_deleteHistoryConfirm_btn')[0]).text(textAssets[lang]["recovery"]["yes"]);
     $($('.selection_deleteHistoryConfirm_btn')[1]).text(textAssets[lang]["recovery"]["no"]);

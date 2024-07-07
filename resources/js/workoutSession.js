@@ -42,14 +42,14 @@ function getHint(session, id){
     for (let i = 0; i < session[2].length; i++) {
         const elem = session[2][i];
 
-        if(elem[elem.lenght - 1] == id){
+        if(elem[elem.length - 1] == id){
             if(elem[0] == "Int."){
                 if(isIntervallLinked(elem)){
                     return elem[3];
                 }else{
                     return elem[2];
                 };
-            }else if(elem.length == 7){
+            }else if(elem.length == 8){
                 return elem[6];
             };
         };
@@ -223,7 +223,7 @@ function workout(exercises_list){
 
             if(exercises_list[i][0] == "Wrm."){
                 remaining_sets += 1;
-                $(exercise).append(`<span class="session_next_exercise_type">Wrm</span>`);
+                $(exercise).append(`<span class="session_next_exercise_type">Wrm</span><span class="session_next_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>`);
                 $(exercise).append(`
                     <div class="session_next_exercise_set">
                         <span class="session_next_exercise_name reorder__avoid">`+exercises_list[i][1]+`</span>
@@ -643,6 +643,7 @@ async function next_exercise(first){
     if($(".session_next_exercise_type").length == 0){return};
     
     extype = $(".session_next_exercise_type").first().text();
+    next_id = $(".session_next_exercise_id").first().text().replace(/_(1|2)/g, "");
 
     if(first && extype != "Pause"){
 
@@ -671,12 +672,12 @@ async function next_exercise(first){
 
         $('.session_exercise_Lrest_btn').data("canLongClick", false);
         $('.session_exercise_Rrest_btn').data("canLongClick", false);
+        
         update_info(true);
     }else if(!first || extype == "Pause"){
         beforeExercise = false;
 
         if(extype != "Pause" && extype != "Wrm"){
-            next_id = $(".session_next_exercise_id").first().text().replace(/_(1|2)/g, "");
             $(".session_next_exercise_id").first().remove();
         }else{
             next_id = false;
