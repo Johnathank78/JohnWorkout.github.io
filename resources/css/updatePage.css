@@ -1129,6 +1129,7 @@
 .update_workout_data_type:disabled{
     -webkit-appearance: none !important;
     -webkit-text-fill-color: white !important;
+    text-align-last: center;
     color: white !important;
     opacity: 1 !important;
 }
