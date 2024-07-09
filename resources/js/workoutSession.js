@@ -1237,6 +1237,7 @@ async function timerDone(LR){
         $('.session_exercise_Lrest_btn').data("canLongClick", true);
 
         if(extype == "Uni"){
+            console.log(actual_setNb, actual_setL)
             if(actual_setNb - actual_setL > 0){
                 if((Rlast || Rdone) && actual_setNb - actual_setL == 1 && lastExo){
                     dropSet_static($(".session_next_exercise_name:contains(' - "+textAssets[language]["misc"]["leftInitial"]+"')").first().parent());
@@ -1492,8 +1493,8 @@ function undoMemorise(way){
         undoData[1]['actual_setNb'] =  actual_setNb;
         undoData[1]['beforeExercise'] =  beforeExercise;
         
-        undoData[1]['LrestLib'] =  $('.Lrest').text();
-        undoData[1]['RrestLib'] =  $('.Rrest').text();
+        undoData[1]['LrestLib'] = $('.Lrest').text();
+        undoData[1]['RrestLib'] = $('.Rrest').text();
 
         $('.session_undo').css('display', 'block');
         undoMemory.push(undoData);
@@ -1542,6 +1543,9 @@ function undoMemorise(way){
         actual_setL = undoData[1]['actual_setL'];
         actual_setNb = undoData[1]['actual_setNb'];
         beforeExercise = undoData[1]['beforeExercise'];
+  
+        console.log("actual_setNb : "+undoData[1]['actual_setNb']+" | "+"actual_setL : "+undoData[1]['actual_setL']+" | "+"Llast : "+undoData[1]['Llast']+" | "+"Ldone : "+undoData[1]['Ldone']);
+        console.log("actual_setNb : "+undoData[1]['actual_setNb']+" | "+"actual_setR : "+undoData[1]['actual_setR']+" | "+"Llast : "+undoData[1]['Rlast']+" | "+"Rdone : "+undoData[1]['Rdone']);
 
         $('.Lrest').text(undoData[1]['LrestLib']);
         $('.Rrest').text(undoData[1]['RrestLib']);
@@ -1699,7 +1703,7 @@ $(document).ready(function(){
     $(document).on("click", ".session_workout_next_btn", async function(){
         if(cannotClick || isDeleting || !canSkip){return};
 
-        if(hasStarted){undoMemorise('in')};
+        if(hasStarted && !Ltimer && !Rtimer){undoMemorise('in')};
 
         canSkip = false;
 
