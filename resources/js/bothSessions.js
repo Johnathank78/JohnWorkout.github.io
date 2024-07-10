@@ -587,6 +587,8 @@ function generateSuggestedChanges(history){
                 newSets = exo[2].length;
             };
 
+            if(newSets == 0){return};
+
             if(type == "Bi." || type == "Uni."){
                 
                 let repsMean = Math.ceil(exo[2].map(item => item[0]).reduce((acc, val) => acc + val, 0) / exo[2].length); 
