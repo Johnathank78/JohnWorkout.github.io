@@ -5,6 +5,7 @@ var Ispent = 0; var iRest_time = 0; var iWork_time = 0; var iCurrent_cycle = fal
 var Ifinished = false;
 var currentExoIndex = 0;
 var Iskip = false;
+var IjustSkipped = false;
 var exoName = false;
 
 function getInvervallSessionCycleCount(data){
@@ -261,6 +262,8 @@ function intervall(data, from_wo = false){
 
             }else if(intervall_state == 1){
 
+                if(Ispent == 2){IjustSkipped = false};
+
                 if(iWork_time - Ispent <= 3 && iWork_time - Ispent > 0 && !isBeeping){
                     isBeeping = true;
 					playBeep(beepPlayer, iWork_time - Ispent);
@@ -272,8 +275,10 @@ function intervall(data, from_wo = false){
                 update_timer($(".screensaver_Ltimer"), iWork_time, Ispent);
 
                 if(Ispent >= iWork_time || Iskip){
+                    if(Iskip){IjustSkipped = true};
+
                     Ispent = Ispent > iWork_time ? iWork_time : Ispent;
-                    let smallestTime = iWork_time * 0.1 < 2 ? 2 : iWork_time * 0.1 > 60 ? 60 : iWork_time * 0.1;
+                    let smallestTime = iWork_time * 0.1 < 5 ? 5 : iWork_time * 0.1 > 60 ? 60 : iWork_time * 0.1;
 
                     iCurrent_cycle--;
                     
@@ -375,12 +380,16 @@ function intervall(data, from_wo = false){
 					playBeep(beepPlayer, iRest_time - Ispent);
                 };
 
+                if(Ispent == 2){IjustSkipped = false};    
+
                 update_timer($(".session_intervall_timer"), iRest_time, Ispent);
                 update_timer($(".screensaver_Ltimer"), iRest_time, Ispent);
 
                 if(Ispent >= iRest_time || Iskip){
+                    if(Iskip){IjustSkipped = true};
+
                     Ispent = Ispent > iWork_time ? iWork_time : Ispent;
-                    let smallestTime = iRest_time * 0.1 < 2 ? 2 : iRest_time * 0.1 > 60 ? 60 : iRest_time * 0.1;
+                    let smallestTime = iRest_time * 0.1 < 5 ? 5 : iRest_time * 0.1 > 60 ? 60 : iRest_time * 0.1;
 
                     isBeeping = false;
                     intervall_state = 1;
@@ -439,8 +448,7 @@ $(document).ready(function(){
     });
 
     $(".session_intervall_next_btn").on('click', function(){
-        if(Iskip){return};
-
+        if(IjustSkipped){return};
         Iskip = true;
     });
 });//readyEnd 

@@ -251,7 +251,7 @@ async function quit_session(failed=false){
     extype = false; next_exo = false; finished = false; hasReallyStarted = false;
     ongoing = false; hasStarted = false; lastExo = false;
     beforeExercise = false; noMore = false; Ifinished = false;
-    iCurrent_cycle = false; iActualCycle = false;
+    iCurrent_cycle = false; iActualCycle = false; Iskip = false; IjustSkipped = false;
 
     if(paused){
         $(".selection_icon_play_pause").attr("src", pauseIMG);
@@ -569,7 +569,6 @@ function generateSuggestedChanges(history){
     if(current_session[0] == "W"){
         history[2].forEach(exo => {
             let id = exo[exo.length - 1].replace(/_(1|2)/g, "");
-
             if(id == last_id){return}else{last_id = id};
 
             let type = current_session[2][getExoIndexById(current_session, id)][0];
@@ -590,10 +589,9 @@ function generateSuggestedChanges(history){
             if(newSets == 0){return};
 
             if(type == "Bi." || type == "Uni."){
-                
                 let repsMean = Math.ceil(exo[2].map(item => item[0]).reduce((acc, val) => acc + val, 0) / exo[2].length); 
                 let weightMean = roundToNearestHalf(exo[2].map(item => item[1]).reduce((acc, val) => acc + val, 0) / exo[2].length);
-        
+
                 if(repsMean != parseInt(exo[1][1]) || weightMean != parseFloat(exo[1][2])){
                     
                     suggestedData[id] = {
