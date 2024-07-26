@@ -387,22 +387,29 @@ function workout(exercises_list){
         if(undoMemory.length > 0){$('.session_undo').css('display', 'block')};
 
         if(extype == "Wrm"){
-            remaining_sets = 1;
             
             if(beforeExercise){
+                remaining_sets = 0;
+                
                 $('.Lrest').text(textAssets[language]["inSession"]["start"]);
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             }else{
+                remaining_sets = 1;
+                
+                setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+"')").length;
                 next_exo = true;
-                dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
 
-                if($(".session_next_exercise_set").length == 0){
-                    noMore = true;
-                    $(".session_next_exercises_container").append(`
-                    <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-                        <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
-                    </div>
-                    `);
+                if(actual_setNb - actual_setL != setNb_Lextracted + 1){
+                    dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
+
+                    if($(".session_next_exercise_set").length == 0){
+                        noMore = true;
+                        $(".session_next_exercises_container").append(`
+                        <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
+                            <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
+                        </div>
+                        `);
+                    };
                 };
 
                 if(noMore){
@@ -625,6 +632,8 @@ function workout(exercises_list){
                 remaining_sets += 1;
             }else if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Bi"){
                 remaining_sets += 1;
+            }else if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Wrm"){
+                remaining_sets += 1;
             };
         };
 
@@ -677,7 +686,7 @@ async function next_exercise(first){
     }else if(!first || extype == "Pause"){
         beforeExercise = false;
 
-        if(extype != "Pause" && extype != "Wrm"){
+        if(extype != "Pause"){
             $(".session_next_exercise_id").first().remove();
         }else{
             next_id = false;
@@ -1248,7 +1257,6 @@ async function timerDone(LR){
         $('.session_exercise_Lrest_btn').data("canLongClick", true);
 
         if(extype == "Uni"){
-            console.log(actual_setNb, actual_setL)
             if(actual_setNb - actual_setL > 0){
                 if((Rlast || Rdone) && actual_setNb - actual_setL == 1 && lastExo){
                     dropSet_static($(".session_next_exercise_name:contains(' - "+textAssets[language]["misc"]["leftInitial"]+"')").first().parent());
@@ -1555,8 +1563,8 @@ function undoMemorise(way){
         actual_setNb = undoData[1]['actual_setNb'];
         beforeExercise = undoData[1]['beforeExercise'];
   
-        console.log("actual_setNb : "+undoData[1]['actual_setNb']+" | "+"actual_setL : "+undoData[1]['actual_setL']+" | "+"Llast : "+undoData[1]['Llast']+" | "+"Ldone : "+undoData[1]['Ldone']);
-        console.log("actual_setNb : "+undoData[1]['actual_setNb']+" | "+"actual_setR : "+undoData[1]['actual_setR']+" | "+"Llast : "+undoData[1]['Rlast']+" | "+"Rdone : "+undoData[1]['Rdone']);
+        //console.log("actual_setNb : "+undoData[1]['actual_setNb']+" | "+"actual_setL : "+undoData[1]['actual_setL']+" | "+"Llast : "+undoData[1]['Llast']+" | "+"Ldone : "+undoData[1]['Ldone']);
+        //console.log("actual_setNb : "+undoData[1]['actual_setNb']+" | "+"actual_setR : "+undoData[1]['actual_setR']+" | "+"Llast : "+undoData[1]['Rlast']+" | "+"Rdone : "+undoData[1]['Rdone']);
 
         $('.Lrest').text(undoData[1]['LrestLib']);
         $('.Rrest').text(undoData[1]['RrestLib']);
