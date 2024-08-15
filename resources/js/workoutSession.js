@@ -395,7 +395,7 @@ function workout(exercises_list){
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             }else{
                 remaining_sets = 1;
-                
+
                 setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+"')").length;
                 next_exo = true;
 
@@ -1574,13 +1574,14 @@ function undoMemorise(way){
                 $('.session_exercise_Rrest_btn').css("display", "none");
                 updateRestBtnStyle('Reset');
             }else{
-                if(Ldone){$(".session_exercise_Lrest_btn").css('opacity', '.7')}else{$(".session_exercise_Lrest_btn").css('opacity', '1')};
-                if(Rdone){$(".session_exercise_Rrest_btn").css('opacity', '.7')}else{$(".session_exercise_Rrest_btn").css('opacity', '1')};
+                if(Ldone){$(".session_exercise_Lrest_btn").css('opacity', '.7')}else if(!Ltimer){$(".session_exercise_Lrest_btn").css('opacity', '1')};
+                if(Rdone){$(".session_exercise_Rrest_btn").css('opacity', '.7')}else if(!Rtimer){$(".session_exercise_Rrest_btn").css('opacity', '1')};
             };
         };
 
         update_info(false);
         stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
+        
         $(".session_workout_remaining_sets").text(remaining_sets);
         $('.session_next_exercises_container').html(undoData[0]);
 

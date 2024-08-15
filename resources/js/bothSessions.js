@@ -190,7 +190,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 0)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -289,6 +289,7 @@ function getSessionEndData(){
     let time = 0;
     let performanceGrowth = 0;
     let weight = 0;
+    let double = false;
 
     if(language == "french"){
         if(number == 1){
@@ -308,34 +309,41 @@ function getSessionEndData(){
         };
     };
 
-    if(current_history[0][1] === "false" || current_history.length == 1){
+    if(current_history[0][1] === "false" || current_history.length == 1 || current_session[0] == "I"){
         return [outNumber, false, false]
     };
 
-    if (current_history[current_history.length - 1][1] === 0) {
-        if (TemptimeSpent === 0) {
+    let pastHistory = current_history[current_history.length - 2];
+    let presentHistory = current_history[current_history.length - 1];
+    let isEqual = areSessionEquallyCompleted(presentHistory, pastHistory);
+
+    if(pastHistory[1] === 0){
+        if(TemptimeSpent === 0){
             performanceGrowth = 0;
         }else{
             performanceGrowth = 100;
         };
     }else{
-        performanceGrowth = Math.round(((current_history[current_history.length - 1][1] - TemptimeSpent) / current_history[current_history.length - 1][1]) * 100);
+        performanceGrowth = Math.round(((pastHistory[1] - TemptimeSpent) / pastHistory[1]) * 100);
     };
 
     if(current_session[0] == "W"){time = Math.max(Math.min(performanceGrowth, Infinity), -100)};
 
-    for(const exo of current_history[current_history.length - 1][2]){
-        if(exo.length == 4){ // NOT INT 
-            for (const set of exo[2]){
-                weight += set[0] * set[1]
+    for(const exo of pastHistory[2]){
+        if(exo.length >= 4){ // NOT INT 
+            double = exo[0].includes("Ts.") || exo[0].includes("Alt.");
+            if(double){
+                weight += parseFloat(exo[1][0]) * convertToUnit(2*parseFloat(exo[1][1])*parseFloat(exo[1][2]), weightUnit, "kg");
+            }else{
+                weight += parseFloat(exo[1][0]) * convertToUnit(parseFloat(exo[1][1])*parseFloat(exo[1][2]), weightUnit, "kg");
             };
         };
     };
 
     weight = weight == 0 ? false : Math.round((TempweightLifted - weight) / weight) * 100;
     time = time == 0 ? false : time;
-
-    return [outNumber, time, weight];
+    
+    return [outNumber, time, weight, isEqual];
 };
 
 function fillSessionEnd(failed){
@@ -394,24 +402,46 @@ function fillSessionEnd(failed){
         $('.selection_sessionFinished').css('paddingBottom', '30px');
         $('.selection_sessionFinished_navigator').css('display', 'none');
 
-        let assetCount = Object.keys(textAssets[language]["sessionEnd"]["subText"]["failed"]).length
-        let randomFailedSub = Math.floor(Math.random() * (assetCount)).toString()
+        let assetCount = Object.keys(textAssets[language]["sessionEnd"]["subText"]["failed"]).length;
+        let randomFailedSub = Math.floor(Math.random() * (assetCount)).toString();
         
         let failedTile = $('.failed');
         
         $(failedTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["failed"]);
-        $(failedTile).find('.selection_sessionFinished_subText').text(textAssets[language]["sessionEnd"]["subText"]["failed"][randomFailedSub])
+        $(failedTile).find('.selection_sessionFinished_subText').text(textAssets[language]["sessionEnd"]["subText"]["failed"][randomFailedSub]);
     }else{
-        let [number, time, weight] = getSessionEndData();
+        let [number, time, weight, isEqual] = getSessionEndData();
         let changes = generateSuggestedChanges(tempNewHistory);
         let changesFilled = Object.keys(changes).length > 0;
 
         let firstTile = $('.finished');
+        let completedTile = $('.completed');
         let secondTile = $('.chrono');
         let thirdTile = $('.lift');
         let forthTile = $('.suggestedChanges');
 
-        if(time === false && weight === false || parseInt(number.match(/\d+/)[0], 10) == 1){
+        if(!isEqual){
+            $(firstTile).css('display', 'flex');
+            $(completedTile).css('display', 'flex');
+            $(secondTile).css('display', 'none');
+            $(thirdTile).css('display', 'none');
+
+            let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["completed"]).length;
+            let randomFailedSub = Math.floor(Math.random() * (assetCount)).toString();
+
+            $(completedTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["completed"][randomFailedSub]);
+            $(completedTile).find('.selection_sessionFinished_subText').text(textAssets[language]["sessionEnd"]["subText"]["completed"]);
+
+            $('.selection_sessionFinished').css('paddingBottom', '45px');
+            $('.selection_sessionFinished_navigator').css('display', 'flex');
+            
+            if(changesFilled){
+                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
+            }else{
+                $('.selection_sessionFinished_navigator_indicator').eq(2).css('display', 'none');
+                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
+            };
+        }else if(time === false && weight === false || parseInt(number.match(/\d+/)[0], 10) == 1){
             $(firstTile).css('display', 'flex');
             $(secondTile).css('display', 'none');
             $(thirdTile).css('display', 'none');
@@ -425,11 +455,11 @@ function fillSessionEnd(failed){
                 $('.selection_sessionFinished_navigator').css('display', 'none');
                 $('.selection_sessionFinished_navigator_indicator').css('display', 'none');
             };
-
         }else if(weight === false){
             $(firstTile).css('display', 'flex');
             $(secondTile).css('display', 'flex');
             $(thirdTile).css('display', 'none');
+            $(completedTile).css('display', 'none');
             
             $('.selection_sessionFinished').css('paddingBottom', '45px');
             $('.selection_sessionFinished_navigator').css('display', 'flex');
@@ -444,6 +474,7 @@ function fillSessionEnd(failed){
             $(firstTile).css('display', 'flex');
             $(secondTile).css('display', 'flex');
             $(thirdTile).css('display', 'flex');
+            $(completedTile).css('display', 'none');
             
             $('.selection_sessionFinished').css('paddingBottom', '45px');
 
@@ -501,7 +532,6 @@ function fillSessionEnd(failed){
             $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["even"]);
             $($(secondTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['ATLT']);
         };
-
 
         // Third Tile
         if(weight > 0){

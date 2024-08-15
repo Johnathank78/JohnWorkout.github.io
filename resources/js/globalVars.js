@@ -15,6 +15,7 @@ const dayofweek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frid
 const monthofyear = ["Jan","Feb","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"];
 const dayofweek_conventional = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const timeUnit = 1000;
+const repTime = 2.1;
 
 const textAssets = {
     "french": {
@@ -258,6 +259,11 @@ const textAssets = {
             "mainText": {
                 "congrats": "Félicitations !",
                 "failed": "Quel échec",
+                "completed": {
+                    "0": "Peut mieux faire",
+                    "1": "Lâche rien !",
+                    "2": "Fatigué ?"
+                },
                 "chrono": {
                     "good": {
                         "0": "Si rapide !",
@@ -311,6 +317,7 @@ const textAssets = {
                     "4": "L'échec est temporaire, relève-toi et essaie à nouveau !",
                     "5": "C'est un échec, pas une défaite, continue à progresser !"
                 },
+                "completed": "Tu as manqué des séries mec",
                 "congrats": {
                     "YC": "Tu as complété ",
                     "FT": " pour la ",
@@ -583,6 +590,11 @@ const textAssets = {
             "mainText": {
                 "congrats": "Congratulations !",
                 "failed": "Failed",
+                "completed": {
+                    "0": "Can do better",
+                    "1": "Don't give up !",
+                    "2": "Tired ?"
+                },
                 "chrono": {
                     "good": {
                         "0": "So fast !",
@@ -635,6 +647,7 @@ const textAssets = {
                     "4": "Failure is temporary, get back up and give it another shot!",
                     "5": "It's a setback, not defeat, keep striving for progress!"
                 },
+                "completed": "You missed some sets bro",
                 "congrats": {
                     "YC": "You completed ",
                     "FT": " for the ",

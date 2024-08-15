@@ -236,16 +236,15 @@ function get_session_time(session, uniFix=false){
                 };
             }else if(session[2][i][0] == "Bi."){
                 if(session[2][i][1].includes("Alt.")){
-                    total += session[2][i][2] * (time_unstring(session[2][i][3])*4.2 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
+                    total += session[2][i][2] * (time_unstring(session[2][i][3])*2*repTime + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
                 }else{
-                    total += session[2][i][2] * (time_unstring(session[2][i][3])*2.1 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
+                    total += session[2][i][2] * (time_unstring(session[2][i][3])*repTime + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
                 };
             }else if(session[2][i][0] == "Uni."){
-                if(uniFix){
-                    total += (session[2][i][2] * (time_unstring(session[2][i][3])*2.1 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]));
-                }else{
-                    total += 2 * (session[2][i][2] * (time_unstring(session[2][i][3])*2.1 + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]));
-                };
+                let repsDuration = time_unstring(session[2][i][3]) * repTime;
+                let setsDone = uniFix ? Math.floor(session[2][i][2]/2) : session[2][i][2];
+ 
+                total += setsDone * (2*repsDuration + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
             }else if(session[2][i][0] == "Pause"){
                 if(i != session[2].length - 1){total += time_unstring(session[2][i][1])};
             };
@@ -315,7 +314,7 @@ function get_session_stats(session){
 
             for(let z=0;z<exoList.length;z++){
                 if(exoList[z][0] == "Int."){
-                    repsDone += parseInt(exoList[z][2]) * (time_unstring(exoList[z][3]) / 2.1);
+                    repsDone += parseInt(exoList[z][2]) * (time_unstring(exoList[z][3]) / repTime);
                     workedTime += parseInt(exoList[z][2]) * time_unstring(exoList[z][3])
                 };
             };
@@ -325,18 +324,18 @@ function get_session_stats(session){
             reps = parseInt(item[2]) * parseInt(item[3]);
             if(session[2][i][1].includes("Alt.")){
                 repsDone += 2 * reps;
-                workedTime += reps * 2.1;
+                workedTime += reps * repTime;
                 weightLifted += 2 * reps * roundedWeight;
             }else{
                 repsDone += reps;
-                workedTime += reps * 2.1;
+                workedTime += reps * repTime;
                 weightLifted += reps * roundedWeight;
             };
         }else if(type == "Uni."){
             roundedWeight = unitRound(item[4]);
             reps = parseInt(item[2]) * parseInt(item[3]);
             repsDone += reps;
-            workedTime += reps * 2.1;
+            workedTime += reps * repTime;
             weightLifted += reps * roundedWeight;
         };
     };
@@ -488,7 +487,36 @@ function mergeHistoryExo(history, id){
     });
     
     return [...out[0][2], ...out[1][2]];
-}
+};
+
+function areSessionEquallyCompleted(currentHistory, pastHistory){
+    function findHistoryExoByID(history, id){
+        for (let index = 0; index < history[2].length; index++){
+            const exo = history[2][index];
+            
+            if(exo[exo.length - 1] == id){
+                return exo;
+            };
+        };
+
+        return -1
+    };
+
+    let areEqual = true;
+    let pastExo = false;
+
+    currentHistory[2].forEach(currentExo => {
+        pastExo = findHistoryExoByID(pastHistory, currentExo[currentExo.length - 1]);
+
+        if(pastExo == -1){return};
+
+        if(currentExo[2].length < pastExo[2].length){
+            areEqual = false;
+        };
+    });
+
+    return areEqual;
+};
 
 // Time
 
