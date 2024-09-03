@@ -1630,7 +1630,7 @@ $(document).ready(function(){
                 extype == 'Uni' ? 
                     tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id+"_1")][2].push([reps, weight]) : 
                     next_name.includes("Alt.") ? 
-                        tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id)][2].push([reps/2, weight]) : 
+                        tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id)][2].push([Math.round(reps/2), weight]) : 
                         tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id)][2].push([reps, weight]);
 
                 TemprepsDone += reps;
@@ -1821,6 +1821,7 @@ $(document).ready(function(){
     // HISOTRY NOTES;
 
     $(document).on('click', ".session_current_exercise_name", function(e){
+
         if(!isAbleToClick("historyNotes")){return};
 
         if(!notesInp && extype != "Int" && extype != "Pause" && hasStarted){
@@ -1841,19 +1842,23 @@ $(document).ready(function(){
         if(extype == "Uni"){
             temp = tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id+"_1")];
 
-            if($(this).val() == ""){
+            if($(this).val() == "" && temp.lenght == 5){
                 temp.splice(3, 1);
-            }else{
-                temp[3] = $(".session_workout_historyNotes_inp").val();
+            }else if($(this).val() != "" && temp.lenght == 5){
+                temp[3] = $(this).val().val();
+            }else if($(this).val() != "" && temp.lenght == 4){
+                temp.splice(3, 0, $(this).val());
             };
 
         }else if(extype == "Bi"){
             temp = tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id)];
 
-            if($(this).val() == ""){
+            if($(this).val() == "" && temp.lenght == 5){
                 temp.splice(3, 1);
-            }else{
-                temp[3] = $(".session_workout_historyNotes_inp").val();
+            }else if($(this).val() != "" && temp.lenght == 5){
+                temp[3] = $(this).val().val();
+            }else if($(this).val() != "" && temp.lenght == 4){
+                temp.splice(3, 0, $(this).val());
             };
         };
 

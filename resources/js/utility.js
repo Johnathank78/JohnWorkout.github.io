@@ -637,7 +637,7 @@ function time_unstring(strr, getList=false){
 };
 
 function timeFormat(ref){
-    return  ref >= 604800 ? (ref - ref%86400) : ref >= 86400 ? (ref - ref%3600) : ref >= 3600 ? (ref - ref%60) : ref;
+    return  ref >= 86400 ? (ref - ref%3600) : ref >= 3600 ? (ref - ref%60) : ref;
 };
 
 // Date

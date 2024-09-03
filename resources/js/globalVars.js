@@ -433,7 +433,7 @@ const textAssets = {
         "recovery": {
             "recovery": "Recovery",
             "subText2": " unexpectedly stopped.",
-            "subText2": "Resume it ?",
+            "subText3": "Resume it ?",
             "no": "No",
             "yes": "Yes",
         },
