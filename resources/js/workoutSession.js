@@ -1485,7 +1485,7 @@ function undoMemorise(way){
         undoData[1]['Llast'] =  Llast;
         undoData[1]['Rlast'] =  Rlast;
         undoData[1]['Lspent'] =  Lspent;
-        undoData[1]['Rspent'] =  Rspent;
+        undoData[1]['Rspent'] =  Rspent;        
         undoData[1]['skip'] =  skip;
         undoData[1]['ncState'] =  ncState;
         undoData[1]['extype'] =  extype;
@@ -1591,6 +1591,20 @@ function undoMemorise(way){
         }else{
             recoveryUpdateFromUndo(undoData);
             recovery_save(recovery);
+        };
+
+        if(actual_setNb - actual_setL > 1 && !beforeExercise){
+            $(".session_exercise_Lrest_btn").data("canLongClick", true);
+        }else{
+            $(".session_exercise_Lrest_btn").data("canLongClick", false);
+        };
+
+        if(extype == "Uni"){
+            if(actual_setNb - actual_setR > 1 && !beforeExercise){
+                $(".session_exercise_Rrest_btn").data("canLongClick", true);
+            }else{
+                $(".session_exercise_Rrest_btn").data("canLongClick", false);
+            };
         };
     };
 };

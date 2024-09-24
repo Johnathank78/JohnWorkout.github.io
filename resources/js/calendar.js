@@ -640,6 +640,7 @@ $(document).ready(function(){
         };
 
         sessionToBeDone[1][previousID] = false;
+        sessionToBeDone[1][idTo] = true;
 
         if(platform == "Mobile"){
             let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
@@ -665,12 +666,19 @@ $(document).ready(function(){
             };
         };
 
+        sessionToBeDone_save(sessionToBeDone)
         sessionSwapped_save(sessionSwapped);
         updateCalendar(session_list);
 
         $('.selection_dayPreview_item').eq($(this).data('elemId')).data('id', idTo);
         $('.selection_dayPreview_item').eq($(this).data('elemId')).text(session_list[getSessionIndexByID(session_list, idTo)][1]);
-        
+
+        if(sessionDone[1][idTo]){
+            $('.selection_dayPreview_item').css('backgroundColor', 'rgb(76, 83, 104)');
+        }else{
+            $('.selection_dayPreview_item').css('backgroundColor', 'rgb(29, 188, 96)');
+        };
+
         closePanel('focus');
     });
 
