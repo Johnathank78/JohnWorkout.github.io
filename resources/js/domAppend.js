@@ -165,7 +165,7 @@ function exercise_tile(data = false){
     if(data){
         if(data[0] == "Int."){
             let element = $(`
-            <div class="update_workout_item noselect reorder__child" id="`+data[data.length - 1]+`">
+            <div class="update_workout_item noselect reorder__child" id="`+data.getId()+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
@@ -224,7 +224,7 @@ function exercise_tile(data = false){
             return element;
         }else{
             let element = $(`
-            <div class="update_workout_item noselect reorder__child" id="`+data[data.length - 1]+`">
+            <div class="update_workout_item noselect reorder__child" id="`+data.getId()+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">

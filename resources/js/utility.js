@@ -772,7 +772,7 @@ function getContractedType(type){
 
 function getSessionIndexByID(data, id){
     for(let i=0; i<data.length; i++){
-        if(data[i][data[i].length - 1] == id){
+        if(data[i].getId() == id){
             return i;
         };
     };
@@ -782,7 +782,7 @@ function getSessionIndexByID(data, id){
 
 function getReminderIndexByID(id){
     for(let i=0; i<reminder_list.length; i++){
-        if(reminder_list[i][reminder_list[i].length - 1] == id){
+        if(reminder_list[i].getId() == id){
             return i;
         };
     };

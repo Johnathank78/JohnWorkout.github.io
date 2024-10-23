@@ -42,7 +42,7 @@ function getHint(session, id){
     for (let i = 0; i < session[2].length; i++) {
         const elem = session[2][i];
 
-        if(elem[elem.length - 1] == id){
+        if(elem.getId() == id){
             if(elem[0] == "Int."){
                 if(isIntervallLinked(elem)){
                     return elem[3];
@@ -223,7 +223,7 @@ function workout(exercises_list){
 
             if(exercises_list[i][0] == "Wrm."){
                 remaining_sets += 1;
-                $(exercise).append(`<span class="session_next_exercise_type">Wrm</span><span class="session_next_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>`);
+                $(exercise).append(`<span class="session_next_exercise_type">Wrm</span><span class="session_next_exercise_id">`+exercises_list[i].getId()+`</span>`);
                 $(exercise).append(`
                     <div class="session_next_exercise_set">
                         <span class="session_next_exercise_name reorder__avoid">`+exercises_list[i][1]+`</span>
@@ -238,7 +238,7 @@ function workout(exercises_list){
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
             }else if(exercises_list[i][0] == "Bi."){
-                $(exercise).append(`<span class="session_next_exercise_type">Bi</span><span class="session_next_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>`);
+                $(exercise).append(`<span class="session_next_exercise_type">Bi</span><span class="session_next_exercise_id">`+exercises_list[i].getId()+`</span>`);
 
                 remaining_sets += parseInt(exercises_list[i][2]);
                 for(let z=0;z<exercises_list[i][2];z++){
@@ -250,18 +250,18 @@ function workout(exercises_list){
                             <span class="session_next_exercise_rest">`+time_unstring(exercises_list[i][5])+`</span>
                             <span class="session_next_exerciseType">Bi</span>
                             <span class="session_setPreviewId">`+z+`</span>
-                            <span class="session_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>
+                            <span class="session_exercise_id">`+exercises_list[i].getId()+`</span>
                         </div>
                     `);
                 };
 
-                tempNewHistory[2].push([exercises_list[i][1], [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i][exercises_list[i].length - 1]]);
+                tempNewHistory[2].push([exercises_list[i][1], [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i].getId()]);
 
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
 
             }else if(exercises_list[i][0] == "Uni."){
-                $(exercise).append(`<span class="session_next_exercise_type">Uni</span><span class="session_next_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>`);
+                $(exercise).append(`<span class="session_next_exercise_type">Uni</span><span class="session_next_exercise_id">`+exercises_list[i].getId()+`</span>`);
 
                 remaining_sets += parseInt(exercises_list[i][2])*2;
                 for(let z=0;z<exercises_list[i][2];z++){
@@ -273,7 +273,7 @@ function workout(exercises_list){
                             <span class="session_next_exercise_rest">`+time_unstring(exercises_list[i][5])+`</span>
                             <span class="session_next_exerciseType">Uni</span>
                             <span class="session_setPreviewId">`+z+`</span>
-                            <span class="session_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>
+                            <span class="session_exercise_id">`+exercises_list[i].getId()+`</span>
                         </div>
                     `);
 
@@ -285,32 +285,32 @@ function workout(exercises_list){
                             <span class="session_next_exercise_rest">`+time_unstring(exercises_list[i][5])+`</span>
                             <span class="session_next_exerciseType">Uni</span>
                             <span class="session_setPreviewId">`+z+`</span>
-                            <span class="session_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>
+                            <span class="session_exercise_id">`+exercises_list[i].getId()+`</span>
                         </div>
                     `);
                 };
 
-                tempNewHistory[2].push([exercises_list[i][1]+" - L", [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i][exercises_list[i].length - 1]+"_1"]);
-                tempNewHistory[2].push([exercises_list[i][1]+" - R", [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i][exercises_list[i].length - 1]+"_2"]);
+                tempNewHistory[2].push([exercises_list[i][1]+" - L", [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i].getId()+"_1"]);
+                tempNewHistory[2].push([exercises_list[i][1]+" - R", [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i].getId()+"_2"]);
 
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
 
             }else if(exercises_list[i][0] == "Int."){
-                $(exercise).append(`<span class="session_next_exercise_type">Int</span><span class="session_next_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>`);
+                $(exercise).append(`<span class="session_next_exercise_type">Int</span><span class="session_next_exercise_id">`+exercises_list[i].getId()+`</span>`);
 
                 let intervallSession = isIntervallLinked(exercises_list[i]) ? session_list[getSessionIndexByID(session_list, exercises_list[i][1])] : exercises_list[i];
                 let intervallString = JSON.stringify(intervallSession[2]);
 
                 remaining_sets += getInvervallSessionCycleCount(intervallSession[2]);
-                tempNewHistory[2].push([intervallSession[1], generateIntervallHistory(intervallSession), exercises_list[i][exercises_list[i].length - 1]]);
+                tempNewHistory[2].push([intervallSession[1], generateIntervallHistory(intervallSession), exercises_list[i].getId()]);
 
                 $(exercise).append(`
                     <div class="session_next_exercise_set">
                         <span class="session_next_exercise_name reorder__avoid">`+intervallSession[1]+`</span>
                         <span class="session_next_exercise_intervallData">`+intervallString+`</span>
                         <span class="session_next_exerciseType">Int</span>
-                        <span class="session_exercise_id">`+exercises_list[i][exercises_list[i].length - 1]+`</span>
+                        <span class="session_exercise_id">`+exercises_list[i].getId()+`</span>
                     </div>
                 `);
 

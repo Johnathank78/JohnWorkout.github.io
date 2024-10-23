@@ -45,10 +45,10 @@ async function launchSession(index){
     current_session = session_list[index];
 
     if(platform == "Mobile"){
-        let shown = await isShown(current_session[current_session.length - 1], getScheduleScheme(current_session));
+        let shown = await isShown(current_session.getId(), getScheduleScheme(current_session));
 
         if(shown){
-            let id = getNotifFirstIdChar(current_session) + current_session[current_session.length - 1] + shown.slice(-1);
+            let id = getNotifFirstIdChar(current_session) + current_session.getId() + shown.slice(-1);
             await undisplayAndCancelNotification(id);
         };
     };
@@ -207,13 +207,14 @@ async function quit_session(failed=false){
             session_save(session_list);
         };
 
-        sessionDone[1][current_session[current_session.length - 1]] = true;
+        sessionDone[1][current_session.getId()] = true;
+        
         sessionDone_save(sessionDone);
 
         // Notification related;
 
         if(isScheduled(current_session)){
-            let id = await getTodayPendingId(current_session[current_session.length - 1], getScheduleScheme(current_session));
+            let id = await getTodayPendingId(current_session.getId(), getScheduleScheme(current_session));
 
             if(platform == "Mobile"){
                 await undisplayAndCancelNotification(id);
@@ -620,7 +621,8 @@ function generateSuggestedChanges(history){
 
             if(type == "Bi." || type == "Uni."){
                 let repsMean = Math.ceil(exo[2].map(item => item[0]).reduce((acc, val) => acc + val, 0) / exo[2].length); 
-                let weightMean = roundToNearestHalf(exo[2].map(item => item[1]).reduce((acc, val) => acc + val, 0) / exo[2].length);
+                let weightMean = exo[2].map(item => item[1]).reduce((acc, val) => acc + val, 0) / exo[2].length;
+                let weightMeanRounded = roundToNearestHalf(weightMean);
 
                 if(repsMean != parseInt(exo[1][1]) || weightMean != parseFloat(exo[1][2])){
                     
@@ -640,7 +642,7 @@ function generateSuggestedChanges(history){
                     };
                     
                     if(weightMean != parseFloat(exo[1][2])){
-                        suggestedData[id]['weight'] = weightMean;
+                        suggestedData[id]['weight'] = weightMeanRounded;
                         suggestedData[id]['oldWeight'] = parseFloat(exo[1][2]);
                     };
                 };
@@ -657,7 +659,7 @@ function generateSuggestedChanges(history){
 
 function recovery_init(mode){
     if(mode == "workout"){
-        recovery = [current_session[current_session.length - 1], "" , "", "", "", []];
+        recovery = [current_session.getId(), "" , "", "", "", []];
 
         recovery[1] = {
             "extype": false,
@@ -684,7 +686,7 @@ function recovery_init(mode){
 
         recovery[5] = undoMemory;
     }else if(mode == "intervall"){
-        recovery = [current_session[current_session.length - 1], "" , "", "", ""];
+        recovery = [current_session.getId(), "" , "", "", ""];
 
         recovery[1] = {
             "hasIntervallStarted": false,

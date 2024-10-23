@@ -2,7 +2,7 @@ function emptySessionScheme(){
     let out = [zeroAM(new Date()).getTime(), {}];
 
     session_list.forEach(session => {
-        out[1][session[session.length - 1]] = false
+        out[1][session.getId()] = false
     });
 
     return out

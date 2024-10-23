@@ -209,7 +209,7 @@ async function uniq_reschedulerSESSION(id){
 
         data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
-        if(Date.now() <= data[2][1] && !sessionToBeDone[1][session_list[index][session_list[index].length - 1]]){
+        if(Date.now() <= data[2][1] && sessionToBeDone[1][session_list[index].getId()]){
             data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0], 1);
         }else{
             data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0]);
@@ -232,7 +232,7 @@ async function uniq_reschedulerSESSION(id){
 
         data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
-        if(Date.now() <= data[2][z][1] && !sessionToBeDone[1][session_list[index][session_list[index].length - 1]]){
+        if(Date.now() <= data[2][z][1] && sessionToBeDone[1][session_list[index].getId()]){
             data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0], 1);
         }else{
             data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0]);
@@ -294,7 +294,7 @@ async function uniq_schedulerEDIT(id, reminderOrSession){
             };
 
         }else if(data[1][0] == "Week"){
-            let idy = input[i][input[i].length - 1];
+            let idy = input[i].getId();
 
             for(let z=0; z<data[2].length; z++){
                 id = "2" + (z+1) + idy + "1";
@@ -340,7 +340,7 @@ async function shiftSchedule(session, toSubstract){
             await removeAllNotifsFromSession(session);
         };
 
-        let idx = await getShownId(session[session.length - 1].toString(), data[1][0]);
+        let idx = await getShownId(session.getId().toString(), data[1][0]);
 
         if(data[1][0] == "Day"){
             let id = idx;
@@ -362,7 +362,7 @@ async function shiftSchedule(session, toSubstract){
                 };
             };
         }else if(data[1][0] == "Week"){
-            let idy = session[session.length - 1];
+            let idy = session.getId();
 
             for(let z=0; z<data[2].length; z++){
                 let id = "2" + (z+1).toString() + idy + "1";
@@ -396,7 +396,7 @@ async function rescheduler(){
 
             if(isScheduled(input[i])){
                 let data = input[i][input[i].length - 2];
-                let idx = await getShownId(input[i][input[i].length - 1].toString(), data[1][0]) // IF FIRST DAY OF WEEK SWITCH FROM 1 to 2, IT WILL RESCHEDULE OTHER DAYS, closestNextDate() PREVENT ERROR BUT NOT CLEAN;
+                let idx = await getShownId(input[i].getId().toString(), data[1][0]) // IF FIRST DAY OF WEEK SWITCH FROM 1 to 2, IT WILL RESCHEDULE OTHER DAYS, closestNextDate() PREVENT ERROR BUT NOT CLEAN;
 
                 if(data[1][0] == "Day"){
 
@@ -427,7 +427,7 @@ async function rescheduler(){
                         };
                     };
                 }else if(data[1][0] == "Week"){
-                    let idy = input[i][input[i].length - 1];
+                    let idy = input[i].getId();
 
                     for(let z=0; z<data[2].length; z++){
                         if(!pending.includes("2" + (z+1).toString() + idy + "1") && !pending.includes("2" + (z+1).toString() + idy + "2")){
@@ -485,7 +485,7 @@ async function scheduler(){
         for(let i=0; i<input.length; i++){
             if(isScheduled(input[i])){
                 let data = input[i][input[i].length - 2];
-                let sessionId = input[i][input[i].length - 1];
+                let sessionId = input[i].getId();
 
                 if(data[1][0] == "Day"){
                     let id = "1" + sessionId + "1"; 
@@ -571,7 +571,7 @@ async function removeAllNotifsFromSession(session){
     console.log('removed');
 
     let idList = false;
-    let sessionId = session[session.length - 1];
+    let sessionId = session.getId();
 
     if(getScheduleScheme(session) == "Week"){
         idList = ["21" + sessionId, "22" + sessionId, "23" + sessionId, "24" + sessionId, "25" + sessionId, "26" + sessionId, "27" + sessionId];

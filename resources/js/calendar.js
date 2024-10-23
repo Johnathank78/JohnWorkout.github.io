@@ -73,7 +73,7 @@ function updateCalendar(data){
 
     for(let i=0; i<data.length; i++){
         if(isScheduled(data[i])){
-            let id = data[i][data[i].length - 1];
+            let id = data[i].getId();
             let schedule = data[i][data[i].length - 2];
             let scheduleDateData = wasScheduledToday(schedule);
 
@@ -107,7 +107,7 @@ function updateCalendar(data){
                         };
 
                         let dayInd = nbdayz - pageOffeset;
-                        let match = findChanged(todaysDate.getTime(), ["from", data[i][data[i].length - 1]])["element"];
+                        let match = findChanged(todaysDate.getTime(), ["from", data[i].getId()])["element"];
 
                         if(match){
                             let newData = data[getSessionIndexByID(data, match['to'])];
@@ -116,7 +116,7 @@ function updateCalendar(data){
                             $(dayz).eq(dayInd).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
                         }else{
                             alpha = parseFloat(get_session_time(data[i])/min);
-                            $(dayz).eq(dayInd).data("sList").push([[data[i][data[i].length - 1], data[i][1]], [schedule[1][2], schedule[1][3]]]);
+                            $(dayz).eq(dayInd).data("sList").push([[data[i].getId(), data[i][1]], [schedule[1][2], schedule[1][3]]]);
                         };
 
                         if(alpha < 0.15){alpha = 0.15};
@@ -142,7 +142,7 @@ function updateCalendar(data){
                             if(match && scheduleDate.getTime() == todaysDate.getTime()){
                                 sessionToBeDone[1][match['to']] = true;
                             }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
-                                sessionToBeDone[1][data[i][data[i].length - 1]] = true;
+                                sessionToBeDone[1][data[i].getId()] = true;
                             };
                         };
                     };
@@ -190,7 +190,7 @@ function updateCalendar(data){
                                 $(dayz).eq(dayInd).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
                             }else{
                                 alpha = parseFloat(get_session_time(data[i])/min);
-                                $(dayz).eq(dayInd).data("sList").push([[data[i][data[i].length - 1], data[i][1]], [schedule[1][2], schedule[1][3]]]);
+                                $(dayz).eq(dayInd).data("sList").push([[data[i].getId(), data[i][1]], [schedule[1][2], schedule[1][3]]]);
                             };
 
                             if(alpha < 0.15){alpha = 0.15};
@@ -272,7 +272,7 @@ async function shiftPlusOne(){
                 let data = input[i][input[i].length - 2];
                 let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
 
-                let id = await getPendingId(input[i][input[i].length - 1], data[1][0]);
+                let id = await getPendingId(input[i].getId(), data[1][0]);
 
                 if(data[1][0] == "Day"){
                     if(input[i][0] == "R" && data[1][1] == 1){continue};
@@ -337,7 +337,7 @@ async function shiftPlusOne(){
                 };
 
                 if(input[i][0] != "R"){
-                    hasBeenShifted[1][input[i][input[i].length - 1]] = true;
+                    hasBeenShifted[1][input[i].getId()] = true;
                 };
             };
         };
@@ -660,7 +660,7 @@ $(document).ready(function(){
                 await scheduleId(start, 0, "Day", sessionto[1]+" | "+schedule[1][2]+":"+schedule[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, "session");
             }else if(match && match["element"]["from"] == idTo){
                 let scheme = getScheduleScheme(sessionto);
-                let notifToId = getNotifFirstIdChar(sessionto) + sessionto[sessionto.length - 1] + "1";
+                let notifToId = getNotifFirstIdChar(sessionto) + sessionto.getId() + "1";
 
                 await scheduleId(start, 0, scheme, sessionto[1]+" | "+schedule[1][2]+":"+schedule[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, "session");
             };
@@ -699,8 +699,8 @@ $(document).ready(function(){
         number = getSessionHistory(session_list[getSessionIndexByID(session_list, $(this).data("id"))])[0][2] + (dayIndex + 1) + (updateCalendarPage - 1) * numberOfDays;
 
         session_list.forEach(session => {
-            if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session[session.length - 1])){
-                $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session[session.length - 1]).replace('[sessionVAL]', session[1])))
+            if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session.getId())){
+                $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session.getId()).replace('[sessionVAL]', session[1])))
             };
         });
 
@@ -764,10 +764,10 @@ $(document).ready(function(){
                 itemHeight = initialHeight;
             };
 
-            if(sessionDone[1][arr[0][0]] && sessionToBeDone[1][arr[0][0]] && $(actualRowDay).data("time") == zeroAM(new Date()).getTime()){
-                itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(76, 83, 104)'))
+            if(sessionDone[1][arr[0][0]] && $(actualRowDay).data("time") == zeroAM(new Date()).getTime()){
+                itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(76, 83, 104)')) // GRAY
             }else{
-                itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(29, 188, 96)'))
+                itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(29, 188, 96)')) // GREEN
             };
             
             $(itemToAdd).data('id', arr[0][0]);

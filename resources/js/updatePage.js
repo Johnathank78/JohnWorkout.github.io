@@ -260,7 +260,7 @@ $(document).ready(function(){
 
             session_list.forEach(session => {
                 if(session[0] == 'I'){
-                    $('.update_intervallLink').append($(optString.replace('[idVAL]', session[session.length - 1]).replace('[sessionVAL]', session[1])))
+                    $('.update_intervallLink').append($(optString.replace('[idVAL]', session.getId()).replace('[sessionVAL]', session[1])))
                 };
             });
         }else{
@@ -331,7 +331,7 @@ $(document).ready(function(){
         if(session_list.filter(session => session[0] == "I").length == 0){return};
 
         let session = session_list[getSessionIndexByID(session_list, $('.update_intervallLink').val())];
-        let data = ["Int.", session[session.length - 1]];
+        let data = ["Int.", session.getId()];
 
         $(currentIntervallItem).data('data', data);
         $(currentIntervallItem).find('.update_workout_intervallName').text(session[1]);
@@ -350,8 +350,8 @@ $(document).ready(function(){
             if(reminderOrSession == "session"){
                 delete calendar_dict[update_current_item[1]];
 
-                sessionToBeDone[update_current_item[update_current_item.length - 1]] = false;
-                hasBeenShifted[1][update_current_item[update_current_item.length - 1]];
+                sessionToBeDone[update_current_item.getId()] = false;
+                hasBeenShifted[1][update_current_item.getId()];
 
                 session_save(session_list);
                 sessionToBeDone_save(sessionToBeDone);
@@ -373,7 +373,7 @@ $(document).ready(function(){
                 await removeAllNotifsFromSession(update_current_item);
             };
 
-            sessionToBeDone[1][update_current_item[update_current_item.length - 1]] = false;
+            sessionToBeDone[1][update_current_item.getId()] = false;
             bottomNotification("unscheduled", update_current_item[1]);
             manageHomeContainerStyle();
 
@@ -549,7 +549,7 @@ $(document).ready(function(){
                         };
 
                         if(isScheduled(session_list[update_current_index])){
-                            let id = await getPendingId(session_list[update_current_index][session_list[update_current_index].length - 1], getScheduleScheme(session_list[update_current_index]));
+                            let id = await getPendingId(session_list[update_current_index].getId(), getScheduleScheme(session_list[update_current_index]));
 
                             if(nameSav != new_name){
                                 updateCalendarDictItem(nameSav, new_name);
@@ -634,7 +634,7 @@ $(document).ready(function(){
                         };
 
                         if(isScheduled(session_list[update_current_index])){
-                            let id = await getPendingId(session_list[update_current_index][session_list[update_current_index].length - 1], getScheduleScheme(session_list[update_current_index]));
+                            let id = await getPendingId(session_list[update_current_index].getId(), getScheduleScheme(session_list[update_current_index]));
 
                             if(nameSav != new_name){
                                 updateCalendarDictItem(nameSav, new_name);
@@ -663,7 +663,7 @@ $(document).ready(function(){
                     reminder_list[update_current_index][2] = new_body;
 
                     if(isScheduled(reminder_list[update_current_index])){
-                        let id = await getPendingId(reminder_list[update_current_index][reminder_list[update_current_index].length - 1], getScheduleScheme(reminder_list[update_current_index]));
+                        let id = await getPendingId(reminder_list[update_current_index].getId(), getScheduleScheme(reminder_list[update_current_index]));
                         uniq_schedulerEDIT(id, "reminder");
                     };
 
@@ -843,7 +843,7 @@ $(document).ready(function(){
 
             if(reminderOrSession == "session"){
                 title = session_list[update_current_index][1];
-                id = session_list[update_current_index][session_list[update_current_index].length - 1];
+                id = session_list[update_current_index].getId();
 
                 if(platform == "Mobile"){
                     await removeAllNotifsFromSession(session_list[update_current_index]);
@@ -958,7 +958,7 @@ $(document).ready(function(){
                 };
 
                 if(every == "Day"){
-                    id = await getPendingId(update_current_item[update_current_item.length - 1], "Day");
+                    id = await getPendingId(update_current_item.getId(), "Day");
 
                     daytoset_conventional = dayofweek_conventional.indexOf(day);
 
@@ -995,7 +995,7 @@ $(document).ready(function(){
                     daytoset_conventional = 0;
 
                     let temp = [];
-                    let idy = update_current_item[update_current_item.length - 1];
+                    let idy = update_current_item.getId();
 
                     for(let i=0; i<day.length; i++){
                         id = (i+1).toString() + idy + "1";
@@ -1060,7 +1060,7 @@ $(document).ready(function(){
                     console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
                 };
 
-                if(reminderOrSession == "session"){hasBeenShifted[1][update_current_item[update_current_item.length - 1]] = false};
+                if(reminderOrSession == "session"){hasBeenShifted[1][update_current_item.getId()] = false};
 
             }else{
                 return;
