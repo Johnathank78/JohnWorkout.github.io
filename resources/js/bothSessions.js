@@ -1103,6 +1103,8 @@ $(document).ready(function(){
         bottomNotification("updated", current_session[1]);
         session_save(session_list);
 
+        refresh_session_tile();
+
         closePanel('congrats');
         canNowClick();
     });
