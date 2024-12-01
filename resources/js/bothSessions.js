@@ -190,7 +190,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -1075,7 +1075,7 @@ $(document).ready(function(){
     });
 
 
-    // SUGGESTED 
+    // SUGGESTED
 
     $('.selection_sessionFinished_suggestedBtn').on('click', function(){
         $('.selection_sessionFinished_suggested_optGroup').each((_, item) => {

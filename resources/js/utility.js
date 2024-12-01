@@ -648,6 +648,10 @@ function closestNextDate(timestamp, gap, intervallType, offset = false){
 
     let inc = intervallType == "Day" ? 1 : 7;
 
+    if (out.getTime() >= now.getTime()) {
+        return out.getTime();
+    };
+
     while (out.getTime() < now.getTime()){
         out.setDate(out.getDate() + (gap * inc));
     };

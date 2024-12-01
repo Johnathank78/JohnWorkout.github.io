@@ -197,9 +197,9 @@ function updateCalendar(data){
 
                             if((!match
                                 && ((calendar_dict[data[i][1]] && !sessionDone[1][id])
-                                || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today))) 
+                                || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today)))
                             || (match
-                                && (!sessionDone[1][match['to']] 
+                                && (!sessionDone[1][match['to']]
                                 || (sessionDone[1][match['to']] && nbdayz != today)))
                             ){
                                 if($(dayz).eq(dayInd).css('backgroundColor').includes("rgba")){
@@ -479,6 +479,7 @@ function extractDate(unixTimestamp) {
 }
 
 $(document).ready(function(){
+
     $(document).on("click", ".main_title_block" , function(){
         if(!isAbleToClick("calendar")){return};
 

@@ -1391,9 +1391,9 @@ function resetTimer(LR){
 
 // DELETION
 
-async function dropSet_animated(node){
-    let big = $(node).parent().parent();
-    let exo = $(node).parent();
+async function dropSet_animated(set){
+    let big = $(set).parent().parent();
+    let exo = $(set).parent();
 
     if($(big).children().length == 1 && $(exo).children(".session_next_exercise_set").length == 1){
         isDeleting = true;
@@ -1402,7 +1402,7 @@ async function dropSet_animated(node){
         });
     }else{
         isDeleting = true;
-        $(node).animateRemove(-17, 350, () => {
+        $(set).animateRemove(-17, 350, () => {
             isDeleting = false;
         });
     };
@@ -1412,21 +1412,16 @@ async function dropSet_animated(node){
     };
 };
 
-function dropSet_static(node){
+function dropSet_static(set){
 
-    let big = $(node).parent().parent();
-    let exo = $(node).parent();
+    let big = $(set).parent().parent();
+    let exo = $(set).parent();
 
-    $(node).remove();
-
-    if($(exo).children().length == 0){
-        $(exo).remove();
-    };
-
-    if($(big).children().length == 0){
+    if($(big).children().length == 1 && $(exo).children(".session_next_exercise_set").length == 1){
         $(big).remove();
+    }else{
+        $(set).remove();
     };
-
 
     if($(".session_next_exercises_container")[0].scrollHeight < ($(window).height()*0.19)){
         $('.session_next_exercise_expander').css("display", "none");
