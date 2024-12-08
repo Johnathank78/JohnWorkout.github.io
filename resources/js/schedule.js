@@ -65,7 +65,7 @@ function getPendingIdListWEB(){
     for (let i = 0; i < comboList.length; i++) {
         if(isScheduled(comboList[i])){
             data = comboList[i][comboList[i].length - 2];
-            if(getScheduleScheme(comboList[i]) == "Day"){
+            if(getScheduleScheme(comboList[i]) == "Day" && data[2][1] > Date.now() - toSubstract){
                 out.push("1" + comboList[i][comboList[i].length - 1] + "1");
             }else{
                 for (let z = 0; z < data[2].length; z++) {
@@ -181,8 +181,9 @@ function setHoursMinutes(date, hours, minutes){
 };
 
 function getScheduleScheme(session){
-    if(isScheduled(session)){
-        return session[session.length - 2][1][0];
+    let scheduleData = isScheduled(session);
+    if(scheduleData){
+        return scheduleData[1][0];
     }else{
         return false;
     };
@@ -196,11 +197,14 @@ function isNotificationAnticipated(timestamp, hours, minutes){
 //-------------;
 
 async function uniq_reschedulerSESSION(id){
+    let hasBeenRescheduled = false;
+    let beforeLeapCycle = false;
     let index = false;
     let data = false;
-
+    
     index = getSessionIndexByNotificationID(id);
-    data = session_list[index][session_list[index].length - 2];
+    data = isScheduled(session_list[index]);
+    beforeLeapCycle = data[3]["everyVal"];
 
     let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
 
@@ -210,9 +214,10 @@ async function uniq_reschedulerSESSION(id){
         data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
         if(Date.now() <= data[2][1] && sessionToBeDone[1][session_list[index].getId()]){
-            data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0], 1);
+            hasBeenRescheduled = true;
+            data[2][1] = closestNextDate(parseInt(data[2][1]), data, 1);
         }else{
-            data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0]);
+            data[2][1] = closestNextDate(parseInt(data[2][1]), data);
         };
 
         if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
@@ -233,9 +238,10 @@ async function uniq_reschedulerSESSION(id){
         data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
         if(Date.now() <= data[2][z][1] && sessionToBeDone[1][session_list[index].getId()]){
-            data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0], 1);
+            hasBeenRescheduled = true;
+            data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data, 1);
         }else{
-            data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0]);
+            data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
         };
 
         if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
@@ -246,6 +252,15 @@ async function uniq_reschedulerSESSION(id){
             await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session_list[index][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
         };
     };
+
+    if(hasBeenRescheduled){
+        if(data[4] + 1 > beforeLeapCycle){
+            data[4] = 1;
+        }else{
+            data[4] += 1;
+        };
+    };
+
 
     if(platform == "Mobile"){
         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
@@ -271,13 +286,14 @@ async function uniq_schedulerEDIT(id, reminderOrSession){
             await removeAllNotifsFromSession(input[i]);
         };
 
-        let data = input[i][input[i].length - 2];
+        let data = isScheduled(input[i]);
+        let beforeLeapCycle = data[3]["everyVal"];
 
         if(data[1][0] == "Day"){
             id = id.slice(0, -1) + "1";
 
             data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-            data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0]);
+            data[2][1] = closestNextDate(parseInt(data[2][1]), data);
 
             if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
                 data[2][1] -= toSubstract;
@@ -300,7 +316,7 @@ async function uniq_schedulerEDIT(id, reminderOrSession){
                 id = "2" + (z+1) + idy + "1";
 
                 data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0]);
+                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
 
                 if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
                     data[2][z][1] -= toSubstract;
@@ -334,7 +350,7 @@ async function uniq_schedulerEDIT(id, reminderOrSession){
 async function shiftSchedule(session, toSubstract){
     if(isScheduled(session)){
 
-        let data = session[session.length - 2];
+        let data = isScheduled(session);
 
         if(platform == "Mobile"){
             await removeAllNotifsFromSession(session);
@@ -346,7 +362,7 @@ async function shiftSchedule(session, toSubstract){
             let id = idx;
 
             data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-            data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0]);
+            data[2][1] = closestNextDate(parseInt(data[2][1]), data);
 
             if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
                 data[2][1] -= toSubstract;
@@ -368,7 +384,7 @@ async function shiftSchedule(session, toSubstract){
                 let id = "2" + (z+1).toString() + idy + "1";
 
                 data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0]);
+                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
 
                 if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
                     data[2][z][1] -= toSubstract;
@@ -395,7 +411,10 @@ async function rescheduler(){
         for(let i=0; i<input.length; i++){
 
             if(isScheduled(input[i])){
+                let hasBeenRescheduled = false;
                 let data = input[i][input[i].length - 2];
+                let beforeLeapCycle = data[3]["everyVal"];
+
                 let idx = await getShownId(input[i].getId().toString(), data[1][0]) // IF FIRST DAY OF WEEK SWITCH FROM 1 to 2, IT WILL RESCHEDULE OTHER DAYS, closestNextDate() PREVENT ERROR BUT NOT CLEAN;
 
                 if(data[1][0] == "Day"){
@@ -406,10 +425,11 @@ async function rescheduler(){
 
                         data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
-                        if(isAnticipated && Date.now() < data[2][1] && istoday(data[2][z][1])){
-                            data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0], 1);
+                        if(isAnticipated && Date.now() < data[2][1] && istoday(data[2][1])){
+                            hasBeenRescheduled = true;
+                            data[2][1] = closestNextDate(parseInt(data[2][1]), data, 1);
                         }else{
-                            data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0]);
+                            data[2][1] = closestNextDate(parseInt(data[2][1]), data);
                         };
 
                         if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
@@ -437,9 +457,10 @@ async function rescheduler(){
                             data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
                             if(isAnticipated && Date.now() < data[2][z][1] && istoday(data[2][z][1])){
-                                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0], 1);
+                                hasBeenRescheduled = true;
+                                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data, 1);
                             }else{
-                                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0]);
+                                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
                             };
 
                             if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
@@ -454,6 +475,14 @@ async function rescheduler(){
                                 };
                             };
                         };
+                    };
+                };
+
+                if(hasBeenRescheduled){
+                    if(data[4] + 1 > beforeLeapCycle){
+                        data[4] = 1;
+                    }else{
+                        data[4] += 1;
                     };
                 };
             };
@@ -491,7 +520,7 @@ async function scheduler(){
                     let id = "1" + sessionId + "1"; 
 
                     data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-                    data[2][1] = closestNextDate(parseInt(data[2][1]), parseInt(data[1][1]), data[1][0]);
+                    data[2][1] = closestNextDate(parseInt(data[2][1]), data);
 
                     if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
                         data[2][1] -= toSubstract;
@@ -512,7 +541,7 @@ async function scheduler(){
                         let id = "2" + (z+1).toString() + sessionId + "1";
 
                         data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-                        data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), parseInt(data[1][1]), data[1][0]);
+                        data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
 
                         if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
                             data[2][z][1] -= toSubstract;

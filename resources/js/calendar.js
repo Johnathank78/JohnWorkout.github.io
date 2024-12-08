@@ -5,6 +5,86 @@ var previewShown = false;
 var actualRowDay = false;
 var focusShown = false;
 
+function getAssociatedDate(dayIndex){
+    return zeroAM(new Date($(".selection_page_calendar_row_day").eq(dayIndex).data('time')));
+};
+
+function isEventScheduled(C, D, X, Y, Z, U, T, O=1, ID=false){
+    // Calcul de diffInDays
+    const millisecondsPerDay = 24 * 60 * 60 * 1000;
+    const diffInDays = Math.round((zeroAM(C) - zeroAM(D)) / millisecondsPerDay);
+
+    // Convertir l'unité de récurrence en jours
+    let intervalDays;
+    if(Y === "Day"){
+        intervalDays = X;
+    }else if(Y === "Week"){
+        intervalDays = X * 7;
+    }else{
+        throw new Error("Unité de récurrence Y invalide. Doit être 'Day' ou 'Week'.");
+    };
+
+    // Vérifier si on a un saut
+    const hasSkip = (typeof Z === 'number' && Z > 0) && (typeof U === 'string');
+
+    let cycleLength;
+    if (hasSkip) {
+        const skipDays = Z;
+        if(U === "Day"){
+            cycleLength = T * intervalDays + skipDays - Math.abs(1 - X);
+        }else if(U === "Week"){
+            cycleLength = T * intervalDays + (skipDays * 7);
+        }else{
+            throw new Error("Unité de récurrence U invalide. Doit être 'Day' ou 'Week'.");
+        };
+    };
+
+    // Fonction interne permettant de déterminer si une date donnée (diffInDays relatif à D)
+    // est un jour d'événement, en utilisant la logique existante.
+    function checkEventDay(dInDays) {
+        if(!hasSkip){
+            // Pas de saut : l'événement se produit tous les intervalDays jours
+            return (dInDays % intervalDays === 0);
+        }else{
+            // Avec saut
+            const daysIntoCycle = ((dInDays) + (O - 1) * intervalDays) % cycleLength;
+            const adjustedDaysIntoCycle = daysIntoCycle < 0 ? cycleLength + daysIntoCycle : daysIntoCycle;
+            
+            if(adjustedDaysIntoCycle < T * intervalDays){
+                return (adjustedDaysIntoCycle % intervalDays === 0);
+            };
+
+            return false;
+        };
+    };
+
+    if(diffInDays >= 0){
+        return checkEventDay(diffInDays);
+    }else{
+        // WAS SCHEDULED
+        // Vérifions si C est un jour d'événement
+        const C_isEvent = checkEventDay(diffInDays);
+
+        // Vérifions l'espacement
+        const dayDifference = Math.round((zeroAM(D) - zeroAM(C)) / millisecondsPerDay); 
+        // dayDifference devrait être positif puisque C < D
+        const correctSpacing = (dayDifference === intervalDays);
+
+        // Si C est un événement, D est un événement, et C est exactement intervalDays jours avant D
+        // alors C est l'événement n - 1 (immédiatement précédent D), on retourne true.
+        const today = zeroAM(new Date());
+        const C_isPast = C.getTime() == today.getTime(); 
+
+        const isShifted = ID ? hasBeenShifted[1][ID] : true
+
+        if(C_isEvent && correctSpacing && C_isPast && !isShifted){
+            return true;
+        };
+
+        return false;
+    };
+};
+
 function updateCalendar(data){
     let end = 20;
 
@@ -75,39 +155,84 @@ function updateCalendar(data){
         if(isScheduled(data[i])){
             let id = data[i].getId();
             let schedule = data[i][data[i].length - 2];
-            let scheduleDateData = wasScheduledToday(schedule);
+            let isAjump = schedule[3]['jumpTimestamp'] !== null;
+            let jumpData = isAjump ? schedule[3] : false;
+            let scheduleOccurence = schedule[4];
 
             if(schedule[1][0] == "Day"){
-                let scheduleDate = zeroAM(new Date(scheduleDateData[2][1]));
-                let pageOffeset = ((end + 1) * (updateCalendarPage - 1));
+                let scheduleDate = zeroAM(new Date(schedule[2][1]));
+                
+                let pageOffset = ((end + 1) * (updateCalendarPage - 1));
+                let nbdayz = pageOffset == 0 ? today : pageOffset;
 
-                let delta = Math.ceil((scheduleDate.getTime() - todaysDate.getTime()) / (1000 * 3600 * 24));
+                while(nbdayz <= end + pageOffset){
+                    let dayInd = nbdayz - pageOffset;
+                    let associatedDate = getAssociatedDate(dayInd);
 
-                let nbdayz = today + delta + pageOffeset;
-
-                for(let y = 0; y<pageOffeset; y++){
-                    if(nbdayz < end + pageOffeset){
-                        nbdayz += schedule[1][1];
+                    if(!isEventScheduled(associatedDate, scheduleDate, schedule[1][1], schedule[1][0], jumpData['jumpVal'], jumpData['jumpType'], jumpData['everyVal'], scheduleOccurence, id)){
+                        nbdayz += 1; 
+                        continue;
                     };
-                };
 
-                if(delta > end - today + pageOffeset){continue};
+                    let match = findChanged(associatedDate.getTime(), ["from", data[i].getId()])["element"];
 
-                if(nbdayz < today){
-                    nbdayz += (Math.ceil((today - nbdayz)/schedule[1][1]) * schedule[1][1]);
-                };
+                    if(match){
+                        let newData = data[getSessionIndexByID(data, match['to'])];
+                        alpha = parseFloat(get_session_time(newData)/min);
 
-                nbdayz = nbdayz - pageOffeset;
+                        $(dayz).eq(dayInd).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
+                    }else{
+                        alpha = parseFloat(get_session_time(data[i])/min);
+                        $(dayz).eq(dayInd).data("sList").push([[data[i].getId(), data[i][1]], [schedule[1][2], schedule[1][3]]]);
+                    };
 
-                while(nbdayz <= end + pageOffeset){
-                    if(nbdayz >= today){
+                    if(alpha < 0.15){alpha = 0.15};
 
-                        if(nbdayz - pageOffeset < 0){
-                            nbdayz = nbdayz + Math.ceil(Math.abs(nbdayz - pageOffeset)/schedule[1][1]) * schedule[1][1];
+                    if((!match
+                        && ((calendar_dict[data[i][1]] && !sessionDone[1][id])
+                        || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today))) 
+                    || (match 
+                        && (!sessionDone[1][match['to']] 
+                        || (sessionDone[1][match['to']] && nbdayz != today)))
+                    ){
+                        if($(dayz).eq(dayInd).css('backgroundColor').includes("rgba")){
+                            let actual_alpha = $(dayz).eq(dayInd).css('backgroundColor').split(",");
+
+                            actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
+                            $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
+                        }else{
+                            if($(dayz).eq(dayInd).css('backgroundColor') == "rgb(76, 83, 104)"){
+                                $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
+                            };
                         };
 
-                        let dayInd = nbdayz - pageOffeset;
-                        let match = findChanged(todaysDate.getTime(), ["from", data[i].getId()])["element"];
+                        if(match && scheduleDate.getTime() == todaysDate.getTime()){
+                            sessionToBeDone[1][match['to']] = true;
+                        }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
+                            sessionToBeDone[1][data[i].getId()] = true;
+                        };
+                    };
+
+                    nbdayz += 1
+                };
+            }else if(schedule[1][0] == "Week"){
+                for(let z=0; z<schedule[2].length; z++){
+                    let scheduleDate = zeroAM(new Date(schedule[2][z][1]));
+
+                    let pageOffset = ((end + 1) * (updateCalendarPage - 1));
+                    let nbdayz = pageOffset == 0 ? today : pageOffset;
+
+                    while(nbdayz <= end + pageOffset){
+                        
+                        let dayInd = nbdayz - pageOffset;
+                        let associatedDate = getAssociatedDate(dayInd);
+
+                        if(!isEventScheduled(associatedDate, scheduleDate, schedule[1][1], schedule[1][0], jumpData['jumpVal'], jumpData['jumpType'], jumpData['everyVal'], scheduleOccurence, id)){
+                            nbdayz += 1; 
+                            continue;
+                        };
+
+                        let match = findChanged(associatedDate.getTime(), ["from", id])["element"];
 
                         if(match){
                             let newData = data[getSessionIndexByID(data, match['to'])];
@@ -123,9 +248,9 @@ function updateCalendar(data){
 
                         if((!match
                             && ((calendar_dict[data[i][1]] && !sessionDone[1][id])
-                            || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today))) 
-                        || (match 
-                            && (!sessionDone[1][match['to']] 
+                            || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today)))
+                        || (match
+                            && (!sessionDone[1][match['to']]
                             || (sessionDone[1][match['to']] && nbdayz != today)))
                         ){
                             if($(dayz).eq(dayInd).css('backgroundColor').includes("rgba")){
@@ -142,86 +267,11 @@ function updateCalendar(data){
                             if(match && scheduleDate.getTime() == todaysDate.getTime()){
                                 sessionToBeDone[1][match['to']] = true;
                             }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
-                                sessionToBeDone[1][data[i].getId()] = true;
-                            };
-                        };
-                    };
-
-                    nbdayz += schedule[1][1];
-                };
-            }else if(schedule[1][0] == "Week"){
-                for(let z=0; z<schedule[2].length; z++){
-                    let scheduleDateData = wasScheduledToday(schedule, z);
-                    
-                    let scheduleDate = zeroAM(new Date(scheduleDateData[2][z][1]));
-
-                    let pageOffeset = ((end + 1) * (updateCalendarPage - 1));
-
-                    let delta = Math.ceil((scheduleDate.getTime() - todaysDate.getTime()) / (1000 * 3600 * 24));
-                    let nbdayz = today + delta + pageOffeset;
-
-                    for(let y = 0; y<pageOffeset; y++){
-                        if(nbdayz < end + pageOffeset){
-                            nbdayz += schedule[1][1] * 7;
-                        };
-                    };
-
-                    if(delta > end - today + pageOffeset){continue};
-
-                    if(nbdayz < today){
-                        nbdayz += schedule[1][1]*7;
-                    };
-
-                    nbdayz = nbdayz - pageOffeset;
-
-                    while(nbdayz <= end + pageOffeset){
-                        if(nbdayz >= today){
-                            if(nbdayz - pageOffeset < 0){
-                                nbdayz = nbdayz + Math.ceil(Math.abs(nbdayz - pageOffeset)/(schedule[1][1] * 7)) * (schedule[1][1] * 7);
-                            };
-
-                            let dayInd = nbdayz - pageOffeset;
-                            let match = findChanged($(dayz).eq(dayInd).data('time'), ["from", id])["element"];
-
-                            if(match){
-                                let newData = data[getSessionIndexByID(data, match['to'])];
-                                alpha = parseFloat(get_session_time(newData)/min);
-
-                                $(dayz).eq(dayInd).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
-                            }else{
-                                alpha = parseFloat(get_session_time(data[i])/min);
-                                $(dayz).eq(dayInd).data("sList").push([[data[i].getId(), data[i][1]], [schedule[1][2], schedule[1][3]]]);
-                            };
-
-                            if(alpha < 0.15){alpha = 0.15};
-
-                            if((!match
-                                && ((calendar_dict[data[i][1]] && !sessionDone[1][id])
-                                || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today)))
-                            || (match
-                                && (!sessionDone[1][match['to']]
-                                || (sessionDone[1][match['to']] && nbdayz != today)))
-                            ){
-                                if($(dayz).eq(dayInd).css('backgroundColor').includes("rgba")){
-                                    let actual_alpha = $(dayz).eq(dayInd).css('backgroundColor').split(",");
-    
-                                    actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
-                                    $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
-                                }else{
-                                    if($(dayz).eq(dayInd).css('backgroundColor') == "rgb(76, 83, 104)"){
-                                        $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
-                                    };
-                                };
-
-                                if(match && scheduleDate.getTime() == todaysDate.getTime()){
-                                    sessionToBeDone[1][match['to']] = true;
-                                }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
-                                    sessionToBeDone[1][id] = true;
-                                };
+                                sessionToBeDone[1][id] = true;
                             };
                         };
 
-                        nbdayz += schedule[1][1] * 7;
+                        nbdayz += 1;
                     };
                 };
             };
@@ -229,38 +279,6 @@ function updateCalendar(data){
     };
 
     sessionToBeDone_save(sessionToBeDone);
-};
-
-function wasScheduledToday(data, z=false){
-    let clonedData = JSON.parse(JSON.stringify(data));
-
-    if (z !== false) {
-        let ScheduleDate = zeroAM(new Date(data[2][z][1]));
-        let TodayDate = zeroAM(new Date());
-        let tempOut = new Date(clonedData[2][z][1]);
-
-        ScheduleDate.setDate(ScheduleDate.getDate() - data[1][1] * 7);
-
-        if (ScheduleDate.getTime() === TodayDate.getTime()){
-            tempOut.setDate(tempOut.getDate() - data[1][1] * 7);
-        };
-
-        clonedData[2][z][1] = tempOut.getTime();
-    } else {
-        let ScheduleDate = zeroAM(new Date(data[2][1]));
-        let TodayDate = zeroAM(new Date());
-        let tempOut = new Date(clonedData[2][1]);
-
-        ScheduleDate.setDate(ScheduleDate.getDate() - data[1][1]);
-
-        if (ScheduleDate.getTime() === TodayDate.getTime()){
-            tempOut.setDate(tempOut.getDate() - data[1][1]);
-        };
-
-        clonedData[2][1] = tempOut.getTime();
-    };
-
-    return clonedData;
 };
 
 async function shiftPlusOne(){
@@ -276,13 +294,11 @@ async function shiftPlusOne(){
 
                 if(data[1][0] == "Day"){
                     if(input[i][0] == "R" && data[1][1] == 1){continue};
+                    
                     isShifted = true;
-
-                    let scheduleSave = wasScheduledToday(data);
-
                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
 
-                    data[2][1] = setHoursMinutes(new Date(scheduleSave[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+                    data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
                     let tempDate = new Date(data[2][1]);
                     tempDate.setDate(tempDate.getDate() + 1);
@@ -308,12 +324,10 @@ async function shiftPlusOne(){
                     isShifted = true;
 
                     for(let z=0; z<data[2].length; z++){
-                        let scheduleSave = wasScheduledToday(data, z);
-
                         let idx = (z+1).toString() + id.slice(1, id.length);
                         if(platform == "Mobile"){await undisplayAndCancelNotification(idx)};
 
-                        data[2][z][1] = setHoursMinutes(new Date(scheduleSave[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+                        data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
 
                         let tempDate = new Date(data[2][z][1]);
                         tempDate.setDate(tempDate.getDate() + 1);

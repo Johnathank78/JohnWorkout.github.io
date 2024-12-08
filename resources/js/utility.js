@@ -642,7 +642,11 @@ function timeFormat(ref){
 
 // Date
 
-function closestNextDate(timestamp, gap, intervallType, offset = false){
+function hasHourPassed(date, hours, minutes){
+    return hours*3600 + minutes*60 > date.getHours()*3600 + date.getMinutes()*60;
+};
+
+function closestNextDateSAV(timestamp, gap, intervallType, offset = false){
     let out = new Date(timestamp);
     let now = new Date();
 
@@ -662,6 +666,57 @@ function closestNextDate(timestamp, gap, intervallType, offset = false){
 
     return out.getTime();
 };
+
+function getScheduleIntervall(fromTimestamp, timestamp, gap, intervalType) {
+    let out = new Date(timestamp);
+    let now = new Date(fromTimestamp);
+
+    let inc = intervalType === "Day" ? 1 : 7;
+
+    // Calculate the number of intervals needed to reach the next valid date
+    if (out.getTime() >= now.getTime()) {
+        let intervalsNeeded = Math.ceil((out.getTime() - now.getTime()) / (gap * inc * 24 * 60 * 60 * 1000));
+        return intervalsNeeded;
+    };
+
+    return -1;
+};
+
+function closestNextDate(D, scheduleData, offset = 0) {
+    const now = new Date();
+    const studyDate = new Date(D)
+
+    const X = scheduleData[1][1];
+    const Y = scheduleData[1][0];
+    const Z = scheduleData[3]["jumpVal"];
+    const U = scheduleData[3]["jumpType"];
+    const T = scheduleData[3]["everyVal"];
+    const O = scheduleData[4];
+
+    const hours = scheduleData[1][2];
+    const minutes = scheduleData[1][3];
+
+    // Start searching from max(D, now) so we look for future occurrences
+    let testDate = new Date(Math.max(studyDate.getTime(), now.getTime()));
+
+    // Increment day-by-day until we find a scheduled event
+    while(!isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)){
+        testDate.setDate(testDate.getDate() + 1);
+    };
+
+    // Once found, if offset is given, move forward by (offset * X * inc) days
+    let offsetCount = 0;
+    while (offsetCount != offset) {
+        testDate.setDate(testDate.getDate() + 1);
+        if(isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)){
+            offsetCount += 1;
+        };
+    };
+
+    testDate = setHoursMinutes(testDate, hours, minutes);
+
+    return testDate.getTime();
+}
 
 function zeroAM(date){
     date.setHours(0);
@@ -955,35 +1010,31 @@ function changeLanguage(lang, first=false){
 
     // Calendar;
 
-    $($(".selection_page_calendar_header_D")[0]).text(textAssets[lang]["misc"]["dayInitials"]["monday"]);
-    $($(".selection_page_calendar_header_D")[1]).text(textAssets[lang]["misc"]["dayInitials"]["tuesday"]);
-    $($(".selection_page_calendar_header_D")[2]).text(textAssets[lang]["misc"]["dayInitials"]["wednesday"]);
-    $($(".selection_page_calendar_header_D")[3]).text(textAssets[lang]["misc"]["dayInitials"]["thursday"]);
-    $($(".selection_page_calendar_header_D")[4]).text(textAssets[lang]["misc"]["dayInitials"]["friday"]);
-    $($(".selection_page_calendar_header_D")[5]).text(textAssets[lang]["misc"]["dayInitials"]["saturday"]);
-    $($(".selection_page_calendar_header_D")[6]).text(textAssets[lang]["misc"]["dayInitials"]["sunday"]);
+    $(".selection_page_calendar_header_D").eq(0).text(textAssets[lang]["misc"]["dayInitials"]["monday"]);
+    $(".selection_page_calendar_header_D").eq(1).text(textAssets[lang]["misc"]["dayInitials"]["tuesday"]);
+    $(".selection_page_calendar_header_D").eq(2).text(textAssets[lang]["misc"]["dayInitials"]["wednesday"]);
+    $(".selection_page_calendar_header_D").eq(3).text(textAssets[lang]["misc"]["dayInitials"]["thursday"]);
+    $(".selection_page_calendar_header_D").eq(4).text(textAssets[lang]["misc"]["dayInitials"]["friday"]);
+    $(".selection_page_calendar_header_D").eq(5).text(textAssets[lang]["misc"]["dayInitials"]["saturday"]);
+    $(".selection_page_calendar_header_D").eq(6).text(textAssets[lang]["misc"]["dayInitials"]["sunday"]);
 
-    $($(".calendarGo")[0]).text(textAssets[lang]["calendar"]["backWard"]);
-    $($(".calendarGo")[1]).text(textAssets[lang]["calendar"]["forWard"]);
+    $(".calendarGo").eq(0).text(textAssets[lang]["calendar"]["backWard"]);
+    $(".calendarGo").eq(1).text(textAssets[lang]["calendar"]["forWard"]);
     $(".selection_page_calendar_plusOne").text(textAssets[lang]["calendar"]["shiftByOne"]);
 
-    $($(".selection_page_calendar_header_M")[0]).text(textAssets[lang]["misc"]["abrMonthLabels"][getKeyByValue(textAssets[previousLanguage]["misc"]["abrMonthLabels"], $($(".selection_page_calendar_header_M")[0]).text())]);
-    $($(".selection_page_calendar_header_M")[1]).text(textAssets[lang]["misc"]["abrMonthLabels"][getKeyByValue(textAssets[previousLanguage]["misc"]["abrMonthLabels"], $($(".selection_page_calendar_header_M")[1]).text())]);
+    $(".selection_page_calendar_header_M").eq(0).text(textAssets[lang]["misc"]["abrMonthLabels"][getKeyByValue(textAssets[previousLanguage]["misc"]["abrMonthLabels"], $($(".selection_page_calendar_header_M")[0]).text())]);
+    $(".selection_page_calendar_header_M").eq(1).text(textAssets[lang]["misc"]["abrMonthLabels"][getKeyByValue(textAssets[previousLanguage]["misc"]["abrMonthLabels"], $($(".selection_page_calendar_header_M")[1]).text())]);
 
     $(".selection_page_calendar_noSession").text(textAssets[lang]["calendar"]["emptyMessage"]);
     $(".selection_dayPreview_noSession").text(textAssets[lang]["calendar"]["emptyMessage"]);
 
-    $($(".update_schedule_span")[0]).text(textAssets[lang]["updatePage"]["on"]);
-    $($(".update_schedule_span")[1]).text(textAssets[lang]["updatePage"]["at"]);
-    $($(".update_schedule_span")[3]).text(textAssets[lang]["updatePage"]["every"]);
-
     // Stats;
 
-    $($(".selection_info_item_title")[0]).text(textAssets[lang]["stats"]["timeSpent"]);
-    $($(".selection_info_item_title")[1]).text(textAssets[lang]["stats"]["workedTime"]);
-    $($(".selection_info_item_title")[2]).text(textAssets[lang]["stats"]["weightLifted"]);
-    $($(".selection_info_item_title")[3]).text(textAssets[lang]["stats"]["repsDone"]);
-    $($(".selection_info_item_title")[4]).text(textAssets[lang]["stats"]["sessionMissed"]);
+    $(".selection_info_item_title").eq(0).text(textAssets[lang]["stats"]["timeSpent"]);
+    $(".selection_info_item_title").eq(1).text(textAssets[lang]["stats"]["workedTime"]);
+    $(".selection_info_item_title").eq(2).text(textAssets[lang]["stats"]["weightLifted"]);
+    $(".selection_info_item_title").eq(3).text(textAssets[lang]["stats"]["repsDone"]);
+    $(".selection_info_item_title").eq(4).text(textAssets[lang]["stats"]["sessionMissed"]);
     $(".selection_infoStart_title").text(textAssets[lang]["stats"]["since"]);
 
     $(".selection_infoStart_value").text(formatDate(since));
@@ -994,12 +1045,12 @@ function changeLanguage(lang, first=false){
     // Preferences;
 
     $(".selection_parameters_title").text(textAssets[lang]["preferences"]["preferences"]);
-    $($(".selection_parameters_text")[0]).text(textAssets[lang]["preferences"]["language"]);
-    $($(".selection_parameters_text")[1]).text(textAssets[lang]["preferences"]["weightUnit"]);
-    $($(".selection_parameters_text")[2]).text(textAssets[lang]["preferences"]["notifBefore"]);
-    $($(".selection_parameters_text")[3]).text(textAssets[lang]["preferences"]["keepHistory"]);
-    $($(".selection_parameters_text")[4]).text(textAssets[lang]["preferences"]["keepAwake"]);
-    $($(".selection_parameters_text")[5]).text(textAssets[lang]["preferences"]["autoSaver"]);
+    $(".selection_parameters_text").eq(0).text(textAssets[lang]["preferences"]["language"]);
+    $(".selection_parameters_text").eq(1).text(textAssets[lang]["preferences"]["weightUnit"]);
+    $(".selection_parameters_text").eq(2).text(textAssets[lang]["preferences"]["notifBefore"]);
+    $(".selection_parameters_text").eq(3).text(textAssets[lang]["preferences"]["keepHistory"]);
+    $(".selection_parameters_text").eq(4).text(textAssets[lang]["preferences"]["keepAwake"]);
+    $(".selection_parameters_text").eq(5).text(textAssets[lang]["preferences"]["autoSaver"]);
 
     let prefList = ["kg", "lbs", "forEver", "sDays", "oMonth", "tMonth", "sMonth", "oYear"];
     $(".selection_parameters_opt").each(function(index){
@@ -1011,10 +1062,10 @@ function changeLanguage(lang, first=false){
     // Import - Export;
 
     $(".selection_saveLoad_headerText").text(textAssets[lang]["preferences"]["impExpMenu"]["selectElements"]);
-    $($(".selection_saveLoad_itemText")[0]).text(textAssets[lang]["preferences"]["impExpMenu"]["sessionList"]);
-    $($(".selection_saveLoad_itemText")[1]).text(textAssets[lang]["preferences"]["impExpMenu"]["reminderList"]);
-    $($(".selection_saveLoad_itemText")[2]).text(textAssets[lang]["preferences"]["impExpMenu"]["preferences"]);
-    $($(".selection_saveLoad_itemText")[3]).text(textAssets[lang]["preferences"]["impExpMenu"]["stats"]);
+    $(".selection_saveLoad_itemText").eq(0).text(textAssets[lang]["preferences"]["impExpMenu"]["sessionList"]);
+    $(".selection_saveLoad_itemText").eq(1).text(textAssets[lang]["preferences"]["impExpMenu"]["reminderList"]);
+    $(".selection_saveLoad_itemText").eq(2).text(textAssets[lang]["preferences"]["impExpMenu"]["preferences"]);
+    $(".selection_saveLoad_itemText").eq(3).text(textAssets[lang]["preferences"]["impExpMenu"]["stats"]);
 
     $($(".selection_parameters_saveLoad_btn ")[0]).text(textAssets[lang]["preferences"]["export"]);
     $($(".selection_parameters_saveLoad_btn ")[1]).text(textAssets[lang]["preferences"]["import"]);
@@ -1041,9 +1092,9 @@ function changeLanguage(lang, first=false){
     $(".update_linkWith").text(textAssets[lang]["updatePage"]["linkWith"]);
 
     $(".update_name_info").text(textAssets[lang]["updatePage"]["name"]);
-    $($(".update_data_tile_info")[0]).text(textAssets[lang]["updatePage"]["cycle"]);
-    $($(".update_data_tile_info")[1]).text(textAssets[lang]["updatePage"]["work"]);
-    $($(".update_data_tile_info")[2]).text(textAssets[lang]["updatePage"]["rest"]);
+    $(".update_data_tile_info").eq(0).text(textAssets[lang]["updatePage"]["cycle"]);
+    $(".update_data_tile_info").eq(1).text(textAssets[lang]["updatePage"]["work"]);
+    $(".update_data_tile_info").eq(2).text(textAssets[lang]["updatePage"]["rest"]);
 
     $(".update_reminder_body_title").text(textAssets[lang]["updatePage"]["reminderBody"]);
     $(".udpate_reminder_body_txtarea").attr("placeholder", textAssets[lang]["updatePage"]["placeHolders"]["body"]);
@@ -1052,15 +1103,27 @@ function changeLanguage(lang, first=false){
 
     // Schedule;
 
-    $($(".update_schedule_opt")[0]).text(textAssets[lang]["misc"]["dayLabels"]["monday"]);
-    $($(".update_schedule_opt")[1]).text(textAssets[lang]["misc"]["dayLabels"]["tuesday"]);
-    $($(".update_schedule_opt")[2]).text(textAssets[lang]["misc"]["dayLabels"]["wednesday"]);
-    $($(".update_schedule_opt")[3]).text(textAssets[lang]["misc"]["dayLabels"]["thursday"]);
-    $($(".update_schedule_opt")[4]).text(textAssets[lang]["misc"]["dayLabels"]["friday"]);
-    $($(".update_schedule_opt")[5]).text(textAssets[lang]["misc"]["dayLabels"]["saturday"]);
-    $($(".update_schedule_opt")[6]).text(textAssets[lang]["misc"]["dayLabels"]["sunday"]);
-    $($(".update_schedule_opt")[7]).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
-    $($(".update_schedule_opt")[8]).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
+    $(".update_schedule_opt").eq(0).text(textAssets[lang]["misc"]["dayLabels"]["monday"]);
+    $(".update_schedule_opt").eq(1).text(textAssets[lang]["misc"]["dayLabels"]["tuesday"]);
+    $(".update_schedule_opt").eq(2).text(textAssets[lang]["misc"]["dayLabels"]["wednesday"]);
+    $(".update_schedule_opt").eq(3).text(textAssets[lang]["misc"]["dayLabels"]["thursday"]);
+    $(".update_schedule_opt").eq(4).text(textAssets[lang]["misc"]["dayLabels"]["friday"]);
+    $(".update_schedule_opt").eq(5).text(textAssets[lang]["misc"]["dayLabels"]["saturday"]);
+    $(".update_schedule_opt").eq(6).text(textAssets[lang]["misc"]["dayLabels"]["sunday"]);
+
+    $(".update_schedule_opt").eq(7).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
+    $(".update_schedule_opt").eq(8).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
+
+    $(".update_schedule_opt").eq(9).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
+    $(".update_schedule_opt").eq(10).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
+
+    $(".update_schedule_span").eq(0).text(textAssets[lang]["updatePage"]["on"]);
+    $(".update_schedule_span").eq(1).text(textAssets[lang]["updatePage"]["at"]);
+    $(".update_schedule_span").eq(3).text(textAssets[lang]["updatePage"]["every"]);
+
+    $(".update_schedule_jumpText").text(textAssets[lang]["updatePage"]["jump"])
+    $(".update_schedule_jumpEveryText").text(textAssets[lang]["updatePage"]["times"])
+    $(".update_schedule_everyText").text(textAssets[lang]["updatePage"]["every"])
 
     // Session;
 
@@ -1072,8 +1135,8 @@ function changeLanguage(lang, first=false){
     $(".session_exist_text").text(textAssets[lang]["inSession"]["exitQuestion"]);
     $(".session_exist_subtext").text(textAssets[lang]["inSession"]["exitDetails"]);
 
-    $($(".session_exit_btn")[0]).text(textAssets[lang]["inSession"]["quit"]);
-    $($(".session_exit_btn")[1]).text(textAssets[lang]["inSession"]["cancel"]);
+    $(".session_exit_btn").eq(0).text(textAssets[lang]["inSession"]["quit"]);
+    $(".session_exit_btn").eq(1).text(textAssets[lang]["inSession"]["cancel"]);
 
     $(".session_btnLabelL").text(textAssets[lang]["misc"]["left"]);
     $(".session_btnLabelR").text(textAssets[lang]["misc"]["right"]);
@@ -1084,8 +1147,8 @@ function changeLanguage(lang, first=false){
     $('.selection_recovery_subText2').text(textAssets[lang]["recovery"]["subText2"]);
     $('.selection_recovery_subText3').text(textAssets[lang]["recovery"]["subText3"]);
     
-    $($('.selection_recovery_btn')[0]).text(textAssets[lang]["recovery"]["no"]);
-    $($('.selection_recovery_btn')[1]).text(textAssets[lang]["recovery"]["yes"]);
+    $('.selection_recovery_btn').eq(0).text(textAssets[lang]["recovery"]["no"]);
+    $('.selection_recovery_btn').eq(1).text(textAssets[lang]["recovery"]["yes"]);
 
     // DeleteHistoryConfirm
 
@@ -1095,16 +1158,16 @@ function changeLanguage(lang, first=false){
     $('.selection_deleteHistoryConfirm_subText4').text(textAssets[lang]["deleteHistoryConfirm"]["subText4"]);
     $('.selection_deleteHistoryConfirm_subText5').text(textAssets[lang]["deleteHistoryConfirm"]["subText5"]);
 
-    $($('.selection_deleteHistoryConfirm_btn')[0]).text(textAssets[lang]["recovery"]["yes"]);
-    $($('.selection_deleteHistoryConfirm_btn')[1]).text(textAssets[lang]["recovery"]["no"]);
+    $('.selection_deleteHistoryConfirm_btn').eq(0).text(textAssets[lang]["recovery"]["yes"]);
+    $('.selection_deleteHistoryConfirm_btn').eq(1).text(textAssets[lang]["recovery"]["no"]);
 
     // Remaining stats
 
-    $($(".session_remaining_item_title")[0]).text(textAssets[lang]["inSession"]["remaining"]["reTime"]); 
-    $($(".session_remaining_item_title")[1]).text(textAssets[lang]["inSession"]["remaining"]["reWoTime"]); 
-    $($(".session_remaining_item_title")[2]).text(textAssets[lang]["inSession"]["remaining"]["reSets"]); 
-    $($(".session_remaining_item_title")[3]).text(textAssets[lang]["inSession"]["remaining"]["reReps"]); 
-    $($(".session_remaining_item_title")[4]).text(textAssets[lang]["inSession"]["remaining"]["reWeight"]); 
+    $(".session_remaining_item_title").eq(0).text(textAssets[lang]["inSession"]["remaining"]["reTime"]); 
+    $(".session_remaining_item_title").eq(1).text(textAssets[lang]["inSession"]["remaining"]["reWoTime"]); 
+    $(".session_remaining_item_title").eq(2).text(textAssets[lang]["inSession"]["remaining"]["reSets"]); 
+    $(".session_remaining_item_title").eq(3).text(textAssets[lang]["inSession"]["remaining"]["reReps"]); 
+    $(".session_remaining_item_title").eq(4).text(textAssets[lang]["inSession"]["remaining"]["reWeight"]); 
 
     previousLanguage = language;
 };

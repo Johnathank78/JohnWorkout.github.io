@@ -1267,6 +1267,18 @@
     display: none;
 }
 
+.update_schedule_separator{
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    height: 5px;
+    width: 40px;
+
+    opacity: 0.125;
+    background-color: white;
+    border-radius: 999px;
+}
+
 .update_schedule_fline{
     display: flex;
     flex-direction: row;
@@ -1328,7 +1340,7 @@
     flex-direction: column;
     flex-wrap: nowrap;
 
-    gap: 10px;
+    gap: 15px;
 
     width: calc(100% - 30px);
 
@@ -1346,12 +1358,53 @@
     justify-content: flex-start;
     align-items: center;
     
+    gap: 15px;
+}
+
+.update_schedule_tline{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+
+    gap: 15px;
+
+    width: calc(100% - 30px);
+
+    text-align: left;
+    padding: 15px;
+    background-color: #303344;
+
+    border-radius: 15px;
+}
+
+.update_schedule_tline_fblock{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.update_schedule_tline_sblock{
+    display: flex;
+    flex-direction: row;
+    
+    justify-content: flex-start;
+    align-items: center;
+    
     gap: 10px;
+
+    display: none;
 }
 
 .update_schedule_span{
     font-size: 22px;
     font-weight: 500;
+}
+
+.update_schedule_small_span{
+    padding: 0 2px;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: .7;
 }
 
 .update_schedule_input{
@@ -1374,6 +1427,14 @@
 }
 
 .update_schedule_select{
+    display: flex;
+
+    flex-grow: 1;
+    flex-shrink: 1;
+
+    justify-content: center;
+    align-items: center;
+
     background-color: #4C5368;
     border: none;
 

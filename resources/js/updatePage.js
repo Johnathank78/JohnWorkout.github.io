@@ -105,6 +105,29 @@ function manageIntervallRestInputVisibility(elem){
     };
 };
 
+function generateJumpData(date, { jumpType, jumpVal, everyVal, intervall, intervallType }){
+    let jumpData = {
+        "jumpTimestamp": null,
+        "jumpType" : null,
+        "jumpVal" : null,
+        "everyVal": 0
+    };
+
+    if($('.jump_toggle').attr('state') == "true"){
+                        
+        let jumpDate = new Date(date.getTime());
+        
+        jumpData['jumpType'] = jumpType;
+        jumpData['jumpVal'] = parseInt(jumpVal);
+        jumpData['everyVal'] = parseInt(everyVal);
+        
+        jumpDate.setDate(date.getDate() + (everyVal - 1) * (intervall) * (intervallType === "Week" ? 7 : 1) + 1);
+        jumpData['jumpTimestamp'] = jumpDate;
+    };
+
+    return jumpData;
+};
+
 $(document).ready(function(){
     $(document).on("click", ".selection_SR_container, .selection_empty_msg", function(){
         if($('.selection_empty_msg').css('display') == "none"){return};
@@ -498,7 +521,7 @@ $(document).ready(function(){
     });
 
     // UPDATE
-    
+
     $(document).on("click", ".update_btn", async function(e){
         if(current_page == "edit"){
 
@@ -508,7 +531,7 @@ $(document).ready(function(){
             let new_name = $(".update_data_name").val().format();
 
             if(reminderOrSession == "session"){
-                beforeUpdateHash = SHA256(session_list[update_current_index].toString());
+                beforeUpdateHash = SHA256(JSON.stringify(session_list[update_current_index]));
 
                 if(session_list[update_current_index][0] == "I"){
                     let ex_name = false;
@@ -651,9 +674,9 @@ $(document).ready(function(){
                     };
                 };
 
-                afterUpdateHash = SHA256(session_list[update_current_index].toString());
+                afterUpdateHash = SHA256(JSON.stringify(session_list[update_current_index]));
             }else if(reminderOrSession == "reminder"){
-                beforeUpdateHash = SHA256(reminder_list[update_current_index].toString());
+                beforeUpdateHash = SHA256(JSON.stringify(reminder_list[update_current_index]));
 
                 let new_body = $(".udpate_reminder_body_txtarea").val();
                 let error = iserrorReminder(new_name, new_body);
@@ -673,7 +696,7 @@ $(document).ready(function(){
                     return;
                 };
 
-                afterUpdateHash = SHA256(reminder_list[update_current_index].toString());
+                afterUpdateHash = SHA256(JSON.stringify(reminder_list[update_current_index]));
             };
 
             update_pageReset();
@@ -911,13 +934,17 @@ $(document).ready(function(){
 
         }else if(current_page == "schedule"){
             let toHashString = isScheduled(update_current_item) ? update_current_item[update_current_item.length - 2] : false;
-            let beforeUpdateHash = SHA256(toHashString.toString());
+            let beforeUpdateHash = SHA256(JSON.stringify(toHashString));
 
             let inp_list = $(".update_schedule_input");
             let every = $(".update_schedule_select_every").val();
 
-            let hours = $($(inp_list)[0]).val();
-            let minutes = $($(inp_list)[1]).val();
+            let hours = $(inp_list).eq(0).val();
+            let minutes = $(inp_list).eq(1).val();
+
+            let jumpType = $(".update_schedule_select_jumpEvery").eq(0).val();
+            let jumpVal = $(inp_list).eq(3).val();
+            let everyVal = $(inp_list).eq(4).val();
 
             if(minutes.length == 1){
                 minutes = "0" + minutes;
@@ -927,13 +954,15 @@ $(document).ready(function(){
                 hours = "0" + hours;
             };
 
-            let count = parseInt($($(inp_list)[2]).val());
+            let count = $(inp_list).eq(2).val();
             let day = $(".update_schedule_select_day").val();
 
-            let error = schedule_iserror(hours, minutes, count, every == "Day" ? dayofweek.indexOf(day) : false, every);
+            let error = schedule_iserror(hours, minutes, count, every == "Day" ? dayofweek.indexOf(day) : false, every, jumpVal, everyVal);
 
             if(!error){
-                let title = $('.update_data_name').val() + " | " + $($(inp_list)[0]).val()+":"+$($(inp_list)[1]).val();
+                count = parseInt(count);
+                
+                let title = $('.update_data_name').val() + " | " + hours+":"+minutes;
                 let totaltime = false; let body = false;
 
                 if(reminderOrSession == "session"){
@@ -964,12 +993,12 @@ $(document).ready(function(){
 
                     if(daytoset_conventional < currentday_conventional){
                         date.setDate(date.getDate() + (daytoset_conventional - currentday_conventional + 7));
-                        date.setHours($($(inp_list)[0]).val());
-                        date.setMinutes($($(inp_list)[1]).val());
+                        date.setHours($(inp_list).eq(0).val());
+                        date.setMinutes($(inp_list).eq(1).val());
                     }else{
                         date.setDate(date.getDate() + (daytoset_conventional - currentday_conventional));
-                        date.setHours($($(inp_list)[0]).val());
-                        date.setMinutes($($(inp_list)[1]).val());
+                        date.setHours($(inp_list).eq(0).val());
+                        date.setMinutes($(inp_list).eq(1).val());
                     };
 
                     date.setSeconds(0);
@@ -989,28 +1018,52 @@ $(document).ready(function(){
                         };
                     };
 
-                    addtosession = ["Notif", [every, count, hours, minutes], [day, date.getTime()]];
+                    
+                    addtosession = ["Notif", [every, count, hours, minutes], [day, date.getTime()], generateJumpData(date, { 
+                        "jumpType" : jumpType, 
+                        "jumpVal" : jumpVal, 
+                        "everyVal" : everyVal, 
+                        "intervall" : count, 
+                        "intervallType" : every 
+                    }), 1];
+                    
                 }else if(every == "Week"){
                     id = 0;
                     daytoset_conventional = 0;
 
                     let temp = [];
                     let idy = update_current_item.getId();
+                    let conventionalDaysSelected = day.map(d => dayofweek_conventional.indexOf(d));
+
+                    let areAllsameWeek = conventionalDaysSelected.every(i => i >= currentday_conventional) || conventionalDaysSelected.every(i => i < currentday_conventional);
+                    let matchArr = conventionalDaysSelected.map(i => i < currentday_conventional); // know which day is before today to dintinguish day of this week and day from next schedule (because past)
 
                     for(let i=0; i<day.length; i++){
-                        id = (i+1).toString() + idy + "1";
-                        daytoset_conventional = dayofweek_conventional.indexOf(day[i]);
-
                         date = new Date();
+                        
+                        id = (i+1).toString() + idy + "1";
+                        daytoset_conventional = conventionalDaysSelected[i];
 
-                        if(daytoset_conventional < currentday_conventional || (daytoset_conventional == currentday_conventional && hours*3600 + minutes*60 < date.getHours()*3600 + date.getMinutes()*60)){
-                            date.setDate(date.getDate() + (daytoset_conventional - currentday_conventional + (count*7)));
-                            date.setHours($($(inp_list)[0]).val());
-                            date.setMinutes($($(inp_list)[1]).val());
+                        if(areAllsameWeek){
+                            if(currentday_conventional <= Math.min(...conventionalDaysSelected)){
+                                date.setDate(date.getDate() + (daytoset_conventional - currentday_conventional));
+                                date.setHours($($(inp_list)[0]).val());
+                                date.setMinutes($($(inp_list)[1]).val());
+                            }else{
+                                date.setDate(date.getDate() + (daytoset_conventional - currentday_conventional + (count*7)));
+                                date.setHours($($(inp_list)[0]).val());
+                                date.setMinutes($($(inp_list)[1]).val());
+                            };
                         }else{
-                            date.setDate(date.getDate() + (daytoset_conventional - currentday_conventional));
-                            date.setHours($($(inp_list)[0]).val());
-                            date.setMinutes($($(inp_list)[1]).val());
+                            if(matchArr[i]){
+                                date.setDate(date.getDate() + (daytoset_conventional - currentday_conventional));
+                                date.setHours($($(inp_list)[0]).val());
+                                date.setMinutes($($(inp_list)[1]).val());
+                            }else{
+                                date.setDate(date.getDate() + (daytoset_conventional - currentday_conventional + (count*7)));
+                                date.setHours($($(inp_list)[0]).val());
+                                date.setMinutes($($(inp_list)[1]).val());
+                            };
                         };
 
                         date.setSeconds(0);
@@ -1032,7 +1085,13 @@ $(document).ready(function(){
                         temp.push([day[i], date.getTime()]);
                     };
 
-                    addtosession = ["Notif", [every, count, hours, minutes], temp];
+                    addtosession = ["Notif", [every, count, hours, minutes], temp, generateJumpData(date, { 
+                        "jumpType" : jumpType, 
+                        "jumpVal" : jumpVal, 
+                        "everyVal" : everyVal, 
+                        "intervall" : count, 
+                        "intervallType" : every 
+                    }), 1];
                 };
 
                 if(isScheduled(update_current_item)){
@@ -1067,8 +1126,8 @@ $(document).ready(function(){
             };
 
             update_pageReset();
-
-            let afterUpdateHash = SHA256(update_current_item[update_current_item.length - 2].toString());
+            
+            let afterUpdateHash = SHA256(JSON.stringify(update_current_item[update_current_item.length - 2]));
             if(beforeUpdateHash != afterUpdateHash){bottomNotification("scheduled", update_current_item[1])};
 
             current_page = "selection";

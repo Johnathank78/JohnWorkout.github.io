@@ -268,19 +268,33 @@ function iserrorReminder(name, body, from){
     };
 };
 
-function schedule_iserror(hours, minutes, count, day, every){
+function schedule_iserror(hours, minutes, count, day, every, jumpVal, timesVal){
     let now = new Date();
 
+    if($(".update_schedule_select_day").val() == ''){
+        $(".update_error_container").css("display", "block");
+        $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["fillAllEntries"]);
+        return true;
+    };
+
+    if(hours == "" || minutes == "" || count == ""){
+        $(".update_error_container").css("display", "block");
+        $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["fillAllEntries"]);
+        return true;
+    };
+    
     if(isNaI(hours) || isNaI(minutes) || isNaI(count)){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[language]["error"]["schedule"]["hoursMinNumeric"]);
         return true;
     };
+    
     if(parseInt(hours) > 23){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[language]["error"]["schedule"]["greatherHours"]);
         return true;
     };
+    
     if(parseInt(minutes) > 59){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[language]["error"]["schedule"]["greaterMinutes"]);
@@ -291,6 +305,20 @@ function schedule_iserror(hours, minutes, count, day, every){
         if((now.getDay() == day && now.getHours() > parseInt(hours)) || (now.getDay() == day && now.getHours() == parseInt(hours) && now.getMinutes() >= parseInt(minutes))){
             $(".update_error_container").css("display", "block");
             $(".update_error_msg").text(textAssets[language]["error"]["schedule"]["timePassed"]);
+            return true;
+        };
+    };
+
+    if($('.jump_toggle').attr('state') == "true"){
+        if(jumpVal == "" || timesVal == ""){
+            $(".update_error_container").css("display", "block");
+            $(".update_error_msg").text(textAssets[language]["error"]["updatePage"]["fillAllEntries"]);
+            return true;
+        };
+
+        if(isNaI(jumpVal) || isNaI(timesVal)){
+            $(".update_error_container").css("display", "block");
+            $(".update_error_msg").text(textAssets[language]["error"]["schedule"]["jumpNumeric"]);
             return true;
         };
     };

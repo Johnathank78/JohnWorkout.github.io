@@ -149,66 +149,81 @@ function session_read(set=false){
 
         // NEW FIX
 
-        let corr = {};
+        // let corr = {};
         
-        data[0].forEach((session, index) => {
-            let newSession = false;
+        // data[0].forEach((session, index) => {
+        //     let newSession = false;
 
-            if(session[0] == "I" && session.length > 6){
-                if(isScheduled(session)){
-                    newSession = ["I", session[1], [['Int.', session[1], parseInt(session[4]), session[2], session[3]]], session[5], session[6], session[7]];
-                }else{
-                    newSession = ["I", session[1], [['Int.', session[1], parseInt(session[4]), session[2], session[3]]], session[5], session[6]];
-                };
+        //     if(session[0] == "I" && session.length > 6){
+        //         if(isScheduled(session)){
+        //             newSession = ["I", session[1], [['Int.', session[1], parseInt(session[4]), session[2], session[3]]], session[5], session[6], session[7]];
+        //         }else{
+        //             newSession = ["I", session[1], [['Int.', session[1], parseInt(session[4]), session[2], session[3]]], session[5], session[6]];
+        //         };
 
-                data[0][index] = newSession;
-            };
+        //         data[0][index] = newSession;
+        //     };
 
-            if(session[0] == "W"){
-                let newExo = false;
-                let one = false;
-                let two = false;
+        //     if(session[0] == "W"){
+        //         let newExo = false;
+        //         let one = false;
+        //         let two = false;
 
-                session[2].forEach((exo, exoInd) => {
-                    if(exo[0] != "Pause"){corr[exo[1]] = (exoInd+1).toString()};
+        //         session[2].forEach((exo, exoInd) => {
+        //             if(exo[0] != "Pause"){corr[exo[1]] = (exoInd+1).toString()};
 
-                    if(exo[0] == "Int." && exo.length > 4 && (isNaI(exo[exo.length - 1]) || !Array.isArray(exo[2]))){
-                        one = true;
-                        newExo = ["Int.", exo[1], [['Int.', exo[1], parseInt(exo[4]), exo[2], exo[3]]], (exoInd+1).toString()];
-                    }else if((exo[0] != "Int." && exo[0] != "Pause") && isNaI(exo[exo.length - 1])){
-                        two = true;
-                        newExo = [...exo, (exoInd+1).toString()];
-                    };
+        //             if(exo[0] == "Int." && exo.length > 4 && (isNaI(exo[exo.length - 1]) || !Array.isArray(exo[2]))){
+        //                 one = true;
+        //                 newExo = ["Int.", exo[1], [['Int.', exo[1], parseInt(exo[4]), exo[2], exo[3]]], (exoInd+1).toString()];
+        //             }else if((exo[0] != "Int." && exo[0] != "Pause") && isNaI(exo[exo.length - 1])){
+        //                 two = true;
+        //                 newExo = [...exo, (exoInd+1).toString()];
+        //             };
 
-                    if(exo[0] != "Pause" && (one || two)){
-                        data[0][index][2][exoInd] = newExo;
-                    };
-                });
-            };
+        //             if(exo[0] != "Pause" && (one || two)){
+        //                 data[0][index][2][exoInd] = newExo;
+        //             };
+        //         });
+        //     };
 
-        });
+        // });
 
-        data[0].forEach((session) => {
-            let history = getSessionHistory(session);
+        // data[0].forEach((session) => {
+        //     let history = getSessionHistory(session);
 
-            if(session[0] == "W"){
-                history.forEach((day, dayInd) => {
-                    if(Array.isArray(day[2])){
-                        day[2].forEach((exo, exoInd) => {
-                            if(isNaI(exo[exo.length - 1][0])){
-                                let name = exo[0].replace(" - L", "").replace(" - R", "")
-                                let suffix = exo[0].endsWith(" - L") ? "_1" : exo[0].endsWith(" - R") ? "_2" : "";
-                                let match = corr[name] === undefined ? "999" : corr[name];
+        //     if(session[0] == "W"){
+        //         history.forEach((day, dayInd) => {
+        //             if(Array.isArray(day[2])){
+        //                 day[2].forEach((exo, exoInd) => {
+        //                     if(isNaI(exo[exo.length - 1][0])){
+        //                         let name = exo[0].replace(" - L", "").replace(" - R", "")
+        //                         let suffix = exo[0].endsWith(" - L") ? "_1" : exo[0].endsWith(" - R") ? "_2" : "";
+        //                         let match = corr[name] === undefined ? "999" : corr[name];
 
-                                history[dayInd][2][exoInd].push(match + suffix);
-                            };
+        //                         history[dayInd][2][exoInd].push(match + suffix);
+        //                     };
     
-                            if(exo[1][0] == '1' && (exo[1][1] == '1' || exo[1][1] == '0') && exo[1][2] == '0'){
-                                history[dayInd][2].splice(exoInd, 1);
-                            };
-                        });
-                    };
+        //                     if(exo[1][0] == '1' && (exo[1][1] == '1' || exo[1][1] == '0') && exo[1][2] == '0'){
+        //                         history[dayInd][2].splice(exoInd, 1);
+        //                     };
+        //                 });
+        //             };
+        //         });
+        //     };
+        // });
+
+        data[0].forEach((data) => {
+            let scheduleData = isScheduled(data);
+
+            if(scheduleData.length == 3){
+                data[data.length - 2].push({
+                    "jumpTimestamp": null,
+                    "jumpType" : null,
+                    "jumpVal" : null,
+                    "everyVal": 0
                 });
+
+                data[data.length - 2].push(1);
             };
         });
 
@@ -254,6 +269,22 @@ function reminder_read(set=false){
         return [];
     }else{
         data = JSON.parse(data);
+
+        data.forEach((data) => {
+            let scheduleData = isScheduled(data);
+
+            if(scheduleData.length == 3){
+                data[data.length - 2].push({
+                    "jumpTimestamp": null,
+                    "jumpType" : null,
+                    "jumpVal" : null,
+                    "everyVal": 0
+                });
+
+                data[data.length - 2].push(1);
+            };
+        });
+
         return data;
     };
 };

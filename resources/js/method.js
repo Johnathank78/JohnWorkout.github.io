@@ -112,6 +112,28 @@ jQuery.fn.animateDespawn = function(marginTopOffset, appearSpeed){
     });
 };
 
+jQuery.fn.staticSpawn = function(displayType, height, resizable=false) {
+    $(this).css({
+        display: displayType,
+        opacity: '1',          
+        height: height + "px", 
+        marginTop: "unset"
+    });
+
+    if(resizable){
+        $(this).css('height', 'unset');
+    }
+};
+
+jQuery.fn.staticDespawn = function() {
+    $(this).css({
+        display: 'none',
+        opacity: '0',   
+        height: '0px',  
+        marginTop: '0px'
+    });
+};
+
 jQuery.fn.animateAppend = function(child, childHeight, childMarginTopOffset, appearSpeed, resizable=false){
     let clone = $(child).clone();
 

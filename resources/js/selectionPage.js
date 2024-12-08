@@ -11,6 +11,37 @@ var currentSEindex = 0;
 var hasAudioBeenInitiated = false;
 var deleteHistoryConfirmShown = false;
 
+function manageJumpContainer(onOff, data=false){
+    if(onOff){
+        $(".jump_toggle").attr("state", true);
+        $(".jump_toggle").css("background-color", green);
+        $(".jump_toggle").children().css("marginLeft", "18px");
+
+        $(".update_schedule_select_jumpEvery").eq(0).val(data['jumpType']);
+        $(".update_schedule_input").eq(3).val(data['jumpVal']);
+
+        if(data['jumpVal'] > 1 && language == "english"){
+            $(".update_schedule_select_jumpEvery").eq(1).text(textAssets[language]["updatePage"]["times"] + "s");
+        }else if(data['jumpVal'] == 1 && language == "english"){
+            $(".update_schedule_select_jumpEvery").eq(1).text(textAssets[language]["updatePage"]["times"]);
+        };
+        $(".update_schedule_input").eq(4).val(data['everyVal']);
+
+        $('.update_schedule_tline_sblock').staticSpawn("flex", 40, 300);
+    }else{
+        $(".jump_toggle").attr("state", false);
+        $(".jump_toggle").css("background-color", "#4C5368");
+        $(".jump_toggle").children().css("marginLeft", "unset");
+
+        $(".update_schedule_select_jumpEvery").eq(0).val("Day");
+        $(".update_schedule_input").eq(3).val("");
+        $(".update_schedule_select_jumpEvery").eq(1).text(textAssets[language]["updatePage"]["times"]);
+        $(".update_schedule_input").eq(4).val("");  
+
+        $('.update_schedule_tline_sblock').staticDespawn(-14, 300);
+    };
+};
+
 function loadHistorydayz(history, scrollState){
 
     $(".update_history_loadMore_btn").remove();
@@ -586,6 +617,11 @@ $(document).ready(function(){
                 $(inp_list[2]).val(notificationData[1][1]);
             };
 
+            if(notificationData.length != 5 || notificationData[3]["jumpTimestamp"] === null){
+                manageJumpContainer(false);
+            }else{
+                manageJumpContainer(true, notificationData[3]);
+            };
         }else{
             $(".update_schedule_select_day").attr("multiple", false);
 
@@ -594,6 +630,8 @@ $(document).ready(function(){
             $(inp_list[2]).val("");
             $('.update_schedule_select_day option[value="'+dayofweek[new Date().getDay()]+'"]').prop('selected', true);
             $('.update_schedule_select_every option[value="Day"]').prop('selected', true);
+
+            manageJumpContainer(false);
         };
 
         $('.update_data_name').val(update_current_item[1]);
@@ -655,6 +693,8 @@ $(document).ready(function(){
                     parameters_save(parameters);
                 }else if($(this).hasClass("history_toggle")){
                     current_history[0][1] = "false";
+                }else if($(this).hasClass("jump_toggle")){
+                    $('.update_schedule_tline_sblock').animateDespawn(-14, 300);
                 };
 
                 $(this).css("background-color", "#4C5368");
@@ -672,6 +712,8 @@ $(document).ready(function(){
                     parameters_save(parameters);
                 }else if($(this).hasClass("history_toggle")){
                     current_history[0][1] = "true";
+                }else if($(this).hasClass("jump_toggle")){
+                    $('.update_schedule_tline_sblock').animateSpawn("flex", 40, -14, 300);
                 };
 
 
