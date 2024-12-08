@@ -9,7 +9,7 @@ function getAssociatedDate(dayIndex){
     return zeroAM(new Date($(".selection_page_calendar_row_day").eq(dayIndex).data('time')));
 };
 
-function isEventScheduled(C, D, X, Y, Z, U, T, O=1, ID=false){
+function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
     // Calcul de diffInDays
     const millisecondsPerDay = 24 * 60 * 60 * 1000;
     const diffInDays = Math.round((zeroAM(C) - zeroAM(D)) / millisecondsPerDay);

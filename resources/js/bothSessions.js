@@ -190,7 +190,7 @@ async function quit_session(failed=false){
 
     if(keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
 
         timeSpent += TemptimeSpent;
         workedTime += TempworkedTime;
@@ -310,7 +310,7 @@ function getSessionEndData(){
         };
     };
 
-    if(current_history[0][1] === "false" || current_history.length == 1 || current_session[0] == "I"){
+    if(current_history[0][1] === "false" || current_session[0] == "I" || number == 1){
         return [outNumber, false, false]
     };
 
