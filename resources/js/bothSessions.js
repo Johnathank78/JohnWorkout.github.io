@@ -310,7 +310,7 @@ function getSessionEndData(){
         };
     };
 
-    if(current_history[0][1] === "false" || current_session[0] == "I" || number == 1){
+    if(current_history[0][1] === "false" || current_history.length == 1 || current_session[0] == "I" || number == 1){
         return [outNumber, false, false]
     };
 
