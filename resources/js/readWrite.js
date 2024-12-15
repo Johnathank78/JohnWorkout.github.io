@@ -94,9 +94,9 @@ $(document).ready(function(){
             current_page = "import";
             window.history.pushState("import", "");
 
-            if($(this).text() == textAssets[language]["preferences"]["export"]){
+            if($(this).text() == textAssets[parameters["language"]]["preferences"]["export"]){
 
-                $(".selection_saveLoad_btn_submit").text(textAssets[language]["preferences"]["export"]);
+                $(".selection_saveLoad_btn_submit").text(textAssets[parameters["language"]]["preferences"]["export"]);
                 $('.selection_saveLoad_emptyMsg').css('display', 'none');
 
 
@@ -107,9 +107,9 @@ $(document).ready(function(){
 
                 closePanel('parameters');
                 showBlurPage('selection_saveLoad_page');
-            }else if($(this).text() == textAssets[language]["preferences"]["import"]){
+            }else if($(this).text() == textAssets[parameters["language"]]["preferences"]["import"]){
 
-                $(".selection_saveLoad_btn_submit").text(textAssets[language]["preferences"]["import"]);
+                $(".selection_saveLoad_btn_submit").text(textAssets[parameters["language"]]["preferences"]["import"]);
 
                 $(".selection_saveLoad_page").children(":not(.selection_saveLoad_emptyMsg)").css('display', 'none');
                 $('.selection_saveLoad_emptyMsg').css('display', 'inline-block');
@@ -207,7 +207,7 @@ $(document).ready(function(){
         let temp = false;
         let schedule = false;
 
-        if($(this).text() == textAssets[language]["preferences"]["import"]){
+        if($(this).text() == textAssets[parameters["language"]]["preferences"]["import"]){
             if(platform == "Mobile"){
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0){
                     temp = await readFromFile("Workout", 'parameters.txt');
@@ -230,8 +230,7 @@ $(document).ready(function(){
                     calendar_save(calendar_dict);
                     calendar_read(session_list)
 
-                    updateCalendar(session_list);
-                    updateWeightUnits(session_list, previousWeightUnit, weightUnit);
+                    updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
 
                     session_save(session_list);
                     schedule = true;
@@ -248,7 +247,7 @@ $(document).ready(function(){
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
                     temp = await readFromFile("Workout", 'stats.txt');
 
-                    [timeSpent, workedTime, weightLifted, repsDone, since, nbMissed] = stats_read(temp);
+                    stats = stats_read(temp);
                 };
 
                 if(schedule){scheduler()};
@@ -273,9 +272,8 @@ $(document).ready(function(){
                         calendar_read(session_list)
 
                         session_pusher(session_list);
-                        updateCalendar(session_list);
                         
-                        updateWeightUnits(session_list, previousWeightUnit, weightUnit);
+                        updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
                         session_save(session_list);
                         
                         schedule = true;
@@ -291,7 +289,7 @@ $(document).ready(function(){
                     };
                     if(checked.filter($('#selection_saveLoad_st')).length > 0 && localFiles[i].name == "stats.txt"){
                         temp = await localFiles[i].text();
-                        [timeSpent, workedTime, weightLifted, repsDone, since, nbMissed] = stats_read(temp);
+                        stats = stats_read(temp);
                     };
 
                     if(schedule){scheduler()};
@@ -299,12 +297,12 @@ $(document).ready(function(){
             };
 
             if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
-                bottomNotification("imported", textAssets[language]["bottomNotif"]["IOprefix"]);
+                bottomNotification("imported", textAssets[parameters["language"]]["bottomNotif"]["IOprefix"]);
             };
-        }else if($(this).text() == textAssets[language]["preferences"]["export"]){
+        }else if($(this).text() == textAssets[parameters["language"]]["preferences"]["export"]){
             if(platform == "Mobile"){
                 if(checked.filter($('#selection_saveLoad_sl')).length > 0){
-                    writeToFile([session_list, weightUnit], "Workout", "session_list.txt");
+                    writeToFile([session_list, parameters["weightUnit"]], "Workout", "session_list.txt");
                 };
                 if(checked.filter($('#selection_saveLoad_rl')).length > 0){
                     writeToFile(reminder_list, "Workout", "reminder_list.txt");
@@ -313,17 +311,17 @@ $(document).ready(function(){
                     writeToFile(parameters, "Workout", "parameters.txt");
                 };
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
-                    writeToFile([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed], "Workout", "stats.txt");
+                    writeToFile(stats, "Workout", "stats.txt");
                 };
                 
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
-                    bottomNotification("exported", textAssets[language]["bottomNotif"]["IOprefix"]);
+                    bottomNotification("exported", textAssets[parameters["language"]]["bottomNotif"]["IOprefix"]);
                 };
             }else if(platform == "Web"){
                 let files = [];
 
                 if(checked.filter($('#selection_saveLoad_sl')).length > 0){
-                    files.push(new File([JSON.stringify([session_list, weightUnit])], "session_list.txt", { type: "text/plain" }));
+                    files.push(new File([JSON.stringify([session_list, parameters["weightUnit"]])], "session_list.txt", { type: "text/plain" }));
                 };
                 if(checked.filter($('#selection_saveLoad_rl')).length > 0){
                     files.push(new File([JSON.stringify(reminder_list)], "reminder_list.txt", { type: "text/plain" }));
@@ -332,7 +330,7 @@ $(document).ready(function(){
                     files.push(new File([JSON.stringify(parameters)], "parameters.txt", { type: "text/plain" }));
                 };
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
-                    files.push(new File([JSON.stringify([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed])], "stats.txt", { type: "text/plain" }));
+                    files.push(new File([JSON.stringify(stats)], "stats.txt", { type: "text/plain" }));
                 };
                 
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){

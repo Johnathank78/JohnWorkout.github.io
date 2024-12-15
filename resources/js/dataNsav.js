@@ -1,17 +1,22 @@
+// Data Scheme and Obj
+
 function emptySessionScheme(){
-    let out = [zeroAM(new Date()).getTime(), {}];
+    let out = {
+        "creationDate":  zeroAM(new Date()).getTime(),
+        "data": {}
+    };
 
     session_list.forEach(session => {
-        out[1][session.getId()] = false
+        out["data"][session["id"]] = false
     });
 
     return out
 };
 
 function cleanSessionScheme(drop){
-    delete sessionDone[1][drop];
-    delete hasBeenShifted[1][drop];
-    delete sessionToBeDone[1][drop];
+    delete sessionDone["data"][drop];
+    delete hasBeenShifted["data"][drop];
+    delete sessionToBeDone["data"][drop];
 };
 
 function sessionSchemeVarsReset(){
@@ -19,18 +24,241 @@ function sessionSchemeVarsReset(){
     sessionDone = emptySessionScheme();
     sessionToBeDone = emptySessionScheme();
 
-
     hasBeenShifted_save(hasBeenShifted);
     sessionDone_save(sessionDone);
     sessionToBeDone_save(sessionToBeDone);
 };
 
 function enlargeSessionScheme(id){
-    sessionDone[1][id] = false;
-    hasBeenShifted[1][id] = false;
-    sessionToBeDone[1][id] = false;
+    sessionDone["data"][id] = false;
+    hasBeenShifted["data"][id] = false;
+    sessionToBeDone["data"][id] = false;
 };
 
+//STATS & PARAMS
+
+function generateParametersObj({language, weightUnit, notifBefore, deleteAfter, autoSaver, keepAwake}){
+    return {
+        "language": language,
+        "weightUnit": weightUnit,
+        "notifBefore": notifBefore,
+        "deleteAfter": deleteAfter,
+        "autoSaver": autoSaver,
+        "keepAwake": keepAwake,
+    };
+};
+
+function generateStatsObj({timeSpent, workedTime, weightLifted, repsDone, since, missedSessions}){
+    return {
+        "timeSpent": timeSpent,
+        "workedTime": workedTime,
+        "weightLifted": weightLifted,
+        "repsDone": repsDone,
+        "missedSessions": missedSessions,
+        "since": since
+    };
+};
+
+//REMINDER
+
+function generateReminderObj({type, name, body, notif, color, id}){
+    return {
+        "type": type,
+        "name": name,
+        "body": body,
+        "notif": notif,
+        "color": color,
+        "id": id
+    };
+};
+
+//SESSION
+
+function generateSessionObj({type, name, exoList, history, notif, hint, color, linkId, id}){
+    if(type == "Int."){
+        if(linkId){
+            return {
+                "type" : type,
+                "linkId": linkId,
+                "id" : id
+            };
+        }else{
+            return {
+                "type": type,
+                "name": name,
+                "exoList": exoList,
+                "hint": hint,
+                "id": id
+            };
+        };
+    }else{
+        return {
+            "type": type,
+            "name": name,
+            "exoList": exoList,
+            "history": history,
+            "notif": notif,
+            "color": color,
+            "id": id
+        };
+    }
+};
+
+function generateExoObj({type, name, setNb, reps, weight, rest, cycle, work, hint, id}){
+    if(type == "Int."){
+        return {
+            "type" : type,
+            "name" : name,
+            "cycle" : cycle,
+            "work" : work,
+            "rest" : rest,
+            "hint" : hint,
+            "id" : id
+        };
+    }else if(type == "Bi." || type == "Uni."){
+        return {
+            "type" : type,
+            "name" : name,
+            "setNb" : setNb,
+            "reps" : reps,
+            "weight" : weight,
+            "rest" : rest,
+            "hint" : hint,
+            "id" : id
+        };
+    }else if(type == "Pause"){
+        return {
+            "type" : type,
+            "rest" : rest,
+            "id" : id
+        };
+    }else if(type == "Wrm."){
+        return {
+            "type" : type,
+            "name" : name,
+            "hint": hint,
+            "id" : id
+        };
+    };
+};
+
+//HISTORY
+
+function generateHistoryObj({state, historyCount, historyList}){
+    return {
+        "state": state,
+        "historyCount": historyCount,
+        "historyList": historyList
+    };
+};
+
+function generateHistoryElementObj({date, duration, exoList}){
+    return {
+        "date": date,
+        "duration": duration,
+        "exoList": exoList
+    };
+};
+
+function generateHistoryExoObj({type, name, expectedStats, setList, note, id}){
+    return {
+        "type": type,
+        "name": name,
+        "expectedStats": expectedStats,
+        "setList": setList,
+        "note": note,
+        "id": id
+    };
+};
+
+function generateHistoryINTExoObj({type, name, exoList, note, id}){
+    return {
+        "type": type,
+        "name": name,
+        "exoList": exoList,
+        "note": note,
+        "id": id
+    }
+};
+
+function generateHistoryExceptedStatsObj({type, setNb, reps, weight, weightUnit, cycle, work, rest}){
+    if(type == "Int."){
+        return {
+            "cycle": cycle,
+            "work": work,
+            "rest": rest
+        };
+    }else if(type == "Bi." || type == "Uni."){
+        return {
+            "setNb": setNb,
+            "reps": reps,
+            "weight": weight,
+            "weightUnit": weightUnit
+        };
+    };
+};
+
+function generateHistorySetObj({type, reps, weight, work, rest}){
+    if(type == "Int."){
+        return {
+            "work": work,
+            "rest": rest
+        };
+    }else if(type == "Bi." || type == "Uni."){
+        return {
+            "reps": reps,
+            "weight": weight
+        };
+    };
+};
+
+//NOTIF
+
+function generateNotifObj({scheduleData, dateList, jumpData}){
+    return {
+        "scheduleData": scheduleData,
+        "dateList": dateList,
+        "jumpData": jumpData,
+        "occurence": 1
+    };
+};
+
+function generateScheduleDataObj({scheme, count, hours, minutes}){
+    return {
+        "scheme": scheme,
+        "count": count,
+        "hours": hours,
+        "minutes": minutes
+    };
+};
+
+function generateJumpDataObj({jumpType, jumpVal, everyVal}){
+    if($('.jump_toggle').attr('state') == "true"){
+        return {
+            "jumpType": jumpType,
+            "jumpVal": parseInt(jumpVal),
+            "everyVal": parseInt(everyVal)
+        };
+    }else{
+        return false;
+    };
+};
+
+
+// -----------
+
+function JSONiseStats(data){
+    if(isDict(data)){return data};
+
+    return generateStatsObj({
+        "timeSpent": parseInt(data[0]),
+        "workedTime": parseInt(data[1]),
+        "weightLifted": parseFloat(data[2]),
+        "repsDone": parseInt(data[3]),
+        "missedSessions": parseInt(data[5]),
+        "since": data[4],
+    });
+};
 
 function stats_read(set=false){
     let data = localStorage.getItem("stats");
@@ -38,22 +266,19 @@ function stats_read(set=false){
     if(set){data = set};
 
     if(data == "" || data === null){
-        data = [0,0,0,0,zeroAM(new Date(Date.now())).getTime(), 0];
+        data = generateStatsObj({
+            "timeSpent": 0, 
+            "workedTime": 0, 
+            "weightLifted": 0, 
+            "repsDone": 0,
+            "missedSessions": 0,
+            "since": zeroAM(new Date.now()).getTime()
+        });
+        
         stats_save(data);
     }else{
         data = JSON.parse(data);
-
-        data[0] = parseInt(data[0]);
-        data[1] = parseInt(data[1]);
-        data[2] = parseFloat(data[2]);
-        data[3] = parseInt(data[3]);
-        data[4] = parseInt(data[4]);
-
-        if(data.length == 5){
-            data.push(0);
-        }else{
-            data[5] = parseInt(data[5]);
-        };
+        data = JSONiseStats(data);
     };
 
     stats_set(data);
@@ -68,64 +293,76 @@ function stats_save(data){
 };
 
 function stats_set(data){
-    $(".selection_info_TimeSpent").text(get_time_u(timeFormat(parseInt(data[0]))));
-    $(".selection_info_WorkedTime").text(get_time_u(timeFormat(parseInt(data[1]))));
-    $(".selection_info_WeightLifted").text(weightUnitgroup(data[2], weightUnit));
-    $(".selection_info_RepsDone").text(parseInt(data[3]));
-    $(".selection_infoStart_value").text(formatDate(data[4]));
-    $(".selection_info_Missed").text(parseInt(data[5]));
+    $(".selection_info_TimeSpent").text(get_time_u(timeFormat(data["timeSpent"])));
+    $(".selection_info_WorkedTime").text(get_time_u(timeFormat(parseInt(data["workedTime"]))));
+    $(".selection_info_WeightLifted").text(weightUnitgroup(data["weightLifted"], parameters['weightUnit']));
+    $(".selection_info_RepsDone").text(parseInt(data["repsDone"]));
+    $(".selection_info_Missed").text(data["missedSessions"]);
+    $(".selection_infoStart_value").text(formatDate(data["since"]));
 };
 
 
-function parameters_read(set=false){
+function JSONiseParameters(data){
+    if(isDict(data)){return data};
+    
+    return generateParametersObj({
+        "language": data[0],
+        "weightUnit": data[1],
+        "notifBefore": data[2],
+        "deleteAfter": data[3],
+        "autoSaver": data[4] == true,
+        "keepAwake": data[5] == true
+    });
+};
+
+function parameters_read(first = true){
 
     let data = localStorage.getItem("parameterss");
 
-    if(set){data = JSON.parse(set)}else if(data){data = JSON.parse(data)};
-
-    let parameters = $('.selection_parameters_page').find(".selection_parameters_item");
-    let selem = false;
-
-    if(data == "" || data === null || data.length != parameters.length){
-        data = [];
-
-        for(let i=0;i<parameters.length;i++){
-            selem = $($(parameters[i]).children())[1];
-            if($(selem).hasClass("selection_parameters_input") || $(selem).hasClass("selection_parameters_select")){
-                data.push($(selem).val());
-            }else if($(selem).hasClass("toggle")){
-                data.push($(selem).attr("state"));
-            };
-        };
-
+    if(data == "" || data === null){
+        data = generateParametersObj({
+            "language": "english",
+            "weightUnit": "kg",
+            "notifBefore": "0s",
+            "deleteAfter": "1 Year",
+            "autoSaver": false,
+            "keepAwake": false
+        });
+        
+        parameters_set(data);
         parameters_save(data);
     };
 
-    for(let i=0; i<data.length; i++){
-        let target = $(parameters[i]).find(".toggle, .selection_parameters_input, .selection_parameters_select");
-        if($(target).is("select")){
-            $(target).val(data[i]);
-            $('.selection_parameters_select option[value="'+data[i]+'"]').prop('selected', true);
-        }else if($(target).is("input")){
-            $(target).val(data[i]);
-        }else{
-            $(target).attr("state", data[i]);
-        };
-    };
+    data = JSON.parse(data);
+    data = JSONiseParameters(data);
 
-    language = $(".selection_parameters_language").val();
-    autoSaver = $(".selection_parameters_autosaver").attr("state") == "true";
-    keepAwake = $(".selection_parameters_keepawake").attr("state") == "true" && 'wakeLock' in navigator;
-    weightUnit = $(".selection_parameters_weightunit").val();
-    deleteAfter = $(".selection_parameters_deleteafter").val();
+    parameters_set(data);
 
-    previousWeightUnit = weightUnit;
+    previousWeightUnit = data["weightUnit"];
     parametersMemory = JSON.stringify(data);
 
-    changeLanguage(language, set === false);
+    changeLanguage(data['language'], first);
     update_toggle();
 
     return data;
+};
+
+function parameters_set(data){
+    let parameterItems = $('.selection_parameters_page').find(".selection_parameters_item");
+    
+    parameterItems.each((_, item) => {      
+        let target = $(item).find(".toggle, .selection_parameters_input, .selection_parameters_select");
+        let targetName = $(target).attr('parameter');
+
+        if($(target).is("select")){
+            $(target).val(data[targetName]);
+            $('.selection_parameters_select option[value="'+data[targetName]+'"]').prop('selected', true);
+        }else if($(target).is("input")){
+            $(target).val(data[targetName]);
+        }else{
+            $(target).attr("state", data[targetName]);
+        };
+    });
 };
 
 function parameters_save(data){
@@ -133,6 +370,341 @@ function parameters_save(data){
     return;
 };
 
+
+function JSONiseList(list){
+    if(list.length == 0){return []};
+    if(isDict(list[0])){return list};
+
+    //RESET VARS
+
+    localStorage.removeItem('hasBeenShifted');
+    localStorage.removeItem('sessionSwapped');
+    localStorage.removeItem('sessionToBeDone');
+    localStorage.removeItem('session_done');
+    localStorage.removeItem('calendar_dict');
+
+    Array.prototype.getId = function() {
+        return this[this.length - 1];
+    };
+
+    function isScheduled(item){
+        if(item[item.length - 2].constructor.name == "Array"){
+            if(item[item.length - 2][0] == "Notif"){
+                return item[item.length - 2];
+            }else{
+                return false;
+            };
+        }else{
+            return false;
+        };
+    };
+
+    function getSessionHistory(session){
+        if(session[0] == "W"){
+            return isScheduled(session) ? session[session.length - 3] : session[session.length - 2];
+        }else if(session[0] == "I"){
+            return isScheduled(session) ? session[session.length - 3] : session[session.length - 2];
+        }
+    };
+
+    function getHint(session, id){
+        for (let i = 0; i < session[2].length; i++) {
+            const elem = session[2][i];
+    
+            if(elem.getId() == id){
+                if(elem[0] == "Int."){
+                    if(isIntervallLinked(elem)){
+                        return elem[3];
+                    }else{
+                        return elem[2];
+                    };
+                }else if(elem.length == 8){
+                    return elem[6];
+                };
+            };
+        };
+    
+        return false;
+    };
+
+    function isIntervallLinked(data){
+        return !Array.isArray(data[2]);
+    };
+
+    if(platform == "Mobile"){
+        list.forEach(element => {
+            removeAllNotifsFromSession(element.getId())
+        });
+    };
+
+    let out = [];
+
+    for(let i = 0; i < list.length; i++){
+        let session = list[i];
+
+        if(session[0] != "R"){
+            let history = false;            
+            let currentHistory = getSessionHistory(session);
+            
+            if(currentHistory.length == 1){
+                history = generateHistoryObj({
+                    "state": currentHistory[0][1], 
+                    "historyCount": currentHistory[0][2],
+                    "historyList": []
+                });
+            }else{
+                let currentHistoryList = [];
+                
+                if(session[0] == "W"){
+                    currentHistory.forEach((thatHistory, id) => {
+                        if(id != 0){
+                            let date = thatHistory[0];
+                            let time = thatHistory[1];
+                            let exoList = [];
+                            
+                            thatHistory[2].forEach(exo => {
+                                let type = exo.length > 3 ? "Bi." : "Int.";
+                                let exoName = exo[0];
+                                let exoExptected = false;
+                                let setList = [];
+                                
+                                if(type == "Bi."){
+                                    exoExptected = generateHistoryExceptedStatsObj({
+                                        "type": type, 
+                                        "setNb": exo[1][0], 
+                                        "reps": exo[1][1], 
+                                        "weight": exo[1][2], 
+                                        "weightUnit": exo[1][3]
+                                    });
+    
+                                    exo[2].forEach(set => {
+                                        if(set.length > 0){
+                                            setList.push(generateHistorySetObj({
+                                                "type": type,
+                                                "reps": set[0],
+                                                "weight": set[1]
+                                            }));
+                                        };
+                                    });
+    
+                                    exoList.push(generateHistoryExoObj({
+                                        "type": type,
+                                        "name": exoName,
+                                        "expectedStats": exoExptected,
+                                        "setList": setList,
+                                        "note": false,
+                                        "id": false
+                                    }))
+                                }else{
+                                    let intExoList = []
+                                    
+                                    exo[1].forEach(subExo => {
+                                        let name = subExo[0];
+                                        let expectedStats = generateHistoryExceptedStatsObj({
+                                            "type": type, 
+                                            "cycle": subExo[1][0],
+                                            "work": subExo[1][1],
+                                            "rest": subExo[1][2],
+                                        });
+                                        
+                                        let setList = [];
+                                        subExo[2].forEach(set => {
+                                            if(set.length > 0){
+                                                setList.push(generateHistorySetObj({
+                                                    "type": type,
+                                                    "work": set[0],
+                                                    "rest": set[1]
+                                                }));
+                                            };
+                                        });
+    
+                                        intExoList.push(generateHistoryExoObj({
+                                            "type": type,
+                                            "name": name,
+                                            "expectedStats": expectedStats,
+                                            "setList": setList,
+                                            "note": false,
+                                            "id": false
+                                        }))
+    
+                                    });
+    
+                                    exoList.push(generateHistoryINTExoObj({
+                                        "type": "Int.",
+                                        "name": exo[0],
+                                        "exoList": intExoList,
+                                        "note": false,
+                                        "id": false
+                                    }));
+                                };
+                            });
+    
+                            currentHistoryList.push(generateHistoryElementObj({
+                                "date": date,
+                                "duration": time,
+                                "exoList": exoList
+                            }))
+    
+                        };
+                    });
+                }else if(session[0] == "I"){
+                    currentHistory.forEach((thatHistory, id) => {
+                        if(id != 0){
+                            let date = thatHistory[0];
+                            let time = thatHistory[1];
+                            let exoList = [];
+    
+                            thatHistory[2].forEach(exo => {
+                                let type = "Int.";
+                                let exoName = exo[0];
+                                
+                                let exoExptected = generateHistoryExceptedStatsObj({
+                                    "type": type, 
+                                    "cycle": exo[1][0], 
+                                    "work": exo[1][1], 
+                                    "rest": exo[1][2], 
+                                });
+                                
+                                let setList = [];
+    
+                                exo[2].forEach(set => {
+                                    if(set.length > 0){
+                                        setList.push(generateHistorySetObj({
+                                            "type": type,
+                                            "work": set[0],
+                                            "rest": set[1]
+                                        }));
+                                    };
+                                });
+    
+                                exoList.push(generateHistoryExoObj({
+                                    "type": type,
+                                    "name": exoName,
+                                    "expectedStats": exoExptected,
+                                    "setList": setList,
+                                    "note": false,
+                                    "id": false
+                                }))
+                            });
+    
+                            currentHistoryList.push(generateHistoryElementObj({
+                                "date": date,
+                                "duration": time,
+                                "exoList": exoList
+                            }))
+                        };
+                    });
+                };
+    
+                history = generateHistoryObj({
+                    "state": currentHistory[0][1] == "true", 
+                    "historyCount": currentHistory[0][2], 
+                    "historyList": currentHistoryList
+                });
+            };
+            
+            let exoList = [];
+    
+            if(session[0] == "W"){
+                session[2].forEach((exo, index) => {
+                    if(exo[0] == "Pause"){
+                        exoList.push(generateExoObj({"type": "Pause", "rest": exo[1], "id": (index+1).toString()}))
+                    }else if(exo[0] == "Uni." || exo[0] == "Bi."){
+                        exoList.push(generateExoObj({
+                            "type" : exo[0],
+                            "name" : exo[1],
+                            "setNb" : parseInt(exo[2]),
+                            "reps" : parseInt(exo[3]),
+                            "weight" : parseFloat(exo[4]),
+                            "rest" : exo[5],
+                            "hint" : getHint(session, exo.getId()),
+                            "id" : (index+1).toString()
+                        }));
+                    }else if(exo[0] == "Int."){
+                        if(isIntervallLinked(exo)){
+                            exoList.push(generateExoObj({
+                                'type': exo[0], 
+                                'hint': getHint(session, exo.getId()), 
+                                'linkId': exo[1],
+                                'id': (index+1).toString(), 
+                             }));
+                        }else{
+                            let subExoList = []
+
+                            exo[2].forEach((subExo, indexND) => {
+                                subExoList.push(generateExoObj({
+                                    "type" : subExo[0],
+                                    "name" : subExo[1],
+                                    "cycle" : subExo[2],
+                                    "work" : subExo[3],
+                                    "rest" : subExo[4],
+                                    "hint" : false,
+                                    "id" : (indexND+1).toString()
+                                }))
+                            });
+    
+                            let intExo = generateSessionObj({
+                                'type': exo[0], 
+                                'name': exo[1], 
+                                'exoList': subExoList, 
+                                'hint': false, 
+                                'id': (index+1).toString(), 
+                            })
+    
+                            exoList.push(intExo);
+                        };
+                    }else if(exo[0] == "Wrm."){
+                        exoList.push(generateExoObj({
+                            "type" : exo[0],
+                            "name" : exo[1],
+                            "hint" : getHint(session, exo.getId()),
+                            "id" : (index+1).toString()
+                        }));
+                    };
+                });
+            }else if(session[0] == "I"){
+                session[2].forEach((exo, index) => {
+                    if(exo[0] == "Pause"){
+                        exoList.push(generateExoObj({"type": "Pause", "rest": exo[1], "id": (index+1).toString()}))
+                    }else{
+                        exoList.push(generateExoObj({
+                            "type" : exo[0],
+                            "name" : exo[1],
+                            "cycle" : exo[2],
+                            "work" : exo[3],
+                            "rest" : exo[4],
+                            "hint" : false,
+                            "id" : (index+1).toString()
+                        }));
+                    };
+                });
+            };
+
+            let newSessionElement = generateSessionObj({
+                'type': session[0], 
+                'name': session[1], 
+                'exoList': exoList,
+                'history': history, 
+                'notif': false, 
+                'color': colorList[Math.floor(Math.random() * colorList.length)],
+                'id': session.getId()
+            });
+
+            out.push(newSessionElement);
+        }else{
+            out.push(generateReminderObj({
+                "type": session[0], 
+                "name": session[1], 
+                "body": session[2], 
+                "notif": false, 
+                "color": colorList[Math.floor(Math.random() * colorList.length)], 
+                "id": session[3]
+            }));
+        };
+    };
+
+    return out;
+};
 
 function session_read(set=false){ 
     let data = localStorage.getItem("sessions_list");
@@ -147,100 +719,23 @@ function session_read(set=false){
         calendar_dict = calendar_read(data[0]);
         previousWeightUnit = data[1];
 
-        // NEW FIX
-
-        // let corr = {};
+        data[0] = JSONiseList(data[0]);
+        console.log(data[0])
         
-        // data[0].forEach((session, index) => {
-        //     let newSession = false;
-
-        //     if(session[0] == "I" && session.length > 6){
-        //         if(isScheduled(session)){
-        //             newSession = ["I", session[1], [['Int.', session[1], parseInt(session[4]), session[2], session[3]]], session[5], session[6], session[7]];
-        //         }else{
-        //             newSession = ["I", session[1], [['Int.', session[1], parseInt(session[4]), session[2], session[3]]], session[5], session[6]];
-        //         };
-
-        //         data[0][index] = newSession;
-        //     };
-
-        //     if(session[0] == "W"){
-        //         let newExo = false;
-        //         let one = false;
-        //         let two = false;
-
-        //         session[2].forEach((exo, exoInd) => {
-        //             if(exo[0] != "Pause"){corr[exo[1]] = (exoInd+1).toString()};
-
-        //             if(exo[0] == "Int." && exo.length > 4 && (isNaI(exo[exo.length - 1]) || !Array.isArray(exo[2]))){
-        //                 one = true;
-        //                 newExo = ["Int.", exo[1], [['Int.', exo[1], parseInt(exo[4]), exo[2], exo[3]]], (exoInd+1).toString()];
-        //             }else if((exo[0] != "Int." && exo[0] != "Pause") && isNaI(exo[exo.length - 1])){
-        //                 two = true;
-        //                 newExo = [...exo, (exoInd+1).toString()];
-        //             };
-
-        //             if(exo[0] != "Pause" && (one || two)){
-        //                 data[0][index][2][exoInd] = newExo;
-        //             };
-        //         });
-        //     };
-
-        // });
-
-        // data[0].forEach((session) => {
-        //     let history = getSessionHistory(session);
-
-        //     if(session[0] == "W"){
-        //         history.forEach((day, dayInd) => {
-        //             if(Array.isArray(day[2])){
-        //                 day[2].forEach((exo, exoInd) => {
-        //                     if(isNaI(exo[exo.length - 1][0])){
-        //                         let name = exo[0].replace(" - L", "").replace(" - R", "")
-        //                         let suffix = exo[0].endsWith(" - L") ? "_1" : exo[0].endsWith(" - R") ? "_2" : "";
-        //                         let match = corr[name] === undefined ? "999" : corr[name];
-
-        //                         history[dayInd][2][exoInd].push(match + suffix);
-        //                     };
-    
-        //                     if(exo[1][0] == '1' && (exo[1][1] == '1' || exo[1][1] == '0') && exo[1][2] == '0'){
-        //                         history[dayInd][2].splice(exoInd, 1);
-        //                     };
-        //                 });
-        //             };
-        //         });
-        //     };
-        // });
-
-        data[0].forEach((data) => {
-            let scheduleData = isScheduled(data);
-
-            if(scheduleData.length == 3){
-                data[data.length - 2].push({
-                    "jumpTimestamp": null,
-                    "jumpType" : null,
-                    "jumpVal" : null,
-                    "everyVal": 0
-                });
-
-                data[data.length - 2].push(1);
-            };
-        });
-
-        if(previousWeightUnit != weightUnit){
-            updateWeightUnits(data[0], previousWeightUnit, weightUnit);
-        };
-
+        if(previousWeightUnit != parameters['weightUnit']){
+            updateWeightUnits(data[0], previousWeightUnit, parameters['weightUnit']);
+        }; 
+        
         return data[0];
     };
 };
 
 function session_save(data){
-    localStorage.setItem("sessions_list", JSON.stringify([data, weightUnit]));
+    localStorage.setItem("sessions_list", JSON.stringify([data, parameters['weightUnit']]));
     return;
 };
 
-function session_pusher(data){
+function session_pusher(session_list){
 
     if(reminder_list){
         if(reminder_list.length != 0){
@@ -251,9 +746,9 @@ function session_pusher(data){
     $(".selection_session_container").css("display", "flex");
     $(".selection_empty_msg").css("display", "none");
 
-    for (let i = 0; i < data.length; i++){
-        $(".selection_session_container").append(session_tile(data[i]));
-    };
+    session_list.forEach(session => {
+        $(".selection_session_container").append(session_tile(session));
+    });
 
     manageHomeContainerStyle();
     resize_update();
@@ -269,21 +764,7 @@ function reminder_read(set=false){
         return [];
     }else{
         data = JSON.parse(data);
-
-        data.forEach((data) => {
-            let scheduleData = isScheduled(data);
-
-            if(scheduleData.length == 3){
-                data[data.length - 2].push({
-                    "jumpTimestamp": null,
-                    "jumpType" : null,
-                    "jumpVal" : null,
-                    "everyVal": 0
-                });
-
-                data[data.length - 2].push(1);
-            };
-        });
+        data = JSONiseList(data);
 
         return data;
     };
@@ -294,7 +775,7 @@ function reminder_save(data){
     return;
 };
 
-function reminder_pusher(data){
+function reminder_pusher(reminder_list){
     $(".selection_empty_msg").css("display", "none");
 
     if(session_list.length == 0){
@@ -304,9 +785,9 @@ function reminder_pusher(data){
         $(".selection_SR_separator, .selection_reminder_container").css("display", "flex");
     };
 
-    for (let i = 0; i < data.length; i++){
-        $(".selection_reminder_container").append(reminder_tile(data[i]));
-    };
+    reminder_list.forEach(reminder => {
+        $(".selection_reminder_container").append(reminder_tile(reminder));
+    });
 
     manageHomeContainerStyle();
     resize_update();
@@ -316,7 +797,7 @@ function reminder_pusher(data){
 function calendar_read(data){
     let dict = localStorage.getItem("calendar_shown");
 
-    if (dict === null || dict == "" || data.length == 0){
+    if (dict === null || dict == ""){
         dict = calendar_reset(data);
     }else{
         dict = JSON.parse(dict);
@@ -324,25 +805,26 @@ function calendar_read(data){
 
     $(".selection_page_calendar_Scheduled_item").remove();
 
-    for(let i=0; i<data.length; i++){
-        if(isScheduled(data[i]) && data[i][0] != "R"){
-            let temp = $('<span class="selection_page_calendar_Scheduled_item noselect">'+data[i][1]+'</span>');
+    data.forEach(session => {
+        if(isScheduled(session)){
+            let temp = $('<span class="selection_page_calendar_Scheduled_item noselect">'+session["name"]+'</span>');
 
-            $(temp).data("state", dict[data[i][1]]) ? dict[data[i][1]] : $(temp).data("state", true);
+            $(temp).data("state", dict[session["id"]]);
+            $(temp).data("id", session["id"]);
 
-            if(dict[data[i][1]]){
-                $(temp).css('backgroundColor', '#1DBC60');
+            if(dict[session["id"]]){
+                $(temp).css('backgroundColor', session['color']);
             }else{
                 $(temp).css('backgroundColor', '#4C5368');
             };
 
             $(".selection_page_calendar_second").append(temp);
         }else{
-            if(dict[data[i][1]] !== undefined){
-                delete dict[data[i][1]];
+            if(dict[session["id"]] !== undefined){
+                delete dict[session["id"]];
             };
         };
-    };
+    });
 
     if($(".selection_page_calendar_Scheduled_item").length == 0){
         $(".selection_page_calendar_empty_msg").css("display", "flex");
@@ -362,20 +844,13 @@ function calendar_save(data){
 function calendar_reset(data){
     let dict = {};
 
-    for(let i=0; i<data.length; i++){
-        if(isScheduled(data[i])){
-            dict[data[i][1]] = true;
+    data.forEach(session => {
+        if(isScheduled(session)){
+            dict[session["id"]] = true;
         };
-    };
-
+    });
+    
     return dict;
-};
-
-function updateCalendarDictItem(key, newKey){
-    calendar_dict[newKey] = calendar_dict[key];
-    delete calendar_dict[key];
-
-    calendar_save(calendar_dict);
 };
 
 
@@ -440,21 +915,17 @@ function recovery_read(){
     }else{
 
         data = JSON.parse(data);
-        
-        let sessionIndex = getSessionIndexByID(session_list, data[0])
+        let sessionIndex = getSessionIndexByID(data["id"])
 
-        if(session_list[sessionIndex][0] == "I"){
-            if(data[1]['Ifinished']){
+        if(session_list[sessionIndex]["type"] == "I"){
+            if(data["varSav"]['Ifinished']){
                 ongoing = "intervall";
                 
                 current_session = session_list[sessionIndex];
                 current_history = getSessionHistory(current_session);
 
-                TemptimeSpent = data[4][0];
-                TempworkedTime = data[4][1];
-                TempweightLifted = data[4][2];
-                TemprepsDone = data[4][3];
-                tempNewHistory = data[3];
+                tempStats = data['tempStats'];
+                tempNewHistory = data["tempHistory"];
 
                 quit_session();
                 return data;
@@ -462,7 +933,7 @@ function recovery_read(){
         };
 
         showBlurPage("selection_recovery_page");
-        $(".selection_recovery_subText1").text(session_list[getSessionIndexByID(session_list, data[0])][1]);
+        $(".selection_recovery_subText1").text(session_list[getSessionIndexByID(data["id"])]["name"]);
 
         return data;
     };
@@ -486,7 +957,7 @@ function sessionDone_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(new Date(data[0])) != formatDate(zeroAM(new Date()))){
+    if(formatDate(new Date(data["creationDate"])) != formatDate(zeroAM(new Date()))){
         data = emptySessionScheme();
         localStorage.setItem("session_done", JSON.stringify(data));
     };
@@ -511,7 +982,7 @@ function hasBeenShifted_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(new Date(data[0])) != formatDate(zeroAM(new Date()))){
+    if(formatDate(new Date(data["creationDate"])) != formatDate(zeroAM(new Date()))){
         data = emptySessionScheme();
         localStorage.setItem("hasBeenShifted", JSON.stringify(data));
     };
@@ -557,34 +1028,35 @@ function sessionToBeDone_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(new Date(data[0])) != formatDate(zeroAM(new Date()))){
+    if(formatDate(new Date(data["creationDate"])) != formatDate(zeroAM(new Date()))){
 
         //GET MISSED SESSION NB
         
-        let sessionDone = localStorage.getItem("session_done");
-        let elapsedTime = daysBetweenTimestamps(data[0], zeroAM(new Date()).getTime());
-        let count = 0;
+        // let sessionDone = localStorage.getItem("session_done");
 
-        if(elapsedTime > 1){
-            count += nbSessionScheduled(data[0]);
-        };
+        // let count = 0;
+        // let elapsedTime = daysBetweenTimestamps(data["creationDate"], zeroAM(new Date()).getTime());
 
-        if(!(sessionDone === null || sessionDone == "")){
-            sessionDone = JSON.parse(sessionDone);
+        // if(elapsedTime > 1){
+        //     count += nbSessionScheduled();
+        // };
 
-            Object.keys(data[1]).forEach(function(key){
-                if(data[1][key] && !sessionDone[1][key] && elapsedTime == 1){
-                    count += 1;
-                }else if(data[1][key] && sessionDone[1][key] && elapsedTime > 1){
-                    count -= 1;
-                };
-            });
-        };
+        // if(!(sessionDone === null || sessionDone == "")){
+        //     sessionDone = JSON.parse(sessionDone);
 
-        nbMissed += count;
+        //     Object.keys(data["data"]).forEach(function(key){
+        //         if(data["data"][key] && !sessionDone["data"][key] && elapsedTime == 1){
+        //             count += 1;
+        //         }else if(data["data"][key] && sessionDone["data"][key] && elapsedTime > 1){
+        //             count -= 1;
+        //         };
+        //     });
+        // };
 
-        stats_set([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
-        stats_save([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
+        // stats["missedSessions"] += count;
+
+        stats["missedSessions"] += nbSessionScheduled();
+        stats_save(stats);
 
         // --------------------
 

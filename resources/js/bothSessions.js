@@ -32,9 +32,9 @@ function keepAwakeToggle(state){
         };
     }else if(platform == "Mobile"){
         if(state){
-            if(keepAwake){KeepAwake.keepAwake()};
+            if(parameters["keepAwake"]){KeepAwake.keepAwake()};
         }else{
-            if(keepAwake){KeepAwake.allowSleep()};
+            if(parameters["keepAwake"]){KeepAwake.allowSleep()};
         };
     };    
 };
@@ -45,10 +45,10 @@ async function launchSession(index){
     current_session = session_list[index];
 
     if(platform == "Mobile"){
-        let shown = await isShown(current_session.getId(), getScheduleScheme(current_session));
+        let shown = await isShown(current_session["id"], getScheduleScheme(current_session));
 
         if(shown){
-            let id = getNotifFirstIdChar(current_session) + current_session.getId() + shown.slice(-1);
+            let id = getNotifFirstIdChar(current_session) + current_session["id"] + shown.slice(-1);
             await undisplayAndCancelNotification(id);
         };
     };
@@ -62,29 +62,27 @@ async function launchSession(index){
 
     $(".session_header_secondRow").append($(".selection_info_page"));
 
-    if(current_session[0] == "I"){
+    if(current_session["type"] == "I"){
         ongoing = "intervall";
         current_history = getSessionHistory(current_session);
 
         if(recovery){
-            TemptimeSpent = recovery[4][0];
-            TempworkedTime = recovery[4][1];
-            TempweightLifted = recovery[4][2];
-            TemprepsDone = recovery[4][3];
+            tempStats["timeSpent"] = recovery["tempStats"]["timeSpent"];
+            tempStats["workedTime"] = recovery["tempStats"]["workedTime"];
+            tempStats["weightLifted"] = recovery["tempStats"]["weightLifted"];
+            tempStats["repsDone"] = recovery["tempStats"]["repsDone"];
 
-            tempNewHistory = recovery[3];
-
-            stats_set([TemptimeSpent,TempworkedTime,TempweightLifted,TemprepsDone]);
+            tempNewHistory = recovery["tempHistory"];
+            stats_set(tempStats);
         }else{
-            TemptimeSpent = 0;
-            TempworkedTime = 0;
-            TempweightLifted = 0;
-            TemprepsDone = 0;
+            tempStats = generateStatsObj({"timeSpent": 0, "workedTime": 0, "weightLifted": 0, "repsDone": 0});
+            stats_set(tempStats);
 
-            stats_set([0,0,0,0,since]);
-
-            tempNewHistory = [Date.now(), 0, []];
-            tempNewHistory[2] = generateIntervallHistory(current_session)
+            tempNewHistory = generateHistoryElementObj({
+                "date": Date.now(),
+                "duration": 0,
+                "exoList": generateIntervallHistoryExoList(current_session)
+            });
         };
 
         $('.session_workout_footer').css("display", "none");
@@ -93,17 +91,17 @@ async function launchSession(index){
 
         TPtimer = setInterval(() => {
             if(!isIdle){
-                TemptimeSpent++;
-                $(".selection_info_TimeSpent").text(get_time_u(timeFormat(TemptimeSpent)));
+                tempStats["timeSpent"]++;
+                $(".selection_info_TimeSpent").text(get_time_u(timeFormat(tempStats["timeSpent"])));
             };
         }, timeUnit);
 
-        intervall(current_session[2]);
-    }else if(current_session[0] == "W"){
+        intervall(current_session["exoList"]);
+    }else if(current_session["type"] == "W"){
+        ongoing = "workout";
+        
         $('.session_exercise_Lrest_btn').data("canLongClick", false);
         $('.session_exercise_Rrest_btn').data("canLongClick", false);
-
-        ongoing = "workout";
 
         $(".session_intervall_container").css("display", "none");
         $('.session_workout_footer').css("display", "flex");
@@ -119,26 +117,25 @@ async function launchSession(index){
 
         if(recovery){
 
-            TemptimeSpent = recovery[4][0];
-            TempworkedTime = recovery[4][1];
-            TempweightLifted = recovery[4][2];
-            TemprepsDone = recovery[4][3];
+            tempStats["timeSpent"] = recovery["tempStats"]["timeSpent"];
+            tempStats["workedTime"] = recovery["tempStats"]["workedTime"];
+            tempStats["weightLifted"] = recovery["tempStats"]["weightLifted"];
+            tempStats["repsDone"] = recovery["tempStats"]["repsDone"];
 
-            stats_set([TemptimeSpent,TempworkedTime,TempweightLifted,TemprepsDone]);
-
-            tempNewHistory = recovery[3];
+            tempNewHistory = recovery["tempHistory"];            
+            stats_set(tempStats);
         }else{
-            TemptimeSpent = 0;
-            TempworkedTime = 0;
-            TempweightLifted = 0;
-            TemprepsDone = 0;
+            tempStats = generateStatsObj({"timeSpent": 0, "workedTime": 0, "weightLifted": 0, "repsDone": 0});
+            stats_set(tempStats);
 
-            stats_set([0,0,0,0,since]);
-
-            tempNewHistory = [Date.now(), 0, []];
+            tempNewHistory = generateHistoryElementObj({
+                "date": Date.now(),
+                "duration": 0,
+                "exoList": []
+            });
         };
 
-        workout(current_session[2]);
+        workout(current_session["exoList"]);
     };
 
     if(muted){
@@ -149,7 +146,7 @@ async function launchSession(index){
 
     update_soundSlider();
 
-    if(keepAwake){keepAwakeToggle(true)};
+    if(parameters["keepAwake"]){keepAwakeToggle(true)};
 
     $(".selection_infoStart").css("display", "none");
     $(".selection_info_item").eq(4).css("display", "none");
@@ -165,6 +162,7 @@ async function quit_session(failed=false){
     beep2x3Player = null;
 
     color = dark_blue;
+    console.log(tempNewHistory)
 
     infoStyle("selection");
     $("html").css("background-color", dark_blue);
@@ -188,33 +186,33 @@ async function quit_session(failed=false){
         await undisplayAndCancelNotification(1235);
     };
 
-    if(keepAwake){keepAwakeToggle(false)};
+    if(parameters["keepAwake"]){keepAwakeToggle(false)};
 
-    if(!((current_session[0] == "W" && (TemptimeSpent <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session[0] == "I" && TemptimeSpent <= 60)){
+    if(!((current_session["type"] == "W" && (tempStats["timeSpent"] <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session["type"] == "I" && tempStats["timeSpent"] <= 60)){
 
-        timeSpent += TemptimeSpent;
-        workedTime += TempworkedTime;
-        weightLifted += TempweightLifted;
-        repsDone += TemprepsDone;
+        stats["timeSpent"] += tempStats["timeSpent"];
+        stats["workedTime"] += tempStats["workedTime"];
+        stats["weightLifted"] += tempStats["weightLifted"];
+        stats["repsDone"] += tempStats["repsDone"];
         
-        current_history[0][2] += 1;
+        current_history["historyCount"] += 1;
 
-        stats_save([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
+        stats_save(stats);
 
-        if(current_history[0][1] == "true"){
-            tempNewHistory[1] = TemptimeSpent;
-            current_history.push(tempNewHistory);
+        if(current_history["state"] == true){
+            tempNewHistory["duration"] = tempStats["timeSpent"];
+            current_history["historyList"].push(tempNewHistory);
             session_save(session_list);
         };
 
-        sessionDone[1][current_session.getId()] = true;
+        sessionDone["data"][current_session["id"]] = true;
         
         sessionDone_save(sessionDone);
 
         // Notification related;
 
         if(isScheduled(current_session)){
-            let id = await getTodayPendingId(current_session.getId(), getScheduleScheme(current_session));
+            let id = await getTodayPendingId(current_session["id"], getScheduleScheme(current_session));
 
             if(platform == "Mobile"){
                 await undisplayAndCancelNotification(id);
@@ -228,8 +226,8 @@ async function quit_session(failed=false){
         fillSessionEnd(failed);
     };
 
-    stats_set([timeSpent, workedTime, weightLifted, repsDone, since, nbMissed]);
-    updateCalendar(session_list);
+    stats_set(stats);
+    updateCalendar(session_list, updateCalendarPage);
 
     
 
@@ -285,20 +283,20 @@ async function quit_session(failed=false){
 };
 
 function getSessionEndData(){
-    let number = current_history[0][2];
+    let number = current_history["historyCount"];
     let outNumber = "";
     let time = 0;
     let performanceGrowth = 0;
     let weight = 0;
     let double = false;
 
-    if(language == "french"){
+    if(parameters["language"] == "french"){
         if(number == 1){
             outNumber = "1er";
         }else{
             outNumber = number.toString() + "ème";
         };
-    }else if(language == "english"){
+    }else if(parameters["language"] == "english"){
         if(number == 1){
             outNumber = "1st";
         }else if(number == 2){
@@ -310,38 +308,40 @@ function getSessionEndData(){
         };
     };
 
-    if(current_history[0][1] === "false" || current_history.length == 1 || current_session[0] == "I" || number == 1){
+    if(current_history["state"] === false || current_history["historyList"].length == 1 || current_session["type"] == "I" || number == 1){
         return [outNumber, false, false]
     };
 
-    let pastHistory = current_history[current_history.length - 2];
-    let presentHistory = current_history[current_history.length - 1];
+    let pastHistory = current_history["historyList"][current_history["historyList"].length - 2];
+    let presentHistory = current_history["historyList"][current_history["historyList"].length - 1];
     let isEqual = areSessionEquallyCompleted(presentHistory, pastHistory);
 
-    if(pastHistory[1] === 0){
-        if(TemptimeSpent === 0){
+    if(pastHistory["duration"] === 0){
+        if(tempStats["timeSpent"] === 0){
             performanceGrowth = 0;
         }else{
             performanceGrowth = 100;
         };
     }else{
-        performanceGrowth = Math.round(((pastHistory[1] - TemptimeSpent) / pastHistory[1]) * 100);
+        performanceGrowth = Math.round(((pastHistory["duration"] - tempStats["timeSpent"]) / pastHistory["duration"]) * 100);
     };
 
-    if(current_session[0] == "W"){time = Math.max(Math.min(performanceGrowth, Infinity), -100)};
+    if(current_session["type"] == "W"){time = Math.max(Math.min(performanceGrowth, Infinity), -100)};
 
-    for(const exo of pastHistory[2]){
-        if(exo.length >= 4){ // NOT INT 
-            double = exo[0].includes("Ts.") || exo[0].includes("Alt.");
+    for(const exo of pastHistory["exoList"]){
+        if(exo['type'] == "Bi." || exo['type'] == "Uni."){ // NOT INT 
+            double = exo["name"].includes("Ts.") || exo["name"].includes("Alt.");
             if(double){
-                weight += parseFloat(exo[1][0]) * convertToUnit(2*parseFloat(exo[1][1])*parseFloat(exo[1][2]), weightUnit, "kg");
+                weight += parseFloat(exo["expectedStats"]["setNb"]) * convertToUnit(2*parseFloat(exo["expectedStats"]["reps"])*parseFloat(exo["expectedStats"]["weight"]), parameters["weightUnit"], "kg");
             }else{
-                weight += parseFloat(exo[1][0]) * convertToUnit(parseFloat(exo[1][1])*parseFloat(exo[1][2]), weightUnit, "kg");
+                weight += parseFloat(exo["expectedStats"]["setNb"]) * convertToUnit(parseFloat(exo["expectedStats"]["reps"])*parseFloat(exo["expectedStats"]["weight"]), parameters["weightUnit"], "kg");
             };
+        }else if(exo['type'] == "Int."){
+
         };
     };
 
-    weight = weight == 0 ? false : Math.round((TempweightLifted - weight) / weight) * 100;
+    weight = weight == 0 ? false : Math.round((tempStats["weightLifted"] - weight) / weight) * 100;
     time = time == 0 ? false : time;
     
     return [outNumber, time, weight, isEqual];
@@ -375,19 +375,19 @@ function fillSessionEnd(failed){
             if(sets !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["sets", sets]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[language]['updatePage']['placeHolders']['sets'] +" : "+ oldSets + " -> " + sets);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['placeHolders']['sets'] +" : "+ oldSets + " -> " + sets);
             };
 
             if(reps !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["reps", reps]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[language]['updatePage']['placeHolders']['reps'] +" : "+ oldReps + " -> " + reps);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['placeHolders']['reps'] +" : "+ oldReps + " -> " + reps);
             };
             
             if(weight !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["weight", weight]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[language]['updatePage']['placeHolders']['weight'] +" : "+ oldWeight + weightUnit + " -> " + weight + weightUnit);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['placeHolders']['weight'] +" : "+ oldWeight + parameters["weightUnit"] + " -> " + weight + parameters["weightUnit"]);
             };
         };
 
@@ -403,13 +403,13 @@ function fillSessionEnd(failed){
         $('.selection_sessionFinished').css('paddingBottom', '30px');
         $('.selection_sessionFinished_navigator').css('display', 'none');
 
-        let assetCount = Object.keys(textAssets[language]["sessionEnd"]["subText"]["failed"]).length;
+        let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["subText"]["failed"]).length;
         let randomFailedSub = Math.floor(Math.random() * (assetCount)).toString();
         
         let failedTile = $('.failed');
         
-        $(failedTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["failed"]);
-        $(failedTile).find('.selection_sessionFinished_subText').text(textAssets[language]["sessionEnd"]["subText"]["failed"][randomFailedSub]);
+        $(failedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["failed"]);
+        $(failedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["failed"][randomFailedSub]);
     }else{
         let [number, time, weight, isEqual] = getSessionEndData();
         let changes = generateSuggestedChanges(tempNewHistory);
@@ -427,11 +427,11 @@ function fillSessionEnd(failed){
             $(secondTile).css('display', 'none');
             $(thirdTile).css('display', 'none');
 
-            let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["completed"]).length;
+            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["completed"]).length;
             let randomFailedSub = Math.floor(Math.random() * (assetCount)).toString();
 
-            $(completedTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["completed"][randomFailedSub]);
-            $(completedTile).find('.selection_sessionFinished_subText').text(textAssets[language]["sessionEnd"]["subText"]["completed"]);
+            $(completedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["completed"][randomFailedSub]);
+            $(completedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["completed"]);
 
             $('.selection_sessionFinished').css('paddingBottom', '45px');
             $('.selection_sessionFinished_navigator').css('display', 'flex');
@@ -495,73 +495,73 @@ function fillSessionEnd(failed){
         let randomWeightMain = 0;
 
         // First Tile
-        $(firstTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["congrats"]);
+        $(firstTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["congrats"]);
 
-        $($(firstTile).find('.selection_sessionFinished_subTextInterest')[0]).text(current_session[1]);
+        $(firstTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(current_session["name"]);
 
-        $($(firstTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["congrats"]["YC"]);
-        $($(firstTile).find('.selection_sessionFinished_subTextPart')[2]).text(number);
-        $($(firstTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]["subText"]["congrats"]["FT"]);
-        $($(firstTile).find('.selection_sessionFinished_subTextPart')[3]).text(textAssets[language]["sessionEnd"]["subText"]["congrats"]["T"]);
+        $(firstTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["YC"]);
+        $(firstTile).find('.selection_sessionFinished_subTextPart').eq(2).text(number);
+        $(firstTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["FT"]);
+        $(firstTile).find('.selection_sessionFinished_subTextPart').eq(3).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["T"]);
 
         // Second Tile
         if(time > 0){
-            let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["good"]).length
+            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["good"]).length
 
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["good"][randomTimeMain]);
+            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["good"][randomTimeMain]);
 
-            $($(secondTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["chrono"]["YHB"]);
-            $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(time).toString() + textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["faster"]);
-            $($(secondTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['TTLT']);
+            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]["YHB"]);
+            $(secondTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["faster"]);
+            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
         }else if(time < 0){
-            let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
+            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
             
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["bad"][randomTimeMain]);
+            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"][randomTimeMain]);
 
-            $($(secondTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["chrono"]["YHB"]);
-            $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(time).toString() + textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["slower"]);
-            $($(secondTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['TTLT']);
+            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]["YHB"]);
+            $(secondTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["slower"]);
+            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
         }else{
-            let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["even"]).length
+            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"]).length
             
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["even"][randomTimeMain]);
+            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"][randomTimeMain]);
 
-            $($(secondTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["chrono"]['YT']);
-            $($(secondTile).find('.selection_sessionFinished_subTextInterest')[0]).text(textAssets[language]["sessionEnd"]["interestWord"]["chrono"]["even"]);
-            $($(secondTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['ATLT']);
+            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]['YT']);
+            $(secondTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["even"]);
+            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['ATLT']);
         };
 
         // Third Tile
         if(weight > 0){
-            let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["weight"]["good"]).length
+            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["good"]).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["weight"]["good"][randomWeightMain]);
+            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["good"][randomWeightMain]);
 
-            $($(thirdTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $($(thirdTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(weight).toString() + textAssets[language]["sessionEnd"]["interestWord"]["weight"]["more"]);
-            $($(thirdTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['TTLT']);
+            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
+            $(thirdTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["more"]);
+            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
         }else if(weight < 0){
-            let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
+            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["weight"]["bad"][randomWeightMain]);
+            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["bad"][randomWeightMain]);
 
-            $($(thirdTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $($(thirdTile).find('.selection_sessionFinished_subTextInterest')[0]).text(Math.abs(weight).toString() + textAssets[language]["sessionEnd"]["interestWord"]["weight"]["less"]);
-            $($(thirdTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['TTLT']);
+            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
+            $(thirdTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["less"]);
+            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
         }else{
-            let assetCount = Object.keys(textAssets[language]["sessionEnd"]["mainText"]["chrono"]["even"]).length
+            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"]).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[language]["sessionEnd"]["mainText"]["weight"]["even"][randomWeightMain]);
+            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["even"][randomWeightMain]);
 
-            $($(thirdTile).find('.selection_sessionFinished_subTextPart')[0]).text(textAssets[language]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $($(thirdTile).find('.selection_sessionFinished_subTextInterest')[0]).text(textAssets[language]["sessionEnd"]["interestWord"]["weight"]["even"]);
-            $($(thirdTile).find('.selection_sessionFinished_subTextPart')[1]).text(textAssets[language]["sessionEnd"]['common']['ATLT']);
+            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
+            $(thirdTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["even"]);
+            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['ATLT']);
         };
 
         // Forth Tile
@@ -581,13 +581,31 @@ function fillSessionEnd(failed){
     showBlurPage('selection_sessionFinished');
 };
 
-function generateIntervallHistory(session){
-    let out = new Array();
+function generateIntervallHistoryExoList(session){
+    let out = [];
+    let expectedStats = false;
+    let setList = false;
 
-    session[2].forEach(exo => {
-        if(exo[0] == "Int."){
-            out.push([exo[1], [exo[2], exo[3], exo[4]], Array.from({ length: exo[2] }, () => [])]);
-        };
+    session['exoList'].forEach(exo => {
+        expectedStats = generateHistoryExceptedStatsObj({
+            "type": exo['type'],
+            "cycle": exo["cycle"],
+            "work": exo["work"],
+            "rest": exo["rest"]
+        });
+
+        setList = Array.from({ length: exo["cycle"] }, (_, index) => {
+            return generateHistorySetObj({"type": exo["type"], "work": "X", "rest": "X"});
+        })
+
+        out.push(generateHistoryExoObj({
+            "type": exo['type'],
+            "name": exo['name'],
+            "expectedStats": expectedStats,
+            "setList": setList,
+            "note": "",
+            "id": exo["id"]
+        }));
     });
 
     return out;
@@ -597,51 +615,51 @@ function generateSuggestedChanges(history){
     let last_id = -1;
     let suggestedData = {};
 
-    if(current_session[0] == "W"){
-        history[2].forEach(exo => {
-            let id = exo[exo.length - 1].replace(/_(1|2)/g, "");
+    if(current_session["type"] == "W"){
+        history["exoList"].forEach(exo => {
+            let id = exo["id"].replace(/_(1|2)/g, "");
             if(id == last_id){return}else{last_id = id};
 
-            let type = current_session[2][getExoIndexById(current_session, id)][0];
+            let type = exo["type"];
             let name = false;
             let setList = false;
             let newSets = false;
 
             if(type == "Uni."){
-                name = exo[0].slice(0, -4);
+                name = exo["name"].slice(0, -4);
                 setList = mergeHistoryExo(history, id);
                 newSets = Math.floor(setList.length / 2);
-            }else{
-                name = exo[0]
-                setList = exo[2];
-                newSets = exo[2].length;
+            }else if(type != "Int."){
+                name = exo["name"]
+                setList = exo["setList"];
+                newSets = exo["setList"].length;
             };
 
             if(newSets == 0){return};
 
             if(type == "Bi." || type == "Uni."){
-                let repsMean = Math.ceil(exo[2].map(item => item[0]).reduce((acc, val) => acc + val, 0) / exo[2].length); 
-                let weightMean = exo[2].map(item => item[1]).reduce((acc, val) => acc + val, 0) / exo[2].length;
+                let repsMean = Math.ceil(exo["setList"].map(item => item["reps"]).reduce((acc, val) => acc + val, 0) / exo["setList"].length); 
+                let weightMean = exo["setList"].map(item => item["weight"]).reduce((acc, val) => acc + val, 0) / exo["setList"].length;
                 let weightMeanRounded = roundToNearestHalf(weightMean);
 
-                if(repsMean != parseInt(exo[1][1]) || weightMean != parseFloat(exo[1][2])){
+                if(repsMean != parseInt(exo["expectedStats"]["reps"]) || weightMean != parseFloat(exo["expectedStats"]["weight"])){
                     
                     suggestedData[id] = {
                         "name": name,
                         "type": type
                     };
     
-                    if(newSets != parseInt(exo[1][0])){
+                    if(newSets != parseInt(["expectedStats"]["setNb"])){
                         suggestedData[id]['sets'] = newSets;
                         suggestedData[id]['oldSets'] = parseInt(exo[1][0]);
                     };
         
-                    if(repsMean != parseInt(exo[1][1])){
+                    if(repsMean != parseInt(["expectedStats"]["reps"])){
                         suggestedData[id]['reps'] = repsMean;
                         suggestedData[id]['oldReps'] = parseInt(exo[1][1]);
                     };
                     
-                    if(weightMean != parseFloat(exo[1][2])){
+                    if(weightMean != parseFloat(["expectedStats"]["weight"])){
                         suggestedData[id]['weight'] = weightMeanRounded;
                         suggestedData[id]['oldWeight'] = parseFloat(exo[1][2]);
                     };
@@ -659,87 +677,96 @@ function generateSuggestedChanges(history){
 
 function recovery_init(mode){
     if(mode == "workout"){
-        recovery = [current_session.getId(), "" , "", "", "", []];
-
-        recovery[1] = {
-            "extype": false,
-            "next_id": false,
-            "next_name": false,
-            "next_rest": false,
-            "LrestTime": false,
-            "RrestTime": false,
-            "next_specs": false,
-            "actual_setL": false,
-            "actual_setR": false,
-            "actual_setNb": false,
-            "beforeExercise": false,
-            "hasIntervallStarted": false,
-            "intervallData": false,
-            "iCurrent_cycle": false,
-            "iActualCycle": false,
-            "currentExoIndex": false
+        recovery = {
+            "id": current_session['id'],
+            "varSav": {
+                "extype": false,
+                "next_id": false,
+                "next_name": false,
+                "next_rest": false,
+                "LrestTime": false,
+                "RrestTime": false,
+                "next_specs": false,
+                "actual_setL": false,
+                "actual_setR": false,
+                "actual_setNb": false,
+                "beforeExercise": false,
+                "hasIntervallStarted": false,
+                "intervallData": false,
+                "iCurrent_cycle": false,
+                "iActualCycle": false,
+                "currentExoIndex": false
+            },
+            "html": false,
+            "tempHistory": false,
+            "tempStats": {
+                "timeSpent": false,
+                "workedTime": false,
+                "weightLifted": false,
+                "repsDone": false
+            },
+            "undoMemory": undoMemory
         };
-        
-        recovery[2] = false;
-        recovery[3] = false;
-        recovery[4] = [false, false, false, false];
-
-        recovery[5] = undoMemory;
     }else if(mode == "intervall"){
-        recovery = [current_session.getId(), "" , "", "", ""];
-
-        recovery[1] = {
-            "hasIntervallStarted": false,
-            "intervallData": false,
-            "iCurrent_cycle": false,
-            "iActualCycle": false,
-            "currentExoIndex": false,
-            "Ifinished": false
+        recovery = {
+            "id": current_session['id'],
+            "varSav": {
+                "hasIntervallStarted": false,
+                "intervallData": false,
+                "iCurrent_cycle": false,
+                "iActualCycle": false,
+                "currentExoIndex": false,
+                "Ifinished": false
+            },
+            "tempHistory": false,
+            "tempStats": {
+                "timeSpent": false,
+                "workedTime": false,
+                "weightLifted": false,
+                "repsDone": false
+            }
         };
-
-        recovery[3] = false;
-        recovery[4] = [false, false, false, false];
     };
 };
 
 function udpate_recovery(mode, data=false){
-    tempNewHistory[1] = TemptimeSpent;
+    tempNewHistory["duration"] = tempStats["timeSpent"];
     
     if(mode == "workout"){
 
-        recovery[1]["extype"] = extype;
-        recovery[1]["next_id"] = next_id;
-        recovery[1]["next_name"] = next_name;
-        recovery[1]["next_rest"] = next_rest;
-        recovery[1]["LrestTime"] = LrestTime;
-        recovery[1]["RrestTime"] = RrestTime;
-        recovery[1]["next_specs"] = next_specs;
-        recovery[1]["actual_setL"] = actual_setL;
-        recovery[1]["actual_setR"] = actual_setR;
-        recovery[1]["actual_setNb"] = actual_setNb;
-        recovery[1]["beforeExercise"] = beforeExercise;
+        recovery["varSav"]["extype"] = extype;
+        recovery["varSav"]["next_id"] = next_id;
+        recovery["varSav"]["next_name"] = next_name;
+        recovery["varSav"]["next_rest"] = next_rest;
+        recovery["varSav"]["LrestTime"] = LrestTime;
+        recovery["varSav"]["RrestTime"] = RrestTime;
+        recovery["varSav"]["next_specs"] = next_specs;
+        recovery["varSav"]["actual_setL"] = actual_setL;
+        recovery["varSav"]["actual_setR"] = actual_setR;
+        recovery["varSav"]["actual_setNb"] = actual_setNb;
+        recovery["varSav"]["beforeExercise"] = beforeExercise;
 
         if(data){
-            recovery[1]["intervallData"] = data;
-            recovery[1]["iCurrent_cycle"] = iCurrent_cycle;
-            recovery[1]["iActualCycle"] = iActualCycle;
-            recovery[1]["currentExoIndex"] = currentExoIndex;
+            recovery["varSav"]["intervallData"] = data;
+            recovery["varSav"]["iCurrent_cycle"] = iCurrent_cycle;
+            recovery["varSav"]["iActualCycle"] = iActualCycle;
+            recovery["varSav"]["currentExoIndex"] = currentExoIndex;
         };
         
-        recovery[2] = $(".session_next_exercises_container").html();
-        recovery[3] = tempNewHistory;
-        recovery[4] = [TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone];
+        recovery["html"] = $(".session_next_exercises_container").html();
+        recovery["tempHistory"] = tempNewHistory;
+        recovery["tempStats"] = tempStats;
 
-        recovery[5] = undoMemory;
+        recovery["undoMemory"] = undoMemory;
     }else if(mode == "intervall"){
-        recovery[1]["intervallData"] = data;
-        recovery[1]["iCurrent_cycle"] = iCurrent_cycle;
-        recovery[1]["iActualCycle"] = iActualCycle;
-        recovery[1]["currentExoIndex"] = currentExoIndex;
-        recovery[1]["Ifinished"] = Ifinished;
+        recovery["varSav"]["intervallData"] = data;
+        recovery["varSav"]["iCurrent_cycle"] = iCurrent_cycle;
+        recovery["varSav"]["iActualCycle"] = iActualCycle;
+        recovery["varSav"]["currentExoIndex"] = currentExoIndex;
+        recovery["varSav"]["Ifinished"] = Ifinished;
 
-        recovery[3] = tempNewHistory;
-        recovery[4] = [TemptimeSpent - 5, TempworkedTime, TempweightLifted, TemprepsDone];
+        recovery["tempHistory"] = tempNewHistory;
+        recovery["tempStats"] = tempStats;
     };
 
     recovery_save(recovery);
@@ -904,7 +931,7 @@ function screensaver_toggle(on){
         isSaving = true;
 
         if(!(Ltimer || Rtimer || sIntervall)){
-            $(".screensaver_text").text(textAssets[language]["screenSaver"]["saver"]);
+            $(".screensaver_text").text(textAssets[parameters["language"]]["screenSaver"]["saver"]);
             $(".screensaver_Ltimer, .screensaver_Rtimer, .screensaver_Xtimer").text("");
         };
 
@@ -964,7 +991,7 @@ $(document).ready(function(){
 
     $('.session_exit_y').on('longClicked', function(e){
         closePanel('session_exit');
-        quit_session(current_session[0] == 'I' && Ifinished === false || current_session[0] == 'W' && finished === false);
+        quit_session(current_session["type"] == 'I' && Ifinished === false || current_session["type"] == 'W' && finished === false);
     });
 
     // SCREENSAVER;
@@ -985,9 +1012,9 @@ $(document).ready(function(){
 
     $(document).on('longClicked', '.lockTouch', function(e){
         if(lockState){
-            $(this).text(textAssets[language]['screenSaver']['lock']);
+            $(this).text(textAssets[parameters["language"]]['screenSaver']['lock']);
         }else{
-            $(this).text(textAssets[language]['screenSaver']['unlock']);
+            $(this).text(textAssets[parameters["language"]]['screenSaver']['unlock']);
         };
 
         lockState = !lockState;
@@ -1071,7 +1098,7 @@ $(document).ready(function(){
         $('.blurBG').css('display', 'none');
         beepPlayer = constructPlayer(beepPath, 1000);
         beep2x3Player = constructPlayer(beep2x3Path, 1000);
-        launchSession(getSessionIndexByID(session_list, recovery[0]));
+        launchSession(getSessionIndexByID(recovery["id"]));
     });
 
 
@@ -1090,11 +1117,11 @@ $(document).ready(function(){
 
                 if($(line).parent().find(".selection_sessionFinished_suggested_optCheck").is(':checked')){
                     if(type == "sets"){
-                        current_session[2][exoID][2] = val;
+                        current_session["exoList"][exoID][2] = val;
                     }else if(type == "reps"){
-                        current_session[2][exoID][3] = val;
+                        current_session["exoList"][exoID][3] = val;
                     }else if(type == "weight"){
-                        current_session[2][exoID][4] = val;
+                        current_session["exoList"][exoID][4] = val;
                     };
                 };
             });

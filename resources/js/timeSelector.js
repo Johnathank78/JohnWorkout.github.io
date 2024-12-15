@@ -75,12 +75,12 @@ function timeSelectorUpdateTarget(classs){
 
         LrestTime = val === false ? LrestTime : val;
 
-        let nbSetLeft = extype == "Uni" ? $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[language]["misc"]["leftInitial"]+"')").length : $(".session_next_exercise_name:contains('"+next_name+"')").length;
+        let nbSetLeft = extype == "Uni" ? $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters["language"]]["misc"]["leftInitial"]+"')").length : $(".session_next_exercise_name:contains('"+next_name+"')").length;
 
         if(LrestTime == 0 || nbSetLeft == 0){
-            $(".Lrest").text(textAssets[language]["inSession"]["next"]);
+            $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
         }else{
-            $(".Lrest").text(textAssets[language]["inSession"]["rest"]);
+            $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["rest"]);
         };
 
         $(".Linput").css('display', "none");
@@ -88,7 +88,7 @@ function timeSelectorUpdateTarget(classs){
 
         udpate_recovery("workout");
     }else if(classs.includes("Rinput")){
-        $(".Rrest").text(textAssets[language]["inSession"]["next"]);
+        $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
 
         RinputShown = false;
 
@@ -97,12 +97,12 @@ function timeSelectorUpdateTarget(classs){
 
         RrestTime = val === false ? RrestTime : val;
 
-        let nbSetLeft = extype == "Uni" ? $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[language]["misc"]["rightInitial"]+"')").length : $(".session_next_exercise_name:contains('"+next_name+"')").length;
+        let nbSetLeft = extype == "Uni" ? $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters["language"]]["misc"]["rightInitial"]+"')").length : $(".session_next_exercise_name:contains('"+next_name+"')").length;
 
         if(RrestTime == 0 || nbSetLeft == 0){
-            $(".Rrest").text(textAssets[language]["inSession"]["next"]);
+            $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
         }else{
-            $(".Rrest").text(textAssets[language]["inSession"]["rest"]);
+            $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["rest"]);
         };
 
         $(".Rinput").css('display', "none");
@@ -124,7 +124,7 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.timeSelectorSubmit', function(e){
-        //if(isEditing){$(isEditing).blur(); isEditing = false; return};
+        if(isEditing){$(isEditing).blur(); isEditing = false; return};
         let hours = parseInt($('.timeSelectorHours').find(".timeSelectorInput").val());
         let minutes = parseInt($('.timeSelectorMinutes').find(".timeSelectorInput").val());
         let seconds = parseInt($('.timeSelectorSeconds').find(".timeSelectorInput").val());

@@ -39,27 +39,11 @@ var lastExo = false;
 var undoMemory = [];
 
 function getHint(session, id){
-    for (let i = 0; i < session[2].length; i++) {
-        const elem = session[2][i];
-
-        if(elem.getId() == id){
-            if(elem[0] == "Int."){
-                if(isIntervallLinked(elem)){
-                    return elem[3];
-                }else{
-                    return elem[2];
-                };
-            }else if(elem.length == 8){
-                return elem[6];
-            };
-        };
-    };
-
-    return false;
+    return session["exoList"].filter(exo => exo["id"] === id).map(exo => exo["hint"])[0];
 };
 
 function updateRestBtnStyle(data){
-    if(data == "Uni"){
+    if(data == "Uni."){
         $('.session_exercise_Lrest_btn, .session_exercise_Rrest_btn').css({
             "display" : 'flex',
             "width" : '130px',
@@ -176,10 +160,10 @@ function startWorkout(){
 
     TPtimer = setInterval(() => {
         if(!isIdle){
-            TemptimeSpent++;
-            $(".selection_info_TimeSpent").text(get_time_u(timeFormat(TemptimeSpent)));
+            tempStats["timeSpent"]++;
+            $(".selection_info_TimeSpent").text(get_time_u(timeFormat(tempStats["timeSpent"])));
 
-            recovery[4][0] = TemptimeSpent;
+            recovery["tempStats"]["timeSpent"] = tempStats["timeSpent"];
         };
     }, timeUnit);
 
@@ -199,6 +183,7 @@ function startWorkout(){
 function workout(exercises_list){
     let exercise = false;
     let bigExercise = false;
+    let expectedStats = false;
 
     remaining_sets = 0;
 
@@ -216,128 +201,164 @@ function workout(exercises_list){
     
     if(!recovery){
 
-        for(let i=0;i<exercises_list.length;i++){
-
+        exercises_list.forEach(exo => {
             bigExercise = $('<div class="session_next_bigExercise reorder__child"></div>');
             exercise = $('<div class="session_next_exercise"></div>');
+            
+            $(exercise).append(`<span class="session_next_exercise_type">`+exo["type"]+`</span><span class="session_next_exercise_id">`+exo["id"]+`</span>`);
 
-            if(exercises_list[i][0] == "Wrm."){
+            if(exo["type"] == "Wrm."){
                 remaining_sets += 1;
-                $(exercise).append(`<span class="session_next_exercise_type">Wrm</span><span class="session_next_exercise_id">`+exercises_list[i].getId()+`</span>`);
                 $(exercise).append(`
                     <div class="session_next_exercise_set">
-                        <span class="session_next_exercise_name reorder__avoid">`+exercises_list[i][1]+`</span>
-                        <span class="session_next_exercise_reps">`+exercises_list[i][3]+`</span>
-                        <span class="session_next_exercise_weight">`+exercises_list[i][4]+`</span>
-                        <span class="session_next_exercise_rest">`+time_unstring(exercises_list[i][5])+`</span>
-                        <span class="session_next_exerciseType">Wrm</span>
+                        <span class="session_next_exercise_name reorder__avoid">`+exo["name"]+`</span>
+                        <span class="session_next_exerciseType">`+exo["type"]+`</span>
                         <span class="session_setPreviewId">0</span>
                     </div>
                 `);
-
+        
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
-            }else if(exercises_list[i][0] == "Bi."){
-                $(exercise).append(`<span class="session_next_exercise_type">Bi</span><span class="session_next_exercise_id">`+exercises_list[i].getId()+`</span>`);
-
-                remaining_sets += parseInt(exercises_list[i][2]);
-                for(let z=0;z<exercises_list[i][2];z++){
+            }else if(exo["type"] == "Bi."){
+                remaining_sets += parseInt(exo["setNb"]);
+                for(let z=0;z<exo["setNb"];z++){
                     $(exercise).append(`
                         <div class="session_next_exercise_set">
-                            <span class="session_next_exercise_name reorder__avoid">`+exercises_list[i][1]+`</span>
-                            <span class="session_next_exercise_reps">`+exercises_list[i][3]+`</span>
-                            <span class="session_next_exercise_weight">`+exercises_list[i][4]+`</span>
-                            <span class="session_next_exercise_rest">`+time_unstring(exercises_list[i][5])+`</span>
-                            <span class="session_next_exerciseType">Bi</span>
+                            <span class="session_next_exercise_name reorder__avoid">`+exo["name"]+`</span>
+                            <span class="session_next_exercise_reps">`+exo["reps"]+`</span>
+                            <span class="session_next_exercise_weight">`+exo["weight"]+`</span>
+                            <span class="session_next_exercise_rest">`+time_unstring(exo["rest"])+`</span>
+                            <span class="session_next_exerciseType">`+exo["type"]+`</span>
                             <span class="session_setPreviewId">`+z+`</span>
-                            <span class="session_exercise_id">`+exercises_list[i].getId()+`</span>
+                            <span class="session_exercise_id">`+exo["id"]+`</span>
                         </div>
                     `);
                 };
 
-                tempNewHistory[2].push([exercises_list[i][1], [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i].getId()]);
+                expectedStats = generateHistoryExceptedStatsObj({
+                    "type": exo['type'],
+                    "setNb": exo["setNb"],
+                    "reps": exo["reps"],
+                    "weight": exo["weight"],
+                    "weightUnit": parameters["weightUnit"]    
+                });
 
+                tempNewHistory["exoList"].push(generateHistoryExoObj({
+                    "type": exo["type"],
+                    "name": exo["name"],
+                    "expectedStats": expectedStats,
+                    "setList": [],
+                    "note": "",
+                    "id": exo["id"]
+                }));
+        
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
+        
+            }else if(exo["type"] == "Uni."){
+                remaining_sets += parseInt(exo["setNb"])*2;
 
-            }else if(exercises_list[i][0] == "Uni."){
-                $(exercise).append(`<span class="session_next_exercise_type">Uni</span><span class="session_next_exercise_id">`+exercises_list[i].getId()+`</span>`);
-
-                remaining_sets += parseInt(exercises_list[i][2])*2;
-                for(let z=0;z<exercises_list[i][2];z++){
+                for(let z=0;z<exo["setNb"];z++){
                     $(exercise).append(`
                         <div class="session_next_exercise_set">
-                            <span class="session_next_exercise_name reorder__avoid">`+exercises_list[i][1]+` - `+textAssets[language]["misc"]["rightInitial"]+`</span>
-                            <span class="session_next_exercise_reps">`+exercises_list[i][3]+`</span>
-                            <span class="session_next_exercise_weight">`+exercises_list[i][4]+`</span>
-                            <span class="session_next_exercise_rest">`+time_unstring(exercises_list[i][5])+`</span>
-                            <span class="session_next_exerciseType">Uni</span>
+                            <span class="session_next_exercise_name reorder__avoid">`+exo["name"]+` - `+textAssets[parameters["language"]]["misc"]["rightInitial"]+`</span>
+                            <span class="session_next_exercise_reps">`+exo["reps"]+`</span>
+                            <span class="session_next_exercise_weight">`+exo["weight"]+`</span>
+                            <span class="session_next_exercise_rest">`+time_unstring(exo["rest"])+`</span>
+                            <span class="session_next_exerciseType">`+exo["type"]+`</span>
                             <span class="session_setPreviewId">`+z+`</span>
-                            <span class="session_exercise_id">`+exercises_list[i].getId()+`</span>
+                            <span class="session_exercise_id">`+exo["id"]+`</span>
                         </div>
                     `);
-
+        
                     $(exercise).append(`
                         <div class="session_next_exercise_set">
-                            <span class="session_next_exercise_name reorder__avoid">`+exercises_list[i][1]+` - `+textAssets[language]["misc"]["leftInitial"]+`</span>
-                            <span class="session_next_exercise_reps">`+exercises_list[i][3]+`</span>
-                            <span class="session_next_exercise_weight">`+exercises_list[i][4]+`</span>
-                            <span class="session_next_exercise_rest">`+time_unstring(exercises_list[i][5])+`</span>
-                            <span class="session_next_exerciseType">Uni</span>
+                            <span class="session_next_exercise_name reorder__avoid">`+exo["name"]+` - `+textAssets[parameters["language"]]["misc"]["leftInitial"]+`</span>
+                            <span class="session_next_exercise_reps">`+exo["reps"]+`</span>
+                            <span class="session_next_exercise_weight">`+exo["weight"]+`</span>
+                            <span class="session_next_exercise_rest">`+time_unstring(exo["rest"])+`</span>
+                            <span class="session_next_exerciseType">`+exo["type"]+`</span>
                             <span class="session_setPreviewId">`+z+`</span>
-                            <span class="session_exercise_id">`+exercises_list[i].getId()+`</span>
+                            <span class="session_exercise_id">`+exo["id"]+`</span>
                         </div>
                     `);
                 };
 
-                tempNewHistory[2].push([exercises_list[i][1]+" - L", [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i].getId()+"_1"]);
-                tempNewHistory[2].push([exercises_list[i][1]+" - R", [exercises_list[i][2], exercises_list[i][3], exercises_list[i][4], weightUnit], [], exercises_list[i].getId()+"_2"]);
+                expectedStats = generateHistoryExceptedStatsObj({
+                    "type": exo['type'],
+                    "setNb": exo["setNb"],
+                    "reps": exo["reps"],
+                    "weight": exo["weight"],
+                    "weightUnit": parameters["weightUnit"]    
+                });
 
+                
+                tempNewHistory["exoList"].push(generateHistoryExoObj({
+                    "type": exo["type"],
+                    "name": exo["name"]+" - L",
+                    "expectedStats": expectedStats,
+                    "setList": [],
+                    "note": "",
+                    "id": exo["id"]+"_1"
+                }));
+
+                tempNewHistory["exoList"].push(generateHistoryExoObj({
+                    "type": exo["type"],
+                    "name": exo["name"]+" - R",
+                    "expectedStats": expectedStats,
+                    "setList": [],
+                    "note": "",
+                    "id": exo["id"]+"_2"
+                }));
+        
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
+        
+            }else if(exo["type"] == "Int."){
+                let intervallSession = isIntervallLinked(exo) ? session_list[getSessionIndexByID(exo["linkId"])] : exo;
+                let intervallString = JSON.stringify(intervallSession["exoList"]);
 
-            }else if(exercises_list[i][0] == "Int."){
-                $(exercise).append(`<span class="session_next_exercise_type">Int</span><span class="session_next_exercise_id">`+exercises_list[i].getId()+`</span>`);
+                remaining_sets += getInvervallSessionCycleCount(intervallSession["exoList"]);
 
-                let intervallSession = isIntervallLinked(exercises_list[i]) ? session_list[getSessionIndexByID(session_list, exercises_list[i][1])] : exercises_list[i];
-                let intervallString = JSON.stringify(intervallSession[2]);
-
-                remaining_sets += getInvervallSessionCycleCount(intervallSession[2]);
-                tempNewHistory[2].push([intervallSession[1], generateIntervallHistory(intervallSession), exercises_list[i].getId()]);
-
+                tempNewHistory["exoList"].push(generateHistoryINTExoObj({
+                    "type": exo["type"],
+                    "name": exo["name"],
+                    "exoList": generateIntervallHistoryExoList(intervallSession),
+                    "note": "",
+                    "id": exo["id"]
+                }));
+        
                 $(exercise).append(`
                     <div class="session_next_exercise_set">
-                        <span class="session_next_exercise_name reorder__avoid">`+intervallSession[1]+`</span>
+                        <span class="session_next_exercise_name reorder__avoid">`+intervallSession["name"]+`</span>
                         <span class="session_next_exercise_intervallData">`+intervallString+`</span>
-                        <span class="session_next_exerciseType">Int</span>
-                        <span class="session_exercise_id">`+exercises_list[i].getId()+`</span>
+                        <span class="session_next_exerciseType">`+exo['type']+`</span>
+                        <span class="session_exercise_id">`+exo["id"]+`</span>
                     </div>
                 `);
-
+        
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
-
-            }else if(exercises_list[i][0] == "Pause"){
-
-                $(exercise).append(`<span class="session_next_exercise_type">Pause</span>`);
+        
+            }else if(exo["type"] == "Pause"){
                 $(exercise).append(`
                     <div class="session_next_exercise_set">
-                        <span class="session_next_exercise_name reorder__avoid">`+textAssets[language]["updatePage"]["break"]+`</span>
-                        <span class="session_next_exercise_rest">`+time_unstring(exercises_list[i][1])+`</span>
+                        <span class="session_next_exercise_name reorder__avoid">`+textAssets[parameters["language"]]["updatePage"]["break"]+`</span>
+                        <span class="session_next_exercise_rest">`+time_unstring(exo["rest"])+`</span>
                         <span class="session_next_exerciseType">Pause</span>
                     </div>
                 `);
-
+        
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
-            };
-        };
+            }; 
+        });
 
-        $('.Lrest').text(textAssets[language]["inSession"]["start"]);
-        $(".session_current_exercise_name").text(current_session[1]);
+        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
+        $(".session_current_exercise_name").text(current_session["name"]);
         $('.session_current_exercise_specs_details_inp, .session_current_exercise_specs_details_inp, .session_current_exercise_specs_weight_unit').css("display", "none");
         $(".session_current_exercise_specs_before").css("display", 'none');
-        $('.session_current_exercise_specs_pause').text(textAssets[language]["inSession"]["end"] + " : " + new Date(Date.now() + get_session_time(current_session) * 1000).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'}).replace(":", 'h'));
+        $('.session_current_exercise_specs_pause').text(textAssets[parameters["language"]]["inSession"]["end"] + " : " + new Date(Date.now() + get_session_time(current_session) * 1000).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'}).replace(":", 'h'));
         $(".session_next_exercises_container").append('<div class="flex_break"></div>');
     }else{
 
@@ -346,14 +367,14 @@ function workout(exercises_list){
 
         TPtimer = setInterval(() => {
             if(!isIdle){
-                TemptimeSpent++;
-                $(".selection_info_TimeSpent").text(get_time_u(timeFormat(TemptimeSpent)));
+                tempStats["timeSpent"]++;
+                $(".selection_info_TimeSpent").text(get_time_u(timeFormat(tempStats["timeSpent"])));
 
-                recovery[4][0] = TemptimeSpent;
+                recovery["tempStats"]["timeSpent"] = tempStats["timeSpent"];
             }
         }, timeUnit);
 
-        $(".session_next_exercises_container").html(recovery[2]);
+        $(".session_next_exercises_container").html(recovery["html"]);
 
         let setNb_L = 0;
         let setNb_R = 0;
@@ -364,34 +385,34 @@ function workout(exercises_list){
         lastExo = $('.session_next_exercise_type').length == 0;
         noMore = $('.session_noMore').length == 1;
 
-        extype = recovery[1]['extype'];
-        next_id = recovery[1]['next_id'];
+        extype = recovery["varSav"]['extype'];
+        next_id = recovery["varSav"]['next_id'];
 
-        next_name = recovery[1]['next_name'];
-        next_rest = recovery[1]['next_rest'];
-        next_specs = recovery[1]['next_specs'];
+        next_name = recovery["varSav"]['next_name'];
+        next_rest = recovery["varSav"]['next_rest'];
+        next_specs = recovery["varSav"]['next_specs'];
 
-        LrestTime = recovery[1]['LrestTime'];
-        RrestTime = recovery[1]['RrestTime'];
+        LrestTime = recovery["varSav"]['LrestTime'];
+        RrestTime = recovery["varSav"]['RrestTime'];
 
-        actual_setL = recovery[1]['actual_setL'];
-        actual_setR = recovery[1]['actual_setR'];
-        actual_setNb = recovery[1]['actual_setNb'];
+        actual_setL = recovery["varSav"]['actual_setL'];
+        actual_setR = recovery["varSav"]['actual_setR'];
+        actual_setNb = recovery["varSav"]['actual_setNb'];
 
-        beforeExercise = recovery[1]['beforeExercise'];
-        iCurrent_cycle = recovery[1]['iCurrent_cycle'];
+        beforeExercise = recovery["varSav"]['beforeExercise'];
+        iCurrent_cycle = recovery["varSav"]['iCurrent_cycle'];
 
-        tempNewHistory = recovery[3];
-        undoMemory = recovery[5];
+        tempNewHistory = recovery["tempHistory"];
+        undoMemory = recovery["undoMemory"];
 
         if(undoMemory.length > 0){$('.session_undo').css('display', 'block')};
 
-        if(extype == "Wrm"){
+        if(extype == "Wrm."){
             
             if(beforeExercise){
                 remaining_sets = 0;
                 
-                $('.Lrest').text(textAssets[language]["inSession"]["start"]);
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             }else{
                 remaining_sets = 1;
@@ -406,7 +427,7 @@ function workout(exercises_list){
                         noMore = true;
                         $(".session_next_exercises_container").append(`
                         <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-                            <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
+                            <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
                         </div>
                         `);
                     };
@@ -414,17 +435,17 @@ function workout(exercises_list){
 
                 if(noMore){
                     finished = true;
-                    $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
                     $('.session_exercise_Lrest_btn').data("canLongClick", false);
                 }else{
                     sets_reorder.avoidIndexes = [0];
 
-                    $('.Lrest').text(textAssets[language]["inSession"]["next"]);
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
                     $('.session_exercise_Lrest_btn').data("canLongClick", false);
                 };
             };
 
-        }else if(extype == "Bi"){
+        }else if(extype == "Bi."){
             $('.session_exercise_Lrest_btn').data("canLongClick", true);
 
             setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+"')").length;
@@ -432,7 +453,7 @@ function workout(exercises_list){
             if(beforeExercise){
                 remaining_sets = 0;
 
-                $('.Lrest').text(textAssets[language]["inSession"]["start"]);
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             }else{
                 remaining_sets = 1;
@@ -445,7 +466,7 @@ function workout(exercises_list){
                         noMore = true;
                         $(".session_next_exercises_container").append(`
                         <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-                            <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
+                            <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
                         </div>
                         `);
                     };
@@ -454,45 +475,45 @@ function workout(exercises_list){
                 if($(".session_next_exercise_name").first().text() != next_name){
                     if(noMore){
                         finished = true;
-                        $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+                        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
                         $('.session_exercise_Lrest_btn').data("canLongClick", false);
                     }else{
                         sets_reorder.avoidIndexes = [0];
 
                         next_exo = true;
-                        $('.Lrest').text(textAssets[language]["inSession"]["next"]);
+                        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
                         $('.session_exercise_Lrest_btn').data("canLongClick", false);
                     };
                 }else{
                     sets_reorder.avoidIndexes = [0];
                     
                     if(LrestTime == 0){
-                        $(".Lrest").text(textAssets[language]["inSession"]["next"]);
+                        $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
                     }else{
-                        $('.Lrest').text(textAssets[language]["inSession"]["rest"]);
+                        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["rest"]);
                     };
                 };
             };
 
-        }else if(extype == "Uni"){
+        }else if(extype == "Uni."){
             $('.session_exercise_Lrest_btn').data("canLongClick", true);
             $('.session_exercise_Rrest_btn').data("canLongClick", true);
 
             setNb_L = actual_setNb - actual_setL;
             setNb_R = actual_setNb - actual_setR;
 
-            setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[language]["misc"]["leftInitial"]+"')").length;
-            setNb_Rextracted = $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[language]["misc"]["rightInitial"]+"')").length;
+            setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters["language"]]["misc"]["leftInitial"]+"')").length;
+            setNb_Rextracted = $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters["language"]]["misc"]["rightInitial"]+"')").length;
 
             if(beforeExercise){
                 remaining_sets = 0;
 
                 $(".session_exercise_rest_btn_label").css('display', 'none');
-                $('.Lrest').text(textAssets[language]["inSession"]["start"]);
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
 
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             }else{
-                updateRestBtnStyle('Uni')
+                updateRestBtnStyle('Uni.')
                 remaining_sets = 2;
 
                 $(".session_exercise_Rrest_btn").css('display', 'flex');
@@ -502,13 +523,13 @@ function workout(exercises_list){
 
                 if(actual_setNb - actual_setL != setNb_Lextracted + 1){
                     // SET DONE
-                    dropSet_static($(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[language]["misc"]["leftInitial"]+"')").parent().first());
+                    dropSet_static($(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters["language"]]["misc"]["leftInitial"]+"')").parent().first());
 
                     if($(".session_next_exercise_set").length == 0){
                         noMore = true;
                         $(".session_next_exercises_container").append(`
                         <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-                            <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
+                            <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
                         </div>
                         `);
                     };
@@ -517,29 +538,29 @@ function workout(exercises_list){
                 if(actual_setL == (actual_setNb) && setNb_L == 0){
                     remaining_sets = 1;
                     Ldone = true;
-                    $('.Lrest').text(textAssets[language]["inSession"]["done"]);
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["done"]);
                     $('.session_exercise_Lrest_btn').data("canLongClick", false);
                 }else if(actual_setNb - 1 == actual_setL && setNb_L == 1){
                     Llast = true;
-                    $(".Lrest").text(textAssets[language]["inSession"]["last"]);
+                    $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["last"]);
                     $('.session_exercise_Lrest_btn').data("canLongClick", false);
                 }else if(LrestTime == 0){
-                    $(".Lrest").text(textAssets[language]["inSession"]["next"]);
+                    $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
                 }else{
-                    $('.Lrest').text(textAssets[language]["inSession"]["rest"]);
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["rest"]);
                 };
 
                 // R
 
                 if(actual_setNb - actual_setR != setNb_Rextracted + 1){
                     // SET DONE
-                    dropSet_static($(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[language]["misc"]["rightInitial"]+"')").parent().first());
+                    dropSet_static($(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters["language"]]["misc"]["rightInitial"]+"')").parent().first());
                     
                     if($(".session_next_exercise_set").length == 0){
                         noMore = true;
                         $(".session_next_exercises_container").append(`
                         <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-                            <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
+                            <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
                         </div>
                         `);
                     };
@@ -548,16 +569,16 @@ function workout(exercises_list){
                 if(actual_setR == (actual_setNb) && setNb_R == 0){
                     remaining_sets = 1;
                     Rdone = true;
-                    $('.Rrest').text(textAssets[language]["inSession"]["done"]);
+                    $('.Rrest').text(textAssets[parameters["language"]]["inSession"]["done"]);
                     $('.session_exercise_Rrest_btn').data("canLongClick", false);
                 }else if(actual_setNb - 1 == actual_setR && setNb_R == 1){
                     Rlast = true;
-                    $(".Rrest").text(textAssets[language]["inSession"]["last"]);
+                    $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["last"]);
                     $('.session_exercise_Rrest_btn').data("canLongClick", false);
                 }else if(RrestTime == 0){
-                    $(".Rrest").text(textAssets[language]["inSession"]["next"]);
+                    $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
                 }else{
-                    $('.Rrest').text(textAssets[language]["inSession"]["rest"]);
+                    $('.Rrest').text(textAssets[parameters["language"]]["inSession"]["rest"]);
                 }
 
                 if(noMore){
@@ -568,7 +589,7 @@ function workout(exercises_list){
                         $(".session_exercise_Rrest_btn").css('display', 'none');
                         $(".session_exercise_rest_btn_label").css('display', 'none');
 
-                        $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+                        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
                     }else if(Ldone){
                         finished = true;
                         $('.session_exercise_Rrest_btn').css('width', '150px');
@@ -576,23 +597,23 @@ function workout(exercises_list){
                         $(".session_exercise_Lrest_btn").css('display', 'none');
                         $(".session_exercise_rest_btn_label").css('display', 'none');
 
-                        $('.Rrest').text(textAssets[language]["inSession"]["finished"]);
+                        $('.Rrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
                     };
                 };
             };
 
-        }else if(extype == "Int"){
+        }else if(extype == "Int."){
             remaining_sets = 0;
 
             if(beforeExercise){
-                $('.Lrest').text(textAssets[language]["inSession"]["start"]);
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             }else{
                 if($(".session_next_exercise_name").last().text() != next_name){
                     if(noMore && actual_setL == 1){
                         beforeExercise = false;
                         finished = true;
-                        $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+                        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
                     }else{
                         if(!noMore){
                             dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
@@ -603,11 +624,11 @@ function workout(exercises_list){
                         $(".session_intervall_container").css("display", "block");
 
                         ongoing = "intervall";
-                        intervall(recovery[1]["intervallData"], true);
+                        intervall(recovery["varSav"]["intervallData"], true);
     
                         if(noMore){
                             finished = true;
-                            $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+                            $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
                         };
                     };
                 };
@@ -626,13 +647,13 @@ function workout(exercises_list){
         let everySets = $(".session_next_exercise_set");
 
         for(let i=0; i<everySets.length; i++){
-            if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Int"){
+            if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Int."){
                 remaining_sets += getInvervallSessionCycleCount(JSON.parse($(everySets[i]).find('.session_next_exercise_intervallData').text()));
-            }else if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Uni"){
+            }else if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Uni."){
                 remaining_sets += 1;
-            }else if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Bi"){
+            }else if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Bi."){
                 remaining_sets += 1;
-            }else if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Wrm"){
+            }else if($(everySets[i]).find(".session_next_exerciseType").first().text() == "Wrm."){
                 remaining_sets += 1;
             };
         };
@@ -677,7 +698,7 @@ async function next_exercise(first){
         sets_reorder.avoidIndexes = [];
         actual_setNb = parseInt($(".session_next_exercises_container").first().find(".session_next_exercise").first().find(".session_setPreviewId").last().text()) + 1;
 
-        $('.Lrest').text(textAssets[language]["inSession"]["start"]);
+        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
 
         $('.session_exercise_Lrest_btn').data("canLongClick", false);
         $('.session_exercise_Rrest_btn').data("canLongClick", false);
@@ -704,18 +725,18 @@ async function next_exercise(first){
 
         update_info_vars();
 
-        if(extype == "Wrm"){
+        if(extype == "Wrm."){
             
             next_exo = true;
-            $('.Lrest').text(textAssets[language]["inSession"]["next"]);
+            $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
 
             if(remaining_sets == 1){
                 dropSet_static($(".session_next_exercise_set").first());
             }else{
                 await dropSet_animated($(".session_next_exercise_set").first());
             };
-        }else if(extype == 'Uni'){
-            updateRestBtnStyle('Uni')
+        }else if(extype == 'Uni.'){
+            updateRestBtnStyle('Uni.')
 
             $('.session_exercise_Lrest_btn').data("canLongClick", true);
             $('.session_exercise_Rrest_btn').data("canLongClick", true);
@@ -725,19 +746,19 @@ async function next_exercise(first){
             if(actual_setNb == 1){
                 Llast = true;
                 Rlast = true;
-                $('.Lrest').text(textAssets[language]["inSession"]["last"]);
-                $('.Rrest').text(textAssets[language]["inSession"]["last"]);
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["last"]);
+                $('.Rrest').text(textAssets[parameters["language"]]["inSession"]["last"]);
 
                 $(".session_exercise_Lrest_btn").css("cursor", "pointer");
                 $(".Lrest").css("display", "block");
                 $(".Ltimer").css("display", "none");
             }else{
                 if(next_rest == 0){
-                    $(".Lrest").text(textAssets[language]["inSession"]["next"]);
-                    $(".Rrest").text(textAssets[language]["inSession"]["next"]);
+                    $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
+                    $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
                 }else{
-                    $(".Lrest").text(textAssets[language]["inSession"]["rest"]);
-                    $(".Rrest").text(textAssets[language]["inSession"]["rest"]);
+                    $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["rest"]);
+                    $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["rest"]);
                 };
             };
 
@@ -753,21 +774,21 @@ async function next_exercise(first){
                 await dropExo_animated($(".session_next_bigExercise")[0]);
             };
 
-        }else if(extype == "Bi"){
+        }else if(extype == "Bi."){
             $('.session_exercise_Lrest_btn').data("canLongClick", true);
 
             if(actual_setNb == 1){
                 next_exo = true;
 
                 $('.session_exercise_Rrest_btn').css("display", "none");
-                $('.Lrest').text(textAssets[language]["inSession"]["next"]);
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             }else{
                 if(next_rest == 0){
-                    $(".Lrest").text(textAssets[language]["inSession"]["next"]);
+                    $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
                     $('.session_exercise_Lrest_btn').data("canLongClick", false);
                 }else{
-                    $('.Lrest').text(textAssets[language]["inSession"]["rest"]);
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["rest"]);
                 };
             };
 
@@ -776,16 +797,14 @@ async function next_exercise(first){
             }else{
                 await dropSet_animated($(".session_next_exercise_set").first());
             };
-        }else if(extype == "Int"){
-            $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+        }else if(extype == "Int."){
+            $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
             $('.session_workout_footer').css("display", "none");
             $(".session_workout_container").css("display", "none");
             $(".session_intervall_container").css("display", "block");
 
             beforeExercise = false;
             ongoing = "intervall";
-
-
 
             dropSet_static($(".session_next_exercise_set").first());
             intervall(intervallData, true);
@@ -807,7 +826,7 @@ async function next_exercise(first){
         };
 
         check_lastSet();
-        if(hasReallyStarted && extype != "Int"){udpate_recovery("workout")};
+        if(hasReallyStarted && extype != "Int."){udpate_recovery("workout")};
     };
 };
 
@@ -818,11 +837,11 @@ function getIntervallSpecs(nextExo, isBreak=false){
     let workRest = [0, 0];
 
     intervallData.forEach(exo => {
-        if(exo[0] == "Int."){
-            workRest[0] += (exo[2] * time_unstring(exo[3]));
-            workRest[1] += (exo[2] - 1) * time_unstring(exo[4]);
-        }else if(exo[0] == "Pause"){
-            workRest[1] += time_unstring(exo[1]);
+        if(exo["type"] == "Int."){
+            workRest[0] += (exo["cycle"] * time_unstring(exo["work"]));
+            workRest[1] += (exo["cycle"] - 1) * time_unstring(exo["rest"]);
+        }else if(exo["type"] == "Pause"){
+            workRest[1] += time_unstring(exo["rest"]);
         };
     });
 
@@ -833,17 +852,17 @@ function getIntervallSpecs(nextExo, isBreak=false){
     };
 
     if(isBreak){
-        return textAssets[language]["inSession"]["next"] + " : \n" + out;
+        return textAssets[parameters["language"]]["inSession"]["next"] + " : \n" + out;
     }else{
         return out;
     };
 };
 
-function update_info_vars(index = 0) {
+function update_info_vars(index = 0){
     let nextExo = $('.session_next_exercise')[index];
-    let extype = $(nextExo).find(".session_next_exerciseType").eq(0).text();
+    extype = $(nextExo).find(".session_next_exerciseType").eq(0).text();
 
-    if(extype == "Wrm"){
+    if(extype == "Wrm."){
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
         next_specs = [0, 0];
         next_rest = 0;
@@ -852,36 +871,36 @@ function update_info_vars(index = 0) {
         $(".session_current_exercise_specs").css('display', 'flex');
     };
 
-    if (extype == 'Uni'){
-        next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text().split(' - ' + textAssets[language]["misc"]["rightInitial"])[0];
+    if (extype == 'Uni.'){
+        next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text().split(' - ' + textAssets[parameters["language"]]["misc"]["rightInitial"])[0];
         next_specs = [$(nextExo).find(".session_next_exercise_reps").eq(0).text(), unitRound($(nextExo).find(".session_next_exercise_weight").eq(0).text())];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
 
         LrestTime = next_rest;
         RrestTime = next_rest;
-    }else if (extype == "Bi"){
+    }else if (extype == "Bi."){ 
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
         next_specs = [$(nextExo).find(".session_next_exercise_reps").eq(0).text(), unitRound($(nextExo).find(".session_next_exercise_weight").eq(0).text())];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
 
         LrestTime = next_rest;
-    }else if (extype == "Int"){
+    }else if (extype == "Int."){
         intervallData = JSON.parse($(nextExo).find(".session_next_exercise_intervallData").text());
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
         next_specs = getIntervallSpecs(nextExo);
     }else if (extype == "Pause"){
         let adjacentExo = $('.session_next_exercise').eq(index + 1);
         
-        next_name = textAssets[language]["updatePage"]["break"];
+        next_name = textAssets[parameters["language"]]["updatePage"]["break"];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
 
         LrestTime = next_rest;
 
         if($(".session_next_exercise_name").length != 1){   
-            if($(adjacentExo).find(".session_next_exerciseType").eq(0).text() == "Int") {
+            if($(adjacentExo).find(".session_next_exerciseType").eq(0).text() == "Int.") {
                 next_specs = getIntervallSpecs(adjacentExo, false); // true
             }else{
-                next_specs = textAssets[language]["inSession"]["next"] + " : " + unitRound($(".session_next_exercise_weight").eq(0).text()) + weightUnit;
+                next_specs = textAssets[parameters["language"]]["inSession"]["next"] + " : " + unitRound($(".session_next_exercise_weight").eq(0).text()) + parameters["weightUnit"];
             };
         }else{
             next_specs = "";
@@ -890,7 +909,7 @@ function update_info_vars(index = 0) {
 };
 
 function update_specs(reps, weight){
-    if(extype == "Pause" || extype == "Int"){
+    if(extype == "Pause" || extype == "Int."){
         $('.session_current_exercise_specs_details_inp, .session_current_exercise_specs_details_inp, .session_current_exercise_specs_weight_unit').css("display", "none");
         $('.session_current_exercise_specs_pause').text(next_specs);
         $(".session_current_exercise_specs_before").css("display", 'none');
@@ -899,7 +918,7 @@ function update_specs(reps, weight){
         $(".session_current_exercise_specs_reps").val(reps);
         $('.session_current_exercise_specs_pause').text("x");
         $(".session_current_exercise_specs_weight").val(weight);
-        $(".session_current_exercise_specs_weight_unit").text(weightUnit);
+        $(".session_current_exercise_specs_weight_unit").text(parameters["weightUnit"]);
     };
 };
 
@@ -908,7 +927,7 @@ function display_info(){
     update_hint();
     update_specs(next_specs[0], next_specs[1]);
 
-    if(extype != "Int"){update_pastData()};
+    if(extype != "Int."){update_pastData()};
 
     $(".session_next_exercises_container").animateFullScrollUp(
         parseInt($('.session_next_exercises_container').scrollTop())/1600*1350
@@ -921,7 +940,7 @@ function update_info(update=false){
     display_info();
     check_lastSet();
 
-    if(extype == "Wrm"){
+    if(extype == "Wrm."){
         $(".session_current_exercise_specs, .session_current_exercise_specs_before").css('display', 'none');
     }else{
         $(".session_current_exercise_specs").css('display', 'flex');
@@ -936,47 +955,47 @@ function update_pastData(){
     if(current_history.length > 1){
         let out = "";   
 
-        if(extype == "Uni"){
-            historyIndex = getHistoryIndex(getLastHistoryDay(current_history), next_id+"_1");
+        if(extype == "Uni."){
+            historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id+"_1");
             if(historyIndex != -1){
-                past_data = getLastHistoryDay(current_history)[2][historyIndex];
-                if(past_data[2].length > actual_setL){
+                past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
+                if(past_data["setList"].length > actual_setL){
                     $(".session_current_exercise_specs_before").css("display", 'block');
-                    out += "[" + textAssets[language]["misc"]["leftInitial"] + " : "+past_data[2][actual_setL][0]+" x "+unitRound(convertToUnit(past_data[2][actual_setL][1], past_data[1][3], weightUnit))+weightUnit;
+                    out += "[" + textAssets[parameters["language"]]["misc"]["leftInitial"] + " : "+past_data["setList"][actual_setL]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setL]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"];
                     $(".session_current_exercise_specs_before").text(out);
                 }else{
-                    if(!out.includes(textAssets[language]["misc"]["rightInitial"]+" :")){
+                    if(!out.includes(textAssets[parameters["language"]]["misc"]["rightInitial"]+" :")){
                         $(".session_current_exercise_specs_before").css("display", 'none');
                     };
                 };
             }else{
-                if(!out.includes(textAssets[language]["misc"]["rightInitial"]+" :")){
+                if(!out.includes(textAssets[parameters["language"]]["misc"]["rightInitial"]+" :")){
                     $(".session_current_exercise_specs_before").css("display", 'none');
                 };
             };
 
             //----- R -----//;
 
-            historyIndex = getHistoryIndex(getLastHistoryDay(current_history), next_id+"_2");
+            historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id+"_2");
             if(historyIndex != -1){
-                past_data = getLastHistoryDay(current_history)[2][historyIndex];
-                if(past_data[2].length > actual_setR){
+                past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
+                if(past_data["setList"].length > actual_setR){
                     $(".session_current_exercise_specs_before").css("display", 'block');
                     if(out != ""){
-                        $(".session_current_exercise_specs_before").text(out + " | "+textAssets[language]["misc"]["rightInitial"]+" : "+past_data[2][actual_setR][0]+" x "+unitRound(convertToUnit(past_data[2][actual_setR][1], past_data[1][3], weightUnit))+weightUnit+" ]");
+                        $(".session_current_exercise_specs_before").text(out + " | "+textAssets[parameters["language"]]["misc"]["rightInitial"]+" : "+past_data["setList"][actual_setR]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setR]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
                     }else{
-                        $(".session_current_exercise_specs_before").text(out + "["+textAssets[language]["misc"]["rightInitial"]+" : "+past_data[2][actual_setR][0]+" x "+unitRound(convertToUnit(past_data[2][actual_setR][1], past_data[1][3], weightUnit))+weightUnit+" ]");
+                        $(".session_current_exercise_specs_before").text(out + "["+textAssets[parameters["language"]]["misc"]["rightInitial"]+" : "+past_data["setList"][actual_setR]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setR]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
                     };
 
                 }else{
-                    if(!out.includes(textAssets[language]["misc"]["leftInitial"] + " :")){
+                    if(!out.includes(textAssets[parameters["language"]]["misc"]["leftInitial"] + " :")){
                         $(".session_current_exercise_specs_before").css("display", 'none');
                     }else{
                         $(".session_current_exercise_specs_before").text(out + " ]");
                     };
                 };
             }else{
-                if(!out.includes(textAssets[language]["misc"]["leftInitial"] + " :")){
+                if(!out.includes(textAssets[parameters["language"]]["misc"]["leftInitial"] + " :")){
                     $(".session_current_exercise_specs_before").css("display", 'none');
                 }else{
                     $(".session_current_exercise_specs_before").text(out + " ]");
@@ -984,12 +1003,12 @@ function update_pastData(){
             };
 
         }else{
-            historyIndex = getHistoryIndex(getLastHistoryDay(current_history), next_id);
+            historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id);
             if(historyIndex != -1){
-                past_data = current_history[current_history.length - 1][2][historyIndex];
-                if(past_data[2].length > actual_setL){
+                past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
+                if(past_data["setList"].length > actual_setL){
                     $(".session_current_exercise_specs_before").css("display", 'block');
-                    $(".session_current_exercise_specs_before").text("[ "+past_data[2][actual_setL][0]+" x "+unitRound(convertToUnit(past_data[2][actual_setL][1], past_data[1][3], weightUnit))+weightUnit+" ]");
+                    $(".session_current_exercise_specs_before").text("[ "+past_data["setList"][actual_setL]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setL]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
                 }else{
                     $(".session_current_exercise_specs_before").css("display", 'none');
                 };
@@ -1001,34 +1020,34 @@ function update_pastData(){
 };
 
 function check_lastSet(){
-    if(extype == "Int" && !noMore && lastExo){
+    if(extype == "Int." && !noMore && lastExo){
         noMore = true;
 
         $(".session_next_exercises_container").prepend(`
         <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-            <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
+            <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
         </div>
         `);
 
         $('.session_exercise_Rrest_btn').css("display", "none");
-        $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
 
         $(".session_exercise_Lrest_btn").css("cursor", "pointer");
         $(".Lrest").css("display", "block");
         $(".Ltimer").css("display", "none");
 
         finished = true;
-    }else if(remaining_sets <= 1 && extype != "Uni" && !noMore && lastExo){
+    }else if(remaining_sets <= 1 && extype != "Uni." && !noMore && lastExo){
         noMore = true;
         $(".session_next_exercises_container").prepend(`
         <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-            <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
+            <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
         </div>
         `);
 
         if(extype != "Pause"){
             $('.session_exercise_Rrest_btn').css("display", "none");
-            $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+            $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
 
             $(".session_exercise_Lrest_btn").css("cursor", "pointer");
             $(".Lrest").css("display", "block");
@@ -1036,7 +1055,7 @@ function check_lastSet(){
         }
 
         finished = true;
-    }else if(extype == "Uni" && remaining_sets <= 2 && lastExo){
+    }else if(extype == "Uni." && remaining_sets <= 2 && lastExo){
         if(Rdone && Llast){
             finished = true;
             $('.session_exercise_Lrest_btn').css('width', '150px');
@@ -1045,7 +1064,7 @@ function check_lastSet(){
             updateRestBtnStyle('end');
 
             $(".session_exercise_rest_btn_label").css('display', 'none');
-            $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+            $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
         }else if(Ldone && Rlast){
             finished = true;
             $('.session_exercise_Rrest_btn').css('width', '150px');
@@ -1054,14 +1073,14 @@ function check_lastSet(){
             updateRestBtnStyle('end');
 
             $(".session_exercise_rest_btn_label").css('display', 'none')
-            $('.Rrest').text(textAssets[language]["inSession"]["finished"]);
+            $('.Rrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
         }
 
         if(!noMore && ((Rdone && Llast) || (Ldone && Rlast) || (Llast && Rlast))){
             noMore = true;
             $(".session_next_exercises_container").prepend(`
             <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-                <span class="session_next_exercise_name">`+textAssets[language]["inSession"]["noMore"]+`</span>
+                <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
             </div>
             `);
         };
@@ -1104,9 +1123,9 @@ function timerLaunch(LR){
     if(LR == "L"){
         let isBeeping = false;
 
-        if(extype == "Uni" && Ldone){return};
+        if(extype == "Uni." && Ldone){return};
 
-        if(extype == "Uni" && Llast){
+        if(extype == "Uni." && Llast){
             remaining_sets -= 1;
             timerDone("L");
             return;
@@ -1124,7 +1143,7 @@ function timerLaunch(LR){
 
         $('.session_exercise_Lrest_btn').data("canLongClick", false);
 
-        if(autoSaver && LrestTime >= 5){screensaver_toggle(true)};
+        if(parameters['autoSaver'] && LrestTime >= 5){screensaver_toggle(true)};
         screensaver_set(next_name, parseInt(LrestTime));
 
         if(extype != "Pause"){remaining_sets -= 1};
@@ -1160,9 +1179,9 @@ function timerLaunch(LR){
     }else if(LR == "R"){
         let isBeeping = false;
         
-        if(extype == "Uni" && Rdone){return};
+        if(extype == "Uni." && Rdone){return};
 
-        if(extype == "Uni" && Rlast){
+        if(extype == "Uni." && Rlast){
             remaining_sets -= 1;
             timerDone("R");
             return;
@@ -1182,7 +1201,7 @@ function timerLaunch(LR){
 
         if(extype != "Pause"){remaining_sets -= 1};
 
-        if(autoSaver && RrestTime >= 5){screensaver_toggle(true)};
+        if(parameters['autoSaver'] && RrestTime >= 5){screensaver_toggle(true)};
         screensaver_set(next_name, RrestTime, true);
 
         if(RrestTime != 0){
@@ -1217,7 +1236,7 @@ function timerLaunch(LR){
 function timerSkip(LR){
     if(LR == "L"){
         if(!Ltimer){
-            if(extype == "Int"){
+            if(extype == "Int."){
                 if(ongoing != "intervall"){remaining_sets -= next_rest[0]};
                 $(".session_workout_remaining_sets").text(remaining_sets);
 
@@ -1256,12 +1275,12 @@ async function timerDone(LR){
     if(LR == "L"){
         $('.session_exercise_Lrest_btn').data("canLongClick", true);
 
-        if(extype == "Uni"){
+        if(extype == "Uni."){
             if(actual_setNb - actual_setL > 0){
                 if((Rlast || Rdone) && actual_setNb - actual_setL == 1 && lastExo){
-                    dropSet_static($(".session_next_exercise_name:contains(' - "+textAssets[language]["misc"]["leftInitial"]+"')").first().parent());
+                    dropSet_static($(".session_next_exercise_name:contains(' - "+textAssets[parameters["language"]]["misc"]["leftInitial"]+"')").first().parent());
                 }else{
-                    await dropSet_animated($(".session_next_exercise_name:contains(' - "+textAssets[language]["misc"]["leftInitial"]+"')").first().parent());
+                    await dropSet_animated($(".session_next_exercise_name:contains(' - "+textAssets[parameters["language"]]["misc"]["leftInitial"]+"')").first().parent());
                 };
             };
 
@@ -1269,7 +1288,7 @@ async function timerDone(LR){
                 Ldone = true;
 
                 $(".session_workout_remaining_sets").text(remaining_sets);
-                $('.Lrest').text(textAssets[language]["inSession"]["done"]);
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["done"]);
 
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
                 $(".session_exercise_Lrest_btn").css('opacity', '.7');
@@ -1278,7 +1297,7 @@ async function timerDone(LR){
             if(actual_setNb - actual_setL == 1 && !Ldone){
                 Llast = true
 
-                $(".Lrest").text(textAssets[language]["inSession"]["last"]);
+                $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["last"]);
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             };
 
@@ -1290,7 +1309,7 @@ async function timerDone(LR){
 
                 next_exercise(true);
             };
-        }else if(extype == "Bi"){
+        }else if(extype == "Bi."){
             if(!next_exo){
                 if(remaining_sets == 1 && lastExo){
                     dropSet_static($(".session_next_exercise_set").first());
@@ -1302,7 +1321,7 @@ async function timerDone(LR){
                     next_exo = true;
     
                     $('.session_exercise_Rrest_btn').css("display", "none");
-                    $('.Lrest').text(textAssets[language]["inSession"]["next"]);
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
     
                     $('.session_exercise_Lrest_btn').data("canLongClick", false);
                 };
@@ -1310,9 +1329,9 @@ async function timerDone(LR){
                 next_exercise(true);
             };
         }else if(extype == "Pause"){
-            $('.Lrest').text(textAssets[language]["inSession"]["finished"]);
+            $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
             if(!noMore){next_exercise(true);};
-        }else if(extype == "Wrm"){
+        }else if(extype == "Wrm."){
             next_exercise(true);
         };
 
@@ -1322,12 +1341,12 @@ async function timerDone(LR){
 
         $('.session_exercise_Rrest_btn').data("canLongClick", true);
 
-        if(extype == "Uni"){
+        if(extype == "Uni."){
             if(actual_setNb - actual_setR > 0){
                 if((Llast || Ldone) && actual_setNb - actual_setR == 1 && lastExo){
-                    dropSet_static($(".session_next_exercise_name:contains(' - "+textAssets[language]["misc"]["rightInitial"]+"')").first().parent());
+                    dropSet_static($(".session_next_exercise_name:contains(' - "+textAssets[parameters["language"]]["misc"]["rightInitial"]+"')").first().parent());
                 }else{
-                    await dropSet_animated($(".session_next_exercise_name:contains(' - "+textAssets[language]["misc"]["rightInitial"]+"')").first().parent());
+                    await dropSet_animated($(".session_next_exercise_name:contains(' - "+textAssets[parameters["language"]]["misc"]["rightInitial"]+"')").first().parent());
                 };
             };
 
@@ -1335,7 +1354,7 @@ async function timerDone(LR){
                 Rdone = true;
 
                 $(".session_workout_remaining_sets").text(remaining_sets);
-                $(".Rrest").text(textAssets[language]["inSession"]["done"]);
+                $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["done"]);
 
                 $('.session_exercise_Rrest_btn').data("canLongClick", false);
                 $(".session_exercise_Rrest_btn").css('opacity', '.7');
@@ -1344,7 +1363,7 @@ async function timerDone(LR){
             if(actual_setNb - actual_setR == 1 && !Rdone){
                 Rlast = true
 
-                $(".Rrest").text(textAssets[language]["inSession"]["last"]);
+                $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["last"]);
                 $('.session_exercise_Rrest_btn').data("canLongClick", false);
             };
 
@@ -1449,66 +1468,65 @@ function dropExo_static(exo){
 // UNDO
 
 function recoveryUpdateFromUndo(undoData){
-    tempNewHistory[1] = undoData[1]['TemptimeSpent'];
+    tempNewHistory["duration"] = tempStats["timeSpent"];
 
-    recovery[1]["extype"] = undoData[1]['extype'];
-    recovery[1]["next_id"] = undoData[1]['next_id'];
-    recovery[1]["next_name"] = undoData[1]['next_name'];
-    recovery[1]["next_rest"] = undoData[1]['next_rest'];
-    recovery[1]["LrestTime"] = undoData[1]['LrestTime'];
-    recovery[1]["RrestTime"] = undoData[1]['RrestTime'];
-    recovery[1]["next_specs"] = undoData[1]['next_specs'];
-    recovery[1]["actual_setL"] = undoData[1]['actual_setL'];
-    recovery[1]["actual_setR"] = undoData[1]['actual_setR'];
-    recovery[1]["actual_setNb"] = undoData[1]['actual_setNb'];
-    recovery[1]["beforeExercise"] = undoData[1]['beforeExercise'];
+    recovery["varSav"]["extype"] = undoData["varSav"]['extype'];
+    recovery["varSav"]["next_id"] = undoData["varSav"]['next_id'];
+    recovery["varSav"]["next_name"] = undoData["varSav"]['next_name'];
+    recovery["varSav"]["next_rest"] = undoData["varSav"]['next_rest'];
+    recovery["varSav"]["LrestTime"] = undoData["varSav"]['LrestTime'];
+    recovery["varSav"]["RrestTime"] = undoData["varSav"]['RrestTime'];
+    recovery["varSav"]["next_specs"] = undoData["varSav"]['next_specs'];
+    recovery["varSav"]["actual_setL"] = undoData["varSav"]['actual_setL'];
+    recovery["varSav"]["actual_setR"] = undoData["varSav"]['actual_setR'];
+    recovery["varSav"]["actual_setNb"] = undoData["varSav"]['actual_setNb'];
+    recovery["varSav"]["beforeExercise"] = undoData["varSav"]['beforeExercise'];
 
-    recovery[2] = undoData[0];
-    recovery[3] = undoData[1]['tempNewHistory'];
-    recovery[4] = [undoData[1]['TemptimeSpent'], undoData[1]['TempworkedTime'], undoData[1]['TempweightLifted'], undoData[1]['TemprepsDone']];
-    recovery[5] = undoMemory;
+    recovery["html"] = undoData["html"];
+    recovery["tempHistory"] = undoData['tempHistory'];
+    recovery["tempStats"] = undoData['tempStats'];
+    recovery["undoMemory"] = undoMemory;
 
     recovery_save(recovery);
 };
 
 function undoMemorise(way){
     if(way == 'in'){
-        let undoData = [$('.session_next_exercises_container').html(), {}];
-    
-        undoData[1]['Ldone'] =  Ldone;
-        undoData[1]['Rdone'] =  Rdone;
-        undoData[1]['Llast'] =  Llast;
-        undoData[1]['Rlast'] =  Rlast;
-        undoData[1]['Lspent'] =  Lspent;
-        undoData[1]['Rspent'] =  Rspent;        
-        undoData[1]['skip'] =  skip;
-        undoData[1]['ncState'] =  ncState;
-        undoData[1]['extype'] =  extype;
-        undoData[1]['next_exo'] =  next_exo;
-        undoData[1]['noMore'] =  noMore;
-        undoData[1]['finished'] =  finished;
-        undoData[1]['hasReallyStarted'] =  hasReallyStarted;
-        undoData[1]['hasStarted'] =  hasStarted;
-        undoData[1]['lastExo'] =  lastExo;
-        undoData[1]['remaining_sets'] =  remaining_sets;
-        undoData[1]['TemptimeSpent'] =  TemptimeSpent;
-        undoData[1]['TempworkedTime'] =  TempworkedTime;
-        undoData[1]['TempweightLifted'] =  TempweightLifted;
-        undoData[1]['TemprepsDone'] =  TemprepsDone;
-        undoData[1]['tempNewHistory'] = JSON.parse(JSON.stringify(tempNewHistory));
-        undoData[1]['next_name'] =  next_name;
-        undoData[1]['next_id'] =  next_id;
-        undoData[1]['next_specs'] =  next_specs;
-        undoData[1]['next_rest'] =  next_rest;
-        undoData[1]['LrestTime'] =  LrestTime;
-        undoData[1]['RrestTime'] =  RrestTime;
-        undoData[1]['actual_setR'] =  actual_setR;
-        undoData[1]['actual_setL'] =  actual_setL;
-        undoData[1]['actual_setNb'] =  actual_setNb;
-        undoData[1]['beforeExercise'] =  beforeExercise;
-        
-        undoData[1]['LrestLib'] = $('.Lrest').text();
-        undoData[1]['RrestLib'] = $('.Rrest').text();
+        let undoData = {
+            "html": $('.session_next_exercises_container').html(),
+            "varSav": {
+                "Ldone": Ldone,
+                "Rdone": Rdone,
+                "Llast": Llast,
+                "Rlast": Rlast,
+                "Lspent": Lspent,
+                "Rspent": Rspent,
+                "skip": skip,
+                "ncState": ncState,
+                "extype": extype,
+                "next_exo": next_exo,
+                "noMore": noMore,
+                "finished": finished,
+                "hasReallyStarted": hasReallyStarted,
+                "hasStarted": hasStarted,
+                "lastExo": lastExo,
+                "remaining_sets": remaining_sets,
+                "next_name": next_name,
+                "next_id": next_id,
+                "next_specs": next_specs,
+                "next_rest": next_rest,
+                "LrestTime": LrestTime,
+                "RrestTime": RrestTime,
+                "actual_setR": actual_setR,
+                "actual_setL": actual_setL,
+                "actual_setNb": actual_setNb,
+                "beforeExercise": beforeExercise,
+                "LrestLib": $('.Lrest').text(),
+                "RrestLib": $('.Rrest').text()
+            },
+            "tempStats": tempStats,
+            "tempHistory": tempNewHistory,
+        };
 
         $('.session_undo').css('display', 'block');
         undoMemory.push(undoData);
@@ -1516,69 +1534,93 @@ function undoMemorise(way){
         if(undoMemory.lenght < 1){return};
         
         let undoData = undoMemory[undoMemory.length - 1];
-        undoMemory = undoMemory.slice(0, -1);
+        undoMemory = undoMemory.slice(0, -1);   
         
-        if(extype != "Uni" && undoData[1]['extype'] == "Uni" || finished && extype == "Uni"){
+        let  pastExo = undoData["varSav"]['extype'];
+
+        if(extype != "Uni." && pastExo == "Uni." || finished && extype == "Uni."){
             $('.session_exercise_Rrest_btn').css("display", "flex");
-            updateRestBtnStyle('Uni');
-        }else if(extype == "Uni" && skip){
-            if(Rrest){resetTimer("R")};
-        }else{
-            if(Lrest){resetTimer("L")};
+            updateRestBtnStyle('Uni.');
         };
+
+        if(pastExo == "Uni." && skip){
+            if(Rtimer){resetTimer("R")};
+        }else{
+            if(Ltimer){resetTimer("L")};
+        };
+            
+        Ldone = undoData["varSav"]['Ldone'];
+        Rdone = undoData["varSav"]['Rdone'];
+        Llast = undoData["varSav"]['Llast'];
+        Rlast = undoData["varSav"]['Rlast'];
+        Lspent = undoData["varSav"]['Lspent'];
+        Rspent = undoData["varSav"]['Rspent'];
+        skip = undoData["varSav"]['skip'];
+        ncState = undoData["varSav"]['ncState'];
+        extype = undoData["varSav"]['extype'];
+        next_exo = undoData["varSav"]['next_exo'];
+        noMore = undoData["varSav"]['noMore'];
+        finished = undoData["varSav"]['finished'];
+        hasReallyStarted = undoData["varSav"]['hasReallyStarted'];
+        hasStarted = undoData["varSav"]['hasStarted'];
+        lastExo = undoData["varSav"]['lastExo'];
+        remaining_sets = undoData["varSav"]['remaining_sets'];
+        next_name = undoData["varSav"]['next_name'];
+        next_id = undoData["varSav"]['next_id'];
+        next_specs = undoData["varSav"]['next_specs'];
+        next_rest = undoData["varSav"]['next_rest'];
+        LrestTime = undoData["varSav"]['LrestTime'];
+        RrestTime = undoData["varSav"]['RrestTime'];
+        actual_setR = undoData["varSav"]['actual_setR'];
+        actual_setL = undoData["varSav"]['actual_setL'];
+        actual_setNb = undoData["varSav"]['actual_setNb'];
+        beforeExercise = undoData["varSav"]['beforeExercise'];
         
-        Ldone = undoData[1]['Ldone'];
-        Rdone = undoData[1]['Rdone'];
-        Llast = undoData[1]['Llast'];
-        Rlast = undoData[1]['Rlast'];
-        Lspent = undoData[1]['Lspent'];
-        Rspent = undoData[1]['Rspent'];
-        skip = undoData[1]['skip'];
-        ncState = undoData[1]['ncState'];
-        extype = undoData[1]['extype'];
-        next_exo = undoData[1]['next_exo'];
-        noMore = undoData[1]['noMore'];
-        finished = undoData[1]['finished'];
-        hasReallyStarted = undoData[1]['hasReallyStarted'];
-        hasStarted = undoData[1]['hasStarted'];
-        lastExo = undoData[1]['lastExo'];
-        remaining_sets = undoData[1]['remaining_sets'];
-        TempworkedTime = undoData[1]['TempworkedTime'];
-        TempweightLifted = undoData[1]['TempweightLifted'];
-        TemprepsDone = undoData[1]['TemprepsDone'];
-        tempNewHistory = undoData[1]['tempNewHistory'];
-        next_name = undoData[1]['next_name'];
-        next_id = undoData[1]['next_id'];
-        next_specs = undoData[1]['next_specs'];
-        next_rest = undoData[1]['next_rest'];
-        LrestTime = undoData[1]['LrestTime'];
-        RrestTime = undoData[1]['RrestTime'];
-        actual_setR = undoData[1]['actual_setR'];
-        actual_setL = undoData[1]['actual_setL'];
-        actual_setNb = undoData[1]['actual_setNb'];
-        beforeExercise = undoData[1]['beforeExercise'];
-  
-        //console.log("actual_setNb : "+undoData[1]['actual_setNb']+" | "+"actual_setL : "+undoData[1]['actual_setL']+" | "+"Llast : "+undoData[1]['Llast']+" | "+"Ldone : "+undoData[1]['Ldone']);
-        //console.log("actual_setNb : "+undoData[1]['actual_setNb']+" | "+"actual_setR : "+undoData[1]['actual_setR']+" | "+"Llast : "+undoData[1]['Rlast']+" | "+"Rdone : "+undoData[1]['Rdone']);
+        tempStats["workedTime"] = undoData["tempStats"]['workedTime'];
+        tempStats["weightLifted"] = undoData["tempStats"]['weightLifted'];
+        tempStats["repsDone"] = undoData["tempStats"]['repsDone'];
 
-        $('.Lrest').text(undoData[1]['LrestLib']);
-        $('.Rrest').text(undoData[1]['RrestLib']);
+        Ispent = 0;
+        iRest_time = 0;
+        iWork_time = 0;
+        iCurrent_cycle = false;
+        iActualCycle = false;
+        Ifinished = false;
+        Iskip = false;
+        IjustSkipped = false;
+        
+        tempNewHistory = undoData['tempHistory'];
+        recovery["varSav"]["iCurrent_cycle"] = false
 
-        if(extype == "Uni"){
+        $('.Lrest').text(undoData["varSav"]['LrestLib']);
+        $('.Rrest').text(undoData["varSav"]['RrestLib']);
+
+        if(extype == "Uni."){
             if(beforeExercise){
                 $('.session_exercise_Rrest_btn').css("display", "none");
                 updateRestBtnStyle('Reset');
             }else{
-                if(Ldone){$(".session_exercise_Lrest_btn").css('opacity', '.7')}else if(!Ltimer){$(".session_exercise_Lrest_btn").css('opacity', '1')};
-                if(Rdone){$(".session_exercise_Rrest_btn").css('opacity', '.7')}else if(!Rtimer){$(".session_exercise_Rrest_btn").css('opacity', '1')};
+                if(Ldone || Ltimer){
+                    $(".session_exercise_Lrest_btn").css('opacity', '.7');
+                }else{
+                    $(".session_exercise_Lrest_btn").css('opacity', '1');  
+                };
+
+                if(Rdone || Rtimer){
+                    $(".session_exercise_Rrest_btn").css('opacity', '.7');
+                }else{
+                    $(".session_exercise_Rrest_btn").css('opacity', '1');  
+                };
+
+                //if(Ltimer){resetTimer("L")}else if(Rtimer){resetTimer("R")};
             };
         };
 
         update_info(false);
-        stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
+        stats_set(tempStats);
         
         $(".session_workout_remaining_sets").text(remaining_sets);
-        $('.session_next_exercises_container').html(undoData[0]);
+        $('.session_next_exercises_container').html(undoData["html"]);
 
         if(!hasReallyStarted){
             $('.session_undo').css('display', 'none');
@@ -1594,7 +1636,7 @@ function undoMemorise(way){
             $(".session_exercise_Lrest_btn").data("canLongClick", false);
         };
 
-        if(extype == "Uni"){
+        if(extype == "Uni."){
             if(actual_setNb - actual_setR > 1 && !beforeExercise){
                 $(".session_exercise_Rrest_btn").data("canLongClick", true);
             }else{
@@ -1617,42 +1659,54 @@ $(document).ready(function(){
         if(hasStarted && !hasReallyStarted){
             hasReallyStarted = true;
             $('.session_undo').css('display', 'block');
-        };
+        };  
 
         if(!hasStarted){
             startWorkout();
         }else if(beforeExercise){
             next_exercise(false);
-        }else if((extype == "Bi" || extype == "Uni" && !Ldone) && !Ltimer){
+        }else if((extype == "Bi." || extype == "Uni." && !Ldone) && !Ltimer){
 
             actual_setL += 1;
 
             //STATS UPDATE;
 
-            if(extype != "Pause" && extype != "Int" && !Ltimer){
+            if(extype != "Pause" && extype != "Int." && !Ltimer){
                 next_specs[0] = parseInt($(".session_current_exercise_specs_reps").val());
                 next_specs[1] = parseFloat($(".session_current_exercise_specs_weight").val());
 
                 let reps = next_name.includes("Alt.") ? 2*parseInt($(".session_current_exercise_specs_reps").val()) : parseInt($(".session_current_exercise_specs_reps").val());
                 let weight = parseFloat($(".session_current_exercise_specs_weight").val());
 
-                extype == 'Uni' ? 
-                    tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id+"_1")][2].push([reps, weight]) : 
+                extype == 'Uni.' ? 
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]["setList"].push(generateHistorySetObj({
+                        "type": extype,
+                        "reps": reps,
+                        "weight": weight
+                    })) : 
                     next_name.includes("Alt.") ? 
-                        tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id)][2].push([Math.round(reps/2), weight]) : 
-                        tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id)][2].push([reps, weight]);
+                        tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push([generateHistorySetObj({
+                            "type": extype,
+                            "reps": Math.round(reps/2),
+                            "weight": weight
+                        })]) : 
+                        tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push(generateHistorySetObj({
+                            "type": extype,
+                            "reps": reps,
+                            "weight": weight
+                        }));
 
-                TemprepsDone += reps;
+                tempStats["repsDone"] += reps;
 
                 if(next_name.includes("Ts.")){
-                    TempweightLifted += convertToUnit(2*reps*weight, weightUnit, "kg");
+                    tempStats["weightLifted"] += convertToUnit(2*reps*weight, parameters["weightUnit"], "kg");
                 }else{
-                    TempweightLifted += convertToUnit(reps*weight, weightUnit, "kg");
+                    tempStats["weightLifted"] += convertToUnit(reps*weight, parameters["weightUnit"], "kg");
                 };
 
-                TempworkedTime += (reps*2.1);
+                tempStats["workedTime"] += (reps*2.1);
 
-                stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
+                stats_set(tempStats);
             };
 
             udpate_recovery("workout");
@@ -1660,19 +1714,19 @@ $(document).ready(function(){
             if(finished){
                 quit_session();
             }else if(next_exo){
-                if(extype != "Uni"){remaining_sets -= 1};
+                if(extype != "Uni."){remaining_sets -= 1};
                 $(".session_workout_remaining_sets").text(remaining_sets);
 
                 next_exercise(true);
             }else if(!Ltimer){
                 timerLaunch("L");
             };
-        }else if(extype == "Int"){
+        }else if(extype == "Int."){
             if(finished){
                 quit_session(); 
                 return;
             };
-        }else if(extype == "Wrm"){
+        }else if(extype == "Wrm."){
             if(finished){
                 quit_session();
             }else{
@@ -1706,16 +1760,17 @@ $(document).ready(function(){
             let reps = next_name.includes("Alt.") ? 2*parseInt($(".session_current_exercise_specs_reps").val()) : parseInt($(".session_current_exercise_specs_reps").val());
             let weight = parseFloat($(".session_current_exercise_specs_weight").val());
 
-            tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id+"_2")][2].push([reps, weight]);
+            tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_2")]["setList"].push(generateHistorySetObj({
+                "type": extype,
+                "reps": reps,
+                "weight": weight
+            }));
 
-            TemprepsDone += reps;
+            tempStats["repsDone"] += reps;
+            tempStats["weightLifted"] += convertToUnit(reps*weight, parameters["weightUnit"], "kg");
+            tempStats["workedTime"] += (reps*2.1);
 
-            TempweightLifted += convertToUnit(reps*weight, weightUnit, "kg");
-
-            TempworkedTime += (reps*2.1);
-
-            stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
-
+            stats_set(tempStats);
             udpate_recovery("workout");
         };
 
@@ -1743,7 +1798,7 @@ $(document).ready(function(){
         }else if(beforeExercise){
             //SKIP WHOLE EXO;
 
-            if(extype == "Int"){
+            if(extype == "Int."){
                 remaining_sets -= getInvervallSessionCycleCount(intervallData);
             }else{
                 remaining_sets -= $(".session_next_exercise").first().children(".session_next_exercise_set").length;
@@ -1773,7 +1828,7 @@ $(document).ready(function(){
             };
         }else{
             if(!finished){
-                if(extype == "Uni"){
+                if(extype == "Uni."){
                     if(Ldone){
                         skip = false;
                     }else if(Rdone){
@@ -1796,7 +1851,7 @@ $(document).ready(function(){
     // LONGCLICKED;
 
     $(document).on('longClicked', '.session_exercise_Lrest_btn', function(e){
-        if((hasStarted && (extype == "Bi" || extype == "Uni")) && !Ltimer){
+        if((hasStarted && (extype == "Bi." || extype == "Uni.")) && !Ltimer){
             LrestLongClicked = true;
             LinputShown = true;
             $('.Linput').val(get_time_u(LrestTime));
@@ -1833,7 +1888,7 @@ $(document).ready(function(){
 
         if(!isAbleToClick("historyNotes")){return};
 
-        if(!notesInp && extype != "Int" && extype != "Pause" && hasStarted){
+        if(!notesInp && extype != "Int." && extype != "Pause" && hasStarted){
             cannotClick = "historyNotes";
 
             $(".session_workout_historyNotes_isAbout").text(next_name);
@@ -1846,28 +1901,11 @@ $(document).ready(function(){
     });
 
     $(document).on('blur', '.session_workout_historyNotes_inp', function(){
-        let temp = false;
-
-        if(extype == "Uni"){
-            temp = tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id+"_1")];
-
-            if($(this).val() == "" && temp.lenght == 5){
-                temp.splice(3, 1);
-            }else if($(this).val() != "" && temp.lenght == 5){
-                temp[3] = $(this).val().val();
-            }else if($(this).val() != "" && temp.lenght == 4){
-                temp.splice(3, 0, $(this).val());
-            };
-
-        }else if(extype == "Bi"){
-            temp = tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id)];
-
-            if($(this).val() == "" && temp.lenght == 5){
-                temp.splice(3, 1);
-            }else if($(this).val() != "" && temp.lenght == 5){
-                temp[3] = $(this).val().val();
-            }else if($(this).val() != "" && temp.lenght == 4){
-                temp.splice(3, 0, $(this).val());
+        if(extype == "Uni." || extype == "Bi."){
+            if($(this).val() == ""){
+                tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]['note'] = false;
+            }else{
+                tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]['note'] = $(this).val();
             };
         };
 
@@ -1903,7 +1941,7 @@ $(document).ready(function(){
 
         let id = $(this).find(".session_exercise_id").text();
         let name = $(this).find(".session_next_exercise_name").text();
-        if(name == textAssets[language]["inSession"]["noMore"]){return};
+        if(name == textAssets[parameters["language"]]["inSession"]["noMore"]){return};
         
         let side = false;
 
@@ -1926,32 +1964,32 @@ $(document).ready(function(){
 
             $(".session_setPreviewTitle").text(name);
             $(".session_setPreviewRest").text(get_time(rest));
-        }else if(extype == "Int"){
+        }else if(extype == "Int."){
             $(".session_setPreviewInfo").css("display", 'flex');
             $(".session_setPreviewRest").css("display", 'none');
             $(".session_setPreviewTitle").text(name);
             $(".session_setPreviewInfo").text($(this).find(".session_next_exercise_cycle").text() + " x " + get_time_u($(this).find(".session_next_exercise_work").text()) + " x " + get_time_u($(this).find(".session_next_exercise_rest").text()));
-        }else if(extype == "Bi" || extype == "Uni"){
+        }else if(extype == "Bi." || extype == "Uni."){
             $(".session_setPreviewInfoContainer, .session_setPreviewInfo").css("display", 'flex');
             $(".session_setPreviewRest").css('display', 'none');
 
             let actual_set = parseInt($(this).find(".session_setPreviewId").text());
 
             $(".session_setPreviewTitle").text(name);
-            $(".session_setPreviewInfo").text(reps + " x " + weight + weightUnit);
+            $(".session_setPreviewInfo").text(reps + " x " + weight + parameters["weightUnit"]);
 
             if(current_history.length > 1){
-                if(extype == "Bi"){
-                    historyIndex = getHistoryIndex(getLastHistoryDay(current_history), id);
+                if(extype == "Bi."){
+                    historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), id);
                 }else{
-                    historyIndex = getHistoryIndex(getLastHistoryDay(current_history), id+side);
+                    historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), id+side);
                 };
 
                 if(historyIndex != -1){
-                    past_data = getLastHistoryDay(current_history)[2][historyIndex];
-                    if(past_data[2].length > actual_set){
+                    past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
+                    if(past_data["setList"].length > actual_set){
                         $(".session_setPreviewPastInfo").css("display", 'inline-block');
-                        $(".session_setPreviewPastInfo").text("[ "+past_data[2][actual_set][0]+" x "+unitRound(convertToUnit(past_data[2][actual_set][1], past_data[1][3], weightUnit))+weightUnit+" ]");
+                        $(".session_setPreviewPastInfo").text("[ "+past_data["setList"][actual_set][0]+" x "+unitRound(convertToUnit(past_data["setList"][actual_set][1], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
                     }else{
                         $(".session_setPreviewPastInfo").css("display", 'none');
                     };
@@ -1959,7 +1997,7 @@ $(document).ready(function(){
                     $(".session_setPreviewPastInfo").css("display", 'none');
                 };
             };
-        }else if(extype == "Wrm"){
+        }else if(extype == "Wrm."){
             $(".session_setPreviewTitle").text(name);
             $('.session_setPreviewInfo, .session_setPreviewInfoContainer, .session_setPreviewRest').css('display', 'none')
         }; 
@@ -1998,11 +2036,11 @@ $(document).ready(function(){
     $(document).on("reordered", ".session_next_exercises_container", function(e){
         if(extype == "Pause"){
             if($(".session_next_exercise_name").length != 1){
-                if($($(".session_next_exercise_type")[0]).text() == "Int"){
+                if($($(".session_next_exercise_type")[0]).text() == "Int."){
                     let temp = [$($(".session_next_exercise_cycle")[0]).text(), $($(".session_next_exercise_work")[0]).text(), $($(".session_next_exercise_rest")[1]).text()];
-                    next_specs = textAssets[language]["inSession"]["next"] + " : " + temp[0] +" x "+ get_time_u(temp[1]) +" x "+ get_time_u(temp[2]);
+                    next_specs = textAssets[parameters["language"]]["inSession"]["next"] + " : " + temp[0] +" x "+ get_time_u(temp[1]) +" x "+ get_time_u(temp[2]);
                 }else{
-                    next_specs = textAssets[language]["inSession"]["next"] + " : " + unitRound($($(".session_next_exercise_weight")[0]).text()) + weightUnit;
+                    next_specs = textAssets[parameters["language"]]["inSession"]["next"] + " : " + unitRound($($(".session_next_exercise_weight")[0]).text()) + parameters["weightUnit"];
                 };
             }else{
                 next_specs = "";
@@ -2025,7 +2063,7 @@ $(document).ready(function(){
 
             $(".screensaver_Xtimer").text(get_time(restDat));
 
-            if(autoSaver){screensaver_toggle(true)};
+            if(parameters['autoSaver']){screensaver_toggle(true)};
             screensaver_set(false, restDat, false, true);
 
             localStorage.setItem("restDat", restDat);
@@ -2095,65 +2133,66 @@ $(document).ready(function(){
         let type = false;
         let set = false;
         let name = false;
-        let sessionPart = ["W", "name", []];
+
+        let sessionPart = generateSessionObj({
+            "type": "W",
+            "name": "name",
+            "exoList": []
+        });
+
         let remainingExos = $('.session_next_exercise');
 
         // if not rested or skpped, take in count the ongoing set;
 
         for (let i = 0; i < remainingExos.length; i++){
             const exercise = $(remainingExos[i]);
+
             type = $(exercise).find(".session_next_exerciseType").first().text();
             set = parseInt($(exercise).find(".session_next_exercise_set").length);
-            name = $(exercise).find(".session_next_exercise_name").first().text().replace(' - '+textAssets[language]["misc"]["rightInitial"], '').replace(' - '+textAssets[language]["misc"]["leftInitial"], '');
+            name = $(exercise).find(".session_next_exercise_name").first().text().replace(' - '+textAssets[parameters["language"]]["misc"]["rightInitial"], '').replace(' - '+textAssets[parameters["language"]]["misc"]["leftInitial"], '');
             
-            if(type == "Uni" && next_name == name){
+            if(type == "Uni." && next_name == name){
                 if(!Ltimer){set += 1};
                 if(!Rtimer){set += 1};
-            }else if(type == "Bi" && next_name == name){
+            }else if(type == "Bi." && next_name == name){
                 if(!Ltimer){set += 1};
             };
 
-            if(type == "Int"){
-                sessionPart[2].push([
-                    type+".",
-                    name,
-                    JSON.parse($(exercise).find('.session_next_exercise_intervallData').first().text()),
-                    "X"
-                ]);
-            }else if(type == "Bi"){
-                sessionPart[2].push([
-                    type+".",
-                    name,
-                    set,
-                    $(exercise).find('.session_next_exercise_reps').first().text(),
-                    $(exercise).find('.session_next_exercise_weight').first().text(),
-                    get_time_u($(exercise).find('.session_next_exercise_rest').first().text())
-                ]);
-            }else if(type == "Uni"){
-                sessionPart[2].push([
-                    type+".",
-                    name,
-                    set,
-                    $(exercise).find('.session_next_exercise_reps').first().text(),
-                    $(exercise).find('.session_next_exercise_weight').first().text(),
-                    get_time_u($(exercise).find('.session_next_exercise_rest').first().text())
-                ]);
+            if(type == "Int."){
+                sessionPart["exoList"].push(generateSessionObj({
+                    "type": type,
+                    "name": name,
+                    "exoList": JSON.parse($(exercise).find('.session_next_exercise_intervallData').first().text()),
+                    "id": false
+                }));
+            }else if(type == "Bi." || type == "Uni."){
+                sessionPart["exoList"].push(generateExoObj({
+                    "type" : type,
+                    "name" : name,
+                    "setNb" : set,
+                    "reps" : parseInt($(exercise).find('.session_next_exercise_reps').first().text()),
+                    "weight" : parseFloat($(exercise).find('.session_next_exercise_weight').first().text()),
+                    "rest" : get_time_u($(exercise).find('.session_next_exercise_rest').first().text()),
+                    "hint" : false,
+                    "id" : false
+                }));
             }else if(type == "Pause"){
-                sessionPart[2].push([
-                    type,
-                    get_time_u($(exercise).find('.session_next_exercise_rest').first().text())
-                ]);
+                sessionPart["exoList"].push(generateExoObj({
+                    "type" : type,
+                    "rest" : get_time_u($(exercise).find('.session_next_exercise_rest').first().text()),
+                    "id" : false
+                }));
             };
         };
 
-        let remaining_time = get_session_time(sessionPart, true);
-        let [workedTime, weightLifted, repsDone] = get_session_stats(sessionPart);
+        let remainingTime = get_session_time(sessionPart, true);
+        let remainingStats = get_session_stats(sessionPart);
 
-        $('.session_remaining_TimeSpent').text(get_time_u(Math.round(remaining_time)));
-        $('.session_remaining_WorkedTime').text(get_time_u(Math.round(workedTime)));
+        $('.session_remaining_TimeSpent').text(get_time_u(Math.round(remainingTime)));
+        $('.session_remaining_WorkedTime').text(get_time_u(Math.round(remainingStats["workedTime"])));
         $('.session_remaining_SetsDone').text(remaining_sets);
-        $('.session_remaining_RepsDone').text(repsDone);
-        $('.session_remaining_WeightLifted').text(weightLifted+weightUnit);
+        $('.session_remaining_RepsDone').text(remainingStats["repsDone"]);
+        $('.session_remaining_WeightLifted').text(remainingStats["weightLifted"]+parameters["weightUnit"]);
         
         showBlurPage('session_remaining_page');
     });

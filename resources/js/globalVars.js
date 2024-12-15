@@ -11,10 +11,28 @@ const green = "#1DBC60"; const orange = "#E67E22"; const red = "#E74C3C"; const 
 const mid_green = "#4AC980"; const mid_orange = "#EB984E"; const mid_red = "#EC7063"; const mid_yellow = "#FFE167"; const mid_blue = "#6c97c2"; const mid_dark_blue = "#29293F";
 const light_orange = "#f2bc8c"; const light_green = "#65e79b"; const light_red = "#f3a49b"; const light_blue = "#a0bdd9"; const light_yellow = "#ffeb9a"; const light_dark_blue = "#3B3B5B";
 
+const colorList = [
+    "rgb(76, 175, 80)",   // Green 500
+    "rgb(129, 199, 132)", // Green 300
+    "rgb(200, 230, 201)", // Green 100
+    "rgb(33, 150, 243)",  // Blue 500
+    "rgb(100, 181, 246)", // Blue 300
+    "rgb(187, 222, 251)", // Blue 100
+    "rgb(156, 39, 176)",  // Purple 500
+    "rgb(186, 104, 200)", // Purple 300
+    "rgb(225, 190, 231)", // Purple 100
+    "rgb(244, 67, 54)",   // Red 500
+    "rgb(229, 115, 115)", // Red 300
+    "rgb(239, 154, 154)", // Red 100
+    "rgb(0, 150, 136)",   // Teal 500
+    "rgb(77, 182, 172)",  // Teal 300
+    "rgb(178, 223, 219)"  // Teal 100
+];
+
 const dayofweek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthofyear = ["Jan","Feb","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"];
 const dayofweek_conventional = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-const timeUnit = 1000;
+const timeUnit = 100;
 const repTime = 2.1;
 
 const textAssets = {
@@ -140,6 +158,9 @@ const textAssets = {
             "emptyHistory": "Pas encore d'historique",
             "disabledHistory": "L'historique est désactivé",
             "today": "Aujourd'hui",
+            "pickColor": "Choisir une couleur",
+            "pickDate": "Choisir une date",
+
             "temporalityChoices": {
                 "day": "Jour",
                 "week": "Semaine"
@@ -234,7 +255,8 @@ const textAssets = {
                 "greatherHours": "Heure ne peut pas être supérieur à 23",
                 "greaterMinutes": "Minute ne peut pas être supérieur à 59",
                 "timePassed": "Le temps est déjà passé",
-                "notScheduled": "Cette séance n'est pas encore programmée"
+                "notScheduled": "Cette séance n'est pas encore programmée",
+                "tooEarly" : "L'avance de notification ne permet pas de programmer si tôt"
             },
             "parameters": {
                 "notifTime": "Avance doit être temporelle",
@@ -406,7 +428,7 @@ const textAssets = {
             "preferences": "Preferences",
             "language": "Language",
             "weightUnit": "Weight unit",
-            "notifBefore": "Notif before",
+            "notifBefore": "Forewarning",
             "keepHistory": "Keep history",
             "forEver" : "Forever",
             "sDays" : "7 Days",
@@ -474,6 +496,9 @@ const textAssets = {
             "emptyHistory": "No history yet",
             "disabledHistory": "History is disabled",
             "today": "Today",
+            "pickColor": "Select a color",
+            "pickDate": "Choose a date",
+
             "temporalityChoices": {
                 "day": "Day",
                 "week": "Week"
@@ -568,7 +593,8 @@ const textAssets = {
                 "greatherHours": "Hours cannot be greater than 23",
                 "greaterMinutes": "Minutes cannot be greater than 59",
                 "timePassed": "Time has already passed",
-                "notScheduled": "This session is not scheduled yet"
+                "notScheduled": "This session is not scheduled yet",
+                "tooEarly" : "The forewarning does not allow scheduling this early"
             },
             "parameters": {
                 "notifTime": "Notif must be time",
@@ -732,4 +758,10 @@ $(document).ready(function(){
     exchangeIMG = $('#linkIMG').attr('src');
 
     $("img").attr("draggable", false);
+
+    $.each(colorList, function(index, colorValue){
+        $(".update_colorChooser_body").append(
+            $('&lt;div class="update_colorDot"&gt;&lt;/div&gt;').css("background-color", colorValue)
+        );
+    });
 });//readyEnd

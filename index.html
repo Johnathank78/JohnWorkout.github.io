@@ -470,6 +470,20 @@
                 </div>
             </div>
 
+            <!-- UPDATE -->
+
+            <div class="update_colorChooserUI noselect">
+                <div class="update_colorChooser_header">
+                    <span class="update_colorPicker_span">Select a color</span>
+                </div>
+                <div class="update_colorChooser_body">
+                </div>
+            </div>
+
+            <div class="update_datePicker noselect">
+
+            </div>
+
             <!-- SESSION -->
             
             <div class="session_exit_confirm noselect">
@@ -660,6 +674,8 @@
                                 <div class="calendarGoBack calendarGo noselect">Back</div>
                                 <div class="calendarGoForward calendarGo noselect">Forward</div>
                             </div>
+
+                            <div class="calendarPickerSubmit">Submit</div>
         
                             <div class="selection_page_calendar_btnConainer">
                                 <div class="selection_page_calendar_parameters noselect"><img src="./resources/imgs/parameters.svg" draggable="false" class="selection_calendar_parameters_icon"></div>
@@ -673,7 +689,7 @@
                             <div class="selection_parameters_item noselect">
                                 <span class="selection_parameters_text">Language</span>
     
-                                <select name="" id="" class="selection_parameters_select selection_parameters_language">
+                                <select name="" id="" parameter="language" class="selection_parameters_select selection_parameters_language">
                                     <option class="selection_parameters_opt" value="english" selected>English</option>
                                     <option class="selection_parameters_opt" value="french">Français</option>
                                 </select>
@@ -681,7 +697,7 @@
     
                             <div class="selection_parameters_item noselect">
                                 <span class="selection_parameters_text">Weight Unit</span>
-                                <select name="" id="" class="selection_parameters_select selection_parameters_weightunit">
+                                <select name="" id="" parameter="weightUnit" class="selection_parameters_select selection_parameters_weightunit">
                                     <option class="selection_parameters_opt" value="kg" selected>kg</option>  
                                     <option class="selection_parameters_opt" value="lbs">lbs</option>
                                 </select>
@@ -689,13 +705,13 @@
     
                             <div class="selection_parameters_item">
                                 <span class="selection_parameters_text noselect">Notif Before</span>
-                                <input type="text" value="0s" readonly="readonly" class="timeString selection_parameters_input selection_parameters_notifbefore">
+                                <input parameter="notifBefore" type="text" value="0s" readonly="readonly" class="timeString selection_parameters_input selection_parameters_notifbefore">
                             </div>
     
                             <div class="selection_parameters_item noselect">
                                 <span class="selection_parameters_text">Keep History</span>
     
-                                <select name="" id="" class="selection_parameters_select selection_parameters_deleteafter">
+                                <select name="" id="" parameter="deleteAfter" class="selection_parameters_select selection_parameters_deleteafter">
                                     <option class="selection_parameters_opt" value="For ever" selected>For ever</option>
                                     <option class="selection_parameters_opt" value="7 Days">7 Days</option>
                                     <option class="selection_parameters_opt" value="1 Month">1 Month</option>
@@ -707,12 +723,12 @@
     
                             <div class="selection_parameters_item noselect">
                                 <span class="selection_parameters_text">Keep awake</span>
-                                <div class="toggle parameters_toggle selection_parameters_keepawake" state="false" moveState="true"><div class="toggle_dot"></div></div>
+                                <div parameter="keepAwake" class="toggle parameters_toggle selection_parameters_keepawake" state="false" moveState="true"><div class="toggle_dot"></div></div>
                             </div>
     
                             <div class="selection_parameters_item noselect">
                                 <span class="selection_parameters_text">Auto saver</span>
-                                <div class="toggle parameters_toggle selection_parameters_autosaver" state="false" moveState="true"><div class="toggle_dot"></div></div>
+                                <div parameter="autoSaver" class="toggle parameters_toggle selection_parameters_autosaver" state="false" moveState="true"><div class="toggle_dot"></div></div>
                             </div>
     
                             <div class="selection_parameters_saveLoad_container noselect">
@@ -772,6 +788,7 @@
                     <div class="update_tile_header_left">
                         <span class="update_name_info noselect">Name</span>
                         <input value="" type="text" class="update_name_tile update_data_name">
+                        <div class="update_colorDot update_colorChooser" style="display: none;"></div>
                         <span class="update_history_count noselect">20</span>
                         <div class="toggle history_toggle noselect" state="false" moveState="true"><div class="toggle_dot"></div></div>
                     </div>
@@ -796,15 +813,7 @@
                     <div class="update_schedule_fline">
                         <div class="update_schedule_fline_fblock">
                             <span class="update_schedule_span noselect">On</span>
-                            <select name="" id="" class="update_schedule_select update_schedule_select_day">
-                                <option class="update_schedule_opt" value="Monday">Monday</option>  
-                                <option class="update_schedule_opt" value="Tuesday">Tuesday</option>  
-                                <option class="update_schedule_opt" value="Wednesday">Wednesday</option>  
-                                <option class="update_schedule_opt" value="Thursday">Thursday</option>  
-                                <option class="update_schedule_opt" value="Friday">Friday</option>  
-                                <option class="update_schedule_opt" value="Saturday">Saturday</option>  
-                                <option class="update_schedule_opt" value="Sunday">Sunday</option>  
-                            </select>
+                            <span name="" id="" class="update_schedule_select update_schedule_datePicker">Choose a date</span>
                         </div>
                             
                         <div class="update_schedule_fline_sblock">

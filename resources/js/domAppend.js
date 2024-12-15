@@ -1,10 +1,10 @@
-function reminder_tile(data){
+function reminder_tile(reminder){
 
     let schedule_color = false;
-    if(isScheduled(data)){schedule_color = "#1dbc60"}else{schedule_color = "#363949"};
+    if(isScheduled(reminder)){schedule_color = "#1dbc60"}else{schedule_color = "#363949"};
 
     return `<div class="selection_reminder_tile reorder__child noselect grab" style="z-index: 0;">
-                <span class="selection_reminder_name noselect">`+data[1]+`</span>
+                <span class="selection_reminder_name noselect">`+reminder["name"]+`</span>
                 <div class="selection_session_button_container">
                     <button class="reorder__avoid selection_round_btn selection_bin_btn">
                         <img src="`+binIMG+`" draggable="False" alt="" class="selection_icon_btn noselect">
@@ -14,23 +14,23 @@ function reminder_tile(data){
                         <img src="`+editIMG+`" draggable="False" alt="" class="selection_icon_btn noselect">
                     </button>
 
-                    <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule selection_reminder_btn reorder__avoid" style="background-color:`+schedule_color+`;">`+textAssets[language]["sessionItem"]["schedule"]+`</span>
+                    <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule selection_reminder_btn reorder__avoid" style="background-color:`+schedule_color+`;">`+textAssets[parameters["language"]]["sessionItem"]["schedule"]+`</span>
                 </div>
             </div>`;
 };
 
-function session_tile(data){
+function session_tile(session){
     
-    let time = get_session_time(data)
+    let time = get_session_time(session)
     let schedule_color = false;
 
-    if(isScheduled(data)){schedule_color = "#1dbc60"}else{schedule_color = "#363949"};
+    if(isScheduled(session)){schedule_color = "#1dbc60"}else{schedule_color = "#363949"};
 
     return `<div class="selection_session_tile reorder__child noselect">
-                <span class="selection_session_name noselect">`+data[1]+`</span>
+                <span class="selection_session_name noselect">`+session["name"]+`</span>
                 <div class="selection_session_details_container">
                     <span class="selection_session_details selection_session_totaltime noselect">`+get_time(time)+`</span>
-                    <span class="selection_session_details selection_session_cycle noselect">`+get_session_exoCount(data)+` Exercises</span>
+                    <span class="selection_session_details selection_session_cycle noselect">`+get_session_exoCount(session)+` Exercises</span>
                     <span class="selection_session_details selection_session_work noselect"></span>
                     <span class="selection_session_details selection_session_rest noselect"></span>
                 </div>
@@ -57,8 +57,8 @@ function session_tile(data){
                     </div>
 
                     <div class="selection_session_tile_extra">
-                        <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule" style=background-color:`+schedule_color+`;>`+textAssets[language]["sessionItem"]["schedule"]+`</span>
-                        <span class="selection_session_tile_extra_element selection_session_tile_extra_history">`+textAssets[language]["sessionItem"]["history"]+`</span>
+                        <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule" style=background-color:`+schedule_color+`;>`+textAssets[parameters["language"]]["sessionItem"]["schedule"]+`</span>
+                        <span class="selection_session_tile_extra_element selection_session_tile_extra_history">`+textAssets[parameters["language"]]["sessionItem"]["history"]+`</span>
                     </div>
                 </div>
             </div>`;
@@ -66,46 +66,48 @@ function session_tile(data){
 
 function Iintervall_tile(data = false){
     if(data){
+        let hint = data['hint'] ? data['hint'] : "";
+
         return `
-            <div class="update_workout_item noselect reorder__child">
+            <div class="update_workout_item noselect reorder__child" id="`+data["id"]+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
                         <select name="type" class="update_workout_data_type update_workout_data" disabled>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`" selected>`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`" selected>`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`</option>
                         </select>
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["type"]+`</span>
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["type"]+`</span>
                     </div>
 
                     <div class="update_workout_data_name_container">
-                        <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`" value="`+data[0]+`" class="update_workout_data update_workout_data_name">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`" value="`+data["name"]+`" class="update_workout_data update_workout_data_name">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`</span>
                     </div>
                 </div>
 
                 <div class="update_workout_item_second_line">
 
                     <div class="update_workout_intervall_data_container">
-                        <input type="tel" placeholder="`+textAssets[language]["updatePage"]["cycle"]+`" value="`+data[1]+`" class="strictlyNumeric update_workout_intervall_data update_workout_intervall_data_cycle">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["cycle"]+`</span>
+                        <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["cycle"]+`" value="`+data["cycle"]+`" class="strictlyNumeric update_workout_intervall_data update_workout_intervall_data_cycle">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["cycle"]+`</span>
                     </div>
 
                     <div class="update_workout_intervall_data_container">
-                        <input placeholder="`+textAssets[language]["updatePage"]["work"]+`" value="`+data[2]+`" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_work">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["work"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["work"]+`" value="`+data["work"]+`" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_work">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["work"]+`</span>
                     </div>
 
                     <div class="update_workout_intervall_data_container">
-                        <input placeholder="`+textAssets[language]["updatePage"]["rest"]+`" value="`+data[3]+`" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_rest">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["rest"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["rest"]+`" value="`+data["rest"]+`" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_rest">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["rest"]+`</span>
                     </div>
                 </div>
 
                 <span class="update_workout_data_lablel update_workout_hint_lablel">Hint</span>
-                <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["hint"]+`">`+data[4]+`</textarea>
+                <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["hint"]+`">`+hint+`</textarea>
 
                 <div class="update_workout_expandRowContainer reorder__avoid"><img src="`+arrowIMG+`" class="update_workout_expandRow" alt=""></div>
 
@@ -114,44 +116,44 @@ function Iintervall_tile(data = false){
         `;
     }else{
         return `
-            <div class="update_workout_item noselect reorder__child">
+            <div class="update_workout_item noselect reorder__child" id="`+smallestAvailableExoId()+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
                         <select name="type" class="update_workout_data_type update_workout_data" disabled>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`" selected>`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`" selected>`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`</option>
                         </select>
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["type"]+`</span>
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["type"]+`</span>
                     </div>
                     <div class="update_workout_data_name_container">
-                        <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`" value="" class="update_workout_data update_workout_data_name">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`" value="" class="update_workout_data update_workout_data_name">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`</span>
                     </div>
                 </div>
 
                 <div class="update_workout_item_second_line">
 
                     <div class="update_workout_intervall_data_container">
-                        <input type="tel" placeholder="`+textAssets[language]["updatePage"]["cycle"]+`" value="" class="strictlyNumeric update_workout_intervall_data update_workout_intervall_data_cycle">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["cycle"]+`</span>
+                        <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["cycle"]+`" value="" class="strictlyNumeric update_workout_intervall_data update_workout_intervall_data_cycle">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["cycle"]+`</span>
                     </div>
 
                     <div class="update_workout_intervall_data_container">
-                        <input placeholder="`+textAssets[language]["updatePage"]["work"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_work">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["work"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["work"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_work">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["work"]+`</span>
                     </div>
 
                     <div class="update_workout_intervall_data_container">
-                        <input placeholder="`+textAssets[language]["updatePage"]["rest"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_rest">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["rest"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["rest"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_rest">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["rest"]+`</span>
                     </div>
                 </div>
 
                 <span class="update_workout_data_lablel update_workout_hint_lablel">Hint</span>
-                <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["hint"]+`"></textarea>
+                <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["hint"]+`"></textarea>
 
                 <div class="update_workout_expandRowContainer reorder__avoid"><img src="`+arrowIMG+`" class="update_workout_expandRow" alt=""></div>
 
@@ -163,28 +165,32 @@ function Iintervall_tile(data = false){
 
 function exercise_tile(data = false){
     if(data){
-        if(data[0] == "Int."){
+        let hint = data['hint'] ? data['hint'] : "";
+
+        if(data["type"] == "Int."){
+            let name = data["linkId"] ? session_list[getSessionIndexByID(data["linkId"])]["name"] : data["name"];
+
             let element = $(`
-            <div class="update_workout_item noselect reorder__child" id="`+data.getId()+`">
+            <div class="update_workout_item noselect reorder__child" id="`+data['id']+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
                         <select name="type" class="update_workout_data_type update_workout_data">
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`" selected>`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`" selected>`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`</option>
                         </select>
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["type"]+`</span>
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["type"]+`</span>
                     </div>
 
                     <div class="update_workout_data_name_container" style="display: none">
-                        <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`" value="" class="update_workout_data update_workout_data_name">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`" value="" class="update_workout_data update_workout_data_name">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`</span>
                     </div>
 
                     <div class="update_workout_intervallEdit_container reorder__avoid noselect">
-                        <span class="update_workout_intervallName">`+data[1]+`</span>
+                        <span class="update_workout_intervallName">`+name+`</span>
                         <img src="`+editIMG+`" alt="edit" class="update_workout_intervallIMG">
                     </div>
                 </div>
@@ -192,28 +198,28 @@ function exercise_tile(data = false){
                 <div class="update_workout_item_second_line" style="display: none;">
 
                     <div class="update_workout_data_container" style="display: none;">
-                        <input type="tel" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["sets"]+`" value="" class="strictlyNumeric update_workout_data update_workout_data_sets">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["sets"]+`</span>
+                        <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["sets"]+`" value="" class="strictlyNumeric update_workout_data update_workout_data_sets">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["sets"]+`</span>
                     </div>
 
                     <div class="update_workout_data_container" style="display: none;">
-                        <input type="tel" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["reps"]+`" value="" class="strictlyNumeric update_workout_data update_workout_data_reps">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["reps"]+`</span>
+                        <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["reps"]+`" value="" class="strictlyNumeric update_workout_data update_workout_data_reps">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["reps"]+`</span>
                     </div>
 
                     <div class="update_workout_data_container" style="display: none;">
-                        <input type="tel" placeholder="`+weightUnit+`" value="" class="strictlyFloatable update_workout_data update_workout_data_weight">
-                        <span class="update_workout_data_lablel">`+weightUnit+`</span>
+                        <input type="tel" placeholder="`+parameters["weightUnit"]+`" value="" class="strictlyFloatable update_workout_data update_workout_data_weight">
+                        <span class="update_workout_data_lablel">`+parameters["weightUnit"]+`</span>
                     </div>
 
                     <div class="update_workout_data_container" style="display: none;">
-                        <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["rest"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_resttime">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["rest"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["rest"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_resttime">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["rest"]+`</span>
                     </div>
                 </div>
 
                 <span class="update_workout_data_lablel update_workout_hint_lablel">Hint</span>
-                <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["hint"]+`">`+data[2]+`</textarea>
+                <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["hint"]+`">`+hint+`</textarea>
 
                 <div class="update_workout_expandRowContainer reorder__avoid"><img src="`+arrowIMG+`" class="update_workout_expandRow" alt=""></div>
 
@@ -223,22 +229,27 @@ function exercise_tile(data = false){
 
             return element;
         }else{
+            let sets = data["setNb"] ? data["setNb"] : 0;
+            let reps = data["reps"] ? data["reps"] : 0;
+            let weight = data["weight"] ? data["weight"] : 0;
+            let rest = data["rest"] ? data["rest"] : 0;
+            
             let element = $(`
-            <div class="update_workout_item noselect reorder__child" id="`+data.getId()+`">
+            <div class="update_workout_item noselect reorder__child" id="`+data['id']+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
                         <select name="type" class="update_workout_data_type update_workout_data">
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
-                            <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
+                            <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`</option>
                         </select>
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["type"]+`</span>
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["type"]+`</span>
                     </div>
                     <div class="update_workout_data_name_container">
-                        <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`" value="`+data[1]+`" class="update_workout_data update_workout_data_name">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`" value="`+data["name"]+`" class="update_workout_data update_workout_data_name">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`</span>
                     </div>
                     <div class="update_workout_intervallEdit_container reorder__avoid noselect" style="display: none;">
                         <span class="update_workout_intervallName">`+"Empty"+`</span>
@@ -249,28 +260,28 @@ function exercise_tile(data = false){
                 <div class="update_workout_item_second_line">
 
                     <div class="update_workout_data_container">
-                        <input type="tel" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["sets"]+`" value="`+data[2]+`" class="strictlyNumeric update_workout_data update_workout_data_sets">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["sets"]+`</span>
+                        <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["sets"]+`" value="`+sets+`" class="strictlyNumeric update_workout_data update_workout_data_sets">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["sets"]+`</span>
                     </div>
 
                     <div class="update_workout_data_container">
-                        <input type="tel" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["reps"]+`" value="`+data[3]+`" class="strictlyNumeric update_workout_data update_workout_data_reps">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["reps"]+`</span>
+                        <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["reps"]+`" value="`+reps+`" class="strictlyNumeric update_workout_data update_workout_data_reps">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["reps"]+`</span>
                     </div>
 
                     <div class="update_workout_data_container">
-                        <input type="tel" placeholder="`+weightUnit+`" value="`+unitRound(data[4])+`" class="strictlyFloatable update_workout_data update_workout_data_weight">
-                        <span class="update_workout_data_lablel">`+weightUnit+`</span>
+                        <input type="tel" placeholder="`+parameters["weightUnit"]+`" value="`+unitRound(weight)+`" class="strictlyFloatable update_workout_data update_workout_data_weight">
+                        <span class="update_workout_data_lablel">`+parameters["weightUnit"]+`</span>
                     </div>
 
                     <div class="update_workout_data_container">
-                        <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["rest"]+`" value="`+data[5]+`" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_resttime">
-                        <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["rest"]+`</span>
+                        <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["rest"]+`" value="`+rest+`" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_resttime">
+                        <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["rest"]+`</span>
                     </div>
                 </div>
 
                 <span class="update_workout_data_lablel update_workout_hint_lablel">Hint</span>
-                <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["hint"]+`">`+data[6]+`</textarea>
+                <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["hint"]+`">`+hint+`</textarea>
 
                 <div class="update_workout_expandRowContainer reorder__avoid"><img src="`+arrowIMG+`" class="update_workout_expandRow" alt=""></div>
 
@@ -278,7 +289,7 @@ function exercise_tile(data = false){
             </div>
             `);
                 
-            $(element).find('select[name=type]').find('option[value='+textAssets[language]["updatePage"]["exerciseTypes"][data[0]]+']').prop("selected", true)
+            $(element).find('select[name=type]').find('option[value='+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"][data["type"]]+']').prop("selected", true)
             return element
         };
     }else{
@@ -288,17 +299,17 @@ function exercise_tile(data = false){
             <div class="update_workout_item_first_line">
                 <div class="update_workout_data_type_container reorder__avoid">
                     <select name="type" class="update_workout_data_type update_workout_data">
-                        <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
-                        <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`" selected>`+textAssets[language]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
-                        <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
-                        <option value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`">`+textAssets[language]["updatePage"]["exerciseTypes"]["Int."]+`</option>
+                        <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]+`</option>
+                        <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`" selected>`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]+`</option>
+                        <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]+`</option>
+                        <option value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`">`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]+`</option>
                     </select>
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["type"]+`</span>
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["type"]+`</span>
                 </div>
 
                 <div class="update_workout_data_name_container">
-                    <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`" value="" class="update_workout_data update_workout_data_name">
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["name"]+`</span>
+                    <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`" value="" class="update_workout_data update_workout_data_name">
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["name"]+`</span>
                 </div>
 
                 <div class="update_workout_intervallEdit_container reorder__avoid noselect" style="display: none;">
@@ -310,44 +321,44 @@ function exercise_tile(data = false){
             <div class="update_workout_item_second_line">
 
                 <div class="update_workout_data_container">
-                    <input type="tel" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["sets"]+`" value="" class="strictlyNumeric update_workout_data update_workout_data_sets">
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["sets"]+`</span>
+                    <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["sets"]+`" value="" class="strictlyNumeric update_workout_data update_workout_data_sets">
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["sets"]+`</span>
                 </div>
 
                 <div class="update_workout_data_container">
-                    <input type="tel" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["reps"]+`" value="" class="strictlyNumeric update_workout_data update_workout_data_reps">
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["reps"]+`</span>
+                    <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["reps"]+`" value="" class="strictlyNumeric update_workout_data update_workout_data_reps">
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["reps"]+`</span>
                 </div>
 
                 <div class="update_workout_data_container">
-                    <input type="tel" placeholder="`+weightUnit+`" value="" class="strictlyFloatable update_workout_data update_workout_data_weight">
-                    <span class="update_workout_data_lablel">`+weightUnit+`</span>
+                    <input type="tel" placeholder="`+parameters["weightUnit"]+`" value="" class="strictlyFloatable update_workout_data update_workout_data_weight">
+                    <span class="update_workout_data_lablel">`+parameters["weightUnit"]+`</span>
                 </div>
 
                 <div class="update_workout_data_container">
-                    <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["rest"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_resttime">
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["rest"]+`</span>
+                    <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["rest"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_resttime">
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["rest"]+`</span>
                 </div>
 
 
                 <div class="update_workout_intervall_data_container" style="display: none;">
-                    <input type="tel" placeholder="`+textAssets[language]["updatePage"]["cycle"]+`" value="" class="strictlyNumeric update_workout_intervall_data update_workout_intervall_data_cycle">
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["cycle"]+`</span>
+                    <input type="tel" placeholder="`+textAssets[parameters["language"]]["updatePage"]["cycle"]+`" value="" class="strictlyNumeric update_workout_intervall_data update_workout_intervall_data_cycle">
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["cycle"]+`</span>
                 </div>
 
                 <div class="update_workout_intervall_data_container" style="display: none;">
-                    <input placeholder="`+textAssets[language]["updatePage"]["work"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_work">
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["work"]+`</span>
+                    <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["work"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_work">
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["work"]+`</span>
                 </div>
 
                 <div class="update_workout_intervall_data_container" style="display: none;">
-                    <input placeholder="`+textAssets[language]["updatePage"]["rest"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_rest">
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["rest"]+`</span>
+                    <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["rest"]+`" value="" readonly="readonly" class="timeString reorder__avoid update_workout_intervall_data update_workout_intervall_data_rest">
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["rest"]+`</span>
                 </div>
             </div>
 
             <span class="update_workout_data_lablel update_workout_hint_lablel">Hint</span>
-            <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["hint"]+`"></textarea>
+            <textarea name="hint" class="udpate_workout_hint_txtarea" placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["hint"]+`"></textarea>
 
             <div class="update_workout_expandRowContainer reorder__avoid"><img src="`+arrowIMG+`" class="update_workout_expandRow" alt=""></div>
 
@@ -365,12 +376,12 @@ function pause_tile(data = false){
         <div class="update_exercise_pause_item noselect reorder__child">
             <div class="update_workout_pause_item_line">
                 <div class="update_workout_data_type_container update_workout_data_pause">
-                    <input type="text" class="update_workout_data_type update_workout_data" value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Pause"]+`" disabled>
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["type"]+`</span>
+                    <input type="text" class="update_workout_data_type update_workout_data" value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Pause"]+`" disabled>
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["type"]+`</span>
                 </div>
                 <div class="update_workout_data_container">
-                    <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["rest"]+`" value="`+data+`" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_pausetime"></input>
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["pause"]+`</span>
+                    <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["rest"]+`" value="`+data["rest"]+`" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_pausetime"></input>
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["pause"]+`</span>
                 </div>
             </div>
 
@@ -382,12 +393,12 @@ function pause_tile(data = false){
         <div class="update_exercise_pause_item noselect reorder__child">
             <div class="update_workout_pause_item_line">
                 <div class="update_workout_data_type_container update_workout_data_pause">
-                    <input type="text" class="update_workout_data_type update_workout_data" value="`+textAssets[language]["updatePage"]["exerciseTypes"]["Pause"]+`" disabled>
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["type"]+`</span>
+                    <input type="text" class="update_workout_data_type update_workout_data" value="`+textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Pause"]+`" disabled>
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["type"]+`</span>
                 </div>
                 <div class="update_workout_data_container">
-                    <input placeholder="`+textAssets[language]["updatePage"]["placeHolders"]["rest"]+`" value="2m" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_pausetime"></input>
-                    <span class="update_workout_data_lablel">`+textAssets[language]["updatePage"]["placeHolders"]["pause"]+`</span>
+                    <input placeholder="`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["rest"]+`" value="2m" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_pausetime"></input>
+                    <span class="update_workout_data_lablel">`+textAssets[parameters["language"]]["updatePage"]["placeHolders"]["pause"]+`</span>
                 </div>
             </div>
 
@@ -470,81 +481,77 @@ function historyDay(i, history){
 
     let out = [[],[]];
 
-    day = history[i];
-    date = formatDate(day[0]);
-    time = get_time_u(timeFormat(parseInt(day[1])));
+    day = history["historyList"][i];
+    date = formatDate(day["date"]);
+    time = get_time_u(timeFormat(parseInt(day["duration"])));
 
     if(date == formatDate(Date.now())){
-        out[0].push(fillElem("day", [textAssets[language]['updatePage']['today'], time]));
+        out[0].push(fillElem("day", [textAssets[parameters["language"]]['updatePage']['today'], time]));
     }else{
         out[0].push(fillElem("day", [date, time]));
     };
 
-    if(session_list[update_current_index][0] == "W"){
-        for(let z=0; z<day[2].length;z++){
-            exo = day[2][z].slice(0, -1); // GET RID OF ID
+    if(session_list[update_current_index]["type"] == "W"){
+        for(let z=0; z<day["exoList"].length;z++){
+            exo = day["exoList"][z]
             
-            if(exo.length == 2){ // INT
-                for(let y=0; y< exo[1].length;y++){
-                    subExo = exo[1][y];
+            if(exo['type'] == "Int."){ // INT
+                for(let y=0; y< exo["exoList"].length;y++){
+                    subExo = exo["exoList"][y];
     
-                    if(subExo.length == 3){
-                        sets = subExo[2].filter(data => data.length > 0 && data[0] != "X").length;
-                        expectedSets = parseInt(subExo[1][0]);
-            
-                        out[1].push([fillElem('exo', [subExo[0], sets, '/'+expectedSets]), fillElem("note", "No")]);
-                        
-                        for(let x=0;x<subExo[2].length;x++){
-                            set = subExo[2][x];
+                    sets = subExo["setList"].filter(data => data["work"] != "X").length;
+                    expectedSets = subExo["expectedStats"]["cycle"];
         
-                            expectedWork = subExo[1][1];
-                            expectedRest = subExo[1][2];
-                
-                            if(set[0] != "X" && sets > 0){
-                                out[1][out[1].length - 1].push(fillElem("intSet", [set[0], '/'+expectedWork, set[1], '/'+expectedRest], set[1] == "X" ? true : false));
-                            };
+                    out[1].push([fillElem('exo', [subExo["name"], sets, '/'+expectedSets]), fillElem("note", "No")]);
+                    
+                    for(let x=0;x<subExo["setList"].length;x++){
+                        set = subExo["setList"][x];
+    
+                        expectedWork = subExo["expectedStats"]["work"];
+                        expectedRest = subExo["expectedStats"]["rest"];
+            
+                        if(set["work"] != "X" && sets > 0){
+                            out[1][out[1].length - 1].push(fillElem("intSet", [set["work"], '/'+expectedWork, set["rest"], '/'+expectedRest], set["rest"] == "X" ? true : false));
                         };
                     };
                 };
-            }else if(exo.length == 3){ // OTHER
-                sets = exo[2].length;
-                expectedSets = parseInt(exo[1][0]);
-                formatedName = exo[0].replace(" - L", " - " + textAssets[language]["misc"]["leftInitial"]).replace(" - R", " - " + textAssets[language]["misc"]["rightInitial"]);
+            }else if(exo['type'] == "Bi." || exo['type'] == "Uni."){ // OTHER
+                sets = exo["setList"].length;
+                expectedSets = parseInt(exo["expectedStats"]["setNb"]);
+                formatedName = exo["name"].replace(" - L", " - " + textAssets[parameters["language"]]["misc"]["leftInitial"]).replace(" - R", " - " + textAssets[parameters["language"]]["misc"]["rightInitial"]);
     
-                out[1].push([fillElem('exo', [formatedName, sets, '/'+expectedSets]), exo[3] ? fillElem("note", exo[3]) : fillElem("note", 'No')]);
+                out[1].push([fillElem('exo', [formatedName, sets, '/'+expectedSets]), exo["note"] ? fillElem("note", exo["note"]) : fillElem("note", 'No')]);
     
-                for(let y=0;y<exo[2].length;y++){
-                    set = exo[2][y];
+                for(let y=0;y<exo["setList"].length;y++){
+                    set = exo["setList"][y];
     
-                    expectedWeightUnit = exo[1][3];
-                    expectedReps = exo[1][1];
+                    expectedWeightUnit = exo["expectedStats"]["weightUnit"];
+                    expectedReps = exo["expectedStats"]["reps"];
         
-                    actualWeight = convertToUnit(set[1], expectedWeightUnit, weightUnit);
-                    expectedWeight = convertToUnit(exo[1][2], expectedWeightUnit, weightUnit);
+                    actualWeight = convertToUnit(set["weight"], expectedWeightUnit, parameters["weightUnit"]);
+                    expectedWeight = convertToUnit(exo["expectedStats"]["weight"], expectedWeightUnit, parameters["weightUnit"]);
         
-                    out[1][out[1].length - 1].push(fillElem('set', [set[0], '/'+expectedReps, unitRound(actualWeight), '/'+unitRound(expectedWeight), weightUnit]));
+                    out[1][out[1].length - 1].push(fillElem('set', [set["reps"], '/'+expectedReps, unitRound(actualWeight), '/'+unitRound(expectedWeight), parameters["weightUnit"]]));
                 };
             };
         };
-    }else if(session_list[update_current_index][0] == "I"){
-        for(let z=0; z<day[2].length;z++){
-            exo = day[2][z];
-
-            if(exo.length == 3){
-                sets = exo[2].filter(data => data.length > 0 && data[0] != "X").length;
-                expectedSets = parseInt(exo[1][0]);
+    }else if(session_list[update_current_index]["type"] == "I"){
+        for(let z=0; z<day["exoList"].length;z++){
+            exo = day["exoList"][z];
     
-                out[1].push([fillElem('exo', [exo[0], sets, '/'+expectedSets]), fillElem("note", "No")]);
-                
-                for(let x=0;x<exo[2].length;x++){
-                    set = exo[2][x];
+            sets = exo["setList"].filter(data => data["work"] != "X").length;
+            expectedSets = exo["expectedStats"]["cycle"];
 
-                    expectedWork = exo[1][1];
-                    expectedRest = exo[1][2];
-                    
-                    if(set[0] != "X"){
-                        out[1][out[1].length - 1].push(fillElem("intSet", [set[0], '/'+expectedWork, set[1], '/'+expectedRest], set[1] == "X" ? true : false));
-                    };
+            out[1].push([fillElem('exo', [exo["name"], sets, '/'+expectedSets]), fillElem("note", "No")]);
+
+            for(let x=0;x<exo["setList"].length;x++){
+                set = exo["setList"][x];
+
+                expectedWork = exo["expectedStats"]["work"];
+                expectedRest = exo["expectedStats"]["rest"];
+
+                if(set["work"] != "X" && sets > 0){
+                    out[1][out[1].length - 1].push(fillElem("intSet", [set["work"], '/'+expectedWork, set["rest"], '/'+expectedRest], set["rest"] == "X" ? true : false));
                 };
             };
         };

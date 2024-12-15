@@ -65,11 +65,12 @@ function closePanel(src, notAnimated=false){
             break;
 
         case "timeSelector":
+            if(isEditing){$(isEditing).blur(); isEditing = false; return};
             timeInputShown = false;
+
             $('.blurBG').css('display', 'none');
             timeSelectorUpdateTarget($(".timeSelectorSubmit").data("target"));
             break;
-
         case "session_cancel":
             current_page = "session";
             window.history.pushState("session", "");
@@ -121,7 +122,36 @@ function closePanel(src, notAnimated=false){
             $('.blurBG').css('display', 'none');
             deleteHistoryConfirmShown = false;
             break;
+        case "colorPicker":
+            $('.blurBG').css('display', 'none');
+            colorPickerShown = false;
+            break;
+        case "datePicker":
+            if(pastSelectedDates != getNodeData(datePicker, "selectedDates")){
+                setNodeData(datePicker, "selectedDates", pastSelectedDates);
+                setNodeData(datePicker, "selectedPage", pastSelectedPage);
+                setNodeData(datePicker, "selectedRow", pastSelectedRow);
+            };
 
+            $('.blurBG').css('display', 'none');
+            $(".calendarPickerSubmit").css('display', 'none');
+            
+            $('.selection_info_page').after($(".selection_page_calendar"));
+            $(".selection_page_calendar").children('.selection_page_calendar_btnConainer').css('display', 'flex');
+            $(".selection_page_calendar").css({
+                "display": 'none',
+                "position": 'absolute'
+            });
+
+            isDatePicking = false;
+            break;
+        case "xtraContainer":
+            isExtraOut = false;
+            $('.selection_session_tile_extra_container').animate({
+                right: "-230px",
+            }, 200);
+
+            break;
         default:
             console.warn(`Unknown src: ${src}`);
             break;
@@ -155,12 +185,7 @@ function unfocusDivs(e){
     };
 
     if(notTargeted(e.target, ".selection_session_tile_extra_container") && current_page == "selection" && isExtraOut){
-
-        isExtraOut = false;
-        $('.selection_session_tile_extra_container').animate({
-            right: "-230px",
-        }, 200);
-
+        closePanel('xtraContainer')
         canNowClick();
     };
 
@@ -194,8 +219,6 @@ function unfocusDivs(e){
     };
 
     if(notTargeted(e.target, ".selection_page_calendar, .main_title_block") && !previewShown  && calendarState){
-        calendarState = false;
-
         closePanel("calendar");
         canNowClick();
     };
@@ -208,7 +231,6 @@ function unfocusDivs(e){
     };
 
     if(notTargeted(e.target, '.timeSelectorBody') && timeInputShown){
-        if(isEditing){$(isEditing).blur(); isEditing = false; return};
         closePanel('timeSelector');
         canNowClick();
     };
@@ -245,6 +267,15 @@ function unfocusDivs(e){
 
     if(notTargeted(e.target, '.selection_dayPreview_focus') && focusShown){
         closePanel('focus');
+        canNowClick();
+    };
+
+    if(notTargeted(e.target, '.update_colorChooserUI') && colorPickerShown){
+        closePanel('colorPicker');
+    };
+    
+    if(notTargeted(e.target, '.selection_page_calendar') && isDatePicking){
+        closePanel('datePicker');
         canNowClick();
     };
 };

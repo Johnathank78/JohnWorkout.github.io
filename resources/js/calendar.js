@@ -1,9 +1,20 @@
 var updateCalendarPage = 1;
+var selectCalendarPage = 1;
+
 var calendarState = false;
 var calenderParamsState = false;
+
+var activePreviewItem = false;
 var previewShown = false;
 var actualRowDay = false;
+
 var focusShown = false;
+
+const datePicker = ".update_schedule_datePicker";
+
+var pastSelectedDates = [];
+var pastSelectedPage = 1;
+var pastSelectedRow = 0;
 
 function getAssociatedDate(dayIndex){
     return zeroAM(new Date($(".selection_page_calendar_row_day").eq(dayIndex).data('time')));
@@ -75,7 +86,7 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
         const today = zeroAM(new Date());
         const C_isPast = C.getTime() == today.getTime(); 
 
-        const isShifted = ID ? hasBeenShifted[1][ID] : true
+        const isShifted = ID ? hasBeenShifted["data"][ID] : true
 
         if(C_isEvent && correctSpacing && C_isPast && !isShifted){
             return true;
@@ -85,22 +96,19 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
     };
 };
 
-function updateCalendar(data){
+function generateBaseCalendar(page){
     let end = 20;
-
-    let min = 1800;
-    let alpha = 1;
-
     let dayz = $(".selection_page_calendar_row_day");
 
     $(dayz).css({opacity: "unset", backgroundColor: "#4C5368", outline: "unset", outlineOffset: "unset"});
-
     let today = dayofweek_conventional.indexOf(dayofweek[new Date().getDay()]);
-    let todaysDate = zeroAM(new Date());
 
-    $(dayz).each(function(i){$(dayz).eq(i).data("sList", [])});
+    $(dayz).each(function(i){
+        $(dayz).eq(i).data("sList", []);
+        $(dayz).eq(i).data("alpha", 0);
+    });
 
-    if(updateCalendarPage == 1){
+    if(page == 1){
         $($(dayz)[today]).css({
             outline: "white 2px solid",
             outlineOffset: "2px"
@@ -121,10 +129,10 @@ function updateCalendar(data){
     let tempDate = zeroAM(new Date());
     let dateSub = dayofweek_conventional.indexOf(dayofweek[tempDate.getDay()]);
     
-    tempDate.setDate(tempDate.getDate() + (updateCalendarPage - 1) * 21 - dateSub);
+    tempDate.setDate(tempDate.getDate() + (page - 1) * 21 - dateSub);
     $(dayz).first().text(tempDate.getDate());
 
-    if(today > 0 && updateCalendarPage == 1){
+    if(today > 0 && page == 1){
         $(dayz).first().data("time", false);
     }else{
         $(dayz).first().data('time', tempDate.getTime());
@@ -134,140 +142,152 @@ function updateCalendar(data){
         tempDate.setDate(tempDate.getDate() + 1);
 
         if(i == 1){
-            $(".selection_page_calendar_header_M").first().text(textAssets[language]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]]);
+            $(".selection_page_calendar_header_M").first().text(textAssets[parameters["language"]]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]]);
             $(".selection_page_calendar_header_Y").text(tempDate.getFullYear());
         };
 
-        if(i == end){$(".selection_page_calendar_header_M").last().text(textAssets[language]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]])};
+        if(i == end){$(".selection_page_calendar_header_M").last().text(textAssets[parameters["language"]]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]])};
 
         $(dayz).eq(i).text(tempDate.getDate());
 
-        if(i >= today || updateCalendarPage != 1){
+        if(i >= today || page != 1){
             $(dayz).eq(i).data('time', tempDate.getTime());
         }else{
             $(dayz).eq(i).data("time", false);
         }
     };
+};
 
-    //-------------;
+function updateCalendar(data, page){
+    let end = 20;
+    let min = 1800;
+
+    let today = dayofweek_conventional.indexOf(dayofweek[new Date().getDay()]);
+    let todaysDate = zeroAM(new Date());
+
+    let dayz = $(".selection_page_calendar_row_day");
+
+    generateBaseCalendar(page);
 
     for(let i=0; i<data.length; i++){
-        if(isScheduled(data[i])){
-            let id = data[i].getId();
-            let schedule = data[i][data[i].length - 2];
-            let isAjump = schedule[3]['jumpTimestamp'] !== null;
-            let jumpData = isAjump ? schedule[3] : false;
-            let scheduleOccurence = schedule[4];
+        let notif = isScheduled(data[i])
+        
+        if(notif){
+            let id = data[i]["id"];
+            let jumpData = notif["jumpData"];
+            let scheduleOccurence = notif["occurence"];
 
-            if(schedule[1][0] == "Day"){
-                let scheduleDate = zeroAM(new Date(schedule[2][1]));
+            if(getScheduleScheme(data[i]) == "Day"){
+                let scheduleDate = zeroAM(new Date(notif["dateList"][0]));
                 
-                let pageOffset = ((end + 1) * (updateCalendarPage - 1));
+                let pageOffset = ((end + 1) * (page - 1));
                 let nbdayz = pageOffset == 0 ? today : pageOffset;
 
                 while(nbdayz <= end + pageOffset){
                     let dayInd = nbdayz - pageOffset;
                     let associatedDate = getAssociatedDate(dayInd);
 
-                    if(!isEventScheduled(associatedDate, scheduleDate, schedule[1][1], schedule[1][0], jumpData['jumpVal'], jumpData['jumpType'], jumpData['everyVal'], scheduleOccurence, id)){
+                    if(!isEventScheduled(
+                        associatedDate, 
+                        scheduleDate, 
+                        notif["scheduleData"]["count"], 
+                        notif["scheduleData"]["scheme"], 
+                        jumpData['jumpVal'], 
+                        jumpData['jumpType'], 
+                        jumpData['everyVal'], 
+                        scheduleOccurence, 
+                        id
+                    )){
                         nbdayz += 1; 
                         continue;
                     };
 
-                    let match = findChanged(associatedDate.getTime(), ["from", data[i].getId()])["element"];
+                    let match = findChanged(associatedDate.getTime(), ["from", data[i]["id"]])["element"];
+                    let alphaToAdd = 0
 
                     if(match){
-                        let newData = data[getSessionIndexByID(data, match['to'])];
-                        alpha = parseFloat(get_session_time(newData)/min);
+                        let newData = data[getSessionIndexByID(match['to'])];
 
-                        $(dayz).eq(dayInd).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
+                        alphaToAdd = parseFloat(get_session_time(newData)/min);
+                        $(dayz).eq(dayInd).data("sList").push([[newData["id"], newData["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                     }else{
-                        alpha = parseFloat(get_session_time(data[i])/min);
-                        $(dayz).eq(dayInd).data("sList").push([[data[i].getId(), data[i][1]], [schedule[1][2], schedule[1][3]]]);
+                        alphaToAdd = parseFloat(get_session_time(data[i])/min);
+                        $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                     };
 
-                    if(alpha < 0.15){alpha = 0.15};
+                    let alpha = $(dayz).eq(dayInd).data("alpha");
 
                     if((!match
-                        && ((calendar_dict[data[i][1]] && !sessionDone[1][id])
-                        || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today))) 
+                        && ((calendar_dict[data[i]["id"]] && !sessionDone["data"][id])
+                        || (calendar_dict[data[i]["id"]] && sessionDone["data"][id] && nbdayz != today))) 
                     || (match 
-                        && (!sessionDone[1][match['to']] 
-                        || (sessionDone[1][match['to']] && nbdayz != today)))
+                        && (!sessionDone["data"][match['to']] 
+                        || (sessionDone["data"][match['to']] && nbdayz != today)))
                     ){
-                        if($(dayz).eq(dayInd).css('backgroundColor').includes("rgba")){
-                            let actual_alpha = $(dayz).eq(dayInd).css('backgroundColor').split(",");
-
-                            actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
-                            $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
-                        }else{
-                            if($(dayz).eq(dayInd).css('backgroundColor') == "rgb(76, 83, 104)"){
-                                $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
-                            };
-                        };
+                        $(dayz).eq(dayInd).data("alpha", alpha + alphaToAdd);
 
                         if(match && scheduleDate.getTime() == todaysDate.getTime()){
-                            sessionToBeDone[1][match['to']] = true;
+                            sessionToBeDone["data"][match['to']] = true;
                         }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
-                            sessionToBeDone[1][data[i].getId()] = true;
+                            sessionToBeDone["data"][data[i]['id']] = true;
                         };
                     };
 
                     nbdayz += 1
                 };
-            }else if(schedule[1][0] == "Week"){
-                for(let z=0; z<schedule[2].length; z++){
-                    let scheduleDate = zeroAM(new Date(schedule[2][z][1]));
+            }else if(getScheduleScheme(data[i]) == "Week"){
+                for(let z=0; z<notif["dateList"].length; z++){
+                    let scheduleDate = zeroAM(new Date(notif["dateList"][z]));
 
-                    let pageOffset = ((end + 1) * (updateCalendarPage - 1));
+                    let pageOffset = ((end + 1) * (page - 1));
                     let nbdayz = pageOffset == 0 ? today : pageOffset;
 
                     while(nbdayz <= end + pageOffset){
-                        
                         let dayInd = nbdayz - pageOffset;
                         let associatedDate = getAssociatedDate(dayInd);
 
-                        if(!isEventScheduled(associatedDate, scheduleDate, schedule[1][1], schedule[1][0], jumpData['jumpVal'], jumpData['jumpType'], jumpData['everyVal'], scheduleOccurence, id)){
+                        if(!isEventScheduled(
+                            associatedDate, 
+                            scheduleDate, 
+                            notif["scheduleData"]["count"], 
+                            notif["scheduleData"]["scheme"], 
+                            jumpData['jumpVal'], 
+                            jumpData['jumpType'], 
+                            jumpData['everyVal'], 
+                            scheduleOccurence, 
+                            id
+                        )){
                             nbdayz += 1; 
                             continue;
                         };
 
                         let match = findChanged(associatedDate.getTime(), ["from", id])["element"];
+                        let alphaToAdd = 0;
 
                         if(match){
-                            let newData = data[getSessionIndexByID(data, match['to'])];
-                            alpha = parseFloat(get_session_time(newData)/min);
-
-                            $(dayz).eq(dayInd).data("sList").push([[newData[newData.length - 1], newData[1]], [schedule[1][2], schedule[1][3]]]);
+                            let newData = data[getSessionIndexByID(match['to'])];
+                            alphaToAdd = parseFloat(get_session_time(newData)/min);
+                            $(dayz).eq(dayInd).data("sList").push([[newData["id"], newData["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                         }else{
-                            alpha = parseFloat(get_session_time(data[i])/min);
-                            $(dayz).eq(dayInd).data("sList").push([[data[i].getId(), data[i][1]], [schedule[1][2], schedule[1][3]]]);
+                            alphaToAdd = parseFloat(get_session_time(data[i])/min);
+                            $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                         };
 
-                        if(alpha < 0.15){alpha = 0.15};
+                        let alpha = $(dayz).eq(dayInd).data("alpha");
 
                         if((!match
-                            && ((calendar_dict[data[i][1]] && !sessionDone[1][id])
-                            || (calendar_dict[data[i][1]] && sessionDone[1][id] && nbdayz != today)))
+                            && ((calendar_dict[data[i]["id"]] && !sessionDone["data"][id])
+                            || (calendar_dict[data[i]["id"]] && sessionDone["data"][id] && nbdayz != today)))
                         || (match
-                            && (!sessionDone[1][match['to']]
-                            || (sessionDone[1][match['to']] && nbdayz != today)))
+                            && (!sessionDone["data"][match['to']]
+                            || (sessionDone["data"][match['to']] && nbdayz != today)))
                         ){
-                            if($(dayz).eq(dayInd).css('backgroundColor').includes("rgba")){
-                                let actual_alpha = $(dayz).eq(dayInd).css('backgroundColor').split(",");
-
-                                actual_alpha = parseFloat(actual_alpha[actual_alpha.length - 1].slice(0, -1));
-                                $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+(alpha+actual_alpha).toString()+")");
-                            }else{
-                                if($(dayz).eq(dayInd).css('backgroundColor') == "rgb(76, 83, 104)"){
-                                    $(dayz).eq(dayInd).css('backgroundColor', "rgba(29, 188, 96, "+alpha.toString()+")");
-                                };
-                            };
+                            $(dayz).eq(dayInd).data("alpha", alpha + alphaToAdd);
 
                             if(match && scheduleDate.getTime() == todaysDate.getTime()){
-                                sessionToBeDone[1][match['to']] = true;
+                                sessionToBeDone["data"][match['to']] = true;
                             }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
-                                sessionToBeDone[1][id] = true;
+                                sessionToBeDone["data"][id] = true;
                             };
                         };
 
@@ -278,6 +298,39 @@ function updateCalendar(data){
         };
     };
 
+    
+    $(dayz).each(function(i){
+        let sList = $(dayz).eq(i).data("sList");
+
+        if(sList.length == 0 || $(dayz).eq(i).data("alpha") == 0){return};
+
+        let longest = false;
+        let time = false;
+
+        for(let x = 0; x < sList.length; x++){
+            const element = sList[x];
+            let sessionID = element[0][0];
+
+            if(longest === false && calendar_dict[sessionID]){
+                longest = sessionID;
+            }else if(longest){
+                time = get_session_time(session_list[getSessionIndexByID(sessionID)]);
+            
+                if(time > get_session_time(session_list[getSessionIndexByID(longest)]) && calendar_dict[sessionID]){
+                    longest = sessionID;
+                };
+            };  
+        };
+
+        if(longest === false){return};
+
+        let alpha = $(dayz).eq(i).data("alpha") > 1 ? 1 : $(dayz).eq(i).data("alpha");
+        let color = session_list[getSessionIndexByID(longest)]['color'];
+        let rgba = color.replace(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/, 'rgba($1, $2, $3, ') + alpha.toString() + ")";
+
+        $(dayz).eq(i).css('backgroundColor', rgba);
+    });
+
     sessionToBeDone_save(sessionToBeDone);
 };
 
@@ -287,71 +340,68 @@ async function shiftPlusOne(){
         for(let i=0; i<input.length; i++){
             if(isScheduled(input[i])){
 
-                let data = input[i][input[i].length - 2];
+                let notif = isScheduled(input[i]);
                 let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
 
-                let id = await getPendingId(input[i].getId(), data[1][0]);
+                let id = await getPendingId(input[i]["id"]);
 
-                if(data[1][0] == "Day"){
-                    if(input[i][0] == "R" && data[1][1] == 1){continue};
+                if(getScheduleScheme(input[i]) == "Day"){
+                    if(input[i]["type"] == "R" && notif["scheduleData"]["count"] == 1){continue};
                     
                     isShifted = true;
                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
 
-                    data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+                    notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
 
-                    let tempDate = new Date(data[2][1]);
+                    let tempDate = new Date(notif["dateList"][0]);
                     tempDate.setDate(tempDate.getDate() + 1);
 
-                    data[2][1] = tempDate.getTime();
+                    notif["dateList"][0] = tempDate.getTime();
 
-                    if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
-                        data[2][1] -= toSubstract;
+                    if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
+                        notif["dateList"][0] -= toSubstract;
                     };
-
-                    data[2][0] = dayofweek[new Date(data[2][1]).getDay()];
 
                     if(platform == "Mobile"){
-                        if(input[i][0] == "R"){
-                            await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], input[i][2], id, 'reminder');
+                        if(input[i]["type"] == "R"){
+                            await scheduleId(new Date(notif["dateList"][0]), notif["scheduleData"]["count"], notif["scheduleData"]["scheme"].toLowerCase(), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                         }else{
-                            await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                            await scheduleId(new Date(notif["dateList"][0]), notif["scheduleData"]["count"], notif["scheduleData"]["scheme"].toLowerCase(), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                         };
                     };
-                }else if(data[1][0] == "Week"){
+                }else if(getScheduleScheme(input[i]) == "Week"){
 
-                    if(input[i][0] == "R" && data[2].length == 7){continue};
+                    if(input[i]["type"] == "R" && notif["dateList"].length == 7){continue};
                     isShifted = true;
 
-                    for(let z=0; z<data[2].length; z++){
+                    for(let z=0; z<notif["dateList"].length; z++){
                         let idx = (z+1).toString() + id.slice(1, id.length);
+
                         if(platform == "Mobile"){await undisplayAndCancelNotification(idx)};
 
-                        data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+                        notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
 
-                        let tempDate = new Date(data[2][z][1]);
+                        let tempDate = new Date(notif["dateList"][z]);
                         tempDate.setDate(tempDate.getDate() + 1);
 
-                        data[2][z][1] = tempDate.getTime();
+                        notif["dateList"][z] = tempDate.getTime();
 
-                        if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
-                            data[2][z][1] -= toSubstract;
+                        if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
+                            notif["dateList"][z] -= toSubstract;
                         };
 
-                        data[2][z][0] = dayofweek[new Date(data[2][z][1]).getDay()];
-
                         if(platform == "Mobile"){
-                            if(input[i][0] == "R"){
-                                await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], input[i][2], idx, 'reminder');
+                            if(input[i]["type"] == "R"){
+                                await scheduleId(new Date(notif["dateList"][z]), notif["scheduleData"]["count"], notif["scheduleData"]["scheme"].toLowerCase(), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                             }else{
-                                await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), idx, 'session');
+                                await scheduleId(new Date(notif["dateList"][z]), notif["scheduleData"]["count"], notif["scheduleData"]["scheme"].toLowerCase(), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                             };
                         };
                     };
                 };
 
-                if(input[i][0] != "R"){
-                    hasBeenShifted[1][input[i].getId()] = true;
+                if(input[i]["type"] != "R"){
+                    hasBeenShifted["data"][input[i]["id"]] = true;
                 };
             };
         };
@@ -361,7 +411,7 @@ async function shiftPlusOne(){
 
     await shiftPlusCore(session_list);
     session_save(session_list);
-    updateCalendar(session_list);
+    updateCalendar(session_list, updateCalendarPage);
 
     //-------------;
 
@@ -410,7 +460,7 @@ function getClosestElement(currentTime) {
         const elementTime = $(this).data('time');
         const timeDifference = Math.abs(currentTime - elementTime);
         
-        if (timeDifference < smallestDifference && (!sessionDone[1][$(this).data("id")])){
+        if (timeDifference < smallestDifference && (!sessionDone["data"][$(this).data("id")])){
             closestElement = $(this);
             smallestDifference = timeDifference;
         };
@@ -486,11 +536,195 @@ function checkDisplayState(){
 function extractDate(unixTimestamp) {
     const date = new Date(unixTimestamp);
     const day = date.getDate();
-    const month = textAssets[language]["misc"]["abrMonthLabels"][monthofyear[date.getMonth()]];
+    const month = textAssets[parameters["language"]]["misc"]["abrMonthLabels"][monthofyear[date.getMonth()]];
     const year = date.getFullYear();
 
     return `${day} ${month} ${year}`;
 }
+
+function calendarGoHome(mode, page){
+    if(mode == "static"){
+        if(page == 1){
+            $(".calendarGoBack").css({
+                opacity: .5,
+                pointerEvents: "none"
+            });
+        }else{
+            $(".calendarGoBack").css({
+                opacity: 1,
+                pointerEvents: "all"
+            });
+        };
+
+        updateCalendar(session_list, page);
+        return page;
+    }else if(mode == "forward"){
+        $(".calendarGoBack").css({
+            opacity: 1,
+            pointerEvents: "all"
+        });
+
+        page += 1;
+
+        updateCalendar(session_list, page);
+    }else if(mode == "backward"){
+        if(page == 1){return};
+
+        if(page > 2){
+            page -= 1;
+
+            updateCalendar(session_list, page);
+        }else if(page == 2){
+            $(".calendarGoBack").css({
+                opacity: .5,
+                pointerEvents: "none"
+            });
+
+            page -= 1;
+
+            updateCalendar(session_list, page);
+        };
+    };
+
+    return page;    
+};
+
+// DATEPICKER
+
+function calendarGoPicker(mode, page){
+    if(mode == "static"){
+        if(page == 1){
+            $(".calendarGoBack").css({
+                opacity: .5,
+                pointerEvents: "none"
+            });
+        }else{
+            $(".calendarGoBack").css({
+                opacity: 1,
+                pointerEvents: "all"
+            });
+        };
+
+        generateBaseCalendar(page);    
+        return page;
+    }else if(mode == "forward"){
+        $(".calendarGoBack").css({
+            opacity: 1,
+            pointerEvents: "all"
+        });
+
+        page += 1;
+
+        generateBaseCalendar(page);
+        setCalendarSelection();
+    }else if(mode == "backward"){
+        if(page == 1){return};
+
+        if(page > 2){
+            page -= 1;
+
+            generateBaseCalendar(page);
+            setCalendarSelection();
+        }else if(page == 2){
+            $(".calendarGoBack").css({
+                opacity: .5,
+                pointerEvents: "none"
+            });
+
+            page -= 1;
+
+            generateBaseCalendar(page);
+            setCalendarSelection();
+        };
+    };
+
+    return page;
+};
+
+function getPageOfDate(D){
+    const now = new Date();
+    const oneDay = 24 * 60 * 60 * 1000; 
+
+    const diff = Math.round((zeroAM(D).getTime() - zeroAM(now).getTime()) / oneDay);
+    const page = Math.round(diff / 21) + 1;
+
+    return page;
+};
+
+function generateDateString(selectedDates, lang){
+    if(selectedDates.length == 0){return textAssets[parameters["language"]]["updatePage"]["pickDate"]};
+
+    let locale;
+    if (lang == "french") {
+        locale = "fr-FR";
+    } else if(lang == "english") {
+        // Default to English if unsupported or "EN"
+        locale = "en-US";
+    }
+
+    // Find the smallest timestamp
+    const smallestTimestamp = Math.min(...selectedDates);
+    const date = new Date(smallestTimestamp);
+
+    // Format date using Intl.DateTimeFormat for a nice localized date string
+    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = new Intl.DateTimeFormat(locale, dateOptions).format(date);
+
+    // If there's more than one timestamp, append "..."
+    return selectedDates.length > 1 ? formattedDate + "..." : formattedDate;
+};
+
+function currentTimeSelection(notif){
+    if(!notif){return};
+    
+    let selectedDates = notif["dateList"].map(timestamp => zeroAM(new Date(timestamp)).getTime());  
+    let rowIndex = $(".selection_page_calendar_row").index($(".selection_page_calendar_row_day").filter((_, dayEl) => {return selectedDates.includes($(dayEl).data('time'))}).first().parent());
+    let selectCalendarPage = getPageOfDate(new Date(selectedDates[0]));
+
+    let datePicker_selectionInfo = {"rowIndex": rowIndex, "page": selectCalendarPage}; 
+
+    return {"info": datePicker_selectionInfo, "dates": selectedDates};
+};
+
+function setPastUserSelection(generatedData){
+    let selectedString = generateDateString(generatedData["dates"], parameters["language"]);
+    
+    setNodeData(datePicker, "selectedDates", generatedData["dates"]);
+    setNodeData(datePicker, "selectedPage", generatedData["info"]["page"]);
+    setNodeData(datePicker, "selectedRow", generatedData["info"]["rowIndex"]);
+
+    $('.update_schedule_datePicker').text(selectedString);
+};
+
+function setCalendarSelection(){
+
+    let selectedDates = getNodeData(datePicker, "selectedDates");
+
+    if(selectedDates.length == 0){
+        $(".selection_page_calendar_row_day").css("backgroundColor", 'rgb(76, 83, 104)');
+    }else{
+        if($('.update_schedule_select_every').val() == "Day"){
+            selectedDates = [Math.min(...selectedDates)];
+            setNodeData(datePicker, "selectedDates", selectedDates);
+            $(".selection_page_calendar_row_day").css("backgroundColor", 'rgb(76, 83, 104)');
+            
+            $(".selection_page_calendar_row_day").filter((_, dayEl) => {
+                return selectedDates.includes($(dayEl).data('time'));
+            }).css("background-color", 'rgb(29, 188, 96)');
+        }else if($('.update_schedule_select_every').val() == "Week"){
+            $(".selection_page_calendar_row_day").css("backgroundColor", 'rgb(76, 83, 104)');
+            $(".selection_page_calendar_row_day").css("opacity", ".3");
+            $(".selection_page_calendar_row").eq(getNodeData(datePicker, "selectedRow")).children().filter((_, dayEl) => {
+                return zeroAM(new Date($(dayEl).data('time'))).getTime() >= zeroAM(new Date()).getTime()}
+            ).css("opacity", "1");
+    
+            $(".selection_page_calendar_row_day").filter((_, dayEl) => {
+                return selectedDates.includes($(dayEl).data('time'));
+            }).css("background-color", 'rgb(29, 188, 96)');
+        };
+    };
+
+};
 
 $(document).ready(function(){
 
@@ -502,6 +736,8 @@ $(document).ready(function(){
             calendarState = true;
             window.history.pushState("calendar", "");
             $(".selection_page_calendar, .selection_page_calendar_goConainer").css("display", 'flex');
+            
+            calendarGoHome("static", updateCalendarPage);
         }else{
             closePanel("calendar");
             canNowClick("allowed");
@@ -513,33 +749,20 @@ $(document).ready(function(){
     });
 
     $(document).on("click", '.calendarGo', function(e){
-        if($(this).text() == textAssets[language]["calendar"]["forWard"]){
-            $(".calendarGoBack").css({
-                opacity: 1,
-                pointerEvents: "all"
-            });
-
-            updateCalendarPage += 1;
-
-            updateCalendar(session_list);
-        }else if($(this).text() == textAssets[language]["calendar"]["backWard"]){
-            if(updateCalendarPage == 1){return};
-
-            if(updateCalendarPage > 2){
-                updateCalendarPage -= 1;
-
-                updateCalendar(session_list);
-            }else if(updateCalendarPage == 2){
-                $(".calendarGoBack").css({
-                    opacity: .5,
-                    pointerEvents: "none"
-                });
-
-                updateCalendarPage -= 1;
-
-                updateCalendar(session_list);
-            };
+        let mode;
+        
+        if($(this).text() == textAssets[parameters["language"]]["calendar"]["forWard"]){
+            mode = "forward";
+        }else if($(this).text() == textAssets[parameters["language"]]["calendar"]["backWard"]){
+            mode = "backward";
         };
+
+        if(isDatePicking){
+            selectCalendarPage = calendarGoPicker(mode, selectCalendarPage);
+        }else{
+            updateCalendarPage = calendarGoHome(mode, updateCalendarPage);
+        };
+
     });
 
     $(document).on("click", '.selection_page_calendar_parameters' , function(e){
@@ -556,19 +779,20 @@ $(document).ready(function(){
     });
 
     $(document).on("click", ".selection_page_calendar_Scheduled_item", function(e){
-
         $(this).data("state", !$(this).data("state"));
+
+        let color = session_list[getSessionIndexByID($(this).data("id"))]['color'];
 
         if($(this).data("state") === false){
             $(this).css('backgroundColor', '#4C5368');
         }else if($(this).data("state") == true){
-            $(this).css('backgroundColor', '#1DBC60');
+            $(this).css('backgroundColor', color);
         };
 
-        calendar_dict[$(this).text()] = $(this).data("state");
+        calendar_dict[$(this).data('id')] = $(this).data("state");
 
         calendar_save(calendar_dict);
-        updateCalendar(session_list);
+        updateCalendar(session_list, updateCalendarPage);
     });
 
     let isSyncingHeader = false;
@@ -635,6 +859,8 @@ $(document).ready(function(){
         let idFrom = $(this).data('idFrom');
         let idTo = $('.selection_dayPreview_focusforChange').val();
         let time = $(actualRowDay).data('time');
+
+        let sessionto = session_list[getSessionIndexByID(idTo)];
         
         let match = findChanged(time, ["to", idFrom]);
         let previousID = match ? match["element"]["to"] : idFrom;
@@ -654,13 +880,12 @@ $(document).ready(function(){
             bottomNotification("exchanged");
         };
 
-        sessionToBeDone[1][previousID] = false;
-        sessionToBeDone[1][idTo] = true;
+        sessionToBeDone["data"][previousID] = false;
+        sessionToBeDone["data"][idTo] = true;
 
         if(platform == "Mobile"){
             let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
-            let sessionto = session_list[getSessionIndexByID(session_list, idTo)];
-            let schedule = isScheduled(sessionto);
+            let notif = isScheduled(sessionto);
 
             let start = new Date(time);
             start.setHours($(this).data("hourMinutes")[0]);
@@ -672,26 +897,27 @@ $(document).ready(function(){
             if(!match || (match && match["element"]["from"] != idTo)){
                 let notifToId = "9" + idTo + "1"
 
-                await scheduleId(start, 0, "Day", sessionto[1]+" | "+schedule[1][2]+":"+schedule[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, "session");
+                await scheduleId(start, 0, "day", sessionto["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, 'session');
             }else if(match && match["element"]["from"] == idTo){
                 let scheme = getScheduleScheme(sessionto);
-                let notifToId = getNotifFirstIdChar(sessionto) + sessionto.getId() + "1";
-
-                await scheduleId(start, 0, scheme, sessionto[1]+" | "+schedule[1][2]+":"+schedule[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, "session");
+                let notifToId = getNotifFirstIdChar(sessionto) + sessionto["id"] + "1";
+                await scheduleId(start, 0, scheme, sessionto["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, 'session');
             };
         };
 
         sessionToBeDone_save(sessionToBeDone)
         sessionSwapped_save(sessionSwapped);
-        updateCalendar(session_list);
+        updateCalendar(session_list, updateCalendarPage);
 
         $('.selection_dayPreview_item').eq($(this).data('elemId')).data('id', idTo);
-        $('.selection_dayPreview_item').eq($(this).data('elemId')).text(session_list[getSessionIndexByID(session_list, idTo)][1]);
+        $('.selection_dayPreview_item').eq($(this).data('elemId')).text(session_list[getSessionIndexByID(idTo)]["name"]);
 
-        if(sessionDone[1][idTo]){
-            $('.selection_dayPreview_item').css('backgroundColor', 'rgb(76, 83, 104)');
+        let color = sessionto['color'];
+
+        if(sessionDone["data"][idTo]){
+            $(activePreviewItem).css('backgroundColor', 'rgb(76, 83, 104)'); // GRAY
         }else{
-            $('.selection_dayPreview_item').css('backgroundColor', 'rgb(29, 188, 96)');
+            $(activePreviewItem).css('backgroundColor', color); // GREEN
         };
 
         closePanel('focus');
@@ -702,7 +928,7 @@ $(document).ready(function(){
         
         let optString = '<option value="[idVAL]">[sessionVAL]</option>';
         let beforeList = get_time_u($(this).data('time'), true);
-        let afterList = get_time_u($(this).data('time') + Math.ceil(get_session_time(session_list[getSessionIndexByID(session_list, $(this).data("id"))])), true);
+        let afterList = get_time_u($(this).data('time') + Math.ceil(get_session_time(session_list[getSessionIndexByID($(this).data("id"))])), true);
         let number = false;
 
         $('.selection_dayPreview_focusforChange').children().remove();
@@ -711,11 +937,11 @@ $(document).ready(function(){
         let numberOfDays = dayList.length
         let dayIndex = $(dayList).index(actualRowDay)
 
-        number = getSessionHistory(session_list[getSessionIndexByID(session_list, $(this).data("id"))])[0][2] + (dayIndex + 1) + (updateCalendarPage - 1) * numberOfDays;
+        number = getSessionHistory(session_list[getSessionIndexByID($(this).data("id"))])["historyCount"] + (dayIndex + 1) + (updateCalendarPage - 1) * numberOfDays;
 
         session_list.forEach(session => {
-            if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session.getId())){
-                $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session.getId()).replace('[sessionVAL]', session[1])))
+            if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session['id'])){
+                $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session["id"]).replace('[sessionVAL]', session["name"])))
             };
         });
 
@@ -731,6 +957,7 @@ $(document).ready(function(){
         $('.selection_dayPreview_focusExchangeBtn').data("dayInd", $('.selection_page_calendar_row_day').index(actualRowDay));
 
         cannotClick = 'focus';
+        activePreviewItem = this;
         focusShown = true;
         
         $(".selection_dayPreview_focus").css('top', $('.selection_dayPreview_header').outerHeight() + $('.selection_dayPreview_body').getStyleValue('height') + 15 + "px");
@@ -738,146 +965,234 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.selection_page_calendar_row_day', function(e){
-        if(!$(this).data('time')){return};
-        actualRowDay = this;
-        
-        $('.selection_dayPreview_date').text(extractDate($(this).data('time')))
+        if(!isDatePicking){
 
-        let sList = $(this).data("sList");
-        sList.sort(sortSlist);
-
-        let Ydata = false;
-
-        $('.selection_dayPreview_itemContainer').css('height', "unset");
-        $('.selection_dayPreview_itemContainer').children().remove();
-        $('.selection_dayPreview_mainLine').children(".scheduledItem").remove();
-        $('.selection_dayPreview_focusforChange').children().remove();
-
-        let dataString = '<div class="selection_dayPreview_circleContainer scheduledItem" style="left: [leftVAL]px;"><span class="selection_dayPreview_time">[timeVAL]</span><div class="selection_dayPreview_circle"></div></div>';
-        let sessionString = '<span class="selection_dayPreview_item" style="left: [leftVAL]px; top: [topVAL]px; background-color: [bgVAL]">[spanVAL]</span>';
-        let dashedString = '<div class="selection_dayPreview_dashedLine" style="left: [leftVAL]; width: [widthVAL];"></div>';
-
-        let clonedDataString = false;
-        let calculatedOffset = false;
-
-        let itemToAdd = false;
-        
-        let itemHeight = false;
-        let initialHeight = 20;
-        let maxHeight = 70;
-
-        sList.forEach(arr => {
-
-            // Draw SessionItems & dotsNtimes
-
-            calculatedOffset = time_unstring(arr[1][0]+"h"+ arr[1][1]+"m") / 3600 * 150;
-            Ydata = $('.selection_dayPreview_item').filter((_, el) => $(el).getStyleValue('left') >= calculatedOffset - 90);
-
-            if(Ydata.length > 0){
-                itemHeight = Math.max(...$(Ydata).map((_, el) => parseInt($(el).css('top'))).get()) + 50;
-            }else{
-                itemHeight = initialHeight;
-            };
-
-            if(sessionDone[1][arr[0][0]] && $(actualRowDay).data("time") == zeroAM(new Date()).getTime()){
-                itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(76, 83, 104)')) // GRAY
-            }else{
-                itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(29, 188, 96)')) // GREEN
-            };
+            if(!$(this).data('time')){return};
+            actualRowDay = this;
             
-            $(itemToAdd).data('id', arr[0][0]);
-            $(itemToAdd).data('time', time_unstring(arr[1][0]+"h"+ arr[1][1]+"m"));
+            $('.selection_dayPreview_date').text(extractDate($(this).data('time')))
 
+            let sList = $(this).data("sList");
+            sList.sort(sortSlist);
+
+            let Ydata = false;
+
+            $('.selection_dayPreview_itemContainer').css('height', "unset");
+            $('.selection_dayPreview_itemContainer').children().remove();
+            $('.selection_dayPreview_mainLine').children(".scheduledItem").remove();
+            $('.selection_dayPreview_focusforChange').children().remove();
+
+            let dataString = '<div class="selection_dayPreview_circleContainer scheduledItem" style="left: [leftVAL]px;"><span class="selection_dayPreview_time">[timeVAL]</span><div class="selection_dayPreview_circle"></div></div>';
+            let sessionString = '<span class="selection_dayPreview_item" style="left: [leftVAL]px; top: [topVAL]px; background-color: [bgVAL]">[spanVAL]</span>';
+            let dashedString = '<div class="selection_dayPreview_dashedLine" style="left: [leftVAL]; width: [widthVAL];"></div>';
+
+            let clonedDataString = false;
+            let calculatedOffset = false;
+
+            let itemToAdd = false;
             
-            $('.selection_dayPreview_itemContainer').append(itemToAdd);
+            let itemHeight = false;
+            let initialHeight = 20;
+            let maxHeight = 70;
 
-            if(itemHeight + 50 > maxHeight){
-                maxHeight = itemHeight + 50;
-                $('.selection_dayPreview_itemContainer').css('height', maxHeight);
-            };
+            sList.forEach(arr => {
 
-            if(calculatedOffset % 150 != 0){
+                // Draw SessionItems & dotsNtimes
 
-                if(calculatedOffset % 150 < 60 || calculatedOffset % 150 > 90){
-                    clonedDataString = dataString.replace('[timeVAL]', ' ');
+                calculatedOffset = time_unstring(arr[1][0]+"h"+ arr[1][1]+"m") / 3600 * 150;
+                Ydata = $('.selection_dayPreview_item').filter((_, el) => $(el).getStyleValue('left') >= calculatedOffset - 90);
+
+                if(Ydata.length > 0){
+                    itemHeight = Math.max(...$(Ydata).map((_, el) => parseInt($(el).css('top'))).get()) + 50;
                 }else{
-                    clonedDataString = dataString.replace('[timeVAL]', arr[1][0]+"h"+ arr[1][1]);
+                    itemHeight = initialHeight;
                 };
 
-                if(!(calculatedOffset % 150 < 15 || calculatedOffset % 150 > 135)){
-                    $(".selection_dayPreview_mainLine").append($(clonedDataString.replace('[leftVAL]', calculatedOffset)));
+                let color = session_list[getSessionIndexByID(arr[0][0])]['color'];
+
+                if(sessionDone["data"][arr[0][0]] && $(actualRowDay).data("time") == zeroAM(new Date()).getTime()){
+                    itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(76, 83, 104)')) // GRAY
+                }else{
+                    itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', color)) // GREEN
                 };
-            };
-        });
+                
+                $(itemToAdd).data('id', arr[0][0]);
+                $(itemToAdd).data('time', time_unstring(arr[1][0]+"h"+ arr[1][1]+"m"));
 
-        // ---------------
+                
+                $('.selection_dayPreview_itemContainer').append(itemToAdd);
 
-        // Draw dashedLine
+                if(itemHeight + 50 > maxHeight){
+                    maxHeight = itemHeight + 50;
+                    $('.selection_dayPreview_itemContainer').css('height', maxHeight);
+                };
 
-        let groupedNodes = {};
-        $('.selection_dayPreview_item').each(function() {
-            const leftValue = $(this).getStyleValue('left');
-            if (!groupedNodes[leftValue]) {
-                groupedNodes[leftValue] = [];
-            }
+                if(calculatedOffset % 150 != 0){
 
-            groupedNodes[leftValue].push(this);
-        });
+                    if(calculatedOffset % 150 < 60 || calculatedOffset % 150 > 90){
+                        clonedDataString = dataString.replace('[timeVAL]', ' ');
+                    }else{
+                        clonedDataString = dataString.replace('[timeVAL]', arr[1][0]+"h"+ arr[1][1]);
+                    };
 
-        let lowestNodes = [];
-        $.each(groupedNodes, function(leftValue, nodesInGroup) {
-            let highestNode = nodesInGroup[0];
-            $(nodesInGroup).each(function() {
-                if ($(this).getStyleValue('top') < $(highestNode).getStyleValue('left')) {
-                    highestNode = this;
-                }
+                    if(!(calculatedOffset % 150 < 15 || calculatedOffset % 150 > 135)){
+                        $(".selection_dayPreview_mainLine").append($(clonedDataString.replace('[leftVAL]', calculatedOffset)));
+                    };
+                };
             });
 
-            lowestNodes.push(highestNode);
-        });
+            // ---------------
 
-        lowestNodes.forEach(node => {
-            let left = $(node).getStyleValue("left");
-            let top = $(node).getStyleValue("top");
-            $('.selection_dayPreview_itemContainer').prepend(dashedString.replace('[leftVAL]', (left + 9)+"px").replace('[widthVAL]', (top + 50)+"px"))
-        });
+            // Draw dashedLine
 
-        // ---------------
+            let groupedNodes = {};
+            $('.selection_dayPreview_item').each(function() {
+                const leftValue = $(this).getStyleValue('left');
+                if (!groupedNodes[leftValue]) {
+                    groupedNodes[leftValue] = [];
+                }
+
+                groupedNodes[leftValue].push(this);
+            });
+
+            let lowestNodes = [];
+            $.each(groupedNodes, (leftValue, nodesInGroup) => {
+                let highestNode = nodesInGroup[0];
+                $(nodesInGroup).each(function() {
+                    if ($(this).getStyleValue('top') < $(highestNode).getStyleValue('left')) {
+                        highestNode = this;
+                    }
+                });
+
+                lowestNodes.push(highestNode);
+            });
+
+            lowestNodes.forEach(node => {
+                let left = $(node).getStyleValue("left");
+                let top = $(node).getStyleValue("top");
+                $('.selection_dayPreview_itemContainer').prepend(dashedString.replace('[leftVAL]', (left + 9)+"px").replace('[widthVAL]', (top + 50)+"px"))
+            });
+
+            // ---------------
+            
+            previewShown = true;
+
+            $('.selection_dayPreview_focus').css('display', 'none');
+            showBlurPage('selection_dayPreview_page');
         
-        previewShown = true;
+            if($('.selection_dayPreview_item').length == 0){
+                $('.selection_dayPreview_noSession').css('display', 'inline-block');
+            }else{
+                $('.selection_dayPreview_noSession').css('display', 'none');
+            };
 
-        $('.selection_dayPreview_focus').css('display', 'none');
-        showBlurPage('selection_dayPreview_page');
-    
-        if($('.selection_dayPreview_item').length == 0){
-            $('.selection_dayPreview_noSession').css('display', 'inline-block');
-        }else{
-            $('.selection_dayPreview_noSession').css('display', 'none');
+            let now = new Date()
+            let time = now.getHours() * 3600 + now.getMinutes() * 60;
+            let focusElement = false
+
+            if($(actualRowDay).data('time') == zeroAM(new Date()).getTime()){
+                focusElement = getClosestElement(time);
+            }else{
+                focusElement = getSmallestElement();
+            };
+            
+            let smallestTime = Math.trunc($(focusElement).data('time') / 3600);
+
+            if(focusElement){
+                $('.selection_dayPreview_body').scrollLeft(smallestTime * 150);
+                $('.selection_dayPreview_header').scrollLeft(smallestTime * 150);
+            }else{
+                $('.selection_dayPreview_body').scrollLeft(new Date().getHours() * 150);
+                $('.selection_dayPreview_header').scrollLeft(new Date().getHours() * 150);
+            };
+
+            checkDisplayState();
+            
+            $('.selection_dayPreview_body').scrollTop(0);
+            $('.selection_dayPreview_item').scrollLeft(0);
         };
-
-        let now = new Date()
-        let time = now.getHours() * 3600 + now.getMinutes() * 60;
-        let focusElement = false
-
-        if($(actualRowDay).data('time') == zeroAM(new Date()).getTime()){
-            focusElement = getClosestElement(time);
-        }else{
-            focusElement = getSmallestElement();
-        };
-        
-        let smallestTime = Math.trunc($(focusElement).data('time') / 3600);
-
-        if(focusElement){
-            $('.selection_dayPreview_body').scrollLeft(smallestTime * 150);
-            $('.selection_dayPreview_header').scrollLeft(smallestTime * 150);
-        }else{
-            $('.selection_dayPreview_body').scrollLeft(new Date().getHours() * 150);
-            $('.selection_dayPreview_header').scrollLeft(new Date().getHours() * 150);
-        };
-
-        checkDisplayState();
-        
-        $('.selection_dayPreview_body').scrollTop(0);
-        $('.selection_dayPreview_item').scrollLeft(0);
     });
+
+    // DATEPICKER
+
+    $(document).on('click', '.selection_page_calendar_row_day', function(e){
+        if(isDatePicking){
+            if(!$(this).data('time')){return};
+            let dayOrWeek = $(".update_schedule_select_every").val();
+
+            if(dayOrWeek == "Day"){
+                $('.selection_page_calendar_row_day').filter((_, dayEl) => {
+                    return zeroAM(new Date($(dayEl).data('time'))).getTime() >= zeroAM(new Date()).getTime()}
+                ).css({"backgroundColor": 'rgb(76, 83, 104)', 'opacity': '1'});
+                
+                if($(this).data('time') == getNodeData(datePicker, "selectedDates")[0]){
+                    $(this).css("backgroundColor", 'rgb(76, 83, 104)');
+                    setNodeData(datePicker, "selectedDates", []);
+                }else{
+                    $(this).css("backgroundColor", 'rgb(29, 188, 96)');
+                    setNodeData(datePicker, "selectedDates", [$(this).data('time')]);
+                    setNodeData(datePicker, "selectedPage", selectCalendarPage);
+                };
+
+            }else if(dayOrWeek == "Week"){
+                let rowIndex = $(".selection_page_calendar_row").index($(this).parent())
+
+                if(rowIndex != getNodeData(datePicker, "selectedRow") || selectCalendarPage != getNodeData(datePicker, "selectedPage")){
+                    setNodeData(datePicker, "selectedDates", []);
+                };
+
+                setNodeData(datePicker, "selectedRow", rowIndex);
+                setNodeData(datePicker, "selectedPage", selectCalendarPage);
+                
+                $(".selection_page_calendar_row").filter((i) => i !== getNodeData(datePicker, "selectedRow")).children().css({'opacity': '.3', "backgroundColor": 'rgb(76, 83, 104)'});
+                $(".selection_page_calendar_row").filter((i) => i === getNodeData(datePicker, "selectedRow")).children().filter((_, dayEl) => {
+                    return zeroAM(new Date($(dayEl).data('time'))).getTime() >= zeroAM(new Date()).getTime()}
+                ).css('opacity', '1');  
+
+                console.log(getNodeData(datePicker, "selectedDates"))
+                
+                if(!getNodeData(datePicker, "selectedDates").includes($(this).data('time'))){
+                    $(this).css("backgroundColor", 'rgb(29, 188, 96)');
+                    getNodeData(datePicker, "selectedDates").push($(this).data('time'));
+                }else{
+                    $(this).css("backgroundColor", 'rgb(76, 83, 104)');
+                    setNodeData(datePicker, "selectedDates", getNodeData(datePicker, "selectedDates").filter(item => item !== $(this).data('time')));
+                };
+            };
+        };
+    });
+
+    $(document).on('click', '.update_schedule_datePicker', function(e){
+
+        isDatePicking = true;
+
+        $('.update_datePicker').append($(".selection_page_calendar"));
+        $(".calendarPickerSubmit").css('display', 'flex');
+
+        $(".selection_page_calendar").children('.selection_page_calendar_btnConainer').css('display', 'none');
+        $(".selection_page_calendar").css({
+            "display": 'flex',
+            "position": 'relative'
+        }); 
+
+        selectedDates = getNodeData(datePicker, "selectedDates");
+        selectCalendarPage = getNodeData(datePicker, "selectedPage");
+        rowIndex = getNodeData(datePicker, "selectedRow");
+
+        calendarGoPicker("static", selectCalendarPage);
+        setCalendarSelection();
+
+        showBlurPage('update_datePicker');
+    });
+
+    $(document).on('click', '.calendarPickerSubmit', function(e){
+        let dateString = generateDateString(getNodeData(datePicker, "selectedDates"), parameters["language"]);
+        $('.update_schedule_datePicker').text(dateString);
+        
+        pastSelectedDates = getNodeData(datePicker, "selectedDates");
+        pastSelectedPage = getNodeData(datePicker, "selectedPage");
+        pastSelectedRow = getNodeData(datePicker, "selectedRow");
+
+        closePanel("datePicker");
+    }); 
 });//readyEnd

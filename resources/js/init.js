@@ -1,9 +1,4 @@
 var parameters = false;
-var language = localStorage.getItem("parameterss") !== null ? JSON.parse(localStorage.getItem("parameterss"))[0] : "english";
-var autoSaver = false;
-var keepAwake = false;
-var weightUnit = false;
-var deleteAfter = false;
 
 var previousWeightUnit = false;
 var previousLanguage = "english";
@@ -13,16 +8,9 @@ var exercisesHTML = false;
 var intervallHTML = false;
 var audio_lv = false;
 var muted = false;
-var timeSpent = false;
-var workedTime = false;
-var weightLifted = false;
-var repsDone = false;
-var since = false;
-var TemptimeSpent = false;
-var TempworkedTime = false;
-var TempweightLifted = false;
-var TemprepsDone = false;
-var nbMissed = false;
+
+var stats = false;
+var tempStats = false;
 
 var session_list = false;
 var reminder_list = false;
@@ -43,8 +31,9 @@ $(document).ready(async function(){
     intervallHTML = Iintervall_tile();
 
     [audio_lv, muted] = audio_read();
-    [timeSpent, workedTime, weightLifted, repsDone, since, nbMissed] = stats_read();
-    [TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone] = [0,0,0,0];
+
+    stats = stats_read();
+    tempStats = generateStatsObj({"timeSpent": 0, "workedTime": 0, "weightLifted": 0, "repsDone": 0});
 
     session_list = [];
     reminder_list = [];
@@ -64,7 +53,6 @@ $(document).ready(async function(){
     session_pusher(session_list);
     reminder_pusher(reminder_list);
     
-    updateCalendar(session_list);
     session_save(session_list);
     deleteHistory();
 

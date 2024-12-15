@@ -36,15 +36,15 @@ function bottomNotification(from, target="", queued=false){
         $(".bottomNotification_Icon").attr('src', tickIMG);
 
         if(from == "scheduled"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['scheduled']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['scheduled']);
         }else if(from == "created"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['created']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['created']);
         }else if(from == "imported"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['imported']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['imported']);
         }else if(from == "exported"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['exported']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['exported']);
         }else if(from == "parameters"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['parameters']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['parameters']);
         };
     }else if(from == "unscheduled" || from == "deleted" || from == "write" || from == "read"){
         $('.bottomNotification_Icon').css('filter', redFilter);
@@ -61,13 +61,13 @@ function bottomNotification(from, target="", queued=false){
         $(".bottomNotification_Icon").css('scale', "1.1");
 
         if(from == "unscheduled"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['unscheduled']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['unscheduled']);
         }else if(from == "deleted"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['deleted']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['deleted']);
         }else if(from == "write"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['write']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['write']);
         }else if(from == "read"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['read']);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['read']);
         };
     }else if(from == "updated"){
         $('.bottomNotification_Icon').css('filter', blueFilter);
@@ -77,7 +77,7 @@ function bottomNotification(from, target="", queued=false){
         $(".bottomNotification_Icon").attr('src', editIMG);
         $(".bottomNotification_Icon").css('scale', "1");
 
-        $(".bottomNotification_msg").text(target + " " + textAssets[language]["bottomNotif"]['updated']);
+        $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['updated']);
     }else if(from == "longClick"){
         $('.bottomNotification_Icon').css('filter', redFilter);
         $(".bottomNotification_msg").css('color', redText);
@@ -86,7 +86,7 @@ function bottomNotification(from, target="", queued=false){
         $(".bottomNotification_Icon").attr('src', previewIMG);
 
         $(".bottomNotification_Icon").css('scale', "1.1");
-        $(".bottomNotification_msg").text(textAssets[language]["bottomNotif"]['longClickable']);
+        $(".bottomNotification_msg").text(textAssets[parameters["language"]]["bottomNotif"]['longClickable']);
     }else if(from == "exchanged"){
         $('.bottomNotification_Icon').css('filter', greenFilter);
         $(".bottomNotification_msg").css('color', greenText);
@@ -95,7 +95,7 @@ function bottomNotification(from, target="", queued=false){
         $(".bottomNotification_Icon").css('scale', "1");
         $(".bottomNotification_Icon").attr('src', tickIMG);
 
-        $(".bottomNotification_msg").text(textAssets[language]["bottomNotif"]['exchanged']);
+        $(".bottomNotification_msg").text(textAssets[parameters["language"]]["bottomNotif"]['exchanged']);
     };
 
     setTimeout(() => {summonBottomNotification()}, 300);

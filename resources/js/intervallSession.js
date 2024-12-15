@@ -8,12 +8,12 @@ var Iskip = false;
 var IjustSkipped = false;
 var exoName = false;
 
-function getInvervallSessionCycleCount(data){
+function getInvervallSessionCycleCount(exoList){
     let count = 0;
 
-    data.forEach(exo => {
-        if(exo[0] == "Int."){
-            count += parseInt(exo[2]);
+    exoList.forEach(exo => {
+        if(exo["type"] == "Int."){
+            count += parseInt(exo["cycle"]);
         };
     });
 
@@ -27,21 +27,21 @@ function getIntervallExoData(cycle, data, update = false){
     for (let i = 0; i < data.length; i++) {
         const exo = data[i];
         
-        if(exo[0] == "Int."){
+        if(exo["type"] == "Int."){
             if(cycle > computedCycle){
-                computedCycle += exo[2];
+                computedCycle += exo["cycle"];
             };
 
             if(cycle <= computedCycle){
                 if(update){
-                    iWork_time = time_unstring(exo[3]);
-                    iRest_time = time_unstring(exo[4]);
-                    exoName = exo[1];
+                    iWork_time = time_unstring(exo["work"]);
+                    iRest_time = time_unstring(exo["rest"]);
+                    exoName = exo["name"];
                 };
                 
                 return index;
             };
-        }else if(exo[0] == "Pause"){
+        }else if(exo["type"] == "Pause"){
             index--;
         };
 
@@ -52,21 +52,21 @@ function getIntervallExoData(cycle, data, update = false){
 };
 
 function intervall(data, from_wo = false){
-
+    
     function session_state(state){
 
         switch(state){
             case "get_ready":
     
-                screensaver_set(textAssets[language]["inIntervall"]["getReady"], 5);
+                screensaver_set(textAssets[parameters["language"]]["inIntervall"]["getReady"], 5);
     
                 color = yellow;
                 light_color = light_yellow;
                 mid_color = mid_yellow;
                 update_soundSlider();
     
-                $(".session_state").text(textAssets[language]["inIntervall"]["getReady"].toUpperCase());
-                $(".screensaver_text").text(textAssets[language]["inIntervall"]["getReady"]);
+                $(".session_state").text(textAssets[parameters["language"]]["inIntervall"]["getReady"].toUpperCase());
+                $(".screensaver_text").text(textAssets[parameters["language"]]["inIntervall"]["getReady"]);
     
                 $(".session_intervall_btn_container > *").css("background-color", mid_yellow);
     
@@ -108,11 +108,11 @@ function intervall(data, from_wo = false){
                 update_soundSlider();
 
                 if(intExType == "Pause"){
-                    $(".session_state").text(textAssets[language]["updatePage"]["break"].toUpperCase());
-                    $(".screensaver_text").text(textAssets[language]["updatePage"]["break"]);
+                    $(".session_state").text(textAssets[parameters["language"]]["updatePage"]["break"].toUpperCase());
+                    $(".screensaver_text").text(textAssets[parameters["language"]]["updatePage"]["break"]);
                 }else{
-                    $(".session_state").text(textAssets[language]["inIntervall"]["rest"].toUpperCase());
-                    $(".screensaver_text").text(textAssets[language]["inIntervall"]["rest"]);
+                    $(".session_state").text(textAssets[parameters["language"]]["inIntervall"]["rest"].toUpperCase());
+                    $(".screensaver_text").text(textAssets[parameters["language"]]["inIntervall"]["rest"]);
                 };
     
                 $(".session_intervall_btn_container > *").css("background-color", mid_red);
@@ -154,8 +154,8 @@ function intervall(data, from_wo = false){
                 $(".session_intervall_btn_container").css("display", "none");
                 $(".blurBG").css("display", "none");
     
-                $(".session_state").text(textAssets[language]["inIntervall"]["end"].toUpperCase());
-                $(".screensaver_text").text(textAssets[language]["inIntervall"]["end"]);
+                $(".session_state").text(textAssets[parameters["language"]]["inIntervall"]["end"].toUpperCase());
+                $(".screensaver_text").text(textAssets[parameters["language"]]["inIntervall"]["end"]);
     
                 $(".session_remaining_cycle").text("");
                 $(".session_intervall_timer").text("");
@@ -176,9 +176,9 @@ function intervall(data, from_wo = false){
 
     function historyTargetUpdate(){
         if(from_wo){
-            historyTarget = tempNewHistory[2][getHistoryIndex(tempNewHistory, next_id)][1][currentExoIndex][2][iActualCycle];
+            historyTarget = tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["exoList"][currentExoIndex]["setList"][iActualCycle];
         }else{
-            historyTarget = tempNewHistory[2][currentExoIndex][2][iActualCycle];
+            historyTarget = tempNewHistory["exoList"][currentExoIndex]["setList"][iActualCycle];
         };
     };
 
@@ -194,14 +194,14 @@ function intervall(data, from_wo = false){
 
     let totalCycle = parseInt(getInvervallSessionCycleCount(data));
 
-    if(from_wo && recovery[1]["iCurrent_cycle"] === false || !from_wo && !recovery){
+    if(from_wo && recovery["varSav"]["iCurrent_cycle"] === false || !from_wo && !recovery){
         iActualCycle = 0;
         iCurrent_cycle = totalCycle;
         currentExoIndexSAV = 0;
     }else{
-        iActualCycle = recovery[1]['iActualCycle'];
-        iCurrent_cycle = recovery[1]["iCurrent_cycle"];
-        currentExoIndexSAV = recovery[1]['currentExoIndex'];
+        iActualCycle = recovery["varSav"]['iActualCycle'];
+        iCurrent_cycle = recovery["varSav"]["iCurrent_cycle"];
+        currentExoIndexSAV = recovery["varSav"]['currentExoIndex'];
     };
 
     currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle, data, true);
@@ -212,6 +212,7 @@ function intervall(data, from_wo = false){
     session_state('get_ready');
     infoStyle("intervall");
     exit_confirm("light");
+
     $('.lockTouch').css('display', 'flex');
     $(".session_remaining_cycle").text((iCurrent_cycle).toString());
 
@@ -282,16 +283,16 @@ function intervall(data, from_wo = false){
 
                     iCurrent_cycle--;
                     
-                    TempworkedTime += iWork_time;
-                    TemprepsDone += iWork_time/2.1;
+                    tempStats["workedTime"] += iWork_time;
+                    tempStats["repsDone"] += iWork_time/2.1;
                     
                     if(Ispent > smallestTime){
-                        historyTarget.push(get_time_u(Ispent));
+                        historyTarget["work"] = get_time_u(Ispent);
                     }else{
-                        historyTarget.push("X");
+                        historyTarget["work"] = "X";
                     };
 
-                    stats_set([TemptimeSpent, TempworkedTime, TempweightLifted, TemprepsDone, since]);
+                    stats_set(tempStats);
 
                     if(!from_wo && iCurrent_cycle != 0){
                         udpate_recovery("intervall", data);
@@ -304,7 +305,7 @@ function intervall(data, from_wo = false){
                     if (iCurrent_cycle == 0){
                         lockState = false;
                         Ifinished = true;
-                        historyTarget.push("X");
+                        historyTarget["rest"] = "X";
 
                         if(!from_wo){
                             udpate_recovery("intervall", data);
@@ -331,18 +332,18 @@ function intervall(data, from_wo = false){
                         update_timer($(".screensaver_Ltimer"), iRest_time, 0);
                     }else{
                         iActualCycle = 0;
-                        intExType = data[currentExoIndex + 1][0];
+                        intExType = data[currentExoIndex + 1]["type"];
 
                         if(intExType == 'Pause'){
                             Ispent = 0;
                             isBeeping = false;
                             intervall_state = 2;
 
-                            iRest_time = time_unstring(data[currentExoIndex + 1][1]);
+                            iRest_time = time_unstring(data[currentExoIndex + 1]["rest"]);
                             
                             session_state("Rest"); 
                             
-                            historyTarget.push("X");
+                            historyTarget["rest"] = "X";
 
                             update_timer($(".session_intervall_timer"), iRest_time, 0);
                             update_timer($(".screensaver_Ltimer"), iRest_time, 0);
@@ -351,7 +352,7 @@ function intervall(data, from_wo = false){
                             Ispent = 0;
                             intervall_state = 1;
 
-                            historyTarget.push("X");
+                            historyTarget["rest"] = "X";
                             currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, true);
 
                             if(!from_wo && iCurrent_cycle != 0){
@@ -398,13 +399,14 @@ function intervall(data, from_wo = false){
                         iActualCycle++;
                         
                         if(Ispent > smallestTime){
-                            historyTarget.push(get_time_u(Ispent));
+                            historyTarget["rest"] = get_time_u(Ispent);
                         }else{
-                            historyTarget.push("X");
+                            historyTarget["rest"] = "X";
                         };
+
                     };
 
-                    intExType = data[currentExoIndex][0];
+                    intExType = data[currentExoIndex]["type"];
                     currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, true);
 
                     historyTargetUpdate();

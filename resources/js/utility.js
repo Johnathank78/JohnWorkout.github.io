@@ -150,6 +150,14 @@ function isNaI(input) {
     return !/^-?\d+$/.test(input);
 }
 
+function isDict(variable) {
+    return (
+        typeof variable === 'object' &&
+        variable !== null &&
+        !Array.isArray(variable)
+    );
+}
+
 function smoothScroll(item, speed, offset){
     function getFirstScrollableParent(element) {
       let parent = element.parentElement;
@@ -197,6 +205,14 @@ function getKeyByValue(object, value){
     return Object.keys(object).find(key => object[key] === value);
 };
 
+function getNodeData(name, key){
+    return $(name).data(key);
+};
+
+function setNodeData(name, key, value){
+    $(name).data(key, value);
+};
+
 // Session
 
 function update_timer(item, ref, i){
@@ -205,76 +221,80 @@ function update_timer(item, ref, i){
 };
 
 function get_session_time(session, uniFix=false){
-    if(session[0] == "I"){
+    if(session["type"] == "I"){
         let total = 5;
 
-        for(let i=0;i<session[2].length;i++){
-            if(session[2][i][0] == "Int."){
-                total += session[2][i][2] * (time_unstring(session[2][i][3]) + time_unstring(session[2][i][4])) - time_unstring(session[2][i][4]);
-            }else if(session[2][i][0] == "Pause"){
-                total += time_unstring(session[2][i][1]);
+        session["exoList"].forEach(exo => {
+            if(exo["type"] == "Int."){
+                total += exo["cycle"] * (time_unstring(exo["work"]) + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
+            }else if(exo["type"] == "Pause"){
+                total += time_unstring(exo["rest"]);
             };
-        };
+        });
 
         return total;
-    }else if(session[0] == "W"){
+    }else if(session["type"] == "W"){
 
         let total = 0;
 
-        for(let i=0;i<session[2].length;i++){
-            if(session[2][i][0] == "Int."){
-                if(isIntervallLinked(session[2][i])){ // IS LINKED
-                    total += get_session_time(session_list[getSessionIndexByID(session_list, session[2][i][1])]);
+        session["exoList"].forEach((exo, i) => {
+            if(exo["type"] == "Int."){
+                if(isIntervallLinked(exo)){ // IS LINKED
+                    total += get_session_time(session_list[getSessionIndexByID(exo["linkId"])]);
                 }else{ // IS CREATED
-                    for(let z=0;z<session[2][i][2].length;z++){
-                        if(session[2][i][2][z][0] == "Int."){
-                            total += session[2][i][2][z][2] * (time_unstring(session[2][i][2][z][3]) + time_unstring(session[2][i][2][z][4])) - time_unstring(session[2][i][2][z][4]);
-                        }else if(session[2][i][2][z][0] == "Pause"){
-                            total += time_unstring(session[2][i][2][z][1]);
+                    exo["exoList"].forEach(subExo => {
+                        if(subExo["type"] == "Int."){
+                            total += subExo["cycle"] * (time_unstring(subExo["work"]) + time_unstring(subExo["rest"])) - time_unstring(subExo["rest"]);
+                        }else if(subExo["type"] == "Pause"){
+                            total += time_unstring(subExo["rest"]);
                         };
-                    };
+                    });
                 };
-            }else if(session[2][i][0] == "Bi."){
-                if(session[2][i][1].includes("Alt.")){
-                    total += session[2][i][2] * (time_unstring(session[2][i][3])*2*repTime + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
+            }else if(exo["type"] == "Bi."){
+                if(exo["name"].includes("Alt.")){
+                    total += exo["setNb"] * (exo["reps"]*2*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
                 }else{
-                    total += session[2][i][2] * (time_unstring(session[2][i][3])*repTime + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
+                    total += exo["setNb"] * (exo["reps"]*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
                 };
-            }else if(session[2][i][0] == "Uni."){
-                let repsDuration = time_unstring(session[2][i][3]) * repTime;
-                let setsDone = uniFix ? Math.floor(session[2][i][2]/2) : session[2][i][2];
+            }else if(exo["type"] == "Uni."){
+                let repsDuration = time_unstring(exo["reps"]) * repTime;
+                let setsDone = uniFix ? Math.floor(exo["setNb"]/2) : exo["setNb"];
  
-                total += setsDone * (2*repsDuration + time_unstring(session[2][i][5])) - time_unstring(session[2][i][5]);
-            }else if(session[2][i][0] == "Pause"){
-                if(i != session[2].length - 1){total += time_unstring(session[2][i][1])};
+                total += setsDone * (2*repsDuration + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
+            }else if(exo["type"] == "Pause"){
+                if(i != session["exoList"].length - 1){total += time_unstring(exo["rest"])};
             };
-        };
+        });
 
         return total;
     };
 };
 
+function isIntervallLinked(data){
+    return data["linkId"];
+};
+
 function get_session_exoCount(session){
     let nb_exo = 0;
 
-    for(let i=0;i<session[2].length;i++){
-        if(session[0] == "I"){
-            if(session[2][i][0] == "Int."){
+    session["exoList"].forEach(exo => {
+        if(session["type"] == "I"){
+            if(exo["type"] == "Int."){
                 nb_exo += 1;
             };
-        }else if(session[0] == "W"){
-            if(session[2][i][0] == "Int."){
-                if(isIntervallLinked(session[2][i])){
-                    nb_exo += session_list[getSessionIndexByID(session_list, session[2][i][1])][2].filter(el => el[0] == "Int.").length;
+        }else if(session["type"] == "W"){
+            if(exo["type"] == "Int."){
+                if(isIntervallLinked(exo)){
+                    let linkIndex = getSessionIndexByID(exo["linkId"]);
+                    nb_exo += session_list[linkIndex]["exoList"].filter(exo => exo["type"] == "Int.").length;
                 }else{
-                    nb_exo += session[2][i].filter(el => el[0] == "Int.").length;
+                    nb_exo += exo["exoList"].filter(exo => exo['type'] == "Int.").length;
                 };
-            }else if(session[2][i][0] != "Pause" && session[2][i][0] != "Wrm."){
+            }else if(exo["type"] != "Pause" && exo["type"] != "Wrm."){
                 nb_exo += 1;
             };
         };
-
-    };
+    });
 
     return nb_exo;
 };
@@ -283,46 +303,42 @@ function refresh_session_tile(){
     let data = $('.selection_session_tile');
 
     session_list.forEach((session, index) => {
-        $(data[index]).find('.selection_session_totaltime').text(get_time(get_session_time(session)));
-        $(data[index]).find('.selection_session_cycle').text(get_session_exoCount(session) + " Exercises");
+        $(data).eq(index).find('.selection_session_totaltime').text(get_time(get_session_time(session)));
+        $(data).eq(index).find('.selection_session_cycle').text(get_session_exoCount(session) + " Exercises");
     });
 };
 
 function get_session_stats(session){
-    let [workedTime, weightLifted, repsDone] = [0, 0, 0, 0];
+    let [workedTime, weightLifted, repsDone] = [0, 0, 0];
 
     let type = false;
-    let item = false;
     let reps = false;
     let roundedWeight = false;
     let exoList = false;
-    
-    for(let i=0;i<session[2].length;i++){
-        
-        type = session[2][i][0];
-        item = session[2][i];
-        
-        if(type == "Pause"){continue};
 
+    session["exoList"].forEach(exo => {
+        type = exo["type"];
+        
+        if(type == "Pause"){return};
         if(type == "Int."){
 
-            if(isIntervallLinked(session[2][i])){
-                exoList = session_list[getSessionIndexByID(session_list, session[2][i][1])][2];
+            if(isIntervallLinked(exo)){
+                exoList = session_list[getSessionIndexByID(exo["linkId"])]["exoList"];
             }else{
-                exoList = item[2];
+                exoList = exo["exoList"];
             };
 
-            for(let z=0;z<exoList.length;z++){
-                if(exoList[z][0] == "Int."){
-                    repsDone += parseInt(exoList[z][2]) * (time_unstring(exoList[z][3]) / repTime);
-                    workedTime += parseInt(exoList[z][2]) * time_unstring(exoList[z][3])
+            exoList.forEach(subExo => {
+                if(subExo["type"] == "Int."){
+                    repsDone += parseInt(subExo["cycle"]) * (time_unstring(subExo["work"]) / repTime);
+                    workedTime += parseInt(subExo["cycle"]) * time_unstring(subExo["work"])
                 };
-            };
-
+            });
         }else if(type == "Bi."){
-            roundedWeight = unitRound(item[4]);
-            reps = parseInt(item[2]) * parseInt(item[3]);
-            if(session[2][i][1].includes("Alt.")){
+            roundedWeight = unitRound(exo["weight"]);
+            reps = parseInt(exo["setNb"]) * parseInt(exo["reps"]);
+
+            if(exo["name"].includes("Alt.")){
                 repsDone += 2 * reps;
                 workedTime += reps * repTime;
                 weightLifted += 2 * reps * roundedWeight;
@@ -332,22 +348,28 @@ function get_session_stats(session){
                 weightLifted += reps * roundedWeight;
             };
         }else if(type == "Uni."){
-            roundedWeight = unitRound(item[4]);
-            reps = parseInt(item[2]) * parseInt(item[3]);
+            roundedWeight = unitRound(exo["weight"]);
+            reps = parseInt(exo["setNb"]) * parseInt(exo["reps"]);
+
             repsDone += reps;
             workedTime += reps * repTime;
             weightLifted += reps * roundedWeight;
-        };
-    };
+        }; 
+    });
 
-    return [Math.round(workedTime), weightLifted, Math.round(repsDone)];
+
+    return {
+        "workedTime": Math.round(workedTime), 
+        "weightLifted": weightLifted, 
+        "repsDone": Math.round(repsDone)
+    };
 };
 
 function getSmallesRest(){
     if(LrestTime - Lspent > RrestTime - Rspent){
-        return textAssets[language]["misc"]["rightInitial"];
+        return textAssets[parameters["language"]]["misc"]["rightInitial"];
     }else{
-        return textAssets[language]["misc"]["leftInitial"];
+        return textAssets[parameters["language"]]["misc"]["leftInitial"];
     };
 };
 
@@ -359,37 +381,66 @@ function showBlurPage(className){
 
 function nbSessionScheduled(){
     let count = 0;
-    let vsDate = zeroAM(new Date()).getTime();
+    let vsDate = zeroAM(new Date());
 
     session_list.forEach(session => {
         let scheduleType = getScheduleScheme(session);
-        let scheduleData = false;
-        let scheduleOffset = false;
+        let notif = isScheduled(session);
+            
+        let firstDate = false;
         let elapsedDays = false;
-
         let scheduledDate = false;
 
-        if(scheduleType == "Day"){
-            scheduleData = session[session.length - 2];
-            scheduleOffset = scheduleData[1][1];
+        if(notif){
+            if(scheduleType == "Day"){
+                firstDate = zeroAM(new Date(notif["dateList"][0]));
 
-            scheduledDate = zeroAM(new Date(scheduleData[2][1])).getTime();
-            elapsedDays = -daysBetweenTimestamps(vsDate, scheduledDate);
-            
-            if(elapsedDays > 0){
-                count += Math.ceil(elapsedDays / scheduleOffset);
-            };
-        }else if(scheduleType == "Week"){
-            scheduleData = session[session.length - 2];
-            scheduleOffset = scheduleData[1][1] * 7;
-            scheduleData[2].forEach(day => {
-                scheduledDate = zeroAM(new Date(day[1])).getTime();
-                elapsedDays = -daysBetweenTimestamps(vsDate, scheduledDate);
-
-                if(elapsedDays > 0){
-                    count += Math.ceil(elapsedDays / scheduleOffset);
+                scheduledDate = firstDate;
+                elapsedDays = daysBetweenTimestamps(vsDate.getTime(), scheduledDate.getTime());
+    
+                for (let i = 0; i < elapsedDays - 1; i++) { 
+                    if(isEventScheduled(
+                        scheduledDate, 
+                        firstDate, 
+                        notif["scheduleData"]["count"], 
+                        notif["scheduleData"]["scheme"], 
+                        notif['jumpData']['jumpVal'], 
+                        notif['jumpData']['jumpType'], 
+                        notif['jumpData']['everyVal'], 
+                        notif["scheduleData"]['occurence'], 
+                        session['id']
+                    )){
+                        count += 1;
+                    };
+    
+                    scheduledDate.setDate(scheduledDate.getDate() + 1);
                 };
-            });
+            }else if(scheduleType == "Week"){
+                notif["dateList"].forEach(timestamp => {
+                    firstDate = zeroAM(new Date(timestamp));
+
+                    scheduledDate = firstDate;
+                    elapsedDays = daysBetweenTimestamps(vsDate.getTime(), scheduledDate.getTime());
+        
+                    for (let i = 0; i < elapsedDays - 1; i++) { 
+                        if(isEventScheduled(
+                            scheduledDate, 
+                            firstDate, 
+                            notif["scheduleData"]["count"], 
+                            notif["scheduleData"]["scheme"], 
+                            notif['jumpData']['jumpVal'], 
+                            notif['jumpData']['jumpType'], 
+                            notif['jumpData']['everyVal'], 
+                            notif["scheduleData"]['occurence'], 
+                            session['id']
+                        )){
+                            count += 1;
+                        };
+        
+                        scheduledDate.setDate(scheduledDate.getDate() + 1);
+                    };
+                });
+            };
         };
     });
 
@@ -399,44 +450,36 @@ function nbSessionScheduled(){
 // History
 
 function getSessionHistory(session){
-    if(session[0] == "W"){
-        return isScheduled(session) ? session[session.length - 3] : session[session.length - 2];
-    }else if(session[0] == "I"){
-        return isScheduled(session) ? session[session.length - 3] : session[session.length - 2];
-    }
+    return session["history"];
 };
 
 function isHistoryDayEmpty(historyDay){
     let count = 0;
 
-    for(let z=0; z<historyDay[2].length; z++){
-        if(historyDay[2][z].length == 2){
-            historyDay[2][z][1].forEach(intExo => {
-                if(intExo.length == 3){
-                    count += intExo[2].reduce((acc, arr) => acc + arr.length, 0)
-                };
+    historyDay['exoList'].forEach(exo => {
+        if(exo["type"] == "Int."){
+            exo['exoList'].forEach(subExo => {
+                count += subExo["setList"].length;
             });
         }else{
-            count += historyDay[2][z][2].length;
+            count += exo["setList"].length;
         };
-    };
+    });
 
     return count == 0;
 };
 
 function getLastHistoryDay(history){
-    let day = history[history.length - 1];
-
-    if(day[0] == "State"){
+    if(history["historyList"].length == 0){
         return [];
     }else{
-        return day;
+        return history["historyList"][history["historyList"].length - 1];;
     };
 };
 
-function getHistoryIndex(history, id){
-    for(let i=0;i<history[2].length;i++){
-        if(history[2][i][history[2][i].length - 1] == id){
+function getHistoryExoIndex(history, id){
+    for(let i=0;i<history["exoList"].length;i++){
+        if(history["exoList"][i]["id"] == id){
             return i;
         };
     };
@@ -468,8 +511,8 @@ function smallestAvailableExoId(){
 function getExoIndexById(session, id){
     let out = false;
 
-    session[2].forEach((item, index) => {
-        if(item[item.length -1] == id.replace(/_(1|2)/g, "")){
+    session["exoList"].forEach((item, index) => {
+        if(item['id'] == id.replace(/_(1|2)/g, "")){
             out = parseInt(index);
         };
     });
@@ -480,21 +523,21 @@ function getExoIndexById(session, id){
 function mergeHistoryExo(history, id){
     let out = [];
 
-    history[2].forEach((item) => {
-        if(item[item.length -1].replace(/_(1|2)/g, "") == id){
-            out.push(item);
+    history["exoList"].forEach(exo => {
+        if(exo["id"].replace(/_(1|2)/g, "") == id){ 
+            out.push(exo['setList']);
         };
     });
     
-    return [...out[0][2], ...out[1][2]];
+    return [...out[0], ...out[1]];
 };
 
-function areSessionEquallyCompleted(currentHistory, pastHistory){
+function areSessionEquallyCompleted(currentHistory, pastHistory){!
     function findHistoryExoByID(history, id){
-        for (let index = 0; index < history[2].length; index++){
-            const exo = history[2][index];
+        for(let index = 0; index < history["exoList"].length; index++){
+            const exo = history["exoList"][index];
             
-            if(exo[exo.length - 1] == id){
+            if(exo["id"] == id){
                 return exo;
             };
         };
@@ -505,12 +548,12 @@ function areSessionEquallyCompleted(currentHistory, pastHistory){
     let areEqual = true;
     let pastExo = false;
 
-    currentHistory[2].forEach(currentExo => {
-        pastExo = findHistoryExoByID(pastHistory, currentExo[currentExo.length - 1]);
+    currentHistory["exoList"].forEach(currentExo => {
+        pastExo = findHistoryExoByID(pastHistory, currentExo["id"]);
 
-        if(pastExo == -1){return};
+        if(pastExo == -1 || pastExo['type'] == "Int."){return}; // INT ARE NOT TOOK IN COUNT FOR THE MOMENT
 
-        if(currentExo[2].length < pastExo[2].length){
+        if(currentExo["setList"].length < pastExo["setList"].length){
             areEqual = false;
         };
     });
@@ -593,7 +636,7 @@ function get_time_u(ref, getList=false){
     minutes = (minutes.length == 1 && minutes != 0 && ref > 3600) ? "0"+minutes : minutes;
     secondes = (secondes.length == 1 && secondes != 0 && ref > 60) ? "0"+secondes : secondes;
 
-    if(getList){return [parseInt(years), parseInt(weeks), parseInt(days), parseInt(hours), parseInt(minutes), parseInt(secondes)]}else{return (years != 0 ? years+textAssets[language]["misc"]["yearAbbrTimeString"] : "")+(weeks != 0 ? weeks+"w" : "")+(days != 0 ? days+textAssets[language]["misc"]["dayAbbrTimeString"] : "")+(hours != 0 ? hours+"h" : "")+(minutes != 0 ? minutes+"m" : "")+((secondes != 0 || ref < 60) ? secondes+"s" : "")};
+    if(getList){return [parseInt(years), parseInt(weeks), parseInt(days), parseInt(hours), parseInt(minutes), parseInt(secondes)]}else{return (years != 0 ? years+textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"] : "")+(weeks != 0 ? weeks+"w" : "")+(days != 0 ? days+textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"] : "")+(hours != 0 ? hours+"h" : "")+(minutes != 0 ? minutes+"m" : "")+((secondes != 0 || ref < 60) ? secondes+"s" : "")};
 };
 
 function time_unstring(strr, getList=false){
@@ -607,9 +650,9 @@ function time_unstring(strr, getList=false){
         return parseInt(strr);
     };
 
-    let reY = new RegExp(`\\d{1,}${textAssets[language]["misc"]["yearAbbrTimeString"]}`, "g");
-    let reD = new RegExp(`\\d{1,}${textAssets[language]["misc"]["dayAbbrTimeString"]}`, "g");
-    let reAuth = new RegExp("^"+textAssets[language]["misc"]["yearAbbrTimeString"]+"w"+textAssets[language]["misc"]["dayAbbrTimeString"]+"hms0123456789", "g");
+    let reY = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"]}`, "g");
+    let reD = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"]}`, "g");
+    let reAuth = new RegExp("^"+textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"]+"w"+textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"]+"hms0123456789", "g");
 
     let y = strr.match(reY);
     let w = strr.match(/\d{1,}w/);
@@ -622,13 +665,13 @@ function time_unstring(strr, getList=false){
         return false;
     }else if(strr.match(reAuth) !== null){
         return false;
-    }else if(strr.match(textAssets[language]["misc"]["yearAbbrTimeString"]) && y === null || strr.match(/w/) && w === null || strr.match(textAssets[language]["misc"]["dayAbbrTimeString"]) && d === null || strr.match(/h/) && h === null || strr.match(/m/) && m === null || strr.match(/s/) && s === null){
+    }else if(strr.match(textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"]) && y === null || strr.match(/w/) && w === null || strr.match(textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"]) && d === null || strr.match(/h/) && h === null || strr.match(/m/) && m === null || strr.match(/s/) && s === null){
         return false;
     };
 
-    y = (y !== null) ? parseInt(y[0].split(textAssets[language]["misc"]["yearAbbrTimeString"])[0]) : 0;
+    y = (y !== null) ? parseInt(y[0].split(textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"])[0]) : 0;
     w = (w !== null) ? parseInt(w[0].split("w")[0]) : 0;
-    d = (d !== null) ? parseInt(d[0].split(textAssets[language]["misc"]["dayAbbrTimeString"])[0]) : 0;
+    d = (d !== null) ? parseInt(d[0].split(textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"])[0]) : 0;
     h = (h !== null) ? parseInt(h[0].split("h")[0]) : 0;
     m = (m !== null) ? parseInt(m[0].split("m")[0]) : 0;
     s = (s !== null) ? parseInt(s[0].split("s")[0]) : 0;
@@ -646,27 +689,6 @@ function hasHourPassed(date, hours, minutes){
     return hours*3600 + minutes*60 > date.getHours()*3600 + date.getMinutes()*60;
 };
 
-function closestNextDateSAV(timestamp, gap, intervallType, offset = false){
-    let out = new Date(timestamp);
-    let now = new Date();
-
-    let inc = intervallType == "Day" ? 1 : 7;
-
-    if (out.getTime() >= now.getTime()) {
-        return out.getTime();
-    };
-
-    while (out.getTime() < now.getTime()){
-        out.setDate(out.getDate() + (gap * inc));
-    };
-
-    if(offset){
-        out.setDate(out.getDate() + (offset * gap * inc));
-    };
-
-    return out.getTime();
-};
-
 function getScheduleIntervall(fromTimestamp, timestamp, gap, intervalType) {
     let out = new Date(timestamp);
     let now = new Date(fromTimestamp);
@@ -681,42 +703,6 @@ function getScheduleIntervall(fromTimestamp, timestamp, gap, intervalType) {
 
     return -1;
 };
-
-function closestNextDate(D, scheduleData, offset = 0) {
-    const now = new Date();
-    const studyDate = new Date(D)
-
-    const X = scheduleData[1][1];
-    const Y = scheduleData[1][0];
-    const Z = scheduleData[3]["jumpVal"];
-    const U = scheduleData[3]["jumpType"];
-    const T = scheduleData[3]["everyVal"];
-    const O = scheduleData[4];
-
-    const hours = scheduleData[1][2];
-    const minutes = scheduleData[1][3];
-
-    // Start searching from max(D, now) so we look for future occurrences
-    let testDate = new Date(Math.max(studyDate.getTime(), now.getTime()));
-
-    // Increment day-by-day until we find a scheduled event
-    while(!isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)){
-        testDate.setDate(testDate.getDate() + 1);
-    };
-
-    // Once found, if offset is given, move forward by (offset * X * inc) days
-    let offsetCount = 0;
-    while (offsetCount != offset) {
-        testDate.setDate(testDate.getDate() + 1);
-        if(isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)){
-            offsetCount += 1;
-        };
-    };
-
-    testDate = setHoursMinutes(testDate, hours, minutes);
-
-    return testDate.getTime();
-}
 
 function zeroAM(date){
     date.setHours(0);
@@ -741,9 +727,9 @@ function formatDate(timestamp) {
         day = '0' + day;
     };
 
-    if(language == "french"){
+    if(parameters["language"] == "french"){
         return [day, month, year].join('/');
-    }else if(language == "english"){
+    }else if(parameters["language"] == "english"){
         return [year, month, day].join('/');
     };
 };
@@ -754,7 +740,7 @@ function parseDate(dateString) {
 
     let year, month, day;
 
-    if (language == 'french') {
+    if (parameters["language"] == 'french') {
         day = parseInt(parts[0]);
         month = parseInt(parts[1]);
         year = parseInt(parts[2]);
@@ -770,11 +756,71 @@ function parseDate(dateString) {
     return new Date(year, month, day);
 };
 
+function setHoursMinutes(date, hours, minutes){
+    date.setHours(hours);
+    date.setMinutes(minutes);
+
+    return date;
+};
+
 function daysBetweenTimestamps(timestamp1, timestamp2) {
-    return Math.ceil(timestamp2 - timestamp1) / (60 * 60 * 24) / 1000;
+    return Math.round(timestamp2 - timestamp1) / (60 * 60 * 24) / 1000;
 };
 
 // Notification
+
+async function deleteRelatedSwap(from){
+    for (let i = sessionSwapped.length - 1; i >= 0; i--) {
+        const item = sessionSwapped[i];
+
+        if(item["from"] === from){
+            if(istoday(item['time'])){
+                sessionToBeDone["data"][item["idTo"]] = false;
+            };
+            
+            if(platform == "Mobile"){await removeAllNotifsFromSession(session_list[getSessionIndexByID(item["idTo"])])};
+            sessionSwapped.splice(i, 1);
+        };
+    };
+};
+
+function closestNextDate(D, notif, offset = 0) {
+    if(typeof D !== "number"){return false};
+
+    const now = new Date();
+    const studyDate = new Date(D)
+
+    const X = notif["scheduleData"]["count"];
+    const Y = notif["scheduleData"]["scheme"];
+    const Z = notif["jumpData"]["jumpVal"];
+    const U = notif["jumpData"]["jumpType"];
+    const T = notif["jumpData"]["everyVal"];
+    const O = notif["occurence"];
+
+    const hours = notif["scheduleData"]["hours"];
+    const minutes = notif["scheduleData"]["minutes"];
+
+    // Start searching from max(D, now) so we look for future occurrences
+    let testDate = new Date(Math.max(studyDate.getTime(), now.getTime()));
+
+    // Increment day-by-day until we find a scheduled event
+    while(!isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)){
+        testDate.setDate(testDate.getDate() + 1);
+    };
+
+    // Once found, if offset is given, move forward by (offset * X * inc) days
+    let offsetCount = 0;
+    while (offsetCount != offset) {
+        testDate.setDate(testDate.getDate() + 1);
+        if(isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)){
+            offsetCount += 1;
+        };
+    };
+
+    testDate = setHoursMinutes(testDate, hours, minutes);
+
+    return testDate.getTime();
+};
 
 function smallestAvailableId(){
 
@@ -782,7 +828,7 @@ function smallestAvailableId(){
     let fusion = [...session_list, ...reminder_list];
 
     for(let i=0; i<fusion.length; i++){
-        idList.push(parseInt(fusion[i][fusion[i].length -1]));
+        idList.push(parseInt(fusion[i]["id"]));
     };
 
     let max = Math.max(...idList);
@@ -797,15 +843,7 @@ function smallestAvailableId(){
 };
 
 function isScheduled(item){
-    if(item[item.length - 2].constructor.name == "Array"){
-        if(item[item.length - 2][0] == "Notif"){
-            return item[item.length - 2];
-        }else{
-            return false;
-        };
-    }else{
-        return false;
-    };
+    return item["notif"];
 };
 
 function noSessionSchedule(){
@@ -820,8 +858,9 @@ function noSessionSchedule(){
 };
 
 function getContractedType(type){
-    let base = textAssets[language]["updatePage"]["exerciseTypes"];
+    let base = textAssets[parameters["language"]]["updatePage"]["exerciseTypes"];
     let keys  = Object.keys(base);
+
     for (let x = 0; x < keys.length; x++) {
         if(base[keys[x]] == type){
             return keys[x];
@@ -829,9 +868,9 @@ function getContractedType(type){
     };
 };
 
-function getSessionIndexByID(data, id){
-    for(let i=0; i<data.length; i++){
-        if(data[i].getId() == id){
+function getSessionIndexByID(id){
+    for(let i=0; i<session_list.length; i++){
+        if(session_list[i]["id"] == id){
             return i;
         };
     };
@@ -841,7 +880,7 @@ function getSessionIndexByID(data, id){
 
 function getReminderIndexByID(id){
     for(let i=0; i<reminder_list.length; i++){
-        if(reminder_list[i].getId() == id){
+        if(reminder_list[i]['id'] == id){
             return i;
         };
     };
@@ -850,24 +889,43 @@ function getReminderIndexByID(id){
 };
 
 function getNotifFirstIdChar(session){
-    let data = isScheduled(session);
+    let notif = isScheduled(session);
     let todaysDate = zeroAM(new Date()).getTime();
 
-    if(data && getScheduleScheme(session) == "Week"){
-        for(let i=0; i<data[2].length; i++){
-            if(todaysDate == zeroAM(new Date(data[2][i][1])).getTime()){
+    if(notif && getScheduleScheme(session) == "Week"){
+        for(let i=0; i<notif["dateList"].length; i++){
+            if(todaysDate == zeroAM(new Date(notif["dateList"][i])).getTime()){
                 return "2"+(i+1).toString();
             };
         };
-        return "9"
-    }else if(data && getScheduleScheme(session) == "Day"){
-        if(todaysDate == zeroAM(new Date(data[2][1])).getTime()){
+
+        return "9";
+    }else if(notif && getScheduleScheme(session) == "Day"){
+        if(todaysDate == zeroAM(new Date(notif["dateList"][0])).getTime()){
             return "1";
         }else{
             return "9"
         };
     }else{
         return "9";
+    };
+};
+
+function getScheduleScheme(session){
+    let scheduleData = isScheduled(session);
+
+    if(scheduleData){
+        return scheduleData["scheduleData"]["scheme"];
+    }else{
+        return false;
+    };
+};
+
+function nextOccurence(notif){
+    if(notif["occurence"] + 1 > notif["jumpData"]["everyVal"]){
+        notif["occurence"] = 1;
+    }else{
+        notif["occurence"] += 1;
     };
 };
 
@@ -879,7 +937,7 @@ function getSession_order(){
     let sessions = session_reorder.getOrder();
 
     for(let i=0;i<sessions.length;i++){
-        output.push($($(".selection_session_tile")[i]).children(".selection_session_name").text());
+        output.push($(".selection_session_tile").eq(i).children(".selection_session_name").text());
     };
 
     return output;
@@ -890,13 +948,13 @@ function sessionReorder_update(){
     let new_order = getSession_order();
     let new_list = new Array();
 
-    for(let i=0;i<new_order.length;i++){
-        for(let z=0;z<session_list.length;z++){
-            if(session_list[z][1] == new_order[i]){
-                new_list.push(session_list[z]);
+    new_order.forEach(order => {
+        session_list.forEach(session => {
+            if(session["name"] == order){
+                new_list.push(session);
             };
-        };
-    };
+        });
+    });
 
     if(JSON.stringify(session_list)==JSON.stringify(new_list)){return};
 
@@ -907,10 +965,10 @@ function sessionReorder_update(){
 function getReminder_order(){
     let output = new Array();
 
-    let sessions = reminder_reorder.getOrder();
+    let reminders = reminder_reorder.getOrder();
 
-    for(let i=0;i<sessions.length;i++){
-        output.push($($(".selection_reminder_tile")[i]).children(".selection_reminder_name").text());
+    for(let i=0;i<reminders.length;i++){
+        output.push($(".selection_reminder_tile").eq(i).children(".selection_reminder_name").text());
     };
 
     return output;
@@ -921,13 +979,13 @@ function reminderReorder_update(){
     let new_order = getReminder_order();
     let new_list = new Array();
 
-    for(let i=0;i<new_order.length;i++){
-        for(let z=0;z<reminder_list.length;z++){
-            if(reminder_list[z][1] == new_order[i]){
-                new_list.push(reminder_list[z]);
+    new_order.forEach(order => {
+        reminder_list.forEach(reminder => {
+            if(reminder["name"] == order){
+                new_list.push(reminder);
             };
-        };
-    };
+        });
+    });
 
     if(JSON.stringify(reminder_list)==JSON.stringify(new_list)){return};
 
@@ -969,20 +1027,18 @@ function unitRound(val){
 };
 
 function updateWeightUnits(data, from, to){
-    for(let i = 0; i < data.length; i++){
-        let session = data[i];
-        if(session[0] == "W"){
-            let exercises = session[2];
-            for (let j = 0; j < exercises.length; j++) {
-                if(exercises[j][0] != "Pause" && exercises[j][0] != "Int."){
-                    exercises[j][4] = convertToUnit(exercises[j][4], from, to);
+    data.forEach(session => {
+        if(session["type"] == "W"){
+            session['exoList'].forEach(exo => {
+                if(exo["type"] == "Int." || exo["type"] == "Bi."){
+                    exo["weight"] = convertToUnit(exo["weight"], from, to);
                 };
-            };
+            });
         };
-    };
+    });
 
     session_save(data);
-    previousWeightUnit = weightUnit;
+    previousWeightUnit = parameters["weightUnit"];
 };
 
 function weightUnitgroup(val, unit){
@@ -1003,13 +1059,13 @@ function roundToNearestHalf(num) {
 // Language
 
 function changeLanguage(lang, first=false){
-
     // Time Selector;
 
     $(".timeSelectorSubmit").text(textAssets[lang]["misc"]['submit']);
 
     // Calendar;
 
+    $(".calendarPickerSubmit").text(textAssets[lang]["misc"]['submit']);
     $(".selection_page_calendar_header_D").eq(0).text(textAssets[lang]["misc"]["dayInitials"]["monday"]);
     $(".selection_page_calendar_header_D").eq(1).text(textAssets[lang]["misc"]["dayInitials"]["tuesday"]);
     $(".selection_page_calendar_header_D").eq(2).text(textAssets[lang]["misc"]["dayInitials"]["wednesday"]);
@@ -1037,10 +1093,10 @@ function changeLanguage(lang, first=false){
     $(".selection_info_item_title").eq(4).text(textAssets[lang]["stats"]["sessionMissed"]);
     $(".selection_infoStart_title").text(textAssets[lang]["stats"]["since"]);
 
-    $(".selection_infoStart_value").text(formatDate(since));
+    $(".selection_infoStart_value").text(formatDate(stats["since"]));
 
-    $(".selection_info_TimeSpent").text($(".selection_info_TimeSpent").text().replace(textAssets[previousLanguage]["misc"]["yearAbbrTimeString"], textAssets[lang]["misc"]["yearAbbrTimeString"]).replace(textAssets[previousLanguage]["misc"]["dayAbbrTimeString"], textAssets[language]["misc"]["dayAbbrTimeString"]));
-    $(".selection_info_WorkedTime").text($(".selection_info_WorkedTime").text().replace(textAssets[previousLanguage]["misc"]["yearAbbrTimeString"], textAssets[lang]["misc"]["yearAbbrTimeString"]).replace(textAssets[previousLanguage]["misc"]["dayAbbrTimeString"], textAssets[language]["misc"]["dayAbbrTimeString"]));
+    $(".selection_info_TimeSpent").text($(".selection_info_TimeSpent").text().replace(textAssets[previousLanguage]["misc"]["yearAbbrTimeString"], textAssets[lang]["misc"]["yearAbbrTimeString"]).replace(textAssets[previousLanguage]["misc"]["dayAbbrTimeString"], textAssets[lang]["misc"]["dayAbbrTimeString"]));
+    $(".selection_info_WorkedTime").text($(".selection_info_WorkedTime").text().replace(textAssets[previousLanguage]["misc"]["yearAbbrTimeString"], textAssets[lang]["misc"]["yearAbbrTimeString"]).replace(textAssets[previousLanguage]["misc"]["dayAbbrTimeString"], textAssets[lang]["misc"]["dayAbbrTimeString"]));
 
     // Preferences;
 
@@ -1103,34 +1159,28 @@ function changeLanguage(lang, first=false){
 
     // Schedule;
 
-    $(".update_schedule_opt").eq(0).text(textAssets[lang]["misc"]["dayLabels"]["monday"]);
-    $(".update_schedule_opt").eq(1).text(textAssets[lang]["misc"]["dayLabels"]["tuesday"]);
-    $(".update_schedule_opt").eq(2).text(textAssets[lang]["misc"]["dayLabels"]["wednesday"]);
-    $(".update_schedule_opt").eq(3).text(textAssets[lang]["misc"]["dayLabels"]["thursday"]);
-    $(".update_schedule_opt").eq(4).text(textAssets[lang]["misc"]["dayLabels"]["friday"]);
-    $(".update_schedule_opt").eq(5).text(textAssets[lang]["misc"]["dayLabels"]["saturday"]);
-    $(".update_schedule_opt").eq(6).text(textAssets[lang]["misc"]["dayLabels"]["sunday"]);
+    $(".update_schedule_opt").eq(0).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
+    $(".update_schedule_opt").eq(1).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
 
-    $(".update_schedule_opt").eq(7).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
-    $(".update_schedule_opt").eq(8).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
-
-    $(".update_schedule_opt").eq(9).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
-    $(".update_schedule_opt").eq(10).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
+    $(".update_schedule_opt").eq(2).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
+    $(".update_schedule_opt").eq(3).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
 
     $(".update_schedule_span").eq(0).text(textAssets[lang]["updatePage"]["on"]);
     $(".update_schedule_span").eq(1).text(textAssets[lang]["updatePage"]["at"]);
     $(".update_schedule_span").eq(3).text(textAssets[lang]["updatePage"]["every"]);
 
-    $(".update_schedule_jumpText").text(textAssets[lang]["updatePage"]["jump"])
-    $(".update_schedule_jumpEveryText").text(textAssets[lang]["updatePage"]["times"])
-    $(".update_schedule_everyText").text(textAssets[lang]["updatePage"]["every"])
+    $(".update_schedule_jumpText").text(textAssets[lang]["updatePage"]["jump"]);
+    $(".update_schedule_jumpEveryText").text(textAssets[lang]["updatePage"]["times"]);
+    $(".update_schedule_everyText").text(textAssets[lang]["updatePage"]["every"]);
+
+    $('.update_colorPicker_span').text(textAssets[lang]["updatePage"]["pickColor"])
 
     // Session;
 
     $(".screensaver_Ltimer_prefix").text(textAssets[lang]["misc"]["leftInitial"] + " |");
     $(".screensaver_Rtimer_prefix").text(textAssets[lang]["misc"]["rightInitial"] + " |");
 
-    $(".lockTouch").text(textAssets[language]['screenSaver']['lock'])
+    $(".lockTouch").text(textAssets[lang]['screenSaver']['lock'])
 
     $(".session_exist_text").text(textAssets[lang]["inSession"]["exitQuestion"]);
     $(".session_exist_subtext").text(textAssets[lang]["inSession"]["exitDetails"]);
@@ -1169,7 +1219,7 @@ function changeLanguage(lang, first=false){
     $(".session_remaining_item_title").eq(3).text(textAssets[lang]["inSession"]["remaining"]["reReps"]); 
     $(".session_remaining_item_title").eq(4).text(textAssets[lang]["inSession"]["remaining"]["reWeight"]); 
 
-    previousLanguage = language;
+    previousLanguage = lang;
 };
 
 function updateExerciseHTML(prev, next){

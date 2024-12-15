@@ -1,20 +1,22 @@
-function isWeekNotifToday(id){
-    let sessionID = id.slice(2, -1);
-    let session = session_list[getSessionIndexByID(session_list, sessionID)];
-    let today = zeroAM(new Date()).getTime();
+function isIdIncludedToday(arr, sessionID){
 
-    let notifData = session[session.length - 2][2][id.toString()[1] - 1]
-    return zeroAM(new Date(notifData[1])).getTime() == today;
-};
+    function isWeekNotifToday(id){
+        let sessionID = id.slice(2, -1);
+        let session = session_list[getSessionIndexByID(sessionID)];
+        let today = zeroAM(new Date()).getTime();
+    
+        let timestamp = session["notif"]["dateList"][id.toString()[1] - 1];
+        return zeroAM(new Date(timestamp)).getTime() == today;
+    };
 
-function isIdIncludedToday(arr, sessionId, every){
+    let scheme = getScheduleScheme(session_list[getSessionIndexByID(sessionID)]);
 
-    let filteredArr = arr.filter((id) => (every == "Day" ? id.slice(1, -1) : id.slice(2, -1)) == sessionId);
+    let filteredArr = arr.filter((id) => (scheme == "Day" ? id.slice(1, -1) : id.slice(2, -1)) == sessionID);
     let result = false;
 
-    if(every == "Day"){
+    if(scheme == "Day"){
         return filteredArr[0];
-    }else if(every == "Week"){
+    }else if(scheme == "Week"){
         filteredArr.forEach(id => {
             if(isWeekNotifToday(id)){
                 result = id;
@@ -25,16 +27,17 @@ function isIdIncludedToday(arr, sessionId, every){
     return result ? result : filteredArr[filteredArr.length - 1];
 };
 
-async function getTodayPendingId(sessionID, every){
+async function getTodayPendingId(sessionID){
+    let scheme = getScheduleScheme(session_list[getSessionIndexByID(sessionID)]);
     let pending = platform == "Mobile" ? getIDListFromNotificationArray(await LocalNotifications.getPending()) : getPendingIdListWEB();
-    let realID = isIdIncludedToday(pending, sessionID, every);
+    let realID = isIdIncludedToday(pending, sessionID);
 
     if(realID){
         return realID;
     }else{
-        if(every == "Day"){
+        if(scheme == "Day"){
             return "1" + sessionID + "1";
-        }else if(every == "Week"){
+        }else if(scheme == "Week"){
             return "21" + sessionID + "1";
         };
     };
@@ -60,66 +63,69 @@ function getPendingIdListWEB(){
     let out = [];
     let comboList = [...session_list, ...reminder_list];
     let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
-    let data = false;
+    let notif = false;
 
-    for (let i = 0; i < comboList.length; i++) {
-        if(isScheduled(comboList[i])){
-            data = comboList[i][comboList[i].length - 2];
-            if(getScheduleScheme(comboList[i]) == "Day" && data[2][1] > Date.now() - toSubstract){
-                out.push("1" + comboList[i][comboList[i].length - 1] + "1");
+    comboList.forEach(data => {
+        if(isScheduled(data)){
+            notif = isScheduled(data);
+            if(getScheduleScheme(data) == "Day" && notif["dateList"][0] > Date.now() - toSubstract){
+                out.push("1" + data["id"] + "1");
             }else{
-                for (let z = 0; z < data[2].length; z++) {
-                    if(data[2][z][1] > Date.now() - toSubstract){
-                        out.push("2" + (z+1) + comboList[i][comboList[i].length - 1] + "1");
+                notif["dateList"].forEach(date => {
+                    if(date > Date.now() - toSubstract){
+                        out.push("2" + (z+1) + data["id"] + "1");
                     };
-                };
+                });
             };
-        };
-    };
+        }; 
+    });
 
     return out;
 };
 
-function isIdincluded(arr, sessionId, every){
-    let filteredArr = arr.filter((id) => (every == "Week" ? id.slice(2, -1) : id.slice(1, -1)) == sessionId)
+function isIdincluded(arr, sessionID){
+    let scheme = getScheduleScheme(session_list[getSessionIndexByID(sessionID)]);
+    let filteredArr = arr.filter((id) => (scheme == "Week" ? id.slice(2, -1) : id.slice(1, -1)) == sessionID)
     if(filteredArr.length > 0){return filteredArr[0]}else{return false};
 };
 
-async function isShown(sessionId, every){
+async function isShown(sessionID){
     if(platform == "Mobile"){
+        let scheme = getScheduleScheme(session_list[getSessionIndexByID(sessionID)]);
         let shown = getIDListFromNotificationArray(await LocalNotifications.getDeliveredNotifications());
-        return isIdincluded(shown, sessionId, every);
+        return isIdincluded(shown, sessionID, scheme);
     }else{
         return false;
     };
 };
 
-async function getPendingId(sessionID, every){
+async function getPendingId(sessionID){
+    let scheme = getScheduleScheme(session_list[getSessionIndexByID(sessionID)]);
     let pending = platform == "Mobile" ? getIDListFromNotificationArray(await LocalNotifications.getPending()) : getPendingIdListWEB();
-    let realID = isIdincluded(pending, sessionID, every);
+    let realID = isIdincluded(pending, sessionID, scheme);
 
     if(realID){
         return realID;
     }else{
-        if(every == "Day"){
+        if(scheme == "Day"){
             return "1" + sessionID + "1";
-        }else if(every == "Week"){
+        }else if(scheme == "Week"){
             return "21" + sessionID + "1";
         };
     };
 };
 
-async function getShownId(sessionID, every){
-
+async function getShownId(sessionID){
+    let scheme = getScheduleScheme(session_list[getSessionIndexByID(sessionID)]);
     let shown = platform == "Mobile" ? getIDListFromNotificationArray(await LocalNotifications.getDeliveredNotifications()) : [];
-    let realID = isIdincluded(shown, sessionID, every);
+    let realID = isIdincluded(shown, sessionID, scheme);
 
     if(realID){
         return realID;
     }else{
-        if(every == "Day"){
+        if(scheme == "Day"){
             return "1" + sessionID + "1";
-        }else if(every == "Week"){
+        }else if(scheme == "Week"){
             return "21" + sessionID + "1";
         };
     };
@@ -130,8 +136,8 @@ function getSessionIndexByNotificationID(id){
 
     id = id.toString();
 
-    let tryWeek = getSessionIndexByID(session_list, id.slice(2, -1));
-    let tryDay = getSessionIndexByID(session_list, id.slice(1, -1));
+    let tryWeek = getSessionIndexByID(id.slice(2, -1));
+    let tryDay = getSessionIndexByID(id.slice(1, -1));
 
     if (tryWeek !== false){
         if(getScheduleScheme(session_list[tryWeek]) == "Week"){
@@ -174,21 +180,6 @@ function getReminderIndexByNotificationID(id){
     };
 };
 
-function setHoursMinutes(date, hours, minutes){
-    date.setHours(hours);
-    date.setMinutes(minutes);
-    return date;
-};
-
-function getScheduleScheme(session){
-    let scheduleData = isScheduled(session);
-    if(scheduleData){
-        return scheduleData[1][0];
-    }else{
-        return false;
-    };
-};
-
 function isNotificationAnticipated(timestamp, hours, minutes){
     let testDate = new Date(timestamp);
     return testDate.getHours() != hours || testDate.getMinutes() != minutes;
@@ -198,76 +189,65 @@ function isNotificationAnticipated(timestamp, hours, minutes){
 
 async function uniq_reschedulerSESSION(id){
     let hasBeenRescheduled = false;
-    let beforeLeapCycle = false;
     let index = false;
-    let data = false;
+    let notif = false;
     
     index = getSessionIndexByNotificationID(id);
-    data = isScheduled(session_list[index]);
-    beforeLeapCycle = data[3]["everyVal"];
+    notif = isScheduled(session_list[index]);
 
     let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
 
-    if(data[1][0] == "Day"){
+    if(notif["scheduleData"]["scheme"] == "Day"){
         id = id.slice(-1) == "1" ? id.slice(0, -1) + "2" : id.slice(0, -1) + "1";
 
-        data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+        notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
 
-        if(Date.now() <= data[2][1] && sessionToBeDone[1][session_list[index].getId()]){
+        if(Date.now() <= notif["dateList"][0] && sessionToBeDone[1][session_list[index]["id"]]){
             hasBeenRescheduled = true;
-            data[2][1] = closestNextDate(parseInt(data[2][1]), data, 1);
+            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif, 1);
         }else{
-            data[2][1] = closestNextDate(parseInt(data[2][1]), data);
+            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
         };
 
-        if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
-            data[2][1] -= toSubstract;
+        if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
+            notif["dateList"][0] -= toSubstract;
         };
-
-        data[2][0] = dayofweek[new Date(data[2][1]).getDay()];
 
         if(platform == "Mobile"){
-            await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session_list[index][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
+            await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session_list[index][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
         };
 
-    }else if(data[1][0] == "Week"){
+    }else if(notif["scheduleData"]["scheme"] == "Week"){
         let z = parseInt(id.slice(1, 2)) - 1;
 
         id = id.slice(-1) == "1" ? id.slice(0, -1) + "2" : id.slice(0, -1) + "1";
 
-        data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+        notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
 
-        if(Date.now() <= data[2][z][1] && sessionToBeDone[1][session_list[index].getId()]){
+        if(Date.now() <= notif["dateList"][z] && sessionToBeDone[1][session_list[index]["id"]]){
             hasBeenRescheduled = true;
-            data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data, 1);
+            notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif, 1);
         }else{
-            data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
+            notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
         };
 
-        if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
-            data[2][z][1] -= toSubstract;
+        if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
+            notif["dateList"][z] -= toSubstract;
         };
 
         if(platform == "Mobile"){
-            await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session_list[index][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
+            await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session_list[index][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
         };
     };
 
-    if(hasBeenRescheduled){
-        if(data[4] + 1 > beforeLeapCycle){
-            data[4] = 1;
-        }else{
-            data[4] += 1;
-        };
-    };
-
+    if(hasBeenRescheduled){nextOccurence(notif)};
 
     if(platform == "Mobile"){
         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
     };
 
     session_save(session_list);
-    updateCalendar(session_list);
+    updateCalendar(session_list, updateCalendarPage);
 };
 
 async function uniq_schedulerEDIT(id, reminderOrSession){
@@ -286,47 +266,44 @@ async function uniq_schedulerEDIT(id, reminderOrSession){
             await removeAllNotifsFromSession(input[i]);
         };
 
-        let data = isScheduled(input[i]);
-        let beforeLeapCycle = data[3]["everyVal"];
+        let notif = isScheduled(input[i]);
 
-        if(data[1][0] == "Day"){
+        if(notif["scheduleData"]["scheme"] == "Day"){
             id = id.slice(0, -1) + "1";
 
-            data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-            data[2][1] = closestNextDate(parseInt(data[2][1]), data);
+            notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
+            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
 
-            if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
-                data[2][1] -= toSubstract;
+            if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
+                notif["dateList"][0] -= toSubstract;
             };
-
-            data[2][0] = dayofweek[new Date(data[2][1]).getDay()];
 
             if(platform == "Mobile"){
                 if(reminderOrSession == "reminder"){
-                    await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], input[i][2], id, 'reminder');
+                    await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                 }else if(reminderOrSession == "session"){
-                    await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                    await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                 };
             };
 
-        }else if(data[1][0] == "Week"){
-            let idy = input[i].getId();
+        }else if(notif["scheduleData"]["scheme"] == "Week"){
+            let idy = input[i]["id"];
 
-            for(let z=0; z<data[2].length; z++){
+            for(let z=0; z<notif["dateList"].length; z++){
                 id = "2" + (z+1) + idy + "1";
 
-                data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
+                notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
+                notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
 
-                if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
-                    data[2][z][1] -= toSubstract;
+                if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
+                    notif["dateList"][z] -= toSubstract;
                 };
 
                 if(platform == "Mobile"){
                     if(reminderOrSession == "reminder"){
-                        await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], input[i][2], id, 'reminder');
+                        await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                     }else if(reminderOrSession == "session"){
-                        await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                        await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                     };
                 };
             };
@@ -336,7 +313,7 @@ async function uniq_schedulerEDIT(id, reminderOrSession){
     if(reminderOrSession == "session"){
         await uniq_core(session_list);
         session_save(session_list);
-        updateCalendar(session_list);
+        updateCalendar(session_list, updateCalendarPage);
     }else if(reminderOrSession == "reminder"){
         await uniq_core(reminder_list);
         reminder_save(reminder_list);
@@ -350,51 +327,49 @@ async function uniq_schedulerEDIT(id, reminderOrSession){
 async function shiftSchedule(session, toSubstract){
     if(isScheduled(session)){
 
-        let data = isScheduled(session);
+        let notif = isScheduled(session);
 
         if(platform == "Mobile"){
             await removeAllNotifsFromSession(session);
         };
 
-        let idx = await getShownId(session.getId().toString(), data[1][0]);
+        let idx = await getShownId(session["id"].toString());
 
-        if(data[1][0] == "Day"){
+        if(getScheduleScheme(session) == "Day"){
             let id = idx;
 
-            data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-            data[2][1] = closestNextDate(parseInt(data[2][1]), data);
+            notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
+            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
 
-            if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
-                data[2][1] -= toSubstract;
+            if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
+                notif["dateList"][0] -= toSubstract;
             };
-
-            data[2][0] = dayofweek[new Date(data[2][1]).getDay()];
 
             if(platform == "Mobile"){
                 if(session[0] == "R"){
-                    await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session[1]+" | "+data[1][2]+":"+data[1][3], session[2], id, 'reminder');
+                    await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], session[2], id, 'reminder');
                 }else{
-                    await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session[1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session)), id, 'session');
+                    await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session)), id, 'session');
                 };
             };
-        }else if(data[1][0] == "Week"){
-            let idy = session.getId();
+        }else if(getScheduleScheme(session) == "Week"){
+            let idy = session["id"];
 
-            for(let z=0; z<data[2].length; z++){
+            for(let z=0; z<notif["dateList"].length; z++){
                 let id = "2" + (z+1).toString() + idy + "1";
 
-                data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
+                notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
+                notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
 
-                if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
-                    data[2][z][1] -= toSubstract;
+                if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
+                    notif["dateList"][z] -= toSubstract;
                 };
 
                 if(platform == "Mobile"){
                     if(session[0] == "R"){
-                        await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session[1]+" | "+data[1][2]+":"+data[1][3], session[2], id, "reminder");
+                        await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], session[2], id, "reminder");
                     }else{
-                        await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), session[1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(session)), id, "session");
+                        await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session)), id, "session");
                     };
                 };
             };
@@ -409,82 +384,72 @@ async function rescheduler(){
     async function reschedulerCORE(input){
 
         for(let i=0; i<input.length; i++){
-
             if(isScheduled(input[i])){
                 let hasBeenRescheduled = false;
-                let data = input[i][input[i].length - 2];
-                let beforeLeapCycle = data[3]["everyVal"];
+                let notif = isScheduled(input[i]);
 
-                let idx = await getShownId(input[i].getId().toString(), data[1][0]) // IF FIRST DAY OF WEEK SWITCH FROM 1 to 2, IT WILL RESCHEDULE OTHER DAYS, closestNextDate() PREVENT ERROR BUT NOT CLEAN;
+                let idx = await getShownId(input[i]["id"].toString()) // IF FIRST DAY OF WEEK SWITCH FROM 1 to 2, IT WILL RESCHEDULE OTHER DAYS, closestNextDate() PREVENT ERROR BUT NOT CLEAN;
 
-                if(data[1][0] == "Day"){
+                if(getScheduleScheme(input[i]) == "Day"){
 
                     if(!pending.includes(idx.slice(0, -1) + "2") && !pending.includes(idx.slice(0, -1) + "1")){
                         let id = idx.slice(-1) == "1" ? idx.slice(0, -1) + "2" : idx.slice(0, -1) + "1";
-                        let isAnticipated = isNotificationAnticipated(data[2][1], data[1][2], data[1][3]);
+                        let isAnticipated = isNotificationAnticipated(notif["dateList"][0], notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]);
 
-                        data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+                        notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
 
-                        if(isAnticipated && Date.now() < data[2][1] && istoday(data[2][1])){
+                        if(isAnticipated && Date.now() < notif["dateList"][0] && istoday(notif["dateList"][0])){
                             hasBeenRescheduled = true;
-                            data[2][1] = closestNextDate(parseInt(data[2][1]), data, 1);
+                            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif, 1);
                         }else{
-                            data[2][1] = closestNextDate(parseInt(data[2][1]), data);
+                            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
                         };
 
-                        if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
-                            data[2][1] -= toSubstract;
+                        if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
+                            notif["dateList"][0] -= toSubstract;
                         };
-
-                        data[2][0] = dayofweek[new Date(data[2][1]).getDay()];
 
                         if(platform == "Mobile"){
-                            if(input[i][0] == "R"){
-                                await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], input[i][2], id, 'reminder');
+                            if(input[i]["type"] == "R"){
+                                await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                             }else{
-                                await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                                await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                             };
                         };
                     };
-                }else if(data[1][0] == "Week"){
-                    let idy = input[i].getId();
+                }else if(getScheduleScheme(input[i]) == "Week"){
+                    let idy = input[i]["id"];
 
-                    for(let z=0; z<data[2].length; z++){
+                    for(let z=0; z<notif["dateList"].length; z++){
                         if(!pending.includes("2" + (z+1).toString() + idy + "1") && !pending.includes("2" + (z+1).toString() + idy + "2")){
                             let id = idx.slice(-1) == "1" ? "2" + (z+1).toString() + idy + "2" : "2" + (z+1).toString() + idy + "1";
-                            let isAnticipated = isNotificationAnticipated(data[2][z][1], data[1][2], data[1][3]);
+                            let isAnticipated = isNotificationAnticipated(notif["dateList"][z], notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]);
 
-                            data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
+                            notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
 
-                            if(isAnticipated && Date.now() < data[2][z][1] && istoday(data[2][z][1])){
+                            if(isAnticipated && Date.now() < notif["dateList"][z] && istoday(notif["dateList"][z])){
                                 hasBeenRescheduled = true;
-                                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data, 1);
+                                notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif, 1);
                             }else{
-                                data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
+                                notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
                             };
 
-                            if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
-                                data[2][z][1] -= toSubstract;
+                            if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
+                                notif["dateList"][z] -= toSubstract;
                             };
 
                             if(platform == "Mobile"){
-                                if(input[i][0] == "R"){
-                                    await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], input[i][2], id, 'reminder');
+                                if(input[i]["type"] == "R"){
+                                    await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                                 }else{
-                                    await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                                    await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                                 };
                             };
                         };
                     };
                 };
 
-                if(hasBeenRescheduled){
-                    if(data[4] + 1 > beforeLeapCycle){
-                        data[4] = 1;
-                    }else{
-                        data[4] += 1;
-                    };
-                };
+                if(hasBeenRescheduled){nextOccurence(notif)};
             };
         };
     };
@@ -513,45 +478,43 @@ async function scheduler(){
     async function schedulerCORE(input){
         for(let i=0; i<input.length; i++){
             if(isScheduled(input[i])){
-                let data = input[i][input[i].length - 2];
-                let sessionId = input[i].getId();
+                let notif = isScheduled(input[i]);
+                let sessionID = input[i]["id"];
+                
+                if(getScheduleScheme(input[i]) == "Day"){
+                    let id = "1" + sessionID + "1"; 
 
-                if(data[1][0] == "Day"){
-                    let id = "1" + sessionId + "1"; 
+                    notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
+                    notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
 
-                    data[2][1] = setHoursMinutes(new Date(data[2][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-                    data[2][1] = closestNextDate(parseInt(data[2][1]), data);
-
-                    if(toSubstract != 0 && data[2][1] - toSubstract > Date.now() + 5000){
-                        data[2][1] -= toSubstract;
+                    if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
+                        notif["dateList"][0] -= toSubstract;
                     };
-
-                    data[2][0] = dayofweek[new Date(data[2][1]).getDay()];
 
                     if(platform == "Mobile"){
-                        if(input[i][0] == "R"){
-                            await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], input[i][2], id, 'reminder');
+                        if(input[i]["type"] == "R"){
+                            await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                         }else{
-                            await scheduleId(new Date(data[2][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                            await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                         };
                     };
-                }else if(data[1][0] == "Week"){
+                }else if(getScheduleScheme(input[i]) == "Week"){
 
-                    for(let z=0; z<data[2].length; z++){
-                        let id = "2" + (z+1).toString() + sessionId + "1";
+                    for(let z=0; z<notif["dateList"].length; z++){
+                        let id = "2" + (z+1).toString() + sessionID + "1";
 
-                        data[2][z][1] = setHoursMinutes(new Date(data[2][z][1]), parseInt(data[1][2]), parseInt(data[1][3])).getTime();
-                        data[2][z][1] = closestNextDate(parseInt(data[2][z][1]), data);
+                        notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
+                        notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
 
-                        if(toSubstract != 0 && data[2][z][1] - toSubstract > Date.now() + 5000){
-                            data[2][z][1] -= toSubstract;
+                        if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
+                            notif["dateList"][z] -= toSubstract;
                         };
 
                         if(platform == "Mobile"){
-                            if(input[i][0] == "R"){
-                                await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], input[i][2], id, "reminder");
+                            if(input[i]["type"] == "R"){
+                                await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, "reminder");
                             }else{
-                                await scheduleId(new Date(data[2][z][1]), parseInt(data[1][1]), data[1][0].toLowerCase(), input[i][1]+" | "+data[1][2]+":"+data[1][3], textAssets[language]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, "session");
+                                await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, "session");
                             };
                         };
                     };
@@ -562,7 +525,7 @@ async function scheduler(){
 
     await schedulerCORE(session_list);
     session_save(session_list);
-    updateCalendar(session_list);
+    updateCalendar(session_list, updateCalendarPage);
 
     //-------------;
 
@@ -600,12 +563,12 @@ async function removeAllNotifsFromSession(session){
     console.log('removed');
 
     let idList = false;
-    let sessionId = session.getId();
+    let sessionID = session["id"];
 
     if(getScheduleScheme(session) == "Week"){
-        idList = ["21" + sessionId, "22" + sessionId, "23" + sessionId, "24" + sessionId, "25" + sessionId, "26" + sessionId, "27" + sessionId];
+        idList = ["21" + sessionID, "22" + sessionID, "23" + sessionID, "24" + sessionID, "25" + sessionID, "26" + sessionID, "27" + sessionID];
     }else{
-        idList = ["1" + sessionId];
+        idList = ["1" + sessionID];
     };
 
     for(let i=0; i<idList.length; i++){

@@ -45,10 +45,6 @@ Array.prototype.delete = function(ind){
     return output;
 };
 
-Array.prototype.getId = function() {
-    return this[this.length - 1];
-};
-
 jQuery.fn.getChildCoordinates = function(parent){
     let found = false;
     let children = $(parent).children();
