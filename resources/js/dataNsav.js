@@ -272,7 +272,7 @@ function stats_read(set=false){
             "weightLifted": 0, 
             "repsDone": 0,
             "missedSessions": 0,
-            "since": zeroAM(new Date.now()).getTime()
+            "since": zeroAM(new Date()).getTime()
         });
         
         stats_save(data);
@@ -331,11 +331,11 @@ function parameters_read(first = true){
         
         parameters_set(data);
         parameters_save(data);
+    }else{
+        data = JSON.parse(data);
     };
 
-    data = JSON.parse(data);
     data = JSONiseParameters(data);
-
     parameters_set(data);
 
     previousWeightUnit = data["weightUnit"];
@@ -376,12 +376,6 @@ function JSONiseList(list){
     if(isDict(list[0])){return list};
 
     //RESET VARS
-
-    localStorage.removeItem('hasBeenShifted');
-    localStorage.removeItem('sessionSwapped');
-    localStorage.removeItem('sessionToBeDone');
-    localStorage.removeItem('session_done');
-    localStorage.removeItem('calendar_dict');
 
     Array.prototype.getId = function() {
         return this[this.length - 1];
