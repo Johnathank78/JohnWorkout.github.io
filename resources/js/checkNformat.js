@@ -1,4 +1,5 @@
 var cannotClick = false;
+var isEditing = false;
 
 function closePanel(src, notAnimated=false){
     switch(src){
@@ -73,7 +74,6 @@ function closePanel(src, notAnimated=false){
             break;
         case "session_cancel":
             current_page = "session";
-            window.history.pushState("session", "");
             $('.blurBG').css('display', 'none');
             break;
 
@@ -225,8 +225,8 @@ function unfocusDivs(e){
 
     if(notTargeted(e.target, ".selection_dayPreview_page") && previewShown && current_page == "selection"){
         $('.blurBG').css('display', 'none');
-
         previewShown = false;
+
         canNowClick();
     };
 

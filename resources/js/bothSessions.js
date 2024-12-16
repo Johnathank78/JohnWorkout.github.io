@@ -150,7 +150,6 @@ async function launchSession(index){
 
     $(".selection_infoStart").css("display", "none");
     $(".selection_info_item").eq(4).css("display", "none");
-    window.history.pushState("session", "");
 };
 
 async function quit_session(failed=false){
@@ -162,7 +161,6 @@ async function quit_session(failed=false){
     beep2x3Player = null;
 
     color = dark_blue;
-    console.log(tempNewHistory)
 
     infoStyle("selection");
     $("html").css("background-color", dark_blue);

@@ -1,15 +1,11 @@
 $(document).ready(function(){
-    window.onpopstate = function(e){
-        goBack(platform);
-    };
-
     $(document).on("keyup", function(e){
-        if(current_page != "selection" && e.which === 27){
+        if(e.which === 27){
             if(current_page == "session" || current_page == "session_leave"){
                 if(isSaving && lockState){return};
-                window.history.back();
+                goBack(platform);
             }else{
-                $(".update_backArrow").click();
+                goBack(platform);
             };
         };
     });

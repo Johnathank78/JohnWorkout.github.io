@@ -92,7 +92,6 @@ $(document).ready(function(){
             $(".selection_saveLoad_checkbox").prop("checked", false);
 
             current_page = "import";
-            window.history.pushState("import", "");
 
             if($(this).text() == textAssets[parameters["language"]]["preferences"]["export"]){
 

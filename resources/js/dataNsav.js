@@ -714,7 +714,6 @@ function session_read(set=false){
         previousWeightUnit = data[1];
 
         data[0] = JSONiseList(data[0]);
-        console.log(data[0])
         
         if(previousWeightUnit != parameters['weightUnit']){
             updateWeightUnits(data[0], previousWeightUnit, parameters['weightUnit']);

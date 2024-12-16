@@ -28,26 +28,29 @@ function goBack(platform){
         }else if(isSaving && !lockState){
             screensaver_toggle(false);
         }else if(isSetPreviewing){
-            $('.blurBG').css('display', 'none');
+            closePanel('setPreview');
         }else if(isSetPreviewingHint){
-            $('.blurBG').css('display', 'none');
+            closePanel('hint');
         }else if(isRemaningPreviewing){
-            $('.blurBG').css('display', 'none');
+            closePanel('remaining');
         }else if(notesInp){
-            $('.session_workout_historyNotes_inp').blur();
+            closePanel('historyNotes');
         }else if(!isXin){
             closePanel("xin");
         }else{
-            showBlurPage("session_exit_confirm");
-            $(".blurBG").css("display", "flex");
             current_page = "session_leave";
+            showBlurPage("session_exit_confirm");
         };
     }else if(current_page == "session_leave"){
-        $('.blurBG').css('display', 'none');
+        closePanel('session_cancel');
     }else if(current_page == "import"){
-        $('.blurBG').css('display', 'none');
+        closePanel('import');
     }else if(current_page == "schedule" && isDatePicking){
         closePanel("datePicker");
+    }else if(timeInputShown){
+        closePanel('timeSelector');
+    }else if(colorPickerShown){
+        closePanel('colorPicker');
     }else{
         leave_update();
     };

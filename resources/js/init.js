@@ -58,7 +58,6 @@ $(document).ready(async function(){
 
     recovery = recovery_read();
 
-    window.history.pushState("selection", "");
     if(platform == "Web"){
         window.oncontextmenu = function(e) {
             e.preventDefault();

@@ -124,7 +124,8 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.timeSelectorSubmit', function(e){
-        if(isEditing){$(isEditing).blur(); isEditing = false; return};
+        isEditing = false;
+        
         let hours = parseInt($('.timeSelectorHours').find(".timeSelectorInput").val());
         let minutes = parseInt($('.timeSelectorMinutes').find(".timeSelectorInput").val());
         let seconds = parseInt($('.timeSelectorSeconds').find(".timeSelectorInput").val());

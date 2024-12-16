@@ -734,7 +734,6 @@ $(document).ready(function(){
         if(!calendarState){
             cannotClick = "calendar";
             calendarState = true;
-            window.history.pushState("calendar", "");
             $(".selection_page_calendar, .selection_page_calendar_goConainer").css("display", 'flex');
             
             calendarGoHome("static", updateCalendarPage);

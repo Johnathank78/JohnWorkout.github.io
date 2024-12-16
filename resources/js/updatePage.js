@@ -1,4 +1,3 @@
-var isEditing = false;
 var reminderOrSession = false;
 var historyDOM = false;
 

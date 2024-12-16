@@ -120,7 +120,6 @@ $(document).ready(function(){
             }, 250);
 
             if(!rotation_state){
-                window.history.pushState("params", "");
                 cannotClick = "params";
                 $(".selection_parameters_error_container").css("display", "none");
                 $(".selection_parameters_page").css("display", "flex");
@@ -201,7 +200,6 @@ $(document).ready(function(){
     $(".selection_add_option_session").on("click", function(){
 
         current_page = "add";
-        window.history.pushState("update", "");
 
         reminderOrSession = "session";
         selected_mode = add_mode_save;
@@ -239,7 +237,6 @@ $(document).ready(function(){
         update_pageFormat("addRM");
 
         current_page = "add";
-        window.history.pushState("update", "");
 
         $('.update_colorChooser').css('backgroundColor', random_color);
 
@@ -266,7 +263,6 @@ $(document).ready(function(){
         if(cannotClick){return};  
     
         current_page = "edit";
-        window.history.pushState("update", "");
 
         let item = $(e.target).closest(".selection_session_tile, .selection_reminder_tile");
         reminderOrSession = $(item).hasClass("selection_session_tile") ? "session" : "reminder";
@@ -346,7 +342,6 @@ $(document).ready(function(){
         if(cannotClick){return};
 
         current_page = "delete";
-        window.history.pushState("update", "");
 
         let item = $(e.target).closest(".selection_session_tile, .selection_reminder_tile");
         reminderOrSession = $(item).hasClass("selection_session_tile") ? "session" : "reminder";
@@ -479,7 +474,6 @@ $(document).ready(function(){
 
         historyDOM = [];
         current_page = "history";
-        window.history.pushState("history", "");
         
         let historyScrollState = 0;
         rzinp_observer.observe($(".update_page")[0], {childList: true, subtree: true});
@@ -531,7 +525,6 @@ $(document).ready(function(){
 
     $(document).on("click", ".selection_session_tile_extra_schedule", function(e){
         current_page = "schedule";
-        window.history.pushState("update", "");
 
         closePanel("xtraContainer");
         update_pageFormat("schedule");
