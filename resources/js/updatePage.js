@@ -1273,6 +1273,14 @@ $(document).ready(function(){
     $(document).on('click', ".update_colorChooser", function(e){
         colorPickerShown = true;
 
+        $('.update_colorChooserUI').find('.update_colorDot').remove();
+
+        $.each(colorList, function(_, colorValue){
+            $(".update_colorChooser_body").append(
+                $('<div class="update_colorDot" style="background-color: '+colorValue+'; outline: unset; outline-offset: unset"></div>')
+            );
+        });
+
         let childern = $('.update_colorChooserUI').find('.update_colorDot');
         let selected_color_index = colorList.indexOf($(this).css('backgroundColor'));
 

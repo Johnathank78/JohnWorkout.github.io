@@ -758,10 +758,4 @@ $(document).ready(function(){
     exchangeIMG = $('#linkIMG').attr('src');
 
     $("img").attr("draggable", false);
-
-    $.each(colorList, function(_, colorValue){
-        $(".update_colorChooser_body").append(
-            $('&lt;div class="update_colorDot" style="background-color: '+colorValue+'; outline: unset; outline-offset: unset"&gt;&lt;/div&gt;')
-        );
-    });
 });//readyEnd
