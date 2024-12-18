@@ -46,10 +46,11 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
         }else if(U === "Week"){
             cycleLength = T * intervalDays + (skipDays * 7);
         }else if(U === "Times"){
-            cycleLength = T * intervalDays + skipDays - Math.abs(1 - X);
-            //T * intervalDays + ((Z + 1) * intervalDays) - 1; // NOT WORKING
-            //console.log(((Z + 1) * intervalDays) - 1, (skipDays - Math.abs(1 - X)));
-            //console.log('aim :', "?", "?")
+            if(Y == "Day"){
+                cycleLength = T * intervalDays + ((Z + 1) * intervalDays) - X;
+            }else if(Y == "Week"){
+                cycleLength = T * intervalDays + (Z * intervalDays) - (X - 1);
+            };
         }else{
             throw new Error("Unité de récurrence U invalide. Doit être 'Times', 'Day', 'Week'.");
         };

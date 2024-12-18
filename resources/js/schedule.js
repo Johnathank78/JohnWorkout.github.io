@@ -71,7 +71,7 @@ function getPendingIdListWEB(){
             if(getScheduleScheme(data) == "Day" && notif["dateList"][0] > Date.now() - toSubstract){
                 out.push("1" + data["id"] + "1");
             }else{
-                notif["dateList"].forEach(date => {
+                notif["dateList"].forEach((date, z) => {
                     if(date > Date.now() - toSubstract){
                         out.push("2" + (z+1) + data["id"] + "1");
                     };
