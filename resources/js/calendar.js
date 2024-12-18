@@ -45,8 +45,12 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
             cycleLength = T * intervalDays + skipDays - Math.abs(1 - X);
         }else if(U === "Week"){
             cycleLength = T * intervalDays + (skipDays * 7);
+        }else if(U === "Times"){
+            cycleLength = T * intervalDays + ((Z + 1) * intervalDays) - 1; // NOT WORKING
+            //console.log(((Z + 1) * intervalDays) - 1, (skipDays - Math.abs(1 - X)));
+            //console.log('aim :', "?", "?")
         }else{
-            throw new Error("Unité de récurrence U invalide. Doit être 'Day' ou 'Week'.");
+            throw new Error("Unité de récurrence U invalide. Doit être 'Times', 'Day', 'Week'.");
         };
     };
 
@@ -186,6 +190,8 @@ function updateCalendar(data, page){
                 while(nbdayz <= end + pageOffset){
                     let dayInd = nbdayz - pageOffset;
                     let associatedDate = getAssociatedDate(dayInd);
+
+                    //C, D, X, Y, Z, U, T, O
 
                     if(!isEventScheduled(
                         associatedDate, 
