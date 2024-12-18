@@ -9,6 +9,8 @@ function goBack(platform){
     if(current_page == "selection"){
         if(add_state){
             closePanel('addContainer');
+        }else if(timeInputShown){
+            closePanel('timeSelector');
         }else if(rotation_state){
             closePanel('parameters');
         }else if(statOpened){

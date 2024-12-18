@@ -516,7 +516,7 @@ function historyDay(i, history){
                     };
                 };
             }else if(exo['type'] == "Bi." || exo['type'] == "Uni."){ // OTHER
-                sets = exo["setList"].length;
+                sets = exo["setList"].filter(data => data["reps"] != 0).length;
                 expectedSets = parseInt(exo["expectedStats"]["setNb"]);
                 formatedName = exo["name"].replace(" - L", " - " + textAssets[parameters["language"]]["misc"]["leftInitial"]).replace(" - R", " - " + textAssets[parameters["language"]]["misc"]["rightInitial"]);
     
@@ -526,12 +526,16 @@ function historyDay(i, history){
                     set = exo["setList"][y];
     
                     expectedWeightUnit = exo["expectedStats"]["weightUnit"];
+
+                    actualReps = set["reps"]
                     expectedReps = exo["expectedStats"]["reps"];
         
                     actualWeight = convertToUnit(set["weight"], expectedWeightUnit, parameters["weightUnit"]);
                     expectedWeight = convertToUnit(exo["expectedStats"]["weight"], expectedWeightUnit, parameters["weightUnit"]);
-        
-                    out[1][out[1].length - 1].push(fillElem('set', [set["reps"], '/'+expectedReps, unitRound(actualWeight), '/'+unitRound(expectedWeight), parameters["weightUnit"]]));
+                    
+                    if(actualReps != 0){
+                        out[1][out[1].length - 1].push(fillElem('set', [actualReps, '/'+expectedReps, unitRound(actualWeight), '/'+unitRound(expectedWeight), parameters["weightUnit"]]));
+                    };
                 };
             };
         };

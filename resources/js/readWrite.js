@@ -225,8 +225,10 @@ $(document).ready(function(){
         if($(this).text() == textAssets[parameters["language"]]["preferences"]["import"]){
             if(platform == "Mobile"){
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0){
-                    temp = await readFromFile("Workout", 'parameters.txt');
-                    parameters = parameters_read(temp);
+                    temp = await localFiles[i].text();
+
+                    parameters = JSON.parse(temp);
+                    parameters_set(parameters)
 
                     parameters_save(parameters);
                     schedule = true;
@@ -246,8 +248,10 @@ $(document).ready(function(){
                     calendar_read(session_list)
 
                     updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
-
                     session_save(session_list);
+
+                    restoreDoneSessions(session_list);
+
                     schedule = true;
                 };
                 if(checked.filter($('#selection_saveLoad_rl')).length > 0){
@@ -271,7 +275,9 @@ $(document).ready(function(){
                 for(let i=0; i<localFiles.length;i++){
                     if(checked.filter($('#selection_saveLoad_pa')).length > 0 && localFiles[i].name == "parameters.txt"){
                         temp = await localFiles[i].text();
-                        parameters = parameters_read(temp);
+
+                        parameters = JSON.parse(temp);
+                        parameters_set(parameters)
 
                         parameters_save(parameters);
                         schedule = true;

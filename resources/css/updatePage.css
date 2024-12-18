@@ -1515,6 +1515,13 @@
     cursor: pointer;
 }
 
+.update_schedule_datePicker{
+    justify-content: flex-start;
+
+    padding: 0 10px;
+    width: calc(100% - 20px);
+}
+
 .update_schedule_opt:hover{
     background-color: #656e8b;
 }

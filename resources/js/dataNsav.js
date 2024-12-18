@@ -315,7 +315,7 @@ function JSONiseParameters(data){
     });
 };
 
-function parameters_read(first = true){
+function parameters_read(first=true){
 
     let data = localStorage.getItem("parameterss");
 
@@ -342,8 +342,6 @@ function parameters_read(first = true){
     parametersMemory = JSON.stringify(data);
 
     changeLanguage(data['language'], first);
-    update_toggle();
-
     return data;
 };
 
@@ -353,16 +351,18 @@ function parameters_set(data){
     parameterItems.each((_, item) => {      
         let target = $(item).find(".toggle, .selection_parameters_input, .selection_parameters_select");
         let targetName = $(target).attr('parameter');
-
+        
         if($(target).is("select")){
             $(target).val(data[targetName]);
             $('.selection_parameters_select option[value="'+data[targetName]+'"]').prop('selected', true);
         }else if($(target).is("input")){
             $(target).val(data[targetName]);
-        }else{
+        }else if($(target).is('.parameters_toggle')){
             $(target).attr("state", data[targetName]);
         };
     });
+
+    update_toggle();
 };
 
 function parameters_save(data){

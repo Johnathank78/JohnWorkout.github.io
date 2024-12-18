@@ -247,7 +247,7 @@ function workout(exercises_list){
                     "type": exo["type"],
                     "name": exo["name"],
                     "expectedStats": expectedStats,
-                    "setList": [],
+                    "setList": Array.from({ length: exo["setNb"] }, () => ({ "reps": 0, "weight": 0 })),
                     "note": "",
                     "id": exo["id"]
                 }));
@@ -297,7 +297,7 @@ function workout(exercises_list){
                     "type": exo["type"],
                     "name": exo["name"]+" - L",
                     "expectedStats": expectedStats,
-                    "setList": [],
+                    "setList": Array.from({ length: exo["setNb"] }, () => ({ "reps": 0, "weight": 0 })),
                     "note": "",
                     "id": exo["id"]+"_1"
                 }));
@@ -306,7 +306,7 @@ function workout(exercises_list){
                     "type": exo["type"],
                     "name": exo["name"]+" - R",
                     "expectedStats": expectedStats,
-                    "setList": [],
+                    "setList": Array.from({ length: exo["setNb"] }, () => ({ "reps": 0, "weight": 0 })),
                     "note": "",
                     "id": exo["id"]+"_2"
                 }));
@@ -952,14 +952,14 @@ function update_info(update=false){
 };
 
 function update_pastData(){
-    if(current_history["historyList"].length > 1){
+    if(current_history["historyList"].length > 0){
         let out = "";   
 
         if(extype == "Uni."){
             historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id+"_1");
             if(historyIndex != -1){
                 past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
-                if(past_data["setList"].length > actual_setL){
+                if(past_data["setList"].length > actual_setL && past_data["setList"][actual_setL]["reps"] != 0){
                     $(".session_current_exercise_specs_before").css("display", 'block');
                     out += "[" + textAssets[parameters["language"]]["misc"]["leftInitial"] + " : "+past_data["setList"][actual_setL]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setL]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"];
                     $(".session_current_exercise_specs_before").text(out);
@@ -979,7 +979,7 @@ function update_pastData(){
             historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id+"_2");
             if(historyIndex != -1){
                 past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
-                if(past_data["setList"].length > actual_setR){
+                if(past_data["setList"].length > actual_setR && past_data["setList"][actual_setR]["reps"] != 0){
                     $(".session_current_exercise_specs_before").css("display", 'block');
                     if(out != ""){
                         $(".session_current_exercise_specs_before").text(out + " | "+textAssets[parameters["language"]]["misc"]["rightInitial"]+" : "+past_data["setList"][actual_setR]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setR]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
@@ -1002,11 +1002,11 @@ function update_pastData(){
                 };
             };
 
-        }else{
+        }else if(extype == "Bi."){
             historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id);
             if(historyIndex != -1){
                 past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
-                if(past_data["setList"].length > actual_setL){
+                if(past_data["setList"].length > actual_setL && past_data["setList"][actual_setL]["reps"] != 0){
                     $(".session_current_exercise_specs_before").css("display", 'block');
                     $(".session_current_exercise_specs_before").text("[ "+past_data["setList"][actual_setL]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setL]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
                 }else{
@@ -1666,9 +1666,6 @@ $(document).ready(function(){
         }else if(beforeExercise){
             next_exercise(false);
         }else if((extype == "Bi." || extype == "Uni." && !Ldone) && !Ltimer){
-
-            actual_setL += 1;
-
             //STATS UPDATE;
 
             if(extype != "Pause" && extype != "Int." && !Ltimer){
@@ -1677,24 +1674,17 @@ $(document).ready(function(){
 
                 let reps = next_name.includes("Alt.") ? 2*parseInt($(".session_current_exercise_specs_reps").val()) : parseInt($(".session_current_exercise_specs_reps").val());
                 let weight = parseFloat($(".session_current_exercise_specs_weight").val());
-
-                extype == 'Uni.' ? 
-                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]["setList"].push(generateHistorySetObj({
-                        "type": extype,
-                        "reps": reps,
-                        "weight": weight
-                    })) : 
-                    next_name.includes("Alt.") ? 
-                        tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push([generateHistorySetObj({
-                            "type": extype,
-                            "reps": Math.round(reps/2),
-                            "weight": weight
-                        })]) : 
-                        tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push(generateHistorySetObj({
-                            "type": extype,
-                            "reps": reps,
-                            "weight": weight
-                        }));
+                
+                if(extype == 'Uni.'){
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]["setList"][actual_setL]['reps'] = reps;
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]["setList"][actual_setL]['weight'] = weight;
+                }else if(next_name.includes("Alt.")){
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"][actual_setL]['reps'] = Math.round(reps/2);
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"][actual_setL]['weight'] = weight;
+                }else{
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"][actual_setL]['reps'] = reps;
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"][actual_setL]['weight'] = weight;
+                };
 
                 tempStats["repsDone"] += reps;
 
@@ -1704,10 +1694,12 @@ $(document).ready(function(){
                     tempStats["weightLifted"] += convertToUnit(reps*weight, parameters["weightUnit"], "kg");
                 };
 
-                tempStats["workedTime"] += (reps*2.1);
+                tempStats["workedTime"] += reps*2.1;
 
                 stats_set(tempStats);
             };
+
+            actual_setL += 1;
 
             udpate_recovery("workout");
 
@@ -1749,9 +1741,6 @@ $(document).ready(function(){
         };
 
         if(!Rtimer && !Rdone){
-
-            actual_setR += 1;
-
             //STATS UPDATE;
 
             next_specs[0] = parseInt($(".session_current_exercise_specs_reps").val());
@@ -1760,17 +1749,16 @@ $(document).ready(function(){
             let reps = next_name.includes("Alt.") ? 2*parseInt($(".session_current_exercise_specs_reps").val()) : parseInt($(".session_current_exercise_specs_reps").val());
             let weight = parseFloat($(".session_current_exercise_specs_weight").val());
 
-            tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_2")]["setList"].push(generateHistorySetObj({
-                "type": extype,
-                "reps": reps,
-                "weight": weight
-            }));
+            tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_2")]["setList"][actual_setL]['reps'] = reps;
+            tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_2")]["setList"][actual_setL]['weight'] = weight;
 
             tempStats["repsDone"] += reps;
             tempStats["weightLifted"] += convertToUnit(reps*weight, parameters["weightUnit"], "kg");
             tempStats["workedTime"] += (reps*2.1);
 
             stats_set(tempStats);
+            actual_setR += 1;
+
             udpate_recovery("workout");
         };
 
@@ -1901,11 +1889,19 @@ $(document).ready(function(){
     });
 
     $(document).on('blur', '.session_workout_historyNotes_inp', function(){
-        if(extype == "Uni." || extype == "Bi."){
-            if($(this).val() == ""){
-                tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]['note'] = false;
+        if(['Bi.', 'Uni.', 'Int.'].includes(extype)){
+            if(extype == "Uni."){
+                if($(this).val() == ""){
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]['note'] = false;
+                }else{
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]['note'] = $(this).val();
+                };
             }else{
-                tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]['note'] = $(this).val();
+                if($(this).val() == ""){
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]['note'] = false;
+                }else{
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]['note'] = $(this).val();
+                };
             };
         };
 
@@ -1978,7 +1974,7 @@ $(document).ready(function(){
             $(".session_setPreviewTitle").text(name);
             $(".session_setPreviewInfo").text(reps + " x " + weight + parameters["weightUnit"]);
 
-            if(current_history.length > 1){
+            if(current_history["historyList"].length > 0){
                 if(extype == "Bi."){
                     historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), id);
                 }else{
@@ -1987,9 +1983,9 @@ $(document).ready(function(){
 
                 if(historyIndex != -1){
                     past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
-                    if(past_data["setList"].length > actual_set){
+                    if(past_data["setList"].length > actual_set && past_data["setList"][actual_set]["reps"] != 0){
                         $(".session_setPreviewPastInfo").css("display", 'inline-block');
-                        $(".session_setPreviewPastInfo").text("[ "+past_data["setList"][actual_set][0]+" x "+unitRound(convertToUnit(past_data["setList"][actual_set][1], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
+                        $(".session_setPreviewPastInfo").text("[ "+past_data["setList"][actual_set]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_set]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
                     }else{
                         $(".session_setPreviewPastInfo").css("display", 'none');
                     };
