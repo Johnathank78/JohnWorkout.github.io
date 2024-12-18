@@ -700,7 +700,7 @@ function JSONiseList(list){
     return out;
 };
 
-function session_read(set=false){ 
+function session_read(set=false){
     let data = localStorage.getItem("sessions_list");
 
     if(set){data = set; $(".selection_session_container").children().remove()};
@@ -717,7 +717,7 @@ function session_read(set=false){
         
         if(previousWeightUnit != parameters['weightUnit']){
             updateWeightUnits(data[0], previousWeightUnit, parameters['weightUnit']);
-        }; 
+        };
         
         return data[0];
     };
