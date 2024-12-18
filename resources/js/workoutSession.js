@@ -952,7 +952,7 @@ function update_info(update=false){
 };
 
 function update_pastData(){
-    if(current_history.length > 1){
+    if(current_history["historyList"].length > 1){
         let out = "";   
 
         if(extype == "Uni."){

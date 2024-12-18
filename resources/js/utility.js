@@ -532,7 +532,7 @@ function mergeHistoryExo(history, id){
     return [...out[0], ...out[1]];
 };
 
-function areSessionEquallyCompleted(currentHistory, pastHistory){!
+function areSessionEquallyCompleted(currentHistory, pastHistory){
     function findHistoryExoByID(history, id){
         for(let index = 0; index < history["exoList"].length; index++){
             const exo = history["exoList"][index];
@@ -767,6 +767,10 @@ function daysBetweenTimestamps(timestamp1, timestamp2) {
     return Math.round(timestamp2 - timestamp1) / (60 * 60 * 24) / 1000;
 };
 
+function isToday(timeStamp){
+    return zeroAM(new Date()).getTime() == zeroAM(new Date(timeStamp)).getTime()
+};
+
 // Notification
 
 async function deleteRelatedSwap(from){
@@ -774,7 +778,7 @@ async function deleteRelatedSwap(from){
         const item = sessionSwapped[i];
 
         if(item["from"] === from){
-            if(istoday(item['time'])){
+            if(isToday(item['time'])){
                 sessionToBeDone["data"][item["idTo"]] = false;
             };
             

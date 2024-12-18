@@ -85,6 +85,22 @@ async function downloadFilesToFolder(files) {
     };
 };
 
+function restoreDoneSessions(data){
+    data.forEach(session => {
+        let history = getSessionHistory(session);
+        
+        if(history){
+            let lastHistory = getLastHistoryDay(history);
+
+            if(isToday(lastHistory["date"])){
+                sessionDone['data'][session['id']] = true;
+            };
+        };
+    });
+
+    sessionDone_save(sessionDone); 
+};
+
 $(document).ready(function(){
     $(document).on("click", ".selection_parameters_saveLoad_btn", async function(){
         if(parametersChecknUpdate()){
@@ -274,6 +290,8 @@ $(document).ready(function(){
                         
                         updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
                         session_save(session_list);
+
+                        restoreDoneSessions(session_list);
                         
                         schedule = true;
                     };

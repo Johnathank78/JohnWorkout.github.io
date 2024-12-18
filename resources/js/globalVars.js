@@ -32,7 +32,7 @@ const colorList = [
 const dayofweek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const monthofyear = ["Jan","Feb","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"];
 const dayofweek_conventional = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-const timeUnit = 1000;
+const timeUnit = 100;
 const repTime = 2.1;
 
 const textAssets = {
