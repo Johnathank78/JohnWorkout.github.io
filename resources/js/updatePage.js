@@ -19,6 +19,40 @@ var setInd = 0;
 
 var isDatePicking = false;
 
+function updateSelectScheduleLabels(nb, item){
+    if($(item).is(".update_schedule_jump_count")){
+        if(nb == 1){
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(0).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['day']);
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(1).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['week']);
+            
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters["language"]]["updatePage"]["times"]);
+            }else{
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(0).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['day'] + "s");
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(1).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['week'] + "s");
+            
+            if(parameters['language'] == "english"){
+                $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters["language"]]["updatePage"]["times"] + "s");
+            }else if(parameters['language'] == "french"){
+                $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters["language"]]["updatePage"]["times"]);
+            };
+        };
+    }else if($(item).is(".update_schedule_every_count") && parameters['language']){
+        if(nb == 1 || parameters['language'] == "french"){
+            $('.update_schedule_jumpEveryText').text(textAssets[parameters["language"]]["updatePage"]["times"]);
+        }else{
+            $('.update_schedule_jumpEveryText').text(textAssets[parameters["language"]]["updatePage"]["times"]+ "s");
+        };
+    }else if($(item).is(".update_schedule_input_count")){
+        if(nb == 1){
+            $('.update_schedule_select_every').find(".update_schedule_opt").eq(0).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['day']);
+            $('.update_schedule_select_every').find(".update_schedule_opt").eq(1).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['week']);
+        }else{
+            $('.update_schedule_select_every').find(".update_schedule_opt").eq(0).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['day'] + "s");
+            $('.update_schedule_select_every').find(".update_schedule_opt").eq(1).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['week'] + "s");
+        };
+    };
+};
+
 function leave_update(){
 
     if(current_page == "add"){
@@ -1303,5 +1337,10 @@ $(document).ready(function(){
 
         $(".update_colorChooser").css('backgroundColor', $(this).css('backgroundColor'));
         closePanel('colorPicker');
+    });
+
+    // SCHEDLUE     
+    $(document).on('change', '.update_schedule_input', function(){
+        updateSelectScheduleLabels($(this).val(), this);
     });
 });//readyEnd

@@ -974,7 +974,7 @@ function screensaver_set(text=false, time=false, isR=false, isX=false){
         return;
     };
 
-    extype == "Uni" ? $(".screensaver_Ltimer_prefix").css("display", "inline-block") : $(".screensaver_Ltimer_prefix").css("display", "none");
+    extype == "Uni." ? $(".screensaver_Ltimer_prefix").css("display", "inline-block") : $(".screensaver_Ltimer_prefix").css("display", "none");
 
     $(".screensaver_LtextContainer").css("display", "flex");
     $(".screensaver_Ltimer").text(get_time(time));

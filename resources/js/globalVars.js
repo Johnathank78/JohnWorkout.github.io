@@ -163,7 +163,9 @@ const textAssets = {
 
             "temporalityChoices": {
                 "day": "Jour",
-                "week": "Semaine"
+                "week": "Semaine",
+                "days": "Jours",
+                "weeks": "Semaines"
             },
             "itemTypeChoices": {
                 "session": 'Seance',
@@ -501,7 +503,9 @@ const textAssets = {
 
             "temporalityChoices": {
                 "day": "Day",
-                "week": "Week"
+                "week": "Week",
+                "days": "Jours",
+                "weeks": "Semaines"
             },
             "itemTypeChoices": {
                 "session": 'Session',

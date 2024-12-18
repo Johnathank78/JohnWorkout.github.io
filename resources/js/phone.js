@@ -135,7 +135,7 @@ async function pauseApp(){
             };
         }
 
-        if(extype == "Bi"){
+        if(extype == "Bi."){
             if(Ltimer){
                 currentSide += "L";
                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
@@ -149,7 +149,7 @@ async function pauseApp(){
                     });
                 };
             }
-        }else if(extype == "Uni"){
+        }else if(extype == "Uni."){
             if(Ltimer && Rtimer){
                 currentSide += "LR";
 
@@ -373,7 +373,7 @@ if(platform == "Mobile"){
                         });
                     }
 
-                    if(extype == "Bi"){
+                    if(extype == "Bi."){
                         if(Ltimer){
                             currentSide += "L"
                             start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
@@ -394,7 +394,7 @@ if(platform == "Mobile"){
                                 ]
                             });
                         }
-                    }else if(extype == "Uni"){
+                    }else if(extype == "Uni."){
                         if(Ltimer && Rtimer){
                             currentSide += "LR"
 

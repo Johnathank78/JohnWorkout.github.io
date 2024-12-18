@@ -45,11 +45,6 @@ function manageJumpContainer(data){
         $(".update_schedule_select_jumpEvery").eq(0).val(data['jumpType']);
         $(".update_schedule_input").eq(3).val(data['jumpVal']);
 
-        if(data['jumpVal'] > 1 && parameters["language"] == "english"){
-            $(".update_schedule_select_jumpEvery").eq(1).text(textAssets[parameters["language"]]["updatePage"]["times"] + "s");
-        }else if(data['jumpVal'] == 1 && parameters["language"] == "english"){
-            $(".update_schedule_select_jumpEvery").eq(1).text(textAssets[parameters["language"]]["updatePage"]["times"]);
-        };
         $(".update_schedule_input").eq(4).val(data['everyVal']);
 
         $('.update_schedule_tline_sblock').staticSpawn("flex", 40, 300);
@@ -557,6 +552,10 @@ $(document).ready(function(){
             $(inp_list[2]).val(notif["scheduleData"]["count"]);
 
             manageJumpContainer(notif["jumpData"]);
+
+            updateSelectScheduleLabels(notif["scheduleData"]["count"], $('.update_schedule_input_count'));
+            updateSelectScheduleLabels(notif["jumpData"]['jumpVal'], $('.update_schedule_jump_count'));
+            updateSelectScheduleLabels(notif["jumpData"]['everyVal'], $('.update_schedule_every_count'));
 
             $('.update_colorChooser').css('backgroundColor', update_current_item['color']);
         }else{
