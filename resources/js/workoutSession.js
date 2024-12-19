@@ -2037,7 +2037,7 @@ $(document).ready(function(){
     $(document).on("selectionAborted", ".session_next_exercises_container", function(e){
         sets_reorderUpdate(e, false);
     });
-
+    
     $(document).on("reordered", ".session_next_exercises_container", function(e){
         if(extype == "Pause"){
             if($(".session_next_exercise_name").length != 1){

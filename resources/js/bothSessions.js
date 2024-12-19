@@ -221,7 +221,11 @@ async function quit_session(failed=false){
 
         // SessionEnd
 
-        fillSessionEnd(failed);
+        try {
+            fillSessionEnd(failed);
+        } catch (error) {
+            $(".main_title").text(error)
+        };
     };
 
     stats_set(stats);

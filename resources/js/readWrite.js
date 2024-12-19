@@ -228,6 +228,11 @@ $(document).ready(function(){
                     temp = await localFiles[i].text();
 
                     parameters = JSON.parse(temp);
+
+                    previousWeightUnit = parameters["weightUnit"];
+                    parametersMemory = JSON.stringify(parameters);
+                    changeLanguage(parameters['language'], true);
+
                     parameters_set(parameters)
 
                     parameters_save(parameters);
@@ -277,6 +282,11 @@ $(document).ready(function(){
                         temp = await localFiles[i].text();
 
                         parameters = JSON.parse(temp);
+
+                        previousWeightUnit = parameters["weightUnit"];
+                        parametersMemory = JSON.stringify(parameters);
+                        changeLanguage(parameters['language'], true);
+
                         parameters_set(parameters)
 
                         parameters_save(parameters);

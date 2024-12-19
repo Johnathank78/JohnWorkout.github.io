@@ -340,8 +340,8 @@ function parameters_read(first=true){
 
     previousWeightUnit = data["weightUnit"];
     parametersMemory = JSON.stringify(data);
-
     changeLanguage(data['language'], first);
+    
     return data;
 };
 
