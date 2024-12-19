@@ -247,7 +247,7 @@ function workout(exercises_list){
                     "type": exo["type"],
                     "name": exo["name"],
                     "expectedStats": expectedStats,
-                    "setList": Array.from({ length: exo["setNb"] }, () => ({ "reps": 0, "weight": 0 })),
+                    "setList": [],
                     "note": "",
                     "id": exo["id"]
                 }));
@@ -297,7 +297,7 @@ function workout(exercises_list){
                     "type": exo["type"],
                     "name": exo["name"]+" - L",
                     "expectedStats": expectedStats,
-                    "setList": Array.from({ length: exo["setNb"] }, () => ({ "reps": 0, "weight": 0 })),
+                    "setList": [],
                     "note": "",
                     "id": exo["id"]+"_1"
                 }));
@@ -306,7 +306,7 @@ function workout(exercises_list){
                     "type": exo["type"],
                     "name": exo["name"]+" - R",
                     "expectedStats": expectedStats,
-                    "setList": Array.from({ length: exo["setNb"] }, () => ({ "reps": 0, "weight": 0 })),
+                    "setList": [],
                     "note": "",
                     "id": exo["id"]+"_2"
                 }));
@@ -1675,16 +1675,23 @@ $(document).ready(function(){
                 let reps = next_name.includes("Alt.") ? 2*parseInt($(".session_current_exercise_specs_reps").val()) : parseInt($(".session_current_exercise_specs_reps").val());
                 let weight = parseFloat($(".session_current_exercise_specs_weight").val());
                 
-                if(extype == 'Uni.'){
-                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]["setList"][actual_setL]['reps'] = reps;
-                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]["setList"][actual_setL]['weight'] = weight;
-                }else if(next_name.includes("Alt.")){
-                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"][actual_setL]['reps'] = Math.round(reps/2);
-                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"][actual_setL]['weight'] = weight;
-                }else{
-                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"][actual_setL]['reps'] = reps;
-                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"][actual_setL]['weight'] = weight;
-                };
+                extype == 'Uni.' ? 
+                    tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_1")]["setList"].push(generateHistorySetObj({
+                        "type": extype,
+                        "reps": reps,
+                        "weight": weight
+                    })) : 
+                    next_name.includes("Alt.") ? 
+                        tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push([generateHistorySetObj({
+                            "type": extype,
+                            "reps": Math.round(reps/2),
+                            "weight": weight
+                        })]) : 
+                        tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push(generateHistorySetObj({
+                            "type": extype,
+                            "reps": reps,
+                            "weight": weight
+                        }));
 
                 tempStats["repsDone"] += reps;
 
@@ -1749,8 +1756,11 @@ $(document).ready(function(){
             let reps = next_name.includes("Alt.") ? 2*parseInt($(".session_current_exercise_specs_reps").val()) : parseInt($(".session_current_exercise_specs_reps").val());
             let weight = parseFloat($(".session_current_exercise_specs_weight").val());
 
-            tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_2")]["setList"][actual_setL]['reps'] = reps;
-            tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_2")]["setList"][actual_setL]['weight'] = weight;
+            tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id+"_2")]["setList"].push(generateHistorySetObj({
+                "type": extype,
+                "reps": reps,
+                "weight": weight
+            }));
 
             tempStats["repsDone"] += reps;
             tempStats["weightLifted"] += convertToUnit(reps*weight, parameters["weightUnit"], "kg");
@@ -1873,10 +1883,9 @@ $(document).ready(function(){
     // HISOTRY NOTES;
 
     $(document).on('click', ".session_current_exercise_name", function(e){
-
         if(!isAbleToClick("historyNotes")){return};
 
-        if(!notesInp && extype != "Int." && extype != "Pause" && hasStarted){
+        if(!notesInp && ["Uni.", "Bi."].includes(extype) && hasStarted){
             cannotClick = "historyNotes";
 
             $(".session_workout_historyNotes_isAbout").text(next_name);

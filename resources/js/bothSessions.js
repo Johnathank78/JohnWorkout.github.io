@@ -331,18 +331,18 @@ function getSessionEndData(){
         if(exo['type'] == "Bi." || exo['type'] == "Uni."){ // NOT INT 
             double = exo["name"].includes("Ts.") || exo["name"].includes("Alt.");
             if(double){
-                weight += parseFloat(exo["expectedStats"]["setNb"]) * convertToUnit(2*parseFloat(exo["expectedStats"]["reps"])*parseFloat(exo["expectedStats"]["weight"]), parameters["weightUnit"], "kg");
+                weight += convertToUnit(2 * exo["setList"].reduce((sum, set) => sum + (set["reps"] * set['weight']), 0), parameters["weightUnit"], "kg");
             }else{
-                weight += parseFloat(exo["expectedStats"]["setNb"]) * convertToUnit(parseFloat(exo["expectedStats"]["reps"])*parseFloat(exo["expectedStats"]["weight"]), parameters["weightUnit"], "kg");
+                weight += convertToUnit(exo["setList"].reduce((sum, set) => sum + (set["reps"] * set['weight']), 0), parameters["weightUnit"], "kg");
             };
         }else if(exo['type'] == "Int."){
-
+            1
         };
     };
 
-    weight = weight == 0 ? false : Math.round((tempStats["weightLifted"] - weight) / weight) * 100;
+    weight = weight == 0 ? false : Math.round(((tempStats["weightLifted"] - weight) / weight) * 100);
     time = time == 0 ? false : time;
-    
+
     return [outNumber, time, weight, isEqual];
 };
 
@@ -639,24 +639,24 @@ function generateSuggestedChanges(history){
                 let weightMean = exo["setList"].map(item => item["weight"]).reduce((acc, val) => acc + val, 0) / exo["setList"].length;
                 let weightMeanRounded = roundToNearestHalf(weightMean);
 
-                if(repsMean != exo["expectedStats"]["reps"] || weightMean != exo["expectedStats"]["weight"]){
+                if(repsMean != exo["expectedStats"]["reps"] || weightMean != exo["expectedStats"]["weight"] || newSets != exo["expectedStats"]["setNb"]){
                     
                     suggestedData[id] = {
                         "name": name,
                         "type": type
                     };
                     
-                    if(newSets != parseInt(exo["expectedStats"]["setNb"])){
+                    if(newSets != exo["expectedStats"]["setNb"]){
                         suggestedData[id]['sets'] = newSets;
                         suggestedData[id]['oldSets'] = exo["expectedStats"]["setNb"];
                     };
         
-                    if(repsMean != parseInt(exo["expectedStats"]["reps"])){
+                    if(repsMean != exo["expectedStats"]["reps"]){
                         suggestedData[id]['reps'] = repsMean;
                         suggestedData[id]['oldReps'] = exo["expectedStats"]["reps"];
                     };
                     
-                    if(weightMean != parseFloat(exo["expectedStats"]["weight"])){
+                    if(weightMean != exo["expectedStats"]["weight"]){
                         suggestedData[id]['weight'] = weightMeanRounded;
                         suggestedData[id]['oldWeight'] = exo["expectedStats"]["weight"];
                     };

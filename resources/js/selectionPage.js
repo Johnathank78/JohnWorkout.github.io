@@ -551,6 +551,7 @@ $(document).ready(function(){
             $(inp_list[1]).val(notif["scheduleData"]["minutes"]);
             $(inp_list[2]).val(notif["scheduleData"]["count"]);
 
+            $('.update_schedule_datePicker').css('justify-content', "flex-start");
             manageJumpContainer(notif["jumpData"]);
 
             updateSelectScheduleLabels(notif["scheduleData"]["count"], $('.update_schedule_input_count'));
@@ -570,6 +571,7 @@ $(document).ready(function(){
             pastSelectedPage = 1;
             pastSelectedRow = 0;
 
+            $('.update_schedule_datePicker').css('justify-content', "center");
             $('.update_schedule_datePicker').text(textAssets[parameters["language"]]["updatePage"]["pickDate"]);
 
             $(inp_list[0]).val("");
