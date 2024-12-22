@@ -102,6 +102,33 @@ function showHint(classs){
     resizeArea($(classs).children().last().find('.udpate_workout_hint_txtarea')[0]);
 };
 
+function manageRestInputVisibility(elem, mode){
+    let restClass = mode == "W" ? ".update_workout_data_resttime" : ".update_workout_intervall_data_rest";
+    let setClass = mode == "W" ? ".update_workout_data_sets" : ".update_workout_intervall_data_cycle";
+
+    let item = $(elem).find(restClass).parent();
+    let visibility = $(item).css('display') == "block";
+    let val = false;
+
+    if(!isNaI($(elem).find(setClass).val())){
+        val = parseInt($(elem).find(setClass).val());
+        
+        if(val > 1 && !visibility){
+            if($(item).find(restClass).val() == "0s"){
+                $(item).find(restClass).val("");
+            };
+
+            $(item).css('display', 'block');
+        }else if(val <= 1 && visibility){
+            if($(item).find(restClass).val() == ""){
+                $(item).find(restClass).val("0s");
+            };
+    
+            $(item).css('display', 'none');
+        };
+    };
+};
+
 $(document).ready(function(){
     // HEADERS BTN;
 
@@ -280,7 +307,7 @@ $(document).ready(function(){
                         $(".update_intervallList_container").append(Iintervall_tile(exo));
                         if(exo['hint']){showHint(".update_intervallList_container")};
     
-                        manageIntervallRestInputVisibility($(".update_intervallList_container").children().last().find('.update_workout_intervall_data_cycle'));
+                        manageRestInputVisibility($(".update_intervallList_container").children().last(), update_current_item["type"]);
                     }else if(exo["type"] == "Pause"){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
@@ -313,6 +340,7 @@ $(document).ready(function(){
                         $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                     }else{
                         $(".update_workoutList_container").append(exercise_tile(exo));
+                        manageRestInputVisibility($(".update_workoutList_container").children().last(), update_current_item["type"]);
                         if(exo['hint']){showHint(".update_workoutList_container")};
                     };
     
@@ -390,6 +418,7 @@ $(document).ready(function(){
                         $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                     }else{
                         $(".update_workoutList_container").append(exercise_tile(exo));
+                        manageRestInputVisibility($(".update_workoutList_container").children().last(), update_current_item["type"]);
                     };
                 })
 

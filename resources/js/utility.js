@@ -213,6 +213,10 @@ function setNodeData(name, key, value){
     $(name).data(key, value);
 };
 
+function cloneOBJ(obj){
+    return JSON.parse(JSON.stringify(obj));
+};
+
 // Session
 
 function update_timer(item, ref, i){
@@ -467,6 +471,18 @@ function isHistoryDayEmpty(historyDay){
     });
 
     return count == 0;
+};
+
+function isHistoryDayComplete(historyDay){
+    for(const exo of historyDay["exoList"]){
+        if(exo["type"] == "Int." && exo["expectedStats"]["cycle"] != exo["setList"].length){
+            return false;
+        }else if(exo["type"] != "Int." && exo["expectedStats"]["setNb"] != exo["setList"].length){
+            return false;
+        };
+    };
+
+    return true;
 };
 
 function getLastHistoryDay(history){
@@ -962,7 +978,7 @@ function sessionReorder_update(){
 
     if(JSON.stringify(session_list)==JSON.stringify(new_list)){return};
 
-    session_list = JSON.parse(JSON.stringify(new_list));
+    session_list = cloneOBJ(new_list);
     session_save(session_list);
 };
 
@@ -993,7 +1009,7 @@ function reminderReorder_update(){
 
     if(JSON.stringify(reminder_list)==JSON.stringify(new_list)){return};
 
-    reminder_list = JSON.parse(JSON.stringify(new_list));
+    reminder_list = cloneOBJ(new_list);
     reminder_save(reminder_list);
 };
 

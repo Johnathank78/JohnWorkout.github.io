@@ -115,28 +115,6 @@ function leaveIntervallEdit(){
     update_pageFormat(previousPage == "edit" ? "editWO" : "addWO");
 
     current_page = previousPage;
-}
-
-function manageIntervallRestInputVisibility(elem){
-    let item = $(elem).parent().parent().find('.update_workout_intervall_data_rest').parent();
-    let visibility = $(item).css('display') == "block";
-    let val = false;
-
-    if(!isNaI($(elem).val())){
-        val = parseInt($(elem).val());
-        
-        if(val > 1 && !visibility){
-            if($(item).find(".update_workout_intervall_data_rest").val() == "0s"){
-                $(item).find(".update_workout_intervall_data_rest").val("")
-            };
-            $(item).css('display', 'block');
-        }else if(val <= 1 && visibility){
-            if($(item).find(".update_workout_intervall_data_rest").val() == ""){
-                $(item).find(".update_workout_intervall_data_rest").val("0s")
-            };
-            $(item).css('display', 'none');
-        };
-    };
 };
 
 $(document).ready(function(){
@@ -340,7 +318,7 @@ $(document).ready(function(){
                         $(".update_intervallList_container").append(Iintervall_tile(exo));
                         if(exo['hint']){showHint(".update_intervallList_container")};
     
-                        manageIntervallRestInputVisibility($(".update_intervallList_container").children().last().find('.update_workout_intervall_data_cycle'));
+                        manageRestInputVisibility($(".update_intervallList_container").children().last().find('.update_workout_intervall_data_cycle'));
                     }else if(exo["type"] == "Pause"){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
@@ -441,7 +419,10 @@ $(document).ready(function(){
 
     });
 
-    $(document).on('input change', '.update_workout_intervall_data_cycle', function(){manageIntervallRestInputVisibility(this)});
+    $(document).on('input change', '.update_workout_intervall_data_cycle, .update_workout_data_sets', function(){
+        let mode = $(this).is('.update_workout_data_sets') ? "W" : "I";
+        manageRestInputVisibility($(this).parent().parent().parent(), mode);
+    });
 
     // HISTORY
 
@@ -579,8 +560,6 @@ $(document).ready(function(){
                     let error = iserror_int(new_name, true);
 
                     if(!error){
-                        let nameSav = update_current_item["name"];
-                        
                         update_current_item["name"] = new_name;
                         update_current_item["exoList"] = new Array();
                         exercises = $(".update_intervallList_container").children();

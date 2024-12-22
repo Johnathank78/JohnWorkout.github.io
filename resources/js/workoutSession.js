@@ -38,6 +38,17 @@ var lastExo = false;
 
 var undoMemory = [];
 
+const emptyExoObserver = new MutationObserver(function (mutationList) {
+    for (const mutation of mutationList) {
+        for (const removedNode of mutation.removedNodes) {
+            const parentNode = mutation.target;
+            if (parentNode && parentNode.childElementCount === 0) {
+                $(parentNode).remove();
+            };
+        };
+    };
+});
+
 function getHint(session, id){
     return session["exoList"].filter(exo => exo["id"] === id).map(exo => exo["hint"])[0];
 };
@@ -175,6 +186,8 @@ function startWorkout(){
     extype = $(".session_next_exercise_type").first().text();
     next_id = $(".session_next_exercise_id").first().text().replace(/_(1|2)/g, "");
     actual_setNb = parseInt($(".session_next_exercises_container").first().find(".session_next_exercise").first().find(".session_setPreviewId").last().text()) + 1;
+
+    emptyExoObserver.observe($('.session_next_exercises_container')[0], {childList : true, subtree: true});
 
     update_info(true);
     next_exercise(false);
@@ -408,43 +421,34 @@ function workout(exercises_list){
         if(undoMemory.length > 0){$('.session_undo').css('display', 'block')};
 
         if(extype == "Wrm."){
-            
-            if(beforeExercise){
-                remaining_sets = 0;
-                
-                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
-                $('.session_exercise_Lrest_btn').data("canLongClick", false);
-            }else{
-                remaining_sets = 1;
+            remaining_sets = 1;
 
-                setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+"')").length;
-                next_exo = true;
+            setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+"')").length;
+            next_exo = true;
 
-                if(actual_setNb - actual_setL != setNb_Lextracted + 1){
-                    dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
+            if(actual_setNb - actual_setL != setNb_Lextracted + 1){
+                dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
 
-                    if($(".session_next_exercise_set").length == 0){
-                        noMore = true;
-                        $(".session_next_exercises_container").append(`
-                        <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-                            <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
-                        </div>
-                        `);
-                    };
-                };
-
-                if(noMore){
-                    finished = true;
-                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
-                    $('.session_exercise_Lrest_btn').data("canLongClick", false);
-                }else{
-                    sets_reorder.avoidIndexes = [0];
-
-                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
-                    $('.session_exercise_Lrest_btn').data("canLongClick", false);
+                if($(".session_next_exercise_set").length == 0){
+                    noMore = true;
+                    $(".session_next_exercises_container").append(`
+                    <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
+                        <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
+                    </div>
+                    `);
                 };
             };
 
+            if(noMore){
+                finished = true;
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
+                $('.session_exercise_Lrest_btn').data("canLongClick", false);
+            }else{
+                sets_reorder.avoidIndexes = [0];
+
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
+                $('.session_exercise_Lrest_btn').data("canLongClick", false);
+            };
         }else if(extype == "Bi."){
             $('.session_exercise_Lrest_btn').data("canLongClick", true);
 
@@ -675,7 +679,7 @@ async function next_exercise(first){
     extype = $(".session_next_exercise_type").first().text();
     next_id = $(".session_next_exercise_id").first().text().replace(/_(1|2)/g, "");
 
-    if(first && extype != "Pause"){
+    if(first && extype != "Pause" && extype != "Wrm."){
 
         updateRestBtnStyle('Reset')
         $(".session_workout_historyNotes_inp").val("").change();
@@ -704,7 +708,7 @@ async function next_exercise(first){
         $('.session_exercise_Rrest_btn').data("canLongClick", false);
         
         update_info(true);
-    }else if(!first || extype == "Pause"){
+    }else if(!first || extype == "Pause" || extype == "Wrm."){
         beforeExercise = false;
 
         if(extype != "Pause"){
@@ -726,17 +730,12 @@ async function next_exercise(first){
         update_info_vars();
 
         if(extype == "Wrm."){
-            
+            actual_setNb = 1;
             next_exo = true;
             $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
-
-            if(remaining_sets == 1){
-                dropSet_static($(".session_next_exercise_set").first());
-            }else{
-                await dropSet_animated($(".session_next_exercise_set").first());
-            };
+            dropSet_static($(".session_next_exercise_set").first());
         }else if(extype == 'Uni.'){
-            updateRestBtnStyle('Uni.')
+            updateRestBtnStyle('Uni.');
 
             $('.session_exercise_Lrest_btn').data("canLongClick", true);
             $('.session_exercise_Rrest_btn').data("canLongClick", true);
@@ -1267,11 +1266,9 @@ function timerSkip(LR){
 
         timerDone("R");
     };
-
 };
 
 async function timerDone(LR){
-
     if(LR == "L"){
         $('.session_exercise_Lrest_btn').data("canLongClick", true);
 
@@ -1381,14 +1378,28 @@ async function timerDone(LR){
     };
 };
 
+function restoreBtnLabel(LR){
+    if(LR == "L"){
+        $(".session_exercise_Lrest_btn").css("cursor", "pointer");
+        $(".Lrest").css("display", "block");
+        $(".Ltimer").css("display", "none");
+
+        Ltimer = false;
+    }else if(LR == "R"){
+        $(".session_exercise_Rrest_btn").css("cursor", "pointer");
+        $(".Rrest").css("display", "block");
+        $(".Rtimer").css("display", "none");
+
+        Rtimer = false;
+    };
+};
+
 function resetTimer(LR){
     if(LR == "L"){
         clearInterval(Lrest);
 
         if(!Ldone){$(".session_exercise_Lrest_btn").css('opacity', '1')}
-        $(".session_exercise_Lrest_btn").css("cursor", "pointer");
-        $(".Lrest").css("display", "block");
-        $(".Ltimer").css("display", "none");
+        restoreBtnLabel(LR);
 
         Ltimer = false;
         screensaver_toggle(false);
@@ -1397,9 +1408,7 @@ function resetTimer(LR){
         clearInterval(Rrest);
 
         if(!Rdone){$(".session_exercise_Rrest_btn").css('opacity', '1')}
-        $(".session_exercise_Rrest_btn").css("cursor", "pointer");
-        $(".Rrest").css("display", "block");
-        $(".Rtimer").css("display", "none");
+        restoreBtnLabel(LR);
 
         Rtimer = false;
         screensaver_toggle(false);
@@ -1499,8 +1508,8 @@ function undoMemorise(way){
                 "Rdone": Rdone,
                 "Llast": Llast,
                 "Rlast": Rlast,
-                "Lspent": Lspent,
-                "Rspent": Rspent,
+                "Ltimer": Ltimer,
+                "Rtimer": Rtimer,
                 "skip": skip,
                 "ncState": ncState,
                 "extype": extype,
@@ -1520,12 +1529,10 @@ function undoMemorise(way){
                 "actual_setR": actual_setR,
                 "actual_setL": actual_setL,
                 "actual_setNb": actual_setNb,
-                "beforeExercise": beforeExercise,
-                "LrestLib": $('.Lrest').text(),
-                "RrestLib": $('.Rrest').text()
+                "beforeExercise": beforeExercise
             },
-            "tempStats": tempStats,
-            "tempHistory": tempNewHistory,
+            "tempStats": cloneOBJ(tempStats),
+            "tempHistory": cloneOBJ(tempNewHistory),
         };
 
         $('.session_undo').css('display', 'block');
@@ -1543,9 +1550,11 @@ function undoMemorise(way){
             updateRestBtnStyle('Uni.');
         };
 
-        if(pastExo == "Uni." && skip){
+        if(extype == "Uni." && skip){
             if(Rtimer){resetTimer("R")};
-        }else{
+        }else if(extype == "Uni." && !skip){
+            if(Ltimer){resetTimer("L")};
+        }else if(extype != "Uni."){
             if(Ltimer){resetTimer("L")};
         };
             
@@ -1553,8 +1562,8 @@ function undoMemorise(way){
         Rdone = undoData["varSav"]['Rdone'];
         Llast = undoData["varSav"]['Llast'];
         Rlast = undoData["varSav"]['Rlast'];
-        Lspent = undoData["varSav"]['Lspent'];
-        Rspent = undoData["varSav"]['Rspent'];
+        Ltimer = undoData["varSav"]['Ltimer'];
+        Rtimer = undoData["varSav"]['Rtimer'];
         skip = undoData["varSav"]['skip'];
         ncState = undoData["varSav"]['ncState'];
         extype = undoData["varSav"]['extype'];
@@ -1588,31 +1597,49 @@ function undoMemorise(way){
         Ifinished = false;
         Iskip = false;
         IjustSkipped = false;
-        
+
         tempNewHistory = undoData['tempHistory'];
         recovery["varSav"]["iCurrent_cycle"] = false
+        
+        if(beforeExercise){
+            $('.session_exercise_Rrest_btn').css("display", "none");
+            $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
+            $(".session_exercise_Lrest_btn").data("canLongClick", false);
 
-        $('.Lrest').text(undoData["varSav"]['LrestLib']);
-        $('.Rrest').text(undoData["varSav"]['RrestLib']);
-
-        if(extype == "Uni."){
-            if(beforeExercise){
-                $('.session_exercise_Rrest_btn').css("display", "none");
-                updateRestBtnStyle('Reset');
+            updateRestBtnStyle('Reset');
+        }else{
+            console.log(extype, actual_setNb, actual_setL)
+            if(actual_setNb - actual_setL > 1){
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["rest"]);
+                $(".session_exercise_Lrest_btn").css('opacity', '1');
+                $(".session_exercise_Lrest_btn").data("canLongClick", true);
+            }else if(actual_setNb - actual_setL == 1){
+                if(extype == "Uni."){
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["last"]);
+                }else{
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
+                }
+                $(".session_exercise_Lrest_btn").css('opacity', '1');
+                $(".session_exercise_Lrest_btn").data("canLongClick", false);
             }else{
-                if(Ldone || Ltimer){
-                    $(".session_exercise_Lrest_btn").css('opacity', '.7');
-                }else{
-                    $(".session_exercise_Lrest_btn").css('opacity', '1');  
-                };
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["done"]);
+                $(".session_exercise_Lrest_btn").css('opacity', '.7');
+                $(".session_exercise_Lrest_btn").data("canLongClick", false);
+            };
 
-                if(Rdone || Rtimer){
-                    $(".session_exercise_Rrest_btn").css('opacity', '.7');
-                }else{
-                    $(".session_exercise_Rrest_btn").css('opacity', '1');  
-                };
+            if(actual_setNb - actual_setR > 1){
+                $('.Rrest').text(textAssets[parameters["language"]]["inSession"]["rest"]);
+                $(".session_exercise_Rrest_btn").css('opacity', '1'); 
+                $(".session_exercise_Rrest_btn").data("canLongClick", true);
+            }else if(actual_setNb - actual_setR == 1){
+                $('.Rrest').text(textAssets[parameters["language"]]["inSession"]["last"]);
+                $(".session_exercise_Rrest_btn").css('opacity', '1');
+                $(".session_exercise_Rrest_btn").data("canLongClick", false);
 
-                //if(Ltimer){resetTimer("L")}else if(Rtimer){resetTimer("R")};
+            }else{
+                $('.Rrest').text(textAssets[parameters["language"]]["inSession"]["done"]);
+                $(".session_exercise_Rrest_btn").css('opacity', '.7');
+                $(".session_exercise_Rrest_btn").data("canLongClick", false);
             };
         };
 
@@ -1628,20 +1655,6 @@ function undoMemorise(way){
         }else{
             recoveryUpdateFromUndo(undoData);
             recovery_save(recovery);
-        };
-
-        if(actual_setNb - actual_setL > 1 && !beforeExercise){
-            $(".session_exercise_Lrest_btn").data("canLongClick", true);
-        }else{
-            $(".session_exercise_Lrest_btn").data("canLongClick", false);
-        };
-
-        if(extype == "Uni."){
-            if(actual_setNb - actual_setR > 1 && !beforeExercise){
-                $(".session_exercise_Rrest_btn").data("canLongClick", true);
-            }else{
-                $(".session_exercise_Rrest_btn").data("canLongClick", false);
-            };
         };
     };
 };
@@ -1816,6 +1829,9 @@ $(document).ready(function(){
                         dropExo_animated($(".session_next_bigExercise")[1])
                     ]);
                 }else{
+                    if($($('.session_next_exercise_type')[1]).text() == "Wrm."){
+                        $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
+                    };
                     update_info_vars(1);
                     update_pastData();
                     display_info();

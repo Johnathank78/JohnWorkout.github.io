@@ -1,6 +1,18 @@
-var rzinp_observer = false;
 var oldWidth = false;
 var XleftPos = false;
+
+const rzinp_observer = new MutationObserver(function(mutationList){
+    for (var mutation of mutationList) {
+        for (var child of mutation.addedNodes) {
+            let inp = $(child).find("input");
+            for(let i=0; i<inp.length; i++){
+                if($(inp[i]).hasClass("resizingInp")){
+                    resizeInput(inp[i]);
+                };
+            };
+        };
+    };
+});
 
 function infoStyle(style){
     if(style == "selection"){
@@ -390,18 +402,5 @@ $(document).ready(function(){
 
     $(document).on('input', ".resizingInp", function(){
         resizeInput(this);
-    });
-
-    rzinp_observer = new MutationObserver(function(mutationList) {
-        for (var mutation of mutationList) {
-            for (var child of mutation.addedNodes) {
-                let inp = $(child).find("input");
-                for(let i=0; i<inp.length; i++){
-                    if($(inp[i]).hasClass("resizingInp")){
-                        resizeInput(inp[i]);
-                    };
-                };
-            };
-        };
     });
 });//readyEnd

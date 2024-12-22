@@ -186,25 +186,25 @@ async function quit_session(failed=false){
 
     if(parameters["keepAwake"]){keepAwakeToggle(false)};
 
-    if(!((current_session["type"] == "W" && (tempStats["timeSpent"] <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session["type"] == "I" && tempStats["timeSpent"] <= 60)){
+    if(!((current_session["type"] == "W" && (tempStats["timeSpent"] <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session["type"] == "I" && tempStats["timeSpent"] <= 60)){
+        if(current_history["state"] == true){
+            fillSessionEnd(tempNewHistory, current_history, failed);
+
+            tempNewHistory["duration"] = tempStats["timeSpent"];
+            current_history["historyList"].push(tempNewHistory);
+            current_history["historyCount"] += 1;
+
+            session_save(session_list);
+        };
 
         stats["timeSpent"] += tempStats["timeSpent"];
         stats["workedTime"] += tempStats["workedTime"];
         stats["weightLifted"] += tempStats["weightLifted"];
         stats["repsDone"] += tempStats["repsDone"];
         
-        current_history["historyCount"] += 1;
-
         stats_save(stats);
 
-        if(current_history["state"] == true){
-            tempNewHistory["duration"] = tempStats["timeSpent"];
-            current_history["historyList"].push(tempNewHistory);
-            session_save(session_list);
-        };
-
         sessionDone["data"][current_session["id"]] = true;
-        
         sessionDone_save(sessionDone);
 
         // Notification related;
@@ -217,14 +217,6 @@ async function quit_session(failed=false){
             };
 
             await uniq_reschedulerSESSION(id);
-        };
-
-        // SessionEnd
-
-        try {
-            fillSessionEnd(failed);
-        } catch (error) {
-            $(".main_title").text(error)
         };
     };
 
@@ -278,17 +270,41 @@ async function quit_session(failed=false){
     $(".session_current_exercise_specs").css('display', 'flex');
     $('.session_next_exercise_expander').css("display", "flex");
 
+    emptyExoObserver.disconnect();
+
     recovery = false;
     undoMemory = [];
     localStorage.removeItem("recovery");
     canNowClick("allowed");
 };
 
-function getSessionEndData(){
-    let number = current_history["historyCount"];
+function manageSessionEndTabs(){
+    let nb = $(".selection_sessionFinished_subPage").filter(function() {
+        return $(this).css('display') == 'flex';
+    }).length;
+
+    $('.selection_sessionFinished_navigator_indicator').css('display', 'none');
+    
+    if(nb == 1){
+        $('.selection_sessionFinished_navigator').css('display', 'none');
+        $('.selection_sessionFinished').css('paddingBottom', '30px');
+    }else if(nb > 1){
+        $('.selection_sessionFinished_navigator').css('display', 'flex');
+        $('.selection_sessionFinished').css('paddingBottom', '45px');
+        
+        for(let i = 0; i < nb; i++){
+            $('.selection_sessionFinished_navigator_indicator').eq(i).css('display', 'flex');
+        };
+    };
+};
+
+function getSessionEndData(presentHistory, history){
+    let number = history["historyCount"] + 1;
     let outNumber = "";
+    
     let time = 0;
     let performanceGrowth = 0;
+
     let weight = 0;
     let double = false;
 
@@ -310,13 +326,11 @@ function getSessionEndData(){
         };
     };
 
-    if(current_history["state"] !== true || current_history["historyList"].length == 1 || current_session["type"] == "I" || number == 1){
-        return [outNumber, false, false]
+    if(number == 1 || current_session["type"] == "I"){
+        return [outNumber, false, false, isHistoryDayComplete(tempNewHistory)];
     };
 
-    let pastHistory = current_history["historyList"][current_history["historyList"].length - 2];
-    let presentHistory = current_history["historyList"][current_history["historyList"].length - 1];
-
+    let pastHistory = history["historyList"].getLast();
     let isEqual = areSessionEquallyCompleted(presentHistory, pastHistory);
 
     if(pastHistory["duration"] === 0){
@@ -350,7 +364,7 @@ function getSessionEndData(){
     return [outNumber, time, weight, isEqual];
 };
 
-function fillSessionEnd(failed){
+function fillSessionEnd(presentHistory, history, failed){
 
     function changeElemNode(data){
         let out = false;
@@ -397,142 +411,96 @@ function fillSessionEnd(failed){
         return out
     };
 
+    $(".selection_sessionFinished_subPage").css('display', 'none');
+    let pageNb = 0;
+
+    let failedTile = $('.failed');
+    let finishedTile = $('.finished');
+    let completedTile = $('.completed');
+    let chronoTile = $('.chrono');
+    let liftTile = $('.lift');
+    let changesTile = $('.suggestedChanges');
+
     if(failed){
-        $(".selection_sessionFinished_subPage:not('.failed')").css('display', 'none');
         $('.failed').css('display', 'flex');
 
         $('.selection_sessionFinished').css('paddingBottom', '30px');
         $('.selection_sessionFinished_navigator').css('display', 'none');
-
-        let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["subText"]["failed"]).length;
-        let randomFailedSub = Math.floor(Math.random() * (assetCount)).toString();
-        
-        let failedTile = $('.failed');
         
         $(failedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["failed"]);
         $(failedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["failed"][randomFailedSub]);
     }else{
-        let [number, time, weight, isEqual] = getSessionEndData();
+        let [number, time, weight, isEqual] = getSessionEndData(presentHistory, history, failed);
+        let intNum = parseInt(number.match(/\d+/)[0], 10);
         let changes = generateSuggestedChanges(tempNewHistory);
         let changesFilled = Object.keys(changes).length > 0;
 
-        let firstTile = $('.finished');
-        let completedTile = $('.completed');
-        let secondTile = $('.chrono');
-        let thirdTile = $('.lift');
-        let forthTile = $('.suggestedChanges');
-
-        if(!isEqual){
-            $(firstTile).css('display', 'flex');
+        if(!isEqual && intNum != 1){
+            $(finishedTile).css('display', 'flex');
             $(completedTile).css('display', 'flex');
-            $(secondTile).css('display', 'none');
-            $(thirdTile).css('display', 'none');
-
-            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["completed"]).length;
-            let randomFailedSub = Math.floor(Math.random() * (assetCount)).toString();
-
-            $(completedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["completed"][randomFailedSub]);
-            $(completedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["completed"]);
-
-            $('.selection_sessionFinished').css('paddingBottom', '45px');
-            $('.selection_sessionFinished_navigator').css('display', 'flex');
-            
-            if(changesFilled){
-                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
-            }else{
-                $('.selection_sessionFinished_navigator_indicator').eq(2).css('display', 'none');
-                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
-            };
-        }else if(time === false && weight === false || parseInt(number.match(/\d+/)[0], 10) == 1){
-            $(firstTile).css('display', 'flex');
-            $(secondTile).css('display', 'none');
-            $(thirdTile).css('display', 'none');
-
-            $('.selection_sessionFinished').css('paddingBottom', '30px');
-
-            if(changesFilled){
-                $('.selection_sessionFinished_navigator_indicator').eq(2).css('display', 'none');
-                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
-            }else{
-                $('.selection_sessionFinished_navigator').css('display', 'none');
-                $('.selection_sessionFinished_navigator_indicator').css('display', 'none');
-            };
+        }else if(time === false && weight === false){
+            $(finishedTile).css('display', 'flex');
+            if(!isEqual){$(completedTile).css('display', 'flex')};
         }else if(weight === false){
-            $(firstTile).css('display', 'flex');
-            $(secondTile).css('display', 'flex');
-            $(thirdTile).css('display', 'none');
-            $(completedTile).css('display', 'none');
-            
-            $('.selection_sessionFinished').css('paddingBottom', '45px');
-            $('.selection_sessionFinished_navigator').css('display', 'flex');
-            
-            if(changesFilled){
-                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
-            }else{
-                $('.selection_sessionFinished_navigator_indicator').eq(2).css('display', 'none');
-                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
-            };
+            $(finishedTile).css('display', 'flex');
+            $(chronoTile).css('display', 'flex');
         }else{
-            $(firstTile).css('display', 'flex');
-            $(secondTile).css('display', 'flex');
-            $(thirdTile).css('display', 'flex');
-            $(completedTile).css('display', 'none');
-            
-            $('.selection_sessionFinished').css('paddingBottom', '45px');
-
-            if(changesFilled){
-                $('.selection_sessionFinished_navigator_indicator').css('display', 'block');
-            }else{
-                $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
-            };
-
-            $('.selection_sessionFinished_navigator').css('display', 'flex');
+            $(finishedTile).css('display', 'flex');
+            $(chronoTile).css('display', 'flex');
+            $(liftTile).css('display', 'flex');
         };
-        
-        $('.failed').css('display', 'none');
+
         $('.selection_sessionFinishedBody').animate({ scrollLeft: $('.finished').position().left }, 1);
 
         let randomTimeMain = 0;
         let randomWeightMain = 0;
 
         // First Tile
-        $(firstTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["congrats"]);
+        $(finishedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["congrats"]);
 
-        $(firstTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(current_session["name"]);
+        $(finishedTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(current_session["name"]);
 
-        $(firstTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["YC"]);
-        $(firstTile).find('.selection_sessionFinished_subTextPart').eq(2).text(number);
-        $(firstTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["FT"]);
-        $(firstTile).find('.selection_sessionFinished_subTextPart').eq(3).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["T"]);
+        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["YC"]);
+        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(2).text(number);
+        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["FT"]);
+        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(3).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["T"]);
+
+        // CompletedTile 
+
+        let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["completed"]).length;
+        let randomFailed = Math.floor(Math.random() * (assetCount)).toString();
+
+        $(completedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["completed"][randomFailed]);
+        $(completedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["completed"]);
 
         // Second Tile
         if(time > 0){
             let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["good"]).length
 
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["good"][randomTimeMain]);
+            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["good"][randomTimeMain]);
 
-            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]["YHB"]);
-            $(secondTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["faster"]);
-            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]["YHB"]);
+            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["faster"]);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
         }else if(time < 0){
             let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
             
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"][randomTimeMain]);
+            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"][randomTimeMain]);
 
-            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]["YHB"]);
-            $(secondTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["slower"]);
-            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]["YHB"]);
+            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["slower"]);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
         }else{
             let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"]).length
             
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(secondTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"][randomTimeMain]);
+            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"][randomTimeMain]);
 
-            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]['YT']);
-            $(secondTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["even"]);
-            $(secondTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['ATLT']);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]['YT']);
+            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["even"]);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['ATLT']);
         };
 
         // Third Tile
@@ -540,42 +508,41 @@ function fillSessionEnd(failed){
             let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["good"]).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["good"][randomWeightMain]);
+            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["good"][randomWeightMain]);
 
-            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $(thirdTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["more"]);
-            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
+            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["more"]);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
         }else if(weight < 0){
             let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["bad"][randomWeightMain]);
+            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["bad"][randomWeightMain]);
 
-            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $(thirdTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["less"]);
-            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
+            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["less"]);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
         }else{
             let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"]).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(thirdTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["even"][randomWeightMain]);
+            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["even"][randomWeightMain]);
 
-            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $(thirdTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["even"]);
-            $(thirdTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['ATLT']);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
+            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["even"]);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['ATLT']);
         };
 
         // Forth Tile
         if(changesFilled){
-            $(forthTile).css('display', 'flex');
+            $(changesTile).css('display', 'flex');
             $('.selection_sessionFinished_suggestedBody').children().remove();
             Object.keys(changes).forEach(function(key){
                 $('.selection_sessionFinished_suggestedBody').append(changeElemNode([key, changes[key]]));
             });
-        }else{
-            $(forthTile).css('display', 'none');
-            $('.selection_sessionFinished_navigator_indicator').eq(3).css('display', 'none');
         };
+
+        manageSessionEndTabs();
     };
 
     congrats_shown = true;
