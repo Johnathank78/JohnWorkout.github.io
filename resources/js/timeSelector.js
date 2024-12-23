@@ -145,7 +145,7 @@ $(document).ready(function(){
         summonTimeSelector($(this));
     });
 
-    if(/Mobi/.test(navigator.userAgent)){
+    if(isWebMobile){
         $(document).on('touchstart', '.timeSelectorInput', function(e){
             slideStartingPoint = e.touches[0].clientY;
         });

@@ -158,6 +158,7 @@ const textAssets = {
             "emptyHistory": "Pas encore d'historique",
             "disabledHistory": "L'historique est désactivé",
             "today": "Aujourd'hui",
+            "yesterday": "Hier",
             "pickColor": "Choisir une couleur",
             "pickDate": "Choisir une date",
 
@@ -498,6 +499,7 @@ const textAssets = {
             "emptyHistory": "No history yet",
             "disabledHistory": "History is disabled",
             "today": "Today",
+            "yesterday": "Yesterday",
             "pickColor": "Select a color",
             "pickDate": "Choose a date",
 
@@ -613,8 +615,8 @@ const textAssets = {
             "deleted": "deleted",
             "updated": "updated",
             "IOprefix": "Data",
-            "imported": "successfully imported",
-            "exported": "successfully exported",
+            "imported": "Successfully imported",
+            "exported": "Successfully exported",
             "parameters": "updated",
             "read": "Read permission error",
             "write": "Write permission error",
@@ -722,25 +724,9 @@ var expanderOpenedHeight = mobile == "IOS" ? "calc(83vh - 65px)" : "calc(90vh - 
 var current_page = "selection";
 var color = null; var mid_color = null; var light_color = null;
 
-/*KONSOLEADD
+
 var consoleShown = true;
-var konsole = new Konsole($(".konsole"));
-    
-window.onerror = function(message, error) {
-    console.error(message, error);  
-};
-
-$(document).on("click", '.konsole_tiret', function(){
-    
-    if(!consoleShown){
-        $('.konsole__container').css('bottom', '0px');
-    }else{
-        $('.konsole__container').css('bottom', '-455px');
-    };
-
-    consoleShown = !consoleShown;
-})
-KONSOLEADD*/
+var konsole = false;
 
 $(document).ready(function(){
     addIMG = $("#addIMG").attr('src');
@@ -762,4 +748,25 @@ $(document).ready(function(){
     exchangeIMG = $('#linkIMG').attr('src');
 
     $("img").attr("draggable", false);
+    
+    /*KONSOLEADD
+
+    konsole = new Konsole($(".konsole")[0]);
+    window.onerror = function(message, error) {
+        console.error(message, error);  
+    };
+
+    $(document).on("click", '.konsole_tiret', function(){
+        
+        if(!consoleShown){
+            $('.konsole__container').css('bottom', '0px');
+        }else{
+            $('.konsole__container').css('bottom', '-455px');
+        };
+
+        consoleShown = !consoleShown;
+    })
+
+    KONSOLEADD*/
+    
 });//readyEnd

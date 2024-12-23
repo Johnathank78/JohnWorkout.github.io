@@ -100,11 +100,68 @@ function update_hint(){
 
 function sets_reorderUpdate(e, merge){
     if(merge === false){
+        let target; let merged; let pos; let bigExercise;
+        let childs = $(".session_next_exercises_container").children();
+
+        $(childs).each((i) => {
+            target = $(childs).eq(i);
+
+            merged = $(target).find('.session_next_exercise_type').filter(function(){
+                return $(this).text().includes("Pause") || $(this).text().includes("Wrm.");
+            }).parent();
+
+            if($(target).children().length > 1){
+                pos = $(target).children().index(merged);
+                bigExercise = $('<div class="session_next_bigExercise reorder__child"></div>');
+
+                $(bigExercise).append(merged);
+
+                if(pos == 0){
+                    $(target).before(bigExercise);
+                }else if(pos == 1){
+                    $(target).after(bigExercise);
+                };
+            };
+        });
+    }else{
+        let focusChild = $(e.detail.child);
+        let focusedType = $(focusChild).find(".session_next_exercise_type").text();
+
+        if(focusedType == "Pause" || focusedType == "Wrm."){return};
+        
+        let toMerge; let next; let prev; let type;
+        
+        if(e.detail.prctg <= 40){
+            prev = $(focusChild).prev();
+            type = $(prev).find(".session_next_exercise_type").text();
+
+            if(type == "Pause" || type == "Wrm."){
+                toMerge = $(prev).find(".session_next_exercise");
+
+                $(focusChild).prepend(toMerge);
+                $(prev).remove();
+            };
+        }else if(e.detail.prctg >= 60){
+            next = $(focusChild).next();
+            type = $(next).find(".session_next_exercise_type").text();
+
+            if(type == "Pause" || type == "Wrm."){
+                toMerge = $(next).find(".session_next_exercise");
+
+                $(focusChild).append(toMerge);
+                $(next).remove();
+            };
+        };
+    };
+
+    return;
+
+    if(merge === false){
         let target = false; let pause = false; let pos = false; let bigExercise = false;
         let childs = $(".session_next_exercises_container").children();
 
         $(childs).each((i) => {
-            target = $(childs[i]);
+            target = $(childs).eq(i);
             pause = $(target).find('.session_next_exercise_type:contains("Pause")').parent();
 
             if($(target).children().length > 1){
@@ -126,19 +183,19 @@ function sets_reorderUpdate(e, merge){
 
         if(e.detail.prctg <= 40){
             $(childs).each((i) => {
-                prev = $(childs[i]).prev();
+                prev = $(childs).eq(i).prev();
                 if($(prev).find(".session_next_exercise_type").text() == "Pause"){
                     pause = $(prev).find(".session_next_exercise");
-                    $(childs[i]).prepend(pause);
+                    $(childs).eq(i).prepend(pause);
                     $(prev).remove();
                 };
             });
         }else if(e.detail.prctg >= 60){
             $(childs).each((i) => {
-                next = $(childs[i]).next();
+                next = $(childs).eq(i).next();
                 if($(next).find(".session_next_exercise_type").text() == "Pause"){
                     pause = $(next).find(".session_next_exercise");
-                    $(childs[i]).append(pause);
+                    $(childs).eq(i).append(pause);
                     $(next).remove();
                 };
             });
@@ -421,33 +478,40 @@ function workout(exercises_list){
         if(undoMemory.length > 0){$('.session_undo').css('display', 'block')};
 
         if(extype == "Wrm."){
-            remaining_sets = 1;
-
-            setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+"')").length;
-            next_exo = true;
-
-            if(actual_setNb - actual_setL != setNb_Lextracted + 1){
-                dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
-
-                if($(".session_next_exercise_set").length == 0){
-                    noMore = true;
-                    $(".session_next_exercises_container").append(`
-                    <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
-                        <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
-                    </div>
-                    `);
-                };
-            };
-
-            if(noMore){
-                finished = true;
-                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
+            if(beforeExercise){
+                remaining_sets = 0;
+                
+                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["start"]);
                 $('.session_exercise_Lrest_btn').data("canLongClick", false);
             }else{
-                sets_reorder.avoidIndexes = [0];
+                remaining_sets = 1;
 
-                $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
-                $('.session_exercise_Lrest_btn').data("canLongClick", false);
+                setNb_Lextracted = $(".session_next_exercise_name:contains('"+next_name+"')").length;
+                next_exo = true;
+
+                if(actual_setNb - actual_setL != setNb_Lextracted + 1){
+                    dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
+
+                    if($(".session_next_exercise_set").length == 0){
+                        noMore = true;
+                        $(".session_next_exercises_container").append(`
+                        <div class="session_next_exercise_set session_noMore" style="background-color:#363651">
+                            <span class="session_next_exercise_name">`+textAssets[parameters["language"]]["inSession"]["noMore"]+`</span>
+                        </div>
+                        `);
+                    };
+                };
+
+                if(noMore){
+                    finished = true;
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["finished"]);
+                    $('.session_exercise_Lrest_btn').data("canLongClick", false);
+                }else{
+                    sets_reorder.avoidIndexes = [0];
+
+                    $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
+                    $('.session_exercise_Lrest_btn').data("canLongClick", false);
+                };
             };
         }else if(extype == "Bi."){
             $('.session_exercise_Lrest_btn').data("canLongClick", true);
@@ -679,7 +743,7 @@ async function next_exercise(first){
     extype = $(".session_next_exercise_type").first().text();
     next_id = $(".session_next_exercise_id").first().text().replace(/_(1|2)/g, "");
 
-    if(first && extype != "Pause" && extype != "Wrm."){
+    if(first && extype != "Pause"){
 
         updateRestBtnStyle('Reset')
         $(".session_workout_historyNotes_inp").val("").change();
@@ -708,7 +772,7 @@ async function next_exercise(first){
         $('.session_exercise_Rrest_btn').data("canLongClick", false);
         
         update_info(true);
-    }else if(!first || extype == "Pause" || extype == "Wrm."){
+    }else if(!first || extype == "Pause"){
         beforeExercise = false;
 
         if(extype != "Pause"){
@@ -718,10 +782,9 @@ async function next_exercise(first){
         };
 
         $(".session_next_exercise_type").first().remove();
-
         if($(".session_next_exercise_type").length == 0){lastExo = true};
 
-        if(extype == "Pause"){
+        if(extype == "Pause" || extype == "Wrm."){
             sets_reorder.avoidIndexes = [];
         }else{
             sets_reorder.avoidIndexes = [0];
@@ -730,7 +793,6 @@ async function next_exercise(first){
         update_info_vars();
 
         if(extype == "Wrm."){
-            actual_setNb = 1;
             next_exo = true;
             $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
             dropSet_static($(".session_next_exercise_set").first());
@@ -862,15 +924,20 @@ function update_info_vars(index = 0){
     extype = $(nextExo).find(".session_next_exerciseType").eq(0).text();
 
     if(extype == "Wrm."){
+        actual_setNb = 1;
+
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
         next_specs = [0, 0];
         next_rest = 0;
+
         $(".session_current_exercise_specs, .session_current_exercise_specs_before").css('display', 'none');
     }else{
         $(".session_current_exercise_specs").css('display', 'flex');
     };
 
     if (extype == 'Uni.'){
+        actual_setNb = parseInt($(".session_next_exercises_container").first().find(".session_next_exercise").first().find(".session_setPreviewId").last().text()) + 1;
+
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text().split(' - ' + textAssets[parameters["language"]]["misc"]["rightInitial"])[0];
         next_specs = [$(nextExo).find(".session_next_exercise_reps").eq(0).text(), unitRound($(nextExo).find(".session_next_exercise_weight").eq(0).text())];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
@@ -878,17 +945,22 @@ function update_info_vars(index = 0){
         LrestTime = next_rest;
         RrestTime = next_rest;
     }else if (extype == "Bi."){ 
+        actual_setNb = parseInt($(".session_next_exercises_container").first().find(".session_next_exercise").first().find(".session_setPreviewId").last().text()) + 1;
+        
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
         next_specs = [$(nextExo).find(".session_next_exercise_reps").eq(0).text(), unitRound($(nextExo).find(".session_next_exercise_weight").eq(0).text())];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
 
         LrestTime = next_rest;
     }else if (extype == "Int."){
+        actual_setNb = 0;
+
         intervallData = JSON.parse($(nextExo).find(".session_next_exercise_intervallData").text());
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
         next_specs = getIntervallSpecs(nextExo);
     }else if (extype == "Pause"){
         let adjacentExo = $('.session_next_exercise').eq(index + 1);
+        actual_setNb = 0;
         
         next_name = textAssets[parameters["language"]]["updatePage"]["break"];
         next_rest = $(nextExo).find(".session_next_exercise_rest").eq(0).text();
@@ -1501,6 +1573,7 @@ function recoveryUpdateFromUndo(undoData){
 
 function undoMemorise(way){
     if(way == 'in'){
+        // console.log('memorized')
         let undoData = {
             "html": $('.session_next_exercises_container').html(),
             "varSav": {
@@ -1608,7 +1681,6 @@ function undoMemorise(way){
 
             updateRestBtnStyle('Reset');
         }else{
-            console.log(extype, actual_setNb, actual_setL)
             if(actual_setNb - actual_setL > 1){
                 $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["rest"]);
                 $(".session_exercise_Lrest_btn").css('opacity', '1');
@@ -2041,23 +2113,21 @@ $(document).ready(function(){
     });
 
     $(document).on("beforeSelection", ".session_next_exercises_container", function(e){
-        if($(e.detail.child).find(".session_next_exercise_type").text() == "Pause"){return};
         sets_reorderUpdate(e, true);
-    });
-
-    $(document).on("reorderStopped", ".session_next_exercises_container", function(e){
-        sets_reorderUpdate(e, false);
-        if(hasStarted){udpate_recovery("workout")};
     });
 
     $(document).on("selectionAborted", ".session_next_exercises_container", function(e){
         sets_reorderUpdate(e, false);
     });
+
+    $(document).on("reorderStopped", ".session_next_exercises_container", function(e){
+        sets_reorderUpdate(e, false);
+    });
     
-    $(document).on("reordered", ".session_next_exercises_container", function(e){
+    $(document).on("hasBeenReordered", ".session_next_exercises_container", function(e){
         if(extype == "Pause"){
             if($(".session_next_exercise_name").length != 1){
-                if($($(".session_next_exercise_type")[0]).text() == "Int."){
+                if($(".session_next_exercise_type").eq(0).text() == "Int."){
                     let temp = [$($(".session_next_exercise_cycle")[0]).text(), $($(".session_next_exercise_work")[0]).text(), $($(".session_next_exercise_rest")[1]).text()];
                     next_specs = textAssets[parameters["language"]]["inSession"]["next"] + " : " + temp[0] +" x "+ get_time_u(temp[1]) +" x "+ get_time_u(temp[2]);
                 }else{
@@ -2072,7 +2142,8 @@ $(document).ready(function(){
             update_info(true);
         };
 
-        if(hasStarted){udpate_recovery("workout")};
+        if(hasReallyStarted){udpate_recovery("workout")};
+        if(hasStarted){undoMemorise('in')};
     });
 
     // EXTRA TIMER;

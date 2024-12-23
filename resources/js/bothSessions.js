@@ -1036,7 +1036,7 @@ $(document).ready(function(){
         };
     });
 
-    if(/Mobi/.test(navigator.userAgent)){
+    if(isWebMobile){
         $(".session_volume_slider_container").on("touchstart", function(e){sliderMouseDown(e, this)});
     
         $(document).on("touchmove", function(e){sliderMouseMove(e)});

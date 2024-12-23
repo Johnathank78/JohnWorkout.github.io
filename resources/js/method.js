@@ -283,7 +283,7 @@ jQuery.fn.virtualAreaHeight = function() {
 };
 
 jQuery.fn.getStyleValue = function(prop){
-    return parseFloat(this.css(prop).replace('px', ''));
+    return parseFloat($(this).css(prop).replace('px', ''));
 };
 
 jQuery.fn.val = function(){
