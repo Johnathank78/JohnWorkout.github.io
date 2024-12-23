@@ -412,24 +412,13 @@ function historyDay(i, history){
 
     function fillElem(type, data, modify = false){
         let clone = false;
-        let clone2 = false;
-        
-        let container_elem = $('<div class="update_history_container_elem"><button class="reorder__avoid selection_round_btn update_history_bin"><img src='+binIMG+' draggable="False" alt class="selection_icon_btn noselect"></button></div>');
-        let day_elem = $('<div class="update_history_container_day"><div class="update_history_container_day_header"><span class="update_history_container_day_date noselect"></span><span class="update_history_container_day_time noselect"></span></div></div>');
-        let note_elem = $('<div class="update_history_container_exercise_note_container_wrapper"><div class="update_history_container_exercise_note_container"><span class="update_history_container_exercise_note"></span></div></div>');
-        let exo_elem = $('<div class="update_history_container_exercise"><div class="update_history_container_exercise_header"><span class="update_history_container_exercise_name"></span><div class="update_history_container_exercise_sets_container"><span class="update_history_container_exercise_sets"></span><span class="update_history_container_Expectedsets"></span></div></div></div>');
-        let set_elem = $('<div class="update_history_container_set"><div class="update_history_container_reps_container"><input class="update_history_container_reps strictlyNumeric resizingInp" type="tel" value=""><span class="update_history_container_Expectedreps"></span></div><span>x</span><div class="update_history_container_weight_container"><input class="update_history_container_weight strictlyFloatable resizingInp" type="tel" value=""><span class="update_history_container_Expectedweight"></span></div><span class="update_history_container_weightUnit"></span></div>');;
-        let intSet_elem = $(`<div class="update_history_container_set" style="padding: unset;"><div class="update_history_container_work_container"><span class="udpate_history_workTitle">Work</span><div class="udpate_history_workData"><span class="update_history_container_work"></span><span class="update_history_container_Expectedwork"></span></div></div><div class="update_history_container_rest_container"><span class="udpate_history_restTitle">Rest</span><div class="udpate_history_restData"><span class="update_history_container_rest"></span><span class="update_history_container_Expectedrest"></span></div></div></div>`);
 
         switch (type) {
             case "day":
-                clone = container_elem.clone();
-                clone2 = day_elem.clone();
+                clone = day_elem.clone();
 
-                $(clone2).find(".update_history_container_day_date").text(data[0]);
-                $(clone2).find(".update_history_container_day_time").text(data[1]);
-
-                $(clone).prepend($(clone2));
+                $(clone).find(".update_history_container_day_date").text(data[0]);
+                $(clone).find(".update_history_container_day_time").text(data[1]);
                 break;
 
             case "note":
@@ -476,6 +465,12 @@ function historyDay(i, history){
 
         return clone;
     };
+
+    let day_elem = $('<div class="update_history_container_day"><div class="update_history_container_day_header"><span class="update_history_container_day_date noselect"></span><span class="update_history_container_day_time noselect"></span></div></div>');
+    let note_elem = $('<div class="update_history_container_exercise_note_container_wrapper"><div class="update_history_container_exercise_note_container"><span class="update_history_container_exercise_note"></span></div></div>');
+    let exo_elem = $('<div class="update_history_container_exercise"><div class="update_history_container_exercise_header"><span class="update_history_container_exercise_name"></span><div class="update_history_container_exercise_sets_container"><span class="update_history_container_exercise_sets"></span><span class="update_history_container_Expectedsets"></span></div></div></div>');
+    let set_elem = $('<div class="update_history_container_set"><div class="update_history_container_reps_container"><input class="update_history_container_reps strictlyNumeric resizingInp" type="tel" value=""><span class="update_history_container_Expectedreps"></span></div><span>x</span><div class="update_history_container_weight_container"><input class="update_history_container_weight strictlyFloatable resizingInp" type="tel" value=""><span class="update_history_container_Expectedweight"></span></div><span class="update_history_container_weightUnit"></span></div>');;
+    let intSet_elem = $(`<div class="update_history_container_set" style="padding: unset;"><div class="update_history_container_work_container"><span class="udpate_history_workTitle">Work</span><div class="udpate_history_workData"><span class="update_history_container_work"></span><span class="update_history_container_Expectedwork"></span></div></div><div class="update_history_container_rest_container"><span class="udpate_history_restTitle">Rest</span><div class="udpate_history_restData"><span class="update_history_container_rest"></span><span class="update_history_container_Expectedrest"></span></div></div></div>`);
     
     let date = 0; let day = 0; let exo = 0; let subExo =  0; 
     let expectedWeightUnit = 0; let expectedReps = 0; let expectedWeight = 0; let expectedSets = 0; 
@@ -492,8 +487,6 @@ function historyDay(i, history){
 
     if(date == formatDate(Date.now())){
         out[0].push(fillElem("day", [textAssets[parameters["language"]]['updatePage']['today'], time]));
-    }else if(date == formatDate(Date.now() - 86400)){
-        out[0].push(fillElem("day", [textAssets[parameters["language"]]['updatePage']['yesterday'], time]));
     }else{
         out[0].push(fillElem("day", [date, time]));
     };

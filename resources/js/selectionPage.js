@@ -70,12 +70,8 @@ function loadHistorydayz(history, scrollState){
     for(let i=temp - 1; i>temp - 8 && i>=0; i--){
         let elem = historyDay(i, history);
         historyDOM.push(elem);
-
         $(".update_history_container").append(elem[0]);
-        $(".update_history_container").children().last().data('swipable', true);
-        $(".update_history_container").children().last().data('swiped', false);
-        $(".update_history_container").children().last().data('isBeingSwiped', false);
-        
+
         scrollState = i;
     };
 
@@ -510,7 +506,7 @@ $(document).ready(function(){
         trackItem(item, "session");
 
         $(".update_data_name").val(update_current_item["name"]);
-        $(".update_history_container_elem, .update_history_loadMore_btn").remove();
+        $(".update_history_container_day, .update_history_loadMore_btn").remove();
 
         update_pageFormat("history");
         current_history = getSessionHistory(update_current_item);
@@ -532,14 +528,14 @@ $(document).ready(function(){
         };
 
         if(current_history["state"] === false){
-            $('.update_history_container').append('<div class="update_history_container_elem"><div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters["language"]]["updatePage"]["disabledHistory"]+'</span></div></div>');
+            $('.update_history_container').append('<div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters["language"]]["updatePage"]["disabledHistory"]+'</span></div>');
             return;
         };
 
         //-------;
 
         if(current_history['historyList'].length == 0){
-            $('.update_history_container').append('<div class="update_history_container_elem"><div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters["language"]]["updatePage"]["emptyHistory"]+'</span></div></div>');
+            $('.update_history_container').append('<div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters["language"]]["updatePage"]["emptyHistory"]+'</span></div>');
         }else{
             historyScrollState = loadHistorydayz(current_history, current_history["historyList"].length);
         };

@@ -266,32 +266,14 @@
     height: auto;
     
     opacity: 0.1;
-}
-
-.update_history_bin{
-    flex-shrink: 0;
-    flex-grow: 0;
-    background-color: #E74C3C; 
-}
-
-.update_history_container_elem{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-
-    width: calc(100% - 20px + 80px);
-    padding-right: 20px;
-
-    border-radius: 10px;
-}
+}   
 
 .update_history_container_day{
     display: flex;
     flex-direction: column;
     gap: 15px;
 
-    width: calc(100% - 30px - 80px + 20px);
+    width: calc(100% - 30px);
     
     padding: 15px;
 
@@ -299,10 +281,6 @@
     border-radius: 10px;
 
     cursor: pointer;
-}
-
-.update_history_container_day{
-    transition: transform 0.3s ease-out;
 }
 
 .update_history_container_day_noHistory{

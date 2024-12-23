@@ -371,12 +371,12 @@ $(document).ready(function(){
                     if(downloadTest == "Failed"){
                         if(navigator.canShare({ files })){
                             await navigator.share({ files });
-                            bottomNotification("exported");
+                            bottomNotification("exported", textAssets[parameters["language"]]["bottomNotif"]["IOprefix"]);
                         } else {
                             bottomNotification("write");
                         };
                     }else{
-                        bottomNotification("exported");
+                        bottomNotification("exported", textAssets[parameters["language"]]["bottomNotif"]["IOprefix"]);
                     };
                 };
             };
