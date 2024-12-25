@@ -490,20 +490,17 @@ $(document).ready(function(){
                 };
 
                 for(let z=2; z<historyDOM[dayInd][1][exoInd].length;z++){
-                    if($(exo).find('.udpate_history_workTitle').length > 0){
-                        $(exo).animateAppend($($(historyDOM[dayInd][1][exoInd])[z]), 25, -15, 400, true);
+                    if($($(historyDOM[dayInd][1][exoInd])[z]).data('type') == "Int."){
+                        $(exo).animateAppend($($(historyDOM[dayInd][1][exoInd])[z]), 30, -15, 400, true);
                     }else{
                         $(exo).animateAppend($($(historyDOM[dayInd][1][exoInd])[z]), 38, -15, 400, true);
                     };
                 };
-
             };
         }else{
             if($(this).find(".update_history_container_exercise").length != 0){
-                $(this).parent().data("swipable", true);
                 $(this).find(".update_history_container_exercise").animateRemove(-45, 400);
             }else{
-                $(this).parent().data("swipable", false);
                 for(let i=0; i<historyDOM[dayInd][1].length; i++){
                     $(this).animateAppend($($(historyDOM[dayInd][1][i])[0]), 36, -45, 400, true);
                 };
@@ -1271,7 +1268,7 @@ $(document).ready(function(){
                         data["exoList"].push(generateExoObj({
                             "type": type,
                             "name": ex_name,
-                            "cycle": cycle,
+                            "cycle": parseInt(cycle),
                             "work": work,
                             "rest": rest,
                             "hint": hint,

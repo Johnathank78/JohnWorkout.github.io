@@ -567,8 +567,6 @@ async function scheduleId(start, count, every, title, body, id, from){
 };
 
 async function removeAllNotifsFromSession(session){
-    console.log('removed');
-
     let idList = false;
     let sessionID = session["id"];
 

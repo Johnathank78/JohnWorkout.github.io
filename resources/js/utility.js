@@ -473,12 +473,26 @@ function isHistoryDayEmpty(historyDay){
     return count == 0;
 };
 
-function isHistoryDayComplete(historyDay){
-    for(const exo of historyDay["exoList"]){
-        if(exo["type"] == "Int." && exo["expectedStats"]["cycle"] != exo["setList"].length){
-            return false;
-        }else if(exo["type"] != "Int." && exo["expectedStats"]["setNb"] != exo["setList"].length){
-            return false;
+function isHistoryDayComplete(historyDay, type){
+    if(type == "W"){
+        for(const exo of historyDay["exoList"]){
+            if(exo["type"] == "Int."){
+                for (const subExo of exo["exoList"]) {
+                    if(subExo["expectedStats"]["cycle"] != subExo["setList"].filter(set => set["work"] != "X").length){
+                        return false;
+                    };
+                };
+            }else if(["Bi.", "Uni."].includes(exo["type"]) && exo["expectedStats"]["setNb"] != exo["setList"].length){
+                return false;
+            };
+        };
+    }else if(type == "I"){
+        for(const exo of historyDay["exoList"]){
+            if(exo["type"] == "Int."){
+                if(exo["expectedStats"]["cycle"] != exo["setList"].filter(set => set["work"] != "X").length){
+                    return false;
+                };
+            };
         };
     };
 
@@ -503,15 +517,22 @@ function getHistoryExoIndex(history, id){
     return -1;
 };
 
-function smallestAvailableExoId(){
+function smallestAvailableExoId(mode){
 
     let idList = [0];
-    
-    $('.update_workoutList_container').find(".update_workout_item").each((index, item) => {
-        if($(item).attr('id') !== undefined){
-            idList.push(parseInt($(item).attr('id')));
-        };
-    });
+    if(mode == "workout"){
+        $('.update_workoutList_container').find(".update_workout_item").each((index, item) => {
+            if($(item).attr('id') !== undefined){
+                idList.push(parseInt($(item).attr('id')));
+            };
+        });
+    }else if(mode == "intervall"){
+        $('.update_intervallList_container').find(".update_workout_item").each((index, item) => {
+            if($(item).attr('id') !== undefined){
+                idList.push(parseInt($(item).attr('id')));
+            };
+        });
+    };
 
     let max = Math.max(...idList);
 
@@ -525,15 +546,17 @@ function smallestAvailableExoId(){
 };
 
 function getExoIndexById(session, id){
-    let out = false;
 
-    session["exoList"].forEach((item, index) => {
-        if(item['id'] == id.replace(/_(1|2)/g, "")){
-            out = parseInt(index);
+    for(let index = 0; index < session["exoList"].length; index++){
+        const item = session["exoList"][index];
+        const realID = id.replace(/_(1|2)/g, "");
+
+        if(item['id'] == realID){
+            return parseInt(index);
         };
-    });
+    };
 
-    return out;
+    return -1;
 };
 
 function mergeHistoryExo(history, id){
@@ -548,7 +571,7 @@ function mergeHistoryExo(history, id){
     return [...out[0], ...out[1]];
 };
 
-function areSessionEquallyCompleted(currentHistory, pastHistory){
+function areSessionEquallyCompleted(currentHistory, pastHistory, type){
     function findHistoryExoByID(history, id){
         for(let index = 0; index < history["exoList"].length; index++){
             const exo = history["exoList"][index];
@@ -558,21 +581,53 @@ function areSessionEquallyCompleted(currentHistory, pastHistory){
             };
         };
 
-        return -1
+        return false
     };
 
     let areEqual = true;
-    let pastExo = false;
+    let pastExo; let pastSubExo;
+    let setList; let pastSetList;
 
-    currentHistory["exoList"].forEach(currentExo => {
-        pastExo = findHistoryExoByID(pastHistory, currentExo["id"]);
-
-        if(pastExo == -1 || pastExo['type'] == "Int."){return}; // INT ARE NOT TOOK IN COUNT FOR THE MOMENT
-
-        if(currentExo["setList"].length < pastExo["setList"].length){
-            areEqual = false;
-        };
-    });
+    if(type == "W"){
+        currentHistory["exoList"].forEach(exo => {
+            if(exo["type"] == "Int."){
+                pastExo = findHistoryExoByID(pastHistory, exo["id"]);
+                
+                if(pastExo){
+                    exo["exoList"].forEach(subExo => {
+                        pastSubExo = findHistoryExoByID(pastExo, subExo["id"]);
+        
+                        setList = subExo["setList"].filter(set => set["work"] != "X");
+                        pastSetList = pastSubExo["setList"].filter(set => set["work"] != "X");
+    
+                        if(pastSubExo && setList.length < pastSetList.length){
+                            areEqual = false;
+                        };
+                    });
+                };
+            }else{
+                pastExo = findHistoryExoByID(pastHistory, exo["id"]);
+    
+                setList = exo["setList"].filter(set => set["reps"] != 0);
+                pastSetList = pastExo["setList"].filter(set => set["reps"] != 0);
+        
+                if(pastExo && setList.length < pastSetList.length){
+                    areEqual = false;
+                };
+            };
+        });
+    }else if(type == "I"){
+        currentHistory["exoList"].forEach(exo => {
+            pastExo = findHistoryExoByID(pastHistory, exo["id"]);
+    
+            setList = exo["setList"].filter(set => set["work"] != "X");
+            pastSetList = pastExo["setList"].filter(set => set["work"] != "X");
+    
+            if(pastExo && setList.length < pastSetList.length){
+                areEqual = false;
+            };
+        });
+    };
 
     return areEqual;
 };

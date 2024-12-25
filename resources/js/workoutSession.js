@@ -37,6 +37,7 @@ var isDeleting = false;
 var lastExo = false;
 
 var undoMemory = [];
+var undoCapture = false;
 
 const emptyExoObserver = new MutationObserver(function (mutationList) {
     for (const mutation of mutationList) {
@@ -1571,9 +1572,8 @@ function recoveryUpdateFromUndo(undoData){
     recovery_save(recovery);
 };
 
-function undoMemorise(way){
+function undoMemorise(way, param=false){
     if(way == 'in'){
-        // console.log('memorized')
         let undoData = {
             "html": $('.session_next_exercises_container').html(),
             "varSav": {
@@ -1608,8 +1608,16 @@ function undoMemorise(way){
             "tempHistory": cloneOBJ(tempNewHistory),
         };
 
+        if(param == "capture"){
+            undoCapture = undoData;
+            return;
+        }else if(param == "memorize"){
+            undoMemory.push(undoCapture);
+        }else{
+            undoMemory.push(undoData);
+        };
+        
         $('.session_undo').css('display', 'block');
-        undoMemory.push(undoData);
     }else if(way == "out"){
         if(undoMemory.lenght < 1){return};
         
@@ -1666,7 +1674,7 @@ function undoMemorise(way){
         iRest_time = 0;
         iWork_time = 0;
         iCurrent_cycle = false;
-        iActualCycle = false;
+        iActualSet = false;
         Ifinished = false;
         Iskip = false;
         IjustSkipped = false;
@@ -2105,7 +2113,7 @@ $(document).ready(function(){
             ncState = true;
             cannotClick = "expander";
             $(".session_next_exercises_container").css("maxHeight", expanderOpenedHeight);
-            BehindExerciseContainer(false);
+            //BehindExerciseContainer(false);
         }else{
             closePanel("expander");
             canNowClick("allowed");
@@ -2113,6 +2121,7 @@ $(document).ready(function(){
     });
 
     $(document).on("beforeSelection", ".session_next_exercises_container", function(e){
+        undoMemorise('in', 'capture');
         sets_reorderUpdate(e, true);
     });
 
@@ -2136,14 +2145,14 @@ $(document).ready(function(){
             }else{
                 next_specs = "";
             };
-
+            
             update_specs(0, 0);
         }else if(beforeExercise){
             update_info(true);
         };
-
+        
+        if(hasStarted){undoMemorise('in', 'memorize')};
         if(hasReallyStarted){udpate_recovery("workout")};
-        if(hasStarted){undoMemorise('in')};
     });
 
     // EXTRA TIMER;
@@ -2284,7 +2293,7 @@ $(document).ready(function(){
         $('.session_remaining_WorkedTime').text(get_time_u(Math.round(remainingStats["workedTime"])));
         $('.session_remaining_SetsDone').text(remaining_sets);
         $('.session_remaining_RepsDone').text(remainingStats["repsDone"]);
-        $('.session_remaining_WeightLifted').text(remainingStats["weightLifted"]+parameters["weightUnit"]);
+        $('.session_remaining_WeightLifted').text(weightUnitgroup(remainingStats["weightLifted"], parameters["weightUnit"]));
         
         showBlurPage('session_remaining_page');
     });

@@ -20,6 +20,88 @@ function getAssociatedDate(dayIndex){
     return zeroAM(new Date($(".selection_page_calendar_row_day").eq(dayIndex).data('time')));
 };
 
+function getIterationNumber(C, D, X, Y, Z, U, T, O, first_schedule_number){
+    // C: Date we want the iteration number for
+    // D: First scheduled date in the series
+    // X: The recurrence count (e.g. every X days, or every X weeks)
+    // Y: The recurrence scheme ("Day" or "Week")
+    // Z: The "jumpVal" (number of extra days/weeks/times to skip)
+    // U: The "jumpType" ("Times", "Day", "Week")
+    // T: The "everyVal" (how many recurrences happen before a skip)
+    // O: The schedule occurrence index (1-based offset used in isEventScheduled)
+    // first_schedule_number: The iteration number of the first scheduled date D
+    //
+    // Returns an integer: the iteration index of this C date relative to the sequence.
+
+    const millisecondsPerDay = 24 * 60 * 60 * 1000;
+    const diffInDays = Math.round((zeroAM(C) - zeroAM(D)) / millisecondsPerDay);
+
+    // Convert recurrence scheme to a base number of days
+    let intervalDays;
+    if (Y === "Day") {
+        intervalDays = X;
+    } else if (Y === "Week") {
+        intervalDays = X * 7;
+    } else {
+        throw new Error("Unité de récurrence Y invalide. Doit être 'Day' ou 'Week'.");
+    }
+
+    // Check if there's a skip pattern
+    const hasSkip = (typeof Z === 'number' && Z > 0) && (typeof U === 'string');
+
+    if (!hasSkip) {
+        // No skip: straightforward arithmetic progression
+        // Example: If D is iteration first_schedule_number, 
+        // diffInDays / intervalDays tells how many intervals have passed.
+        // If diffInDays = 0 → iteration = first_schedule_number (the very first event).
+        return Math.floor(diffInDays / intervalDays) + first_schedule_number;
+    } else {
+        // We have a skip pattern
+        // Calculate the total length of one "cycle" 
+        // (i.e. T recurrences, then a jump).
+        let cycleLength;
+        if (U === "Day") {
+            cycleLength = T * intervalDays + Z - Math.abs(1 - X);
+        } else if (U === "Week") {
+            cycleLength = T * intervalDays + (Z * 7);
+        } else if (U === "Times") {
+            if (Y === "Day") {
+                cycleLength = T * intervalDays + ((Z + 1) * intervalDays) - X;
+            } else if (Y === "Week") {
+                cycleLength = T * intervalDays + (Z * intervalDays) - (X - 1);
+            } else {
+                throw new Error("Unité de récurrence Y invalide dans le skip. Doit être 'Day' ou 'Week'.");
+            }
+        } else {
+            throw new Error("Unité de récurrence U invalide. Doit être 'Times', 'Day', ou 'Week'.");
+        }
+
+        // Offset the day count by (O - 1)*intervalDays, same as checkEventDay
+        const offsetDays = diffInDays + (O - 1) * intervalDays;
+
+        // Count how many full cycles we have passed
+        let cycles = Math.floor(offsetDays / cycleLength);
+
+        // Days into the current cycle
+        let daysIntoCycle = offsetDays % cycleLength;
+        if (daysIntoCycle < 0) {
+            daysIntoCycle += cycleLength;
+        }
+
+        // Each cycle contains T events. 
+        // How many full events have occurred in all previous cycles?
+        let eventsInFullCycles = cycles * T;
+
+        // Within the current cycle, find which event index (0-based).
+        // E.g. if daysIntoCycle = 0 -> this is the first event in that cycle
+        //     if daysIntoCycle = intervalDays -> second event in that cycle, etc.
+        let partialEvents = Math.floor(daysIntoCycle / intervalDays);
+
+        // Combine it all: iteration = initial offset + events so far + partial
+        return first_schedule_number + eventsInFullCycles + partialEvents - O + 1;
+    }
+};
+
 function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
     // Calcul de diffInDays
     const millisecondsPerDay = 24 * 60 * 60 * 1000;
@@ -182,6 +264,7 @@ function updateCalendar(data, page){
             let id = data[i]["id"];
             let jumpData = notif["jumpData"];
             let scheduleOccurence = notif["occurence"];
+            let historyCount = getSessionHistory(data[i])['historyCount'] + 1;
 
             if(getScheduleScheme(data[i]) == "Day"){
                 let scheduleDate = zeroAM(new Date(notif["dateList"][0]));
@@ -192,8 +275,6 @@ function updateCalendar(data, page){
                 while(nbdayz <= end + pageOffset){
                     let dayInd = nbdayz - pageOffset;
                     let associatedDate = getAssociatedDate(dayInd);
-
-                    //C, D, X, Y, Z, U, T, O
 
                     if(!isEventScheduled(
                         associatedDate, 
@@ -209,6 +290,18 @@ function updateCalendar(data, page){
                         nbdayz += 1; 
                         continue;
                     };
+                    
+                    $(dayz).eq(dayInd).data("iteration", getIterationNumber(
+                        associatedDate,
+                        scheduleDate,
+                        notif["scheduleData"]["count"],
+                        notif["scheduleData"]["scheme"],
+                        jumpData["jumpVal"],
+                        jumpData["jumpType"],
+                        jumpData["everyVal"],
+                        scheduleOccurence,
+                        historyCount
+                    ));
 
                     let match = findChanged(associatedDate.getTime(), ["from", data[i]["id"]])["element"];
                     let alphaToAdd = 0
@@ -305,7 +398,6 @@ function updateCalendar(data, page){
             };
         };
     };
-
     
     $(dayz).each(function(i){
         let sList = $(dayz).eq(i).data("sList");
@@ -314,17 +406,19 @@ function updateCalendar(data, page){
 
         let longest = false;
         let time = false;
-
+        
         for(let x = 0; x < sList.length; x++){
             const element = sList[x];
+            
             let sessionID = element[0][0];
+            let visibility = calendar_dict[sessionID] || !Object.keys(calendar_dict).includes(sessionID)
 
-            if(longest === false && calendar_dict[sessionID]){
+            if(longest === false && visibility){
                 longest = sessionID;
             }else if(longest){
                 time = get_session_time(session_list[getSessionIndexByID(sessionID)]);
             
-                if(time > get_session_time(session_list[getSessionIndexByID(longest)]) && calendar_dict[sessionID]){
+                if(time > get_session_time(session_list[getSessionIndexByID(longest)]) && visibility){
                     longest = sessionID;
                 };
             };  
@@ -809,19 +903,21 @@ $(document).ready(function(){
     const body = $(".selection_dayPreview_body");
 
     header.on('scroll', function() {
-        if (!isSyncingHeader) {
+        if(!isSyncingHeader){
             isSyncingBody = true;
             body.scrollLeft(header.scrollLeft());
         };
+
         isSyncingHeader = false;
         checkDisplayState();
     });
 
     body.on('scroll', function() {
-        if (!isSyncingBody) {
+        if(!isSyncingBody){
             isSyncingHeader = true;
             header.scrollLeft(body.scrollLeft());
         };
+
         isSyncingBody = false;
         checkDisplayState();
     });
@@ -936,15 +1032,9 @@ $(document).ready(function(){
         let optString = '<option value="[idVAL]">[sessionVAL]</option>';
         let beforeList = get_time_u($(this).data('time'), true);
         let afterList = get_time_u($(this).data('time') + Math.ceil(get_session_time(session_list[getSessionIndexByID($(this).data("id"))])), true);
-        let number = false;
+        let number = $(actualRowDay).data('iteration');
 
         $('.selection_dayPreview_focusforChange').children().remove();
-
-        let dayList = $('.selection_page_calendar_row_day').filter((_, el) => $(el).data("sList").length > 0 && $(el).data("sList")[0][0][0] == $(this).data("id"));
-        let numberOfDays = dayList.length
-        let dayIndex = $(dayList).index(actualRowDay)
-
-        number = getSessionHistory(session_list[getSessionIndexByID($(this).data("id"))])["historyCount"] + (dayIndex + 1) + (updateCalendarPage - 1) * numberOfDays;
 
         session_list.forEach(session => {
             if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session['id'])){

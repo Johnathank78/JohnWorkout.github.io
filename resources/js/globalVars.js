@@ -724,7 +724,6 @@ var expanderOpenedHeight = mobile == "IOS" ? "calc(83vh - 65px)" : "calc(90vh - 
 var current_page = "selection";
 var color = null; var mid_color = null; var light_color = null;
 
-
 var consoleShown = true;
 var konsole = false;
 

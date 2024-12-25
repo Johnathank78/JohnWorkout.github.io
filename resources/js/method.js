@@ -45,8 +45,8 @@ Array.prototype.delete = function(ind){
     return output;
 };
 
-Array.prototype.getLast = function(){
-    return this[this.length - 1];
+Array.prototype.getLast = function(n=1){
+    return this[this.length - n];
 };
 
 jQuery.fn.getChildCoordinates = function(parent){

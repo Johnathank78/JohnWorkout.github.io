@@ -519,15 +519,13 @@ $(document).ready(function(){
         // toggle;
         $(".history_toggle").attr("state", current_history["state"]);
 
-        if(current_history["state"] === true){
+        if(current_history["state"] === true || current_history["state"] == "true"){
             $(".history_toggle").css("background-color", green);
             $(".history_toggle").children().css("marginLeft", "18px");
-        }else if(current_history["state"] === false){
+        }else if(current_history["state"] === false || current_history["state"] == "false"){
             $(".history_toggle").css("background-color", "#4C5368");
             $(".history_toggle").children().css("marginLeft", "unset");
-        };
 
-        if(current_history["state"] === false){
             $('.update_history_container').append('<div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters["language"]]["updatePage"]["disabledHistory"]+'</span></div>');
             return;
         };

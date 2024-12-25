@@ -1,7 +1,7 @@
 var sIntervall = false;
 var intervall_state = 0;
 var paused = false;
-var Ispent = 0; var iRest_time = 0; var iWork_time = 0; var iCurrent_cycle = false; var iActualCycle = false;
+var Ispent = 0; var iRest_time = 0; var iWork_time = 0; var iCurrent_cycle = false; var iActualSet = false;
 var Ifinished = false;
 var currentExoIndex = 0;
 var Iskip = false;
@@ -31,7 +31,7 @@ function getIntervallExoData(cycle, data, update = false){
             if(cycle > computedCycle){
                 computedCycle += exo["cycle"];
             };
-
+            
             if(cycle <= computedCycle){
                 if(update){
                     iWork_time = time_unstring(exo["work"]);
@@ -41,11 +41,9 @@ function getIntervallExoData(cycle, data, update = false){
                 
                 return index;
             };
-        }else if(exo["type"] == "Pause"){
-            index--;
         };
 
-        index++;
+        index++
     };
 
     return false;
@@ -175,10 +173,13 @@ function intervall(data, from_wo = false){
     };
 
     function historyTargetUpdate(){
+        let pauseCorr = data.slice(0, currentExoIndex).filter(exo => exo['type'] == "Pause").length;
+        let correctedIndex = currentExoIndex - pauseCorr;
+
         if(from_wo){
-            historyTarget = tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["exoList"][currentExoIndex]["setList"][iActualCycle];
+            historyTarget = tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["exoList"][correctedIndex]["setList"][iActualSet];
         }else{
-            historyTarget = tempNewHistory["exoList"][currentExoIndex]["setList"][iActualCycle];
+            historyTarget = tempNewHistory["exoList"][correctedIndex]["setList"][iActualSet];
         };
     };
 
@@ -195,17 +196,17 @@ function intervall(data, from_wo = false){
     let totalCycle = parseInt(getInvervallSessionCycleCount(data));
 
     if(from_wo && recovery["varSav"]["iCurrent_cycle"] === false || !from_wo && !recovery){
-        iActualCycle = 0;
+        iActualSet = 0;
         iCurrent_cycle = totalCycle;
         currentExoIndexSAV = 0;
     }else{
-        iActualCycle = recovery["varSav"]['iActualCycle'];
+        iActualSet = recovery["varSav"]['iActualSet'];
         iCurrent_cycle = recovery["varSav"]["iCurrent_cycle"];
         currentExoIndexSAV = recovery["varSav"]['currentExoIndex'];
     };
 
-    currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle, data, true);
-    if(currentExoIndex != currentExoIndexSAV){iActualCycle = 0};
+    currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, true);
+    if(currentExoIndex != currentExoIndexSAV){iActualSet = 0};
 
     // Graphic Update
 
@@ -285,12 +286,14 @@ function intervall(data, from_wo = false){
                     
                     tempStats["workedTime"] += iWork_time;
                     tempStats["repsDone"] += iWork_time/2.1;
-                    
-                    if(Ispent > smallestTime){
-                        historyTarget["work"] = get_time_u(Ispent);
-                    }else{
-                        historyTarget["work"] = "X";
-                    };
+
+                    if(intExType == "Int."){
+                        if(Ispent > smallestTime){
+                            historyTarget["work"] = get_time_u(Ispent);
+                        }else{
+                            historyTarget["work"] = "X";
+                        };
+                    }
 
                     stats_set(tempStats);
 
@@ -302,7 +305,7 @@ function intervall(data, from_wo = false){
 
                     recovery_save(recovery);
 
-                    if (iCurrent_cycle == 0){
+                    if(iCurrent_cycle == 0){
                         lockState = false;
                         Ifinished = true;
                         historyTarget["rest"] = "X";
@@ -331,7 +334,7 @@ function intervall(data, from_wo = false){
                         update_timer($(".session_intervall_timer"), iRest_time, 0);
                         update_timer($(".screensaver_Ltimer"), iRest_time, 0);
                     }else{
-                        iActualCycle = 0;
+                        iActualSet = 0;
                         intExType = data[currentExoIndex + 1]["type"];
 
                         if(intExType == 'Pause'){
@@ -342,7 +345,6 @@ function intervall(data, from_wo = false){
                             iRest_time = time_unstring(data[currentExoIndex + 1]["rest"]);
                             
                             session_state("Rest"); 
-                            
                             historyTarget["rest"] = "X";
 
                             update_timer($(".session_intervall_timer"), iRest_time, 0);
@@ -389,21 +391,20 @@ function intervall(data, from_wo = false){
                 if(Ispent >= iRest_time || Iskip){
                     if(Iskip){IjustSkipped = true};
 
-                    Ispent = Ispent > iWork_time ? iWork_time : Ispent;
+                    Ispent = Ispent > iRest_time ? iRest_time : Ispent;
                     let smallestTime = iRest_time * 0.1 < 5 ? 5 : iRest_time * 0.1 > 60 ? 60 : iRest_time * 0.1;
 
                     isBeeping = false;
                     intervall_state = 1;
 
                     if(intExType == "Int."){
-                        iActualCycle++;
+                        iActualSet++;
                         
                         if(Ispent > smallestTime){
                             historyTarget["rest"] = get_time_u(Ispent);
                         }else{
                             historyTarget["rest"] = "X";
                         };
-
                     };
 
                     intExType = data[currentExoIndex]["type"];

@@ -116,7 +116,7 @@ function Iintervall_tile(data = false){
         `;
     }else{
         return `
-            <div class="update_workout_item noselect reorder__child" id="`+smallestAvailableExoId()+`">
+            <div class="update_workout_item noselect reorder__child" id="`+smallestAvailableExoId("intervall")+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
@@ -294,7 +294,7 @@ function exercise_tile(data = false){
         };
     }else{
         let element = $(`
-        <div class="update_workout_item noselect reorder__child" id="`+smallestAvailableExoId()+`">
+        <div class="update_workout_item noselect reorder__child" id="`+smallestAvailableExoId("workout")+`">
 
             <div class="update_workout_item_first_line">
                 <div class="update_workout_data_type_container reorder__avoid">
@@ -437,25 +437,26 @@ function historyDay(i, history){
                 
             case "set":
                 clone = set_elem.clone();
+                $(clone).data('type', 'Other');
 
                 $(clone).find(".update_history_container_reps").val(data[0]);
                 $(clone).find(".update_history_container_Expectedreps").text(data[1]);
                 $(clone).find(".update_history_container_weight").val(data[2]);
                 $(clone).find(".update_history_container_Expectedweight").text(data[3]);
                 $(clone).find(".update_history_container_weightUnit").text(data[4]);
+
                 break;
 
             case "intSet":
                 clone = intSet_elem.clone();
+                $(clone).data('type', 'Int.');
                 
                 $(clone).find(".update_history_container_work").text(data[0]);
                 $(clone).find(".update_history_container_Expectedwork").text(data[1]);
                 $(clone).find(".update_history_container_rest").text(data[2]);
                 $(clone).find(".update_history_container_Expectedrest").text(data[3]);
 
-                if(modify){
-                    $(clone).find('.update_history_container_rest_container').remove()
-                };
+                if(modify){$(clone).find('.update_history_container_rest_container').remove()};
 
                 break;
 
@@ -487,6 +488,8 @@ function historyDay(i, history){
 
     if(date == formatDate(Date.now())){
         out[0].push(fillElem("day", [textAssets[parameters["language"]]['updatePage']['today'], time]));
+    }else if(date == formatDate(Date.now() - 86400 * 1000)){
+        out[0].push(fillElem("day", [textAssets[parameters["language"]]['updatePage']['yesterday'], time]));
     }else{
         out[0].push(fillElem("day", [date, time]));
     };
@@ -495,7 +498,7 @@ function historyDay(i, history){
         for(let z=0; z<day["exoList"].length;z++){
             exo = day["exoList"][z]
             
-            if(exo['type'] == "Int."){ // INT
+            if(exo['type'] == "Int."){
                 for(let y=0; y< exo["exoList"].length;y++){
                     subExo = exo["exoList"][y];
     
