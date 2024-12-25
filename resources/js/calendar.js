@@ -7,7 +7,6 @@ var calenderParamsState = false;
 var activePreviewItem = false;
 var previewShown = false;
 var actualRowDay = false;
-
 var focusShown = false;
 
 const datePicker = ".update_schedule_datePicker";
@@ -20,7 +19,7 @@ function getAssociatedDate(dayIndex){
     return zeroAM(new Date($(".selection_page_calendar_row_day").eq(dayIndex).data('time')));
 };
 
-function getIterationNumber(C, D, X, Y, Z, U, T, O, first_schedule_number){
+function getIterationNumber(C, D, X, Y, Z, U, T, O, F){
     // C: Date we want the iteration number for
     // D: First scheduled date in the series
     // X: The recurrence count (e.g. every X days, or every X weeks)
@@ -29,52 +28,43 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, first_schedule_number){
     // U: The "jumpType" ("Times", "Day", "Week")
     // T: The "everyVal" (how many recurrences happen before a skip)
     // O: The schedule occurrence index (1-based offset used in isEventScheduled)
-    // first_schedule_number: The iteration number of the first scheduled date D
+    // F: The iteration number of the first scheduled date D
     //
     // Returns an integer: the iteration index of this C date relative to the sequence.
 
     const millisecondsPerDay = 24 * 60 * 60 * 1000;
     const diffInDays = Math.round((zeroAM(C) - zeroAM(D)) / millisecondsPerDay);
 
-    // Convert recurrence scheme to a base number of days
     let intervalDays;
-    if (Y === "Day") {
+    if(Y === "Day"){
         intervalDays = X;
-    } else if (Y === "Week") {
+    }else if(Y === "Week"){
         intervalDays = X * 7;
-    } else {
+    }else{
         throw new Error("Unité de récurrence Y invalide. Doit être 'Day' ou 'Week'.");
-    }
+    };
 
-    // Check if there's a skip pattern
     const hasSkip = (typeof Z === 'number' && Z > 0) && (typeof U === 'string');
 
     if (!hasSkip) {
-        // No skip: straightforward arithmetic progression
-        // Example: If D is iteration first_schedule_number, 
-        // diffInDays / intervalDays tells how many intervals have passed.
-        // If diffInDays = 0 → iteration = first_schedule_number (the very first event).
-        return Math.floor(diffInDays / intervalDays) + first_schedule_number;
+        return Math.floor(diffInDays / intervalDays) + F;
     } else {
-        // We have a skip pattern
-        // Calculate the total length of one "cycle" 
-        // (i.e. T recurrences, then a jump).
         let cycleLength;
-        if (U === "Day") {
+        if(U === "Day"){
             cycleLength = T * intervalDays + Z - Math.abs(1 - X);
-        } else if (U === "Week") {
+        }else if(U === "Week"){
             cycleLength = T * intervalDays + (Z * 7);
-        } else if (U === "Times") {
-            if (Y === "Day") {
+        }else if(U === "Times"){
+            if(Y === "Day"){
                 cycleLength = T * intervalDays + ((Z + 1) * intervalDays) - X;
-            } else if (Y === "Week") {
+            }else if(Y === "Week"){
                 cycleLength = T * intervalDays + (Z * intervalDays) - (X - 1);
-            } else {
+            }else{
                 throw new Error("Unité de récurrence Y invalide dans le skip. Doit être 'Day' ou 'Week'.");
-            }
-        } else {
+            };
+        }else{
             throw new Error("Unité de récurrence U invalide. Doit être 'Times', 'Day', ou 'Week'.");
-        }
+        };
 
         // Offset the day count by (O - 1)*intervalDays, same as checkEventDay
         const offsetDays = diffInDays + (O - 1) * intervalDays;
@@ -84,9 +74,9 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, first_schedule_number){
 
         // Days into the current cycle
         let daysIntoCycle = offsetDays % cycleLength;
-        if (daysIntoCycle < 0) {
+        if(daysIntoCycle < 0){
             daysIntoCycle += cycleLength;
-        }
+        };
 
         // Each cycle contains T events. 
         // How many full events have occurred in all previous cycles?
@@ -98,8 +88,8 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, first_schedule_number){
         let partialEvents = Math.floor(daysIntoCycle / intervalDays);
 
         // Combine it all: iteration = initial offset + events so far + partial
-        return first_schedule_number + eventsInFullCycles + partialEvents - O + 1;
-    }
+        return F + eventsInFullCycles + partialEvents - O + 1;
+    };
 };
 
 function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
@@ -290,28 +280,30 @@ function updateCalendar(data, page){
                         nbdayz += 1; 
                         continue;
                     };
-                    
-                    $(dayz).eq(dayInd).data("iteration", getIterationNumber(
-                        associatedDate,
-                        scheduleDate,
-                        notif["scheduleData"]["count"],
-                        notif["scheduleData"]["scheme"],
-                        jumpData["jumpVal"],
-                        jumpData["jumpType"],
-                        jumpData["everyVal"],
-                        scheduleOccurence,
-                        historyCount
-                    ));
 
                     let match = findChanged(associatedDate.getTime(), ["from", data[i]["id"]])["element"];
                     let alphaToAdd = 0
 
                     if(match){
                         let newData = data[getSessionIndexByID(match['to'])];
+                        $(dayz).eq(dayInd).data("iteration", "?"); // calculate the interation number for swapped session :
+                        // When the session is scheduled, and when its not
 
                         alphaToAdd = parseFloat(get_session_time(newData)/min);
                         $(dayz).eq(dayInd).data("sList").push([[newData["id"], newData["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                     }else{
+                        $(dayz).eq(dayInd).data("iteration", getIterationNumber(
+                            associatedDate,
+                            scheduleDate,
+                            notif["scheduleData"]["count"],
+                            notif["scheduleData"]["scheme"],
+                            jumpData["jumpVal"],
+                            jumpData["jumpType"],
+                            jumpData["everyVal"],
+                            scheduleOccurence,
+                            historyCount
+                        )); // Add to iteration number the potentially swapped session before (simple)
+
                         alphaToAdd = parseFloat(get_session_time(data[i])/min);
                         $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                     };
@@ -367,9 +359,24 @@ function updateCalendar(data, page){
 
                         if(match){
                             let newData = data[getSessionIndexByID(match['to'])];
+                            $(dayz).eq(dayInd).data("iteration", "?"); // calculate the interation number for swapped session :
+                            // When the session is scheduled, and when its not
+
                             alphaToAdd = parseFloat(get_session_time(newData)/min);
                             $(dayz).eq(dayInd).data("sList").push([[newData["id"], newData["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                         }else{
+                            $(dayz).eq(dayInd).data("iteration", getIterationNumber(
+                                associatedDate,
+                                scheduleDate,
+                                notif["scheduleData"]["count"],
+                                notif["scheduleData"]["scheme"],
+                                jumpData["jumpVal"],
+                                jumpData["jumpType"],
+                                jumpData["everyVal"],
+                                scheduleOccurence,
+                                historyCount
+                            )); // Add to iteration number the potentially swapped session before (simple)
+
                             alphaToAdd = parseFloat(get_session_time(data[i])/min);
                             $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                         };
@@ -902,7 +909,7 @@ $(document).ready(function(){
     const header = $(".selection_dayPreview_header");
     const body = $(".selection_dayPreview_body");
 
-    header.on('scroll', function() {
+    header.on('scroll', function(){
         if(!isSyncingHeader){
             isSyncingBody = true;
             body.scrollLeft(header.scrollLeft());
@@ -912,7 +919,7 @@ $(document).ready(function(){
         checkDisplayState();
     });
 
-    body.on('scroll', function() {
+    body.on('scroll', function(){
         if(!isSyncingBody){
             isSyncingHeader = true;
             header.scrollLeft(body.scrollLeft());
@@ -1028,6 +1035,10 @@ $(document).ready(function(){
 
     $(document).on('click', '.selection_dayPreview_item', function(){
         if($(this).css('backgroundColor') == 'rgb(76, 83, 104)'){return};
+
+        cannotClick = 'focus';
+        activePreviewItem = this;
+        focusShown = true;
         
         let optString = '<option value="[idVAL]">[sessionVAL]</option>';
         let beforeList = get_time_u($(this).data('time'), true);
@@ -1052,10 +1063,6 @@ $(document).ready(function(){
         $('.selection_dayPreview_focusExchangeBtn').data("hourMinutes", [beforeList[3], beforeList[4]]);
         $('.selection_dayPreview_focusExchangeBtn').data("elemId", $('.selection_dayPreview_item').index(this));
         $('.selection_dayPreview_focusExchangeBtn').data("dayInd", $('.selection_page_calendar_row_day').index(actualRowDay));
-
-        cannotClick = 'focus';
-        activePreviewItem = this;
-        focusShown = true;
         
         $(".selection_dayPreview_focus").css('top', $('.selection_dayPreview_header').outerHeight() + $('.selection_dayPreview_body').getStyleValue('height') + 15 + "px");
         $('.selection_dayPreview_focus').css('display', 'flex');

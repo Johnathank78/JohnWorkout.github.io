@@ -41,7 +41,7 @@ function closePanel(src, notAnimated=false){
 
         case "expander":
             $(".session_next_exercises_container").css("maxHeight", "calc(19vh - 45px)");
-            BehindExerciseContainer(true);
+            behindExerciseContainer(true);
             ncState = false;
             break;
 
@@ -72,6 +72,7 @@ function closePanel(src, notAnimated=false){
             $('.blurBG').css('display', 'none');
             timeSelectorUpdateTarget($(".timeSelectorSubmit").data("target"));
             break;
+        
         case "session_cancel":
             current_page = "session";
             $('.blurBG').css('display', 'none');
@@ -122,10 +123,12 @@ function closePanel(src, notAnimated=false){
             $('.blurBG').css('display', 'none');
             deleteHistoryConfirmShown = false;
             break;
+        
         case "colorPicker":
             $('.blurBG').css('display', 'none');
             colorPickerShown = false;
             break;
+        
         case "datePicker":
             if(pastSelectedDates != getNodeData(datePicker, "selectedDates")){
                 setNodeData(datePicker, "selectedDates", pastSelectedDates);
@@ -145,6 +148,7 @@ function closePanel(src, notAnimated=false){
 
             isDatePicking = false;
             break;
+        
         case "xtraContainer":
             isExtraOut = false;
             $('.selection_session_tile_extra_container').animate({

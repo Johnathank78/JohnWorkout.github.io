@@ -170,7 +170,7 @@ async function quit_session(failed=false){
     $(".session_exercise_Lrest_btn, .session_exercise_Rrest_btn").css('opacity', '1');
     
     updateRestBtnStyle('Reset');
-    BehindExerciseContainer(true);
+    behindExerciseContainer(true);
 
     $(".selection_infoStart").css("display", "flex");
     $(".selection_info_item").eq(4).css("display", "flex");

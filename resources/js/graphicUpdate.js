@@ -320,7 +320,7 @@ function exit_confirm(style){
     };
 };
 
-function BehindExerciseContainer(shown){
+function behindExerciseContainer(shown){
     if(!shown){
 
         let scrollHeight = $(".session_next_exercises_container")[0].scrollHeight + 30 + $(".session_workout_footer_firstRow").height();
@@ -338,6 +338,7 @@ function BehindExerciseContainer(shown){
 
         if(virtualHeight < name_bottomBorder){$(".session_current_exercise_name, .session_workout_extraTimer_container, .session_hint").css("opacity", "0")};
         if(virtualHeight < specs_bottomBorder){$(".session_current_exercise_specs").css("opacity", "0")};
+        if(virtualHeight < specs_before_bottomBorder){$(".session_current_exercise_specs_before").css("opacity", "0")};
         if(virtualHeight < Lrest_bottomBorder){$(".session_exercise_Lrest_btn").css("opacity", "0")};
 
         if(extype == "Uni"){

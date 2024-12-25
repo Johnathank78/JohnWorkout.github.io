@@ -796,7 +796,7 @@ async function next_exercise(first){
         if(extype == "Wrm."){
             next_exo = true;
             $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
-            dropSet_static($(".session_next_exercise_set").first());
+            dropSet_animated($(".session_next_exercise_set").first());
         }else if(extype == 'Uni.'){
             updateRestBtnStyle('Uni.');
 
@@ -2113,7 +2113,7 @@ $(document).ready(function(){
             ncState = true;
             cannotClick = "expander";
             $(".session_next_exercises_container").css("maxHeight", expanderOpenedHeight);
-            //BehindExerciseContainer(false);
+            behindExerciseContainer(false);
         }else{
             closePanel("expander");
             canNowClick("allowed");
