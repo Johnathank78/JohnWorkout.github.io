@@ -1204,14 +1204,13 @@ $(document).ready(function(){
     
                 let realID = id.includes('_') ? id.split('_')[0] : id;
                 let subID = id.includes('_') ? id.split('_')[1] : false;
-    
+
                 $(item).find(".selection_sessionFinished_suggested_optText").each((_, line) => {
                     let data = $(line).data('data');
                     let type = data[0];
                     let val = data[1];
     
                     let exoID = getExoIndexById(current_session, realID);
-                    let subExoID = getExoIndexById(current_session["exoList"][exoID], subID);
     
                     if(!subID){
                         if($(line).parent().find(".selection_sessionFinished_suggested_optCheck").is(':checked')){
@@ -1224,6 +1223,8 @@ $(document).ready(function(){
                             };
                         };
                     }else{
+                        let subExoID = getExoIndexById(current_session["exoList"][exoID], subID);
+
                         if($(line).parent().find(".selection_sessionFinished_suggested_optCheck").is(':checked')){
                             if(type == "cycle"){
                                 current_session["exoList"][exoID]["exoList"][subExoID]["cycle"] = val;

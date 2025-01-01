@@ -2,7 +2,7 @@
 
 function emptySessionScheme(){
     let out = {
-        "creationDate":  zeroAM(new Date()).getTime(),
+        "creationDate":  getToday("timestamp"),
         "data": {}
     };
 
@@ -255,7 +255,7 @@ function JSONiseStats(data){
         "workedTime": parseInt(data[1]),
         "weightLifted": parseFloat(data[2]),
         "repsDone": parseInt(data[3]),
-        "missedSessions": parseInt(data[5]),
+        "missedSessions": {"val": parseInt(data[5]), "year": getToday("date").getFullYear()},
         "since": data[4],
     });
 };
@@ -271,14 +271,26 @@ function stats_read(set=false){
             "workedTime": 0, 
             "weightLifted": 0, 
             "repsDone": 0,
-            "missedSessions": 0,
-            "since": zeroAM(new Date()).getTime()
+            "missedSessions": {"val": 0, "year": getToday('date').getFullYear()},
+            "since": getToday("timestamp")
         });
         
         stats_save(data);
     }else{
         data = JSON.parse(data);
         data = JSONiseStats(data);
+
+        // FIX
+
+        if(!isDict(data['missedSessions'])){
+            data['missedSessions'] = {"val": 0, "year": getToday('date').getFullYear()}
+        };
+
+        // ---
+
+        if(getToday('date').getFullYear() != data['missedSessions']['year']){
+            data['missedSessions']['val'] = 0;
+        };
     };
 
     stats_set(data);
@@ -297,7 +309,7 @@ function stats_set(data){
     $(".selection_info_WorkedTime").text(get_time_u(timeFormat(parseInt(data["workedTime"]))));
     $(".selection_info_WeightLifted").text(weightUnitgroup(data["weightLifted"], parameters['weightUnit']));
     $(".selection_info_RepsDone").text(parseInt(data["repsDone"]));
-    $(".selection_info_Missed").text(data["missedSessions"]);
+    $(".selection_info_Missed").text(data["missedSessions"]["val"]);
     $(".selection_infoStart_value").text(formatDate(data["since"]));
 };
 
@@ -692,7 +704,7 @@ function JSONiseList(list){
                 "body": session[2], 
                 "notif": false, 
                 "color": colorList[Math.floor(Math.random() * colorList.length)], 
-                "id": session[3]
+                "id": session[session.length - 1]
             }));
         };
     };
@@ -950,7 +962,7 @@ function sessionDone_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(new Date(data["creationDate"])) != formatDate(zeroAM(new Date()))){
+    if(formatDate(new Date(data["creationDate"])) != formatDate(getToday("date"))){
         data = emptySessionScheme();
         localStorage.setItem("session_done", JSON.stringify(data));
     };
@@ -975,7 +987,7 @@ function hasBeenShifted_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(new Date(data["creationDate"])) != formatDate(zeroAM(new Date()))){
+    if(formatDate(new Date(data["creationDate"])) != formatDate(getToday("date"))){
         data = emptySessionScheme();
         localStorage.setItem("hasBeenShifted", JSON.stringify(data));
     };
@@ -987,10 +999,9 @@ function hasBeenShifted_save(data){
     localStorage.setItem("hasBeenShifted", JSON.stringify(data));
 };
 
-
 function sessionSwapped_read(){
     let data = localStorage.getItem("sessionSwapped");
-    let now = zeroAM(new Date(Date.now())).getTime();
+    let now = getToday('timestamp');
     
     if (data === null || data == ""){
         localStorage.setItem("sessionSwapped", JSON.stringify([]));
@@ -1021,34 +1032,23 @@ function sessionToBeDone_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(new Date(data["creationDate"])) != formatDate(zeroAM(new Date()))){
+    if(formatDate(new Date(data["creationDate"])) != formatDate(getToday("date"))){
+        let sessionDone = localStorage.getItem("session_done");
 
-        //GET MISSED SESSION NB
-        
-        // let sessionDone = localStorage.getItem("session_done");
+        let count = nbSessionScheduled(getToday("date"));
+        let elapsedDays = daysBetweenTimestamps(data["creationDate"], getToday("date"));
 
-        // let count = 0;
-        // let elapsedTime = daysBetweenTimestamps(data["creationDate"], zeroAM(new Date()).getTime());
+        if(!(sessionDone === null || sessionDone == "") && elapsedDays > 1){
+            sessionDone = JSON.parse(sessionDone);
 
-        // if(elapsedTime > 1){
-        //     count += nbSessionScheduled();
-        // };
+            Object.keys(data["data"]).forEach(function(key){
+                if(data["data"][key] && sessionDone["data"][key]){
+                    count -= 1;
+                };
+            });
+        };
 
-        // if(!(sessionDone === null || sessionDone == "")){
-        //     sessionDone = JSON.parse(sessionDone);
-
-        //     Object.keys(data["data"]).forEach(function(key){
-        //         if(data["data"][key] && !sessionDone["data"][key] && elapsedTime == 1){
-        //             count += 1;
-        //         }else if(data["data"][key] && sessionDone["data"][key] && elapsedTime > 1){
-        //             count -= 1;
-        //         };
-        //     });
-        // };
-
-        // stats["missedSessions"] += count;
-
-        stats["missedSessions"] += nbSessionScheduled();
+        stats["missedSessions"]["val"] += count;
         stats_save(stats);
 
         // --------------------

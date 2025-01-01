@@ -267,6 +267,8 @@ function get_session_time(session, uniFix=false){
                 total += setsDone * (2*repsDuration + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
             }else if(exo["type"] == "Pause"){
                 if(i != session["exoList"].length - 1){total += time_unstring(exo["rest"])};
+            }else if(exo['type'] == "Wrm."){
+                total += wrmTime;
             };
         });
 
@@ -383,67 +385,56 @@ function showBlurPage(className){
     $(".blurBG").css("display", "flex");
 };
 
-function nbSessionScheduled(){
+function nbSessionScheduled(vsDate){
     let count = 0;
-    let vsDate = zeroAM(new Date());
 
     session_list.forEach(session => {
         let scheduleType = getScheduleScheme(session);
         let notif = isScheduled(session);
             
         let firstDate = false;
-        let elapsedDays = false;
-        let scheduledDate = false;
+        let iterationData = false;
+        let nb = false;
 
         if(notif){
             if(scheduleType == "Day"){
-                firstDate = zeroAM(new Date(notif["dateList"][0]));
+                firstDate = zeroAM(notif["dateList"][0], "date");
 
-                scheduledDate = firstDate;
-                elapsedDays = daysBetweenTimestamps(vsDate.getTime(), scheduledDate.getTime());
-    
-                for (let i = 0; i < elapsedDays - 1; i++) { 
-                    if(isEventScheduled(
-                        scheduledDate, 
-                        firstDate, 
-                        notif["scheduleData"]["count"], 
-                        notif["scheduleData"]["scheme"], 
-                        notif['jumpData']['jumpVal'], 
-                        notif['jumpData']['jumpType'], 
-                        notif['jumpData']['everyVal'], 
-                        notif["scheduleData"]['occurence'], 
-                        session['id']
-                    )){
-                        count += 1;
-                    };
-    
-                    scheduledDate.setDate(scheduledDate.getDate() + 1);
-                };
+                nb = getIterationNumber(
+                    vsDate,
+                    firstDate,
+                    notif["scheduleData"]["count"],
+                    notif["scheduleData"]["scheme"],
+                    notif['jumpData']["jumpVal"],
+                    notif['jumpData']["jumpType"],
+                    notif['jumpData']["everyVal"],
+                    notif["occurence"],
+                    1,
+                    false,
+                    session["id"]
+                );
+
+                if(nb > 0){count += nb};
             }else if(scheduleType == "Week"){
-                notif["dateList"].forEach(timestamp => {
-                    firstDate = zeroAM(new Date(timestamp));
+                // Jump offsetting the day indexs, may need a (deep) rework
+                iterationData = {"maxI": notif["dateList"].length, "i": getClosestWeekIteration(vsDate, notif["dateList"])};
+                firstDate = zeroAM(notif["dateList"][iterationData['i']], "date");
 
-                    scheduledDate = firstDate;
-                    elapsedDays = daysBetweenTimestamps(vsDate.getTime(), scheduledDate.getTime());
-        
-                    for (let i = 0; i < elapsedDays - 1; i++) { 
-                        if(isEventScheduled(
-                            scheduledDate, 
-                            firstDate, 
-                            notif["scheduleData"]["count"], 
-                            notif["scheduleData"]["scheme"], 
-                            notif['jumpData']['jumpVal'], 
-                            notif['jumpData']['jumpType'], 
-                            notif['jumpData']['everyVal'], 
-                            notif["scheduleData"]['occurence'], 
-                            session['id']
-                        )){
-                            count += 1;
-                        };
-        
-                        scheduledDate.setDate(scheduledDate.getDate() + 1);
-                    };
-                });
+                nb = getIterationNumber(
+                    vsDate,
+                    firstDate,
+                    notif["scheduleData"]["count"],
+                    notif["scheduleData"]["scheme"],
+                    notif['jumpData']["jumpVal"],
+                    notif['jumpData']["jumpType"],
+                    notif['jumpData']["everyVal"],
+                    notif["occurence"],
+                    1,
+                    iterationData,
+                    session["id"]
+                );
+
+                if(nb > 0){count += nb};
             };
         };
     });
@@ -520,6 +511,7 @@ function getHistoryExoIndex(history, id){
 function smallestAvailableExoId(mode){
 
     let idList = [0];
+    
     if(mode == "workout"){
         $('.update_workoutList_container').find(".update_workout_item").each((index, item) => {
             if($(item).attr('id') !== undefined){
@@ -546,7 +538,6 @@ function smallestAvailableExoId(mode){
 };
 
 function getExoIndexById(session, id){
-
     for(let index = 0; index < session["exoList"].length; index++){
         const item = session["exoList"][index];
         const realID = id.replace(/_(1|2)/g, "");
@@ -775,13 +766,19 @@ function getScheduleIntervall(fromTimestamp, timestamp, gap, intervalType) {
     return -1;
 };
 
-function zeroAM(date){
+function zeroAM(data, mode = "date"){
+    var date = new Date(data);
+
     date.setHours(0);
     date.setMinutes(0);
     date.setSeconds(0);
     date.setMilliseconds(0);
 
-    return date;
+    if(mode == "timestamp"){
+        return date.getTime();
+    }else if(mode == "date"){
+        return date;
+    };
 };
 
 function formatDate(timestamp) {
@@ -834,12 +831,26 @@ function setHoursMinutes(date, hours, minutes){
     return date;
 };
 
-function daysBetweenTimestamps(timestamp1, timestamp2) {
-    return Math.round(timestamp2 - timestamp1) / (60 * 60 * 24) / 1000;
+function daysBetweenTimestamps(timestamp1, timestamp2){
+    return Math.round(timestamp2 - timestamp1) / 86400 / 1000;
 };
 
-function isToday(timeStamp){
-    return zeroAM(new Date()).getTime() == zeroAM(new Date(timeStamp)).getTime()
+function isToday(data){
+    if(typeof data === 'number'){
+        return getToday("timestamp") == zeroAM(data, "timestamp");
+    }else{
+        return getToday("date") == zeroAM(data, "date");
+    };
+};
+
+function getToday(mode = "date"){
+    const today = zeroAM(new Date(), "date");
+
+    if(mode == "timestamp"){
+        return today.getTime();
+    }else if(mode == "date"){
+        return today;
+    };
 };
 
 // Notification
@@ -849,14 +860,18 @@ async function deleteRelatedSwap(from){
         const item = sessionSwapped[i];
 
         if(item["from"] === from){
-            if(isToday(item['time'])){
-                sessionToBeDone["data"][item["idTo"]] = false;
+            if(isToday(item['time']) && !sessionDone["data"][item["idTo"]]){
+                sessionToBeDone["data"][item["idFrom"]] = true;
+                uniq_scheduler(item['idFrom'], "session");
             };
             
-            if(platform == "Mobile"){await removeAllNotifsFromSession(session_list[getSessionIndexByID(item["idTo"])])};
+            if(platform == "Mobile"){await undisplayAndCancelNotification("9" + item['swapID'] + idTo + "1")};
+
             sessionSwapped.splice(i, 1);
         };
     };
+
+    sessionSwapped_save(sessionSwapped);
 };
 
 function closestNextDate(D, notif, offset = 0) {
@@ -897,13 +912,12 @@ function closestNextDate(D, notif, offset = 0) {
     return testDate.getTime();
 };
 
-function smallestAvailableId(){
+function smallestAvailableId(data, idKey){
 
     let idList = [0];
-    let fusion = [...session_list, ...reminder_list];
 
-    for(let i=0; i<fusion.length; i++){
-        idList.push(parseInt(fusion[i]["id"]));
+    for(let i=0; i<data.length; i++){
+        idList.push(parseInt(data[i][idKey]));
     };
 
     let max = Math.max(...idList);
@@ -965,18 +979,18 @@ function getReminderIndexByID(id){
 
 function getNotifFirstIdChar(session){
     let notif = isScheduled(session);
-    let todaysDate = zeroAM(new Date()).getTime();
+    let todaysDate = getToday("timestamp");
 
     if(notif && getScheduleScheme(session) == "Week"){
         for(let i=0; i<notif["dateList"].length; i++){
-            if(todaysDate == zeroAM(new Date(notif["dateList"][i])).getTime()){
+            if(todaysDate == zeroAM(notif["dateList"][i], "timestamp")){
                 return "2"+(i+1).toString();
             };
         };
 
         return "9";
     }else if(notif && getScheduleScheme(session) == "Day"){
-        if(todaysDate == zeroAM(new Date(notif["dateList"][0])).getTime()){
+        if(todaysDate == zeroAM(notif["dateList"][0], "timestamp")){
             return "1";
         }else{
             return "9"

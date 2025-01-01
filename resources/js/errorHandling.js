@@ -303,7 +303,7 @@ function schedule_iserror(dateList, hours, minutes, count, jumpVal, timesVal){
         return true;
     };
 
-    if(dateList.includes(zeroAM(new Date()).getTime()) && parseInt(hours) * 3600 + parseInt(minutes) * 60 < new Date().getHours() * 3600 + new Date().getMinutes() * 60 + toSubstract + safetyOffset){
+    if(dateList.includes(getToday("timestamp")) && parseInt(hours) * 3600 + parseInt(minutes) * 60 < new Date().getHours() * 3600 + new Date().getMinutes() * 60 + toSubstract + safetyOffset){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[parameters["language"]]["error"]["schedule"]["timePassed"]);
         return true;

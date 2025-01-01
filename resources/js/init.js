@@ -43,9 +43,9 @@ $(document).ready(async function(){
     session_list = session_read();
     reminder_list = reminder_read();
 
+    sessionSwapped = sessionSwapped_read();
     sessionToBeDone = sessionToBeDone_read();
     sessionDone = sessionDone_read();
-    sessionSwapped = sessionSwapped_read();
     hasBeenShifted = hasBeenShifted_read();
 
     await rescheduler();

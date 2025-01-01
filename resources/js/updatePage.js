@@ -421,6 +421,8 @@ $(document).ready(function(){
             sessionToBeDone["data"][update_current_item["id"]] = false;
             deleteRelatedSwap(update_current_item["id"]);
 
+            sessionToBeDone_save(sessionToBeDone);
+
             bottomNotification("unscheduled", update_current_item["name"]);
             manageHomeContainerStyle();
 
@@ -561,7 +563,7 @@ $(document).ready(function(){
         stats["workedTime"] += reps*2.1;
     });
     
-    // UPDATE   
+    // UPDATE
 
     $(document).on("click", ".update_btn", async function(e){
         if(current_page == "edit"){
@@ -624,7 +626,7 @@ $(document).ready(function(){
                         if(isScheduled(update_current_item)){
                             let id = await getPendingId(update_current_item["id"]);
 
-                            uniq_schedulerEDIT(id, "session");
+                            uniq_scheduler(id, "session");
                             calendar_read(session_list);
                         };
 
@@ -724,7 +726,7 @@ $(document).ready(function(){
                         if(isScheduled(update_current_item)){
                             let id = await getPendingId(update_current_item['id']);
 
-                            uniq_schedulerEDIT(id, "session");
+                            uniq_scheduler(id, "session");
                             calendar_read(session_list);
                         };
 
@@ -751,7 +753,7 @@ $(document).ready(function(){
 
                     if(isScheduled(update_current_item)){
                         let id = await getPendingId(update_current_item["id"]);
-                        uniq_schedulerEDIT(id, "reminder");
+                        uniq_scheduler(id, "reminder");
                     };
 
                     $(update_current_node).html($(reminder_tile(update_current_item)).html());
@@ -773,8 +775,8 @@ $(document).ready(function(){
             let color = $('.update_colorChooser').css('backgroundColor');
 
             if(reminderOrSession == "session"){
-                let newID = smallestAvailableId();
-
+                let newID = smallestAvailableId([...session_list, ...reminder_list], "id");
+                
                 if(selected_mode == "I"){
                     let ex_name = false;
                     let cycle = false;
@@ -961,7 +963,7 @@ $(document).ready(function(){
                 if(!error){
                     add_reminder_body_save = "";
                     
-                    let id = smallestAvailableId();
+                    let id = smallestAvailableId([...session_list, ...reminder_list], "id");
                     let new_reminder = generateReminderObj({
                         "type": "R",
                         "name": new_name,
@@ -1081,7 +1083,7 @@ $(document).ready(function(){
             };
 
             let count = $(inp_list).eq(2).val();
-            let dateList = $('.update_schedule_datePicker').data("selectedDates");
+            let dateList = $('.update_schedule_datePicker').data("selectedDates").sort();
 
             let error = schedule_iserror(dateList, hours, minutes, count, jumpVal, everyVal);
 

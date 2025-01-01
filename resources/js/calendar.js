@@ -16,10 +16,43 @@ var pastSelectedPage = 1;
 var pastSelectedRow = 0;
 
 function getAssociatedDate(dayIndex){
-    return zeroAM(new Date($(".selection_page_calendar_row_day").eq(dayIndex).data('time')));
+    return zeroAM($(".selection_page_calendar_row_day").eq(dayIndex).data('time'), "date");
 };
 
-function getIterationNumber(C, D, X, Y, Z, U, T, O, F){
+function getClosestWeekIteration(timestamp, TSlist){
+    const getDayOfWeek = (ts) => new Date(ts).getDay();
+    let targetDay = getDayOfWeek(timestamp);
+
+    let dayDifferences = TSlist.map((ts, i) => {
+        let day = getDayOfWeek(ts);
+        let diff = Math.abs(targetDay - day);
+        diff = Math.min(diff, 7 - diff);
+        return { "i" : i, "val" : diff };
+    });
+
+    dayDifferences.sort((a, b) => a["val"] - b["val"]);
+    return dayDifferences[0]['i'];
+};
+
+function getSwapedSessionBeforeDate(timestamp, id, addOrSubstr){
+    if(addOrSubstr == "add"){
+        return sessionSwapped.filter(swap => swap["to"] == id && zeroAM(swap["time"], "timestamp") < zeroAM(timestamp, "timestamp")).length;
+    }else if(addOrSubstr == "substr"){
+        return sessionSwapped.filter(swap => swap["from"] == id && zeroAM(swap["time"], "timestamp") < zeroAM(timestamp, "timestamp")).length;
+    }; 
+};
+
+function getIterationNumber(C, D, X, Y, Z, U, T, O, F, { maxI, i }, ID = false) {
+    // -------------------------------------
+    // 1. HELPER: Positive modulo
+    // -------------------------------------
+    function mod(a, b) {
+      return ((a % b) + b) % b;
+    }
+  
+    // -------------------------------------
+    // 2. Input parameters explanation
+    // -------------------------------------
     // C: Date we want the iteration number for
     // D: First scheduled date in the series
     // X: The recurrence count (e.g. every X days, or every X weeks)
@@ -31,71 +64,157 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, F){
     // F: The iteration number of the first scheduled date D
     //
     // Returns an integer: the iteration index of this C date relative to the sequence.
-
+  
+    // Some external calls in your original code.
+    // You’d keep them as-is, presumably:
+    const swapAdd = getSwapedSessionBeforeDate(C.getTime(), ID, "add");
+    const swapSubstr = getSwapedSessionBeforeDate(C.getTime(), ID, "substr");
+    const swapOffset = swapAdd - swapSubstr;
+  
+    // -------------------------------------
+    // 3. Compute diffInDays (may be negative)
+    // -------------------------------------
     const millisecondsPerDay = 24 * 60 * 60 * 1000;
-    const diffInDays = Math.round((zeroAM(C) - zeroAM(D)) / millisecondsPerDay);
-
+    const diffInDays = Math.round(
+      (zeroAM(C, "date") - zeroAM(D, "date")) / millisecondsPerDay
+    );
+  
+    // -------------------------------------
+    // 4. Base interval in days
+    // -------------------------------------
     let intervalDays;
-    if(Y === "Day"){
-        intervalDays = X;
-    }else if(Y === "Week"){
-        intervalDays = X * 7;
-    }else{
-        throw new Error("Unité de récurrence Y invalide. Doit être 'Day' ou 'Week'.");
-    };
-
-    const hasSkip = (typeof Z === 'number' && Z > 0) && (typeof U === 'string');
-
-    if (!hasSkip) {
-        return Math.floor(diffInDays / intervalDays) + F;
+    if (Y === "Day") {
+      intervalDays = X;
+    } else if (Y === "Week") {
+      intervalDays = X * 7;
     } else {
-        let cycleLength;
-        if(U === "Day"){
-            cycleLength = T * intervalDays + Z - Math.abs(1 - X);
-        }else if(U === "Week"){
-            cycleLength = T * intervalDays + (Z * 7);
-        }else if(U === "Times"){
-            if(Y === "Day"){
-                cycleLength = T * intervalDays + ((Z + 1) * intervalDays) - X;
-            }else if(Y === "Week"){
-                cycleLength = T * intervalDays + (Z * intervalDays) - (X - 1);
-            }else{
-                throw new Error("Unité de récurrence Y invalide dans le skip. Doit être 'Day' ou 'Week'.");
-            };
-        }else{
-            throw new Error("Unité de récurrence U invalide. Doit être 'Times', 'Day', ou 'Week'.");
-        };
-
-        // Offset the day count by (O - 1)*intervalDays, same as checkEventDay
-        const offsetDays = diffInDays + (O - 1) * intervalDays;
-
-        // Count how many full cycles we have passed
-        let cycles = Math.floor(offsetDays / cycleLength);
-
-        // Days into the current cycle
-        let daysIntoCycle = offsetDays % cycleLength;
-        if(daysIntoCycle < 0){
-            daysIntoCycle += cycleLength;
-        };
-
-        // Each cycle contains T events. 
-        // How many full events have occurred in all previous cycles?
-        let eventsInFullCycles = cycles * T;
-
-        // Within the current cycle, find which event index (0-based).
-        // E.g. if daysIntoCycle = 0 -> this is the first event in that cycle
-        //     if daysIntoCycle = intervalDays -> second event in that cycle, etc.
-        let partialEvents = Math.floor(daysIntoCycle / intervalDays);
-
-        // Combine it all: iteration = initial offset + events so far + partial
-        return F + eventsInFullCycles + partialEvents - O + 1;
-    };
+      throw new Error("Unité de récurrence Y invalide. Doit être 'Day' ou 'Week'.");
+    }
+  
+    // -------------------------------------
+    // 5. Determine if skip logic applies
+    // -------------------------------------
+    const hasSkip = (typeof Z === "number" && Z > 0) && typeof U === "string";
+  
+    // -------------------------------------
+    // 6. If NO SKIP, handle forward/backward
+    // -------------------------------------
+    if (!hasSkip) {
+      if (Y === "Day") {
+        //
+        // For both forward and backward,
+        // the iteration is simply:
+        //   floor(diffInDays / intervalDays) + F + swapOffset
+        //
+        // If diffInDays is negative, the floor() will give negative offsets,
+        // resulting in iterations that might be <= F, which is presumably correct
+        // if you allow negative iteration indexes for "before the first date."
+        //
+        return (
+          Math.floor(diffInDays / intervalDays) + F + swapOffset
+        );
+      } else if (Y === "Week") {
+        //
+        // Similarly for weeks, we do:
+        //   floor(diffInDays / (X*7)) + F + ...
+        // but we also have your existing "weekOffset" logic plus i.
+        //
+        const weekOffset = (maxI - 1) * Math.floor(diffInDays / (7 * X));
+        return (
+          Math.floor(diffInDays / intervalDays) + F + weekOffset + swapOffset + i
+        );
+      }
+    }
+  
+    // -------------------------------------
+    // 7. If SKIP applies, compute cycle
+    // -------------------------------------
+    // Here we have to do the bigger logic, but we also handle negative offsets
+    // via the positive modulo approach. That means we'll define cycleLength
+    // and then do offsetDays = diffInDays + ...
+    // and interpret offsetDays in a cyclical manner.
+    // -------------------------------------
+  
+    // 7.1. Determine cycleLength
+    let cycleLength;
+    if (U === "Day") {
+      // Skip by Z days after T events
+      cycleLength = T * intervalDays + Z - Math.abs(1 - X);
+    } else if (U === "Week") {
+      // Skip by Z weeks after T events
+      cycleLength = T * intervalDays + Z * 7;
+    } else if (U === "Times") {
+      // More specialized skip logic
+      if (Y === "Day") {
+        // E.g. skip (Z+1) intervals
+        cycleLength = T * intervalDays + (Z + 1) * intervalDays - X;
+      } else if (Y === "Week") {
+        cycleLength = T * intervalDays + Z * intervalDays - (X - 1);
+      } else {
+        throw new Error(
+          "Unité de récurrence Y invalide dans le skip. Doit être 'Day' ou 'Week'."
+        );
+      }
+    } else {
+      throw new Error(
+        "Unité de récurrence U invalide. Doit être 'Times', 'Day', ou 'Week'."
+      );
+    }
+  
+    // 7.2. offsetDays includes the occurrence offset O
+    let offsetDays = diffInDays + (O - 1) * intervalDays;
+  
+    // 7.3. "Positive modulo" to figure out how far into the cycle we are
+    // (this works for both positive and negative offsetDays).
+    const daysIntoCycle = mod(offsetDays, cycleLength);
+  
+    // 7.4. How many cycles have fully passed?
+    //      (This can be negative if offsetDays < 0.)
+    const cycles = Math.floor((offsetDays - daysIntoCycle) / cycleLength);
+  
+    // 7.5. In each cycle, we have T events. Where do we sit in the current cycle?
+    let partialEvents = Math.floor(daysIntoCycle / intervalDays);
+  
+    // 7.6. If partialEvents >= T, we clamp it,
+    //      because that means we’re in the skip region (past the last event).
+    if (partialEvents >= T) {
+      partialEvents = T - 1;
+    }
+  
+    // 7.7. Combine it all
+    const eventsInFullCycles = cycles * T;
+  
+    if (Y === "Day") {
+      return (
+        F +
+        eventsInFullCycles +
+        partialEvents -
+        O +
+        1 +
+        swapOffset
+      );
+    } else if (Y === "Week") {
+      //
+      // We also keep your extra weekOffset logic for skip:
+      //
+      const weekOffset = (maxI - 1) * Math.floor(diffInDays / cycleLength);
+      return (
+        F +
+        eventsInFullCycles +
+        partialEvents -
+        O +
+        1 +
+        weekOffset +
+        swapOffset +
+        i
+      );
+    }
 };
 
 function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
     // Calcul de diffInDays
     const millisecondsPerDay = 24 * 60 * 60 * 1000;
-    const diffInDays = Math.round((zeroAM(C) - zeroAM(D)) / millisecondsPerDay);
+    const diffInDays = Math.round((zeroAM(C, "date") - zeroAM(D, "date")) / millisecondsPerDay);
 
     // Convertir l'unité de récurrence en jours
     let intervalDays;
@@ -155,18 +274,16 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
         const C_isEvent = checkEventDay(diffInDays);
 
         // Vérifions l'espacement
-        const dayDifference = Math.round((zeroAM(D) - zeroAM(C)) / millisecondsPerDay); 
+        const dayDifference = Math.round((zeroAM(D, "date") - zeroAM(C, "date")) / millisecondsPerDay); 
         // dayDifference devrait être positif puisque C < D
         const correctSpacing = (dayDifference === intervalDays);
 
         // Si C est un événement, D est un événement, et C est exactement intervalDays jours avant D
         // alors C est l'événement n - 1 (immédiatement précédent D), on retourne true.
-        const today = zeroAM(new Date());
-        const C_isPast = C.getTime() == today.getTime(); 
-
+        const C_isToday = C.getTime() == getToday("timestamp");
         const isShifted = ID ? hasBeenShifted["data"][ID] : true
 
-        if(C_isEvent && correctSpacing && C_isPast && !isShifted){
+        if(C_isEvent && correctSpacing && C_isToday && !isShifted){
             return true;
         };
 
@@ -183,6 +300,7 @@ function generateBaseCalendar(page){
 
     $(dayz).each(function(i){
         $(dayz).eq(i).data("sList", []);
+        $(dayz).eq(i).data("iteration", []);
         $(dayz).eq(i).data("alpha", 0);
     });
 
@@ -193,7 +311,7 @@ function generateBaseCalendar(page){
         });
 
         for(let i=0; i<today; i++){
-            $(dayz).eq(i).css('opacity', ".25");
+            $(dayz).eq(i).css('opacity', ".3");
         };
     }else{
         $($(dayz)[today]).css({
@@ -204,7 +322,7 @@ function generateBaseCalendar(page){
 
     // SET DAYS VALS;
 
-    let tempDate = zeroAM(new Date());
+    let tempDate = getToday("date");
     let dateSub = dayofweek_conventional.indexOf(dayofweek[tempDate.getDay()]);
     
     tempDate.setDate(tempDate.getDate() + (page - 1) * 21 - dateSub);
@@ -241,7 +359,7 @@ function updateCalendar(data, page){
     let min = 1800;
 
     let today = dayofweek_conventional.indexOf(dayofweek[new Date().getDay()]);
-    let todaysDate = zeroAM(new Date());
+    let todaysDate = getToday("date");
 
     let dayz = $(".selection_page_calendar_row_day");
 
@@ -254,10 +372,10 @@ function updateCalendar(data, page){
             let id = data[i]["id"];
             let jumpData = notif["jumpData"];
             let scheduleOccurence = notif["occurence"];
-            let historyCount = getSessionHistory(data[i])['historyCount'] + 1;
+            let historyCount = getSessionHistory(data[i])['historyCount'];
 
             if(getScheduleScheme(data[i]) == "Day"){
-                let scheduleDate = zeroAM(new Date(notif["dateList"][0]));
+                let scheduleDate = zeroAM(notif["dateList"][0], "date");
                 
                 let pageOffset = ((end + 1) * (page - 1));
                 let nbdayz = pageOffset == 0 ? today : pageOffset;
@@ -285,14 +403,56 @@ function updateCalendar(data, page){
                     let alphaToAdd = 0
 
                     if(match){
-                        let newData = data[getSessionIndexByID(match['to'])];
-                        $(dayz).eq(dayInd).data("iteration", "?"); // calculate the interation number for swapped session :
-                        // When the session is scheduled, and when its not
+                        let matchedSession = data[getSessionIndexByID(match['to'])];
+                        let matchedNotif = isScheduled(matchedSession);
+                        let matchedHistoryCount = getSessionHistory(matchedSession)['historyCount'];
 
-                        alphaToAdd = parseFloat(get_session_time(newData)/min);
-                        $(dayz).eq(dayInd).data("sList").push([[newData["id"], newData["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
+                        if(matchedNotif){ // Swap has a schedule
+                            let matchedScheduleOccurence = matchedNotif["occurence"];
+                            let matchedJumpData = matchedNotif['jumpData'];
+    
+                            if(getScheduleScheme(matchedSession) == "Day"){
+                                let newScheduleDate = zeroAM(matchedNotif["dateList"][0], "date");
+                                
+                                $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession["id"], "iteration": getIterationNumber(
+                                    associatedDate,
+                                    newScheduleDate,
+                                    matchedNotif["scheduleData"]["count"],
+                                    matchedNotif["scheduleData"]["scheme"],
+                                    matchedJumpData["jumpVal"],
+                                    matchedJumpData["jumpType"],
+                                    matchedJumpData["everyVal"],
+                                    matchedScheduleOccurence,
+                                    matchedHistoryCount + 1,
+                                    false,
+                                    matchedSession["id"]
+                                ) + 1});
+                            }else if(getScheduleScheme(matchedSession) == "Week"){
+                                let closestI = getClosestWeekIteration(associatedDate, matchedNotif["dateList"]);
+                                let newScheduleDate = matchedNotif["dateList"][closestI];
+
+                                $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession["id"], "iteration": getIterationNumber(
+                                    associatedDate,
+                                    newScheduleDate,
+                                    matchedNotif["scheduleData"]["count"],
+                                    matchedNotif["scheduleData"]["scheme"],
+                                    matchedJumpData["jumpVal"],
+                                    matchedJumpData["jumpType"],
+                                    matchedJumpData["everyVal"],
+                                    matchedScheduleOccurence,
+                                    matchedHistoryCount + 1,
+                                    {"maxI": matchedNotif["dateList"].length, "i": closestI},
+                                    matchedSession["id"]
+                                ) + 1});
+                            };
+                        }else{ // Swap has no schedule
+                            $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession["id"], "iteration": getSwapedSessionBeforeDate(associatedDate, matchedSession["id"], "add") + matchedHistoryCount + 1});  
+                        };
+
+                        alphaToAdd = parseFloat(get_session_time(matchedSession)/min);
+                        $(dayz).eq(dayInd).data("sList").push([[matchedSession["id"], matchedSession["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                     }else{
-                        $(dayz).eq(dayInd).data("iteration", getIterationNumber(
+                        $(dayz).eq(dayInd).data("iteration").push({"id": id, "iteration": getIterationNumber(
                             associatedDate,
                             scheduleDate,
                             notif["scheduleData"]["count"],
@@ -301,8 +461,10 @@ function updateCalendar(data, page){
                             jumpData["jumpType"],
                             jumpData["everyVal"],
                             scheduleOccurence,
-                            historyCount
-                        )); // Add to iteration number the potentially swapped session before (simple)
+                            historyCount + 1,
+                            false,
+                            id
+                        )});
 
                         alphaToAdd = parseFloat(get_session_time(data[i])/min);
                         $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
@@ -330,10 +492,11 @@ function updateCalendar(data, page){
                 };
             }else if(getScheduleScheme(data[i]) == "Week"){
                 for(let z=0; z<notif["dateList"].length; z++){
-                    let scheduleDate = zeroAM(new Date(notif["dateList"][z]));
+                    let scheduleDate = zeroAM(notif["dateList"][z], "date");
 
                     let pageOffset = ((end + 1) * (page - 1));
                     let nbdayz = pageOffset == 0 ? today : pageOffset;
+                    let iterationData = {"maxI": notif["dateList"].length, "i": z};
 
                     while(nbdayz <= end + pageOffset){
                         let dayInd = nbdayz - pageOffset;
@@ -358,14 +521,56 @@ function updateCalendar(data, page){
                         let alphaToAdd = 0;
 
                         if(match){
-                            let newData = data[getSessionIndexByID(match['to'])];
-                            $(dayz).eq(dayInd).data("iteration", "?"); // calculate the interation number for swapped session :
-                            // When the session is scheduled, and when its not
-
-                            alphaToAdd = parseFloat(get_session_time(newData)/min);
-                            $(dayz).eq(dayInd).data("sList").push([[newData["id"], newData["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
+                            let matchedSession = data[getSessionIndexByID(match['to'])];
+                            let matchedNotif = isScheduled(matchedSession);
+                            let matchedHistoryCount = getSessionHistory(matchedSession)['historyCount'];
+    
+                            if(matchedNotif){ // Swap has a schedule
+                                let matchedScheduleOccurence = matchedNotif["occurence"];
+                                let matchedJumpData = matchedNotif['jumpData'];
+        
+                                if(getScheduleScheme(matchedSession) == "Day"){
+                                    let newScheduleDate = zeroAM(matchedNotif["dateList"][0], "date");
+                                    
+                                    $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession["id"], "iteration": getIterationNumber(
+                                        associatedDate,
+                                        newScheduleDate,
+                                        matchedNotif["scheduleData"]["count"],
+                                        matchedNotif["scheduleData"]["scheme"],
+                                        matchedJumpData["jumpVal"],
+                                        matchedJumpData["jumpType"],
+                                        matchedJumpData["everyVal"],
+                                        matchedScheduleOccurence,
+                                        matchedHistoryCount + 1,
+                                        false,
+                                        matchedSession["id"]
+                                    ) + 1});
+                                }else if(getScheduleScheme(matchedSession) == "Week"){
+                                    let closestI = getClosestWeekIteration(associatedDate, matchedNotif["dateList"]);
+                                    let newScheduleDate = matchedNotif["dateList"][closestI];
+    
+                                    $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession["id"], "iteration": getIterationNumber(
+                                        associatedDate,
+                                        newScheduleDate,
+                                        matchedNotif["scheduleData"]["count"],
+                                        matchedNotif["scheduleData"]["scheme"],
+                                        matchedJumpData["jumpVal"],
+                                        matchedJumpData["jumpType"],
+                                        matchedJumpData["everyVal"],
+                                        matchedScheduleOccurence,
+                                        matchedHistoryCount + 1,
+                                        {"maxI": matchedNotif["dateList"].length, "i": closestI},
+                                        matchedSession["id"]
+                                    ) + 1});
+                                };
+                            }else{ // Swap has no schedule
+                                $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession["id"], "iteration": getSwapedSessionBeforeDate(associatedDate, matchedSession["id"], "add") + matchedHistoryCount + 1});  
+                            };
+    
+                            alphaToAdd = parseFloat(get_session_time(matchedSession)/min);
+                            $(dayz).eq(dayInd).data("sList").push([[matchedSession["id"], matchedSession["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                         }else{
-                            $(dayz).eq(dayInd).data("iteration", getIterationNumber(
+                            $(dayz).eq(dayInd).data("iteration").push({"id": id, "iteration": getIterationNumber(
                                 associatedDate,
                                 scheduleDate,
                                 notif["scheduleData"]["count"],
@@ -374,8 +579,10 @@ function updateCalendar(data, page){
                                 jumpData["jumpType"],
                                 jumpData["everyVal"],
                                 scheduleOccurence,
-                                historyCount
-                            )); // Add to iteration number the potentially swapped session before (simple)
+                                historyCount + 1,
+                                iterationData,
+                                id
+                            )}); 
 
                             alphaToAdd = parseFloat(get_session_time(data[i])/min);
                             $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
@@ -713,9 +920,6 @@ function calendarGoPicker(mode, page){
                 pointerEvents: "all"
             });
         };
-
-        generateBaseCalendar(page);    
-        return page;
     }else if(mode == "forward"){
         $(".calendarGoBack").css({
             opacity: 1,
@@ -723,9 +927,6 @@ function calendarGoPicker(mode, page){
         });
 
         page += 1;
-
-        generateBaseCalendar(page);
-        setCalendarSelection();
     }else if(mode == "backward"){
         if(page == 1){return};
 
@@ -741,21 +942,22 @@ function calendarGoPicker(mode, page){
             });
 
             page -= 1;
-
-            generateBaseCalendar(page);
-            setCalendarSelection();
         };
     };
+
+    generateBaseCalendar(page);
+    setCalendarSelection(page);
 
     return page;
 };
 
 function getPageOfDate(D){
-    const now = new Date();
-    const oneDay = 24 * 60 * 60 * 1000; 
-
-    const diff = Math.round((zeroAM(D).getTime() - zeroAM(now).getTime()) / oneDay);
-    const page = Math.round(diff / 21) + 1;
+    const now = getToday("date");
+    const oneDay = 24 * 60 * 60 * 1000;
+    const firstDate = new Date(now.setDate(now.getDate() - dayofweek_conventional.indexOf(dayofweek[now.getDay()])));
+    
+    const diff = Math.floor((zeroAM(D, "timestamp") - zeroAM(firstDate, "timestamp")) / oneDay);
+    const page = Math.floor(diff / 21) + 1;
 
     return page;
 };
@@ -786,8 +988,8 @@ function generateDateString(selectedDates, lang){
 function currentTimeSelection(notif){
     if(!notif){return};
     
-    let selectedDates = notif["dateList"].map(timestamp => zeroAM(new Date(timestamp)).getTime());  
-    let rowIndex = $(".selection_page_calendar_row").index($(".selection_page_calendar_row_day").filter((_, dayEl) => {return selectedDates.includes($(dayEl).data('time'))}).first().parent());
+    let selectedDates = notif["dateList"].map(timestamp => zeroAM(timestamp, "timestamp"));  
+    let rowIndex = $(".selection_page_calendar_row").index($(".selection_page_calendar_row_day").filter((_, dayEl) => {return selectedDates.includes($(dayEl).data('time'))}).last().parent());
     let selectCalendarPage = getPageOfDate(new Date(selectedDates[0]));
 
     let datePicker_selectionInfo = {"rowIndex": rowIndex, "page": selectCalendarPage}; 
@@ -805,7 +1007,7 @@ function setPastUserSelection(generatedData){
     $('.update_schedule_datePicker').text(selectedString);
 };
 
-function setCalendarSelection(){
+function setCalendarSelection(page){
 
     let selectedDates = getNodeData(datePicker, "selectedDates");
 
@@ -822,17 +1024,18 @@ function setCalendarSelection(){
             }).css("background-color", 'rgb(29, 188, 96)');
         }else if($('.update_schedule_select_every').val() == "Week"){
             $(".selection_page_calendar_row_day").css("backgroundColor", 'rgb(76, 83, 104)');
-            $(".selection_page_calendar_row_day").css("opacity", ".3");
-            $(".selection_page_calendar_row").eq(getNodeData(datePicker, "selectedRow")).children().filter((_, dayEl) => {
-                return zeroAM(new Date($(dayEl).data('time'))).getTime() >= zeroAM(new Date()).getTime()}
-            ).css("opacity", "1");
-    
-            $(".selection_page_calendar_row_day").filter((_, dayEl) => {
-                return selectedDates.includes($(dayEl).data('time'));
-            }).css("background-color", 'rgb(29, 188, 96)');
+            if(getNodeData(datePicker, "selectedPage") == page){
+                $(".selection_page_calendar_row_day").css("opacity", ".3");
+                $(".selection_page_calendar_row").eq(getNodeData(datePicker, "selectedRow")).children().filter((_, dayEl) => {
+                    return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
+                ).css("opacity", "1");
+        
+                $(".selection_page_calendar_row_day").filter((_, dayEl) => {
+                    return selectedDates.includes($(dayEl).data('time'));
+                }).css("background-color", 'rgb(29, 188, 96)');
+            };
         };
     };
-
 };
 
 $(document).ready(function(){
@@ -873,7 +1076,7 @@ $(document).ready(function(){
 
     });
 
-    $(document).on("click", '.selection_page_calendar_parameters' , function(e){
+    $(document).on("click", '.selection_page_calendar_parameters', function(e){
         if(cannotClick == "rowDay"){return};
 
         if(!calenderParamsState){
@@ -970,48 +1173,50 @@ $(document).ready(function(){
         let idTo = $('.selection_dayPreview_focusforChange').val();
         let time = $(actualRowDay).data('time');
 
-        let sessionto = session_list[getSessionIndexByID(idTo)];
+        let sessionFrom = session_list[getSessionIndexByID(idFrom)];
+        let sessionTo = session_list[getSessionIndexByID(idTo)];
         
         let match = findChanged(time, ["to", idFrom]);
         let previousID = match ? match["element"]["to"] : idFrom;
+        let swapID = match ? match["element"]['swapID'] : smallestAvailableId(sessionSwapped, "swapID");
 
         if(match && match["element"]["from"] == idTo){
             sessionSwapped.splice(match["index"], 1);
-            bottomNotification("exchanged");
         }else if(match && match["element"]["from"] != idTo){
             match["element"]["to"] = idTo;
-            bottomNotification("exchanged");
         }else{
             sessionSwapped.push({
                 "from": idFrom,
                 "to": idTo,
-                "time": time
+                "time": time,
+                "swapID": swapID
             });
-            bottomNotification("exchanged");
         };
+
+        bottomNotification("exchanged");
 
         sessionToBeDone["data"][previousID] = false;
         sessionToBeDone["data"][idTo] = true;
 
         if(platform == "Mobile"){
-            let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
-            let notif = isScheduled(sessionto);
+            let toSubstract = time_unstring(parameters['notifBefore']) * 1000;
+            let notif = isScheduled(sessionTo);
 
             let start = new Date(time);
             start.setHours($(this).data("hourMinutes")[0]);
             start.setMinutes($(this).data("hourMinutes")[1]);
             start = new Date(start.getTime() - toSubstract);
 
-            undisplayAndCancelNotification("9" + previousID + "1");
-
+            let notifPrevID = match ? "9" + swapID + idFrom : getNotifFirstIdChar(sessionFrom) + idFrom;
+            undisplayAndCancelNotification(notifPrevID + "1");
+            undisplayAndCancelNotification(notifPrevID + "2");
+            
             if(!match || (match && match["element"]["from"] != idTo)){
-                let notifToId = "9" + idTo + "1"
-
-                await scheduleId(start, 0, "day", sessionto["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, 'session');
-            }else if(match && match["element"]["from"] == idTo){
-                let scheme = getScheduleScheme(sessionto);
-                let notifToId = getNotifFirstIdChar(sessionto) + sessionto["id"] + "1";
-                await scheduleId(start, 0, scheme, sessionto["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionto)), notifToId, 'session');
+                let notifToID = "9" + swapID + idTo + "1";
+                await scheduleId(start, 0, "day", sessionTo["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionTo)), notifToID, 'session');
+            }else if(match && match["element"]["from"] == idTo && isToday(time)){
+                let notifToID = getNotifFirstIdChar(sessionTo) + sessionTo["id"] + "1";
+                await scheduleId(start, 0, getScheduleScheme(sessionTo), sessionTo["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionTo)), notifToID, 'session');
             };
         };
 
@@ -1022,7 +1227,7 @@ $(document).ready(function(){
         $('.selection_dayPreview_item').eq($(this).data('elemId')).data('id', idTo);
         $('.selection_dayPreview_item').eq($(this).data('elemId')).text(session_list[getSessionIndexByID(idTo)]["name"]);
 
-        let color = sessionto['color'];
+        let color = sessionTo['color'];
 
         if(sessionDone["data"][idTo]){
             $(activePreviewItem).css('backgroundColor', 'rgb(76, 83, 104)'); // GRAY
@@ -1036,6 +1241,15 @@ $(document).ready(function(){
     $(document).on('click', '.selection_dayPreview_item', function(){
         if($(this).css('backgroundColor') == 'rgb(76, 83, 104)'){return};
 
+        if($(this).data("selected")){
+            $(this).data("selected", false);
+            closePanel('focus');
+            return;
+        };
+
+        $('.selection_dayPreview_item').data("selected", false);
+        $(this).data("selected", true);
+
         cannotClick = 'focus';
         activePreviewItem = this;
         focusShown = true;
@@ -1043,7 +1257,13 @@ $(document).ready(function(){
         let optString = '<option value="[idVAL]">[sessionVAL]</option>';
         let beforeList = get_time_u($(this).data('time'), true);
         let afterList = get_time_u($(this).data('time') + Math.ceil(get_session_time(session_list[getSessionIndexByID($(this).data("id"))])), true);
-        let number = $(actualRowDay).data('iteration');
+        let number = null;
+
+        try{    
+            number = $(actualRowDay).data('iteration').filter(data => data["id"] == $(this).data("id"))[0]['iteration'];
+        }catch(error){
+            number = "?";
+        }
 
         $('.selection_dayPreview_focusforChange').children().remove();
 
@@ -1114,13 +1334,14 @@ $(document).ready(function(){
 
                 let color = session_list[getSessionIndexByID(arr[0][0])]['color'];
 
-                if(sessionDone["data"][arr[0][0]] && $(actualRowDay).data("time") == zeroAM(new Date()).getTime()){
+                if(sessionDone["data"][arr[0][0]] && $(actualRowDay).data("time") == getToday("timestamp")){
                     itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(76, 83, 104)')) // GRAY
                 }else{
                     itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', color)) // GREEN
                 };
                 
                 $(itemToAdd).data('id', arr[0][0]);
+                $(itemToAdd).data("selected", false);
                 $(itemToAdd).data('time', time_unstring(arr[1][0]+"h"+ arr[1][1]+"m"));
 
                 
@@ -1162,10 +1383,10 @@ $(document).ready(function(){
             let lowestNodes = [];
             $.each(groupedNodes, (leftValue, nodesInGroup) => {
                 let highestNode = nodesInGroup[0];
-                $(nodesInGroup).each(function() {
-                    if ($(this).getStyleValue('top') < $(highestNode).getStyleValue('left')) {
+                $(nodesInGroup).each(function(){
+                    if($(this).getStyleValue('top') < $(highestNode).getStyleValue('left')) {
                         highestNode = this;
-                    }
+                    };
                 });
 
                 lowestNodes.push(highestNode);
@@ -1194,7 +1415,7 @@ $(document).ready(function(){
             let time = now.getHours() * 3600 + now.getMinutes() * 60;
             let focusElement = false
 
-            if($(actualRowDay).data('time') == zeroAM(new Date()).getTime()){
+            if($(actualRowDay).data('time') == getToday("timestamp")){
                 focusElement = getClosestElement(time);
             }else{
                 focusElement = getSmallestElement();
@@ -1226,7 +1447,7 @@ $(document).ready(function(){
 
             if(dayOrWeek == "Day"){
                 $('.selection_page_calendar_row_day').filter((_, dayEl) => {
-                    return zeroAM(new Date($(dayEl).data('time'))).getTime() >= zeroAM(new Date()).getTime()}
+                    return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
                 ).css({"backgroundColor": 'rgb(76, 83, 104)', 'opacity': '1'});
                 
                 if($(this).data('time') == getNodeData(datePicker, "selectedDates")[0]){
@@ -1250,10 +1471,8 @@ $(document).ready(function(){
                 
                 $(".selection_page_calendar_row").filter((i) => i !== getNodeData(datePicker, "selectedRow")).children().css({'opacity': '.3', "backgroundColor": 'rgb(76, 83, 104)'});
                 $(".selection_page_calendar_row").filter((i) => i === getNodeData(datePicker, "selectedRow")).children().filter((_, dayEl) => {
-                    return zeroAM(new Date($(dayEl).data('time'))).getTime() >= zeroAM(new Date()).getTime()}
+                    return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
                 ).css('opacity', '1');  
-
-                console.log(getNodeData(datePicker, "selectedDates"))
                 
                 if(!getNodeData(datePicker, "selectedDates").includes($(this).data('time'))){
                     $(this).css("backgroundColor", 'rgb(29, 188, 96)');
@@ -1284,15 +1503,20 @@ $(document).ready(function(){
         rowIndex = getNodeData(datePicker, "selectedRow");
 
         calendarGoPicker("static", selectCalendarPage);
-        setCalendarSelection();
-
         showBlurPage('update_datePicker');
     });
 
     $(document).on('click', '.calendarPickerSubmit', function(e){
         let dateString = generateDateString(getNodeData(datePicker, "selectedDates"), parameters["language"]);
-        $('.update_schedule_datePicker').text(dateString);
+
+        if(getNodeData(datePicker, "selectedDates").length > 0){
+            $('.update_schedule_datePicker').css('justify-content', "flex-start");
+        }else{
+            $('.update_schedule_datePicker').css('justify-content', "center");
+        }
         
+        $('.update_schedule_datePicker').text(dateString);
+
         pastSelectedDates = getNodeData(datePicker, "selectedDates");
         pastSelectedPage = getNodeData(datePicker, "selectedPage");
         pastSelectedRow = getNodeData(datePicker, "selectedRow");

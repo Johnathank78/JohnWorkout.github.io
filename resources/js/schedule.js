@@ -3,10 +3,9 @@ function isIdIncludedToday(arr, sessionID){
     function isWeekNotifToday(id){
         let sessionID = id.slice(2, -1);
         let session = session_list[getSessionIndexByID(sessionID)];
-        let today = zeroAM(new Date()).getTime();
     
         let timestamp = session["notif"]["dateList"][id.toString()[1] - 1];
-        return zeroAM(new Date(timestamp)).getTime() == today;
+        return zeroAM(timestamp, "timestamp") == getToday("timestamp");
     };
 
     let scheme = getScheduleScheme(session_list[getSessionIndexByID(sessionID)]);
@@ -241,7 +240,7 @@ async function uniq_reschedulerSESSION(id){
         };
     };
 
-    if(zeroAM(new Date(lastOccurence)).getTime() != zeroAM(new Date(newOccurence)).getTime()){nextOccurence(notif)};
+    if(zeroAM(lastOccurence, "timestamp") != zeroAM(newOccurence, "timestamp")){nextOccurence(notif)};
 
     if(platform == "Mobile"){
         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
@@ -251,7 +250,7 @@ async function uniq_reschedulerSESSION(id){
     updateCalendar(session_list, updateCalendarPage);
 };
 
-async function uniq_schedulerEDIT(id, reminderOrSession){
+async function uniq_scheduler(id, reminderOrSession){
 
     async function uniq_core(input){
         let i = false;
@@ -456,7 +455,7 @@ async function rescheduler(){
                     };
                 };
 
-                if(zeroAM(new Date(lastOccurence)).getTime() != zeroAM(new Date(newOccurence)).getTime()){nextOccurence(notif)};
+                if(zeroAM(lastOccurence, "timestamp") != zeroAM(newOccurence, "timestamp")){nextOccurence(notif)};
             };
         };
     };
