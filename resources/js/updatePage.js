@@ -1115,8 +1115,6 @@ $(document).ready(function(){
                     id = await getPendingId(update_current_item['id']);
 
                     date = setHoursMinutes(date, hours, minutes);
-                    date.setSeconds(0);
-                    date.setMilliseconds(0);
 
                     firston = date.getTime() - toSubstract;
 
@@ -1161,8 +1159,6 @@ $(document).ready(function(){
                         date = new Date(date);
 
                         date = setHoursMinutes(date, hours, minutes);
-                        date.setSeconds(0);
-                        date.setMilliseconds(0);
 
                         firston = date.getTime() - toSubstract;
                         if(firston - 5000 > Date.now()){

@@ -211,82 +211,182 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, F, { maxI, i }, ID = false) 
     }
 };
 
-function isEventScheduled(C, D, X, Y, Z, U, T, O, ID=false){
-    // Calcul de diffInDays
+function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
+    // -------------------------------------
+    // 1. Input parameters explanation
+    // -------------------------------------
+    // C: Date we want to test for an event occurrence
+    // D: First scheduled date in the series
+    // X: The recurrence count (e.g., every X days/weeks)
+    // Y: The recurrence unit ("Day" or "Week")
+    // Z: The "jumpVal" (number of extra days/weeks/times to skip)
+    // U: The "jumpType" ("Times", "Day", or "Week")
+    // T: The "everyVal" (how many recurrences happen before a skip)
+    // O: The schedule occurrence index (1-based offset used for skip logic)
+    // ID: (Optional) Used for external shift-check logic
+    
+    // Return:
+    //   Number (the 1-based occurrence within the current cycle) 
+    //     if date C is part of the recurrence,
+    //   false otherwise.
+
+    // -------------------------------------
+    // 2. HELPER: Positive modulo
+    // -------------------------------------
+    // Used to handle negative offsets gracefully in cycle-based math.
+    function mod(a, b) {
+        return ((a % b) + b) % b;
+    }
+
+    // -------------------------------------
+    // 3. Compute diffInDays (may be negative)
+    // -------------------------------------
+    // This measures how many days separate C from D:
+    //   - If diffInDays >= 0, C is on or after D
+    //   - If diffInDays < 0, C is before D
     const millisecondsPerDay = 24 * 60 * 60 * 1000;
-    const diffInDays = Math.round((zeroAM(C, "date") - zeroAM(D, "date")) / millisecondsPerDay);
+    const diffInDays = Math.round(
+        (zeroAM(C, "date") - zeroAM(D, "date")) / millisecondsPerDay
+    );
 
-    // Convertir l'unité de récurrence en jours
+    // -------------------------------------
+    // 4. Base interval in days
+    // -------------------------------------
+    // Convert Y and X into a day-based interval.
+    // E.g., if Y = "Day", intervalDays = X
+    //       if Y = "Week", intervalDays = X * 7
     let intervalDays;
-    if(Y === "Day"){
+    if (Y === "Day") {
         intervalDays = X;
-    }else if(Y === "Week"){
+    } else if (Y === "Week") {
         intervalDays = X * 7;
-    }else{
+    } else {
         throw new Error("Unité de récurrence Y invalide. Doit être 'Day' ou 'Week'.");
-    };
+    }
 
-    // Vérifier si on a un saut
+    // -------------------------------------
+    // 5. Determine if skip logic applies
+    // -------------------------------------
+    // hasSkip is true if we have a positive number Z
+    // and a valid skip unit U ("Times", "Day", or "Week").
     const hasSkip = (typeof Z === 'number' && Z > 0) && (typeof U === 'string');
 
+    // -------------------------------------
+    // 6. If skip applies, compute cycleLength
+    // -------------------------------------
+    // cycleLength is how many days one full cycle spans:
+    //   T "active" events plus the skip region (Z days/weeks/times).
     let cycleLength;
     if (hasSkip) {
         const skipDays = Z;
-        if(U === "Day"){
+        if (U === "Day") {
+            // Skip Z days after T events:
+            //   cycleLength ~ T * intervalDays + Z - some offset with X
             cycleLength = T * intervalDays + skipDays - Math.abs(1 - X);
-        }else if(U === "Week"){
+        } else if (U === "Week") {
+            // Skip Z weeks after T events:
+            //   cycleLength ~ T * intervalDays + Z * 7
             cycleLength = T * intervalDays + (skipDays * 7);
-        }else if(U === "Times"){
-            if(Y == "Day"){
-                cycleLength = T * intervalDays + ((Z + 1) * intervalDays) - X;
-            }else if(Y == "Week"){
-                cycleLength = T * intervalDays + (Z * intervalDays) - (X - 1);
-            };
-        }else{
+        } else if (U === "Times") {
+            // "Times" indicates we skip multiple intervals, with Y controlling the scale.
+            if (Y === "Day") {
+                // cycleLength ~ T*intervalDays + (Z+1)*intervalDays - X
+                cycleLength = T * intervalDays + (skipDays + 1) * intervalDays - X;
+            } else if (Y === "Week") {
+                // cycleLength ~ T*intervalDays + Z*intervalDays - (X - 1)
+                cycleLength = T * intervalDays + skipDays * intervalDays - (X - 1);
+            }
+        } else {
             throw new Error("Unité de récurrence U invalide. Doit être 'Times', 'Day', 'Week'.");
-        };
-    };
+        }
+    }
 
-    // Fonction interne permettant de déterminer si une date donnée (diffInDays relatif à D)
-    // est un jour d'événement, en utilisant la logique existante.
+    // -------------------------------------
+    // 7. HELPER: checkEventDay(dInDays)
+    // -------------------------------------
+    // Decides if a given diffInDays is an event date and returns the occurrence (1-based),
+    // or false if it's not an event date.
+    //
+    //   - If no skip logic, check if dInDays is divisible by intervalDays.
+    //     Then occurrence = floor(dInDays / intervalDays) + 1
+    //
+    //   - If skip logic, we:
+    //       1) Shift dInDays by (O - 1)*intervalDays so that O aligns properly.
+    //       2) Use modulo cycleLength to find position in the cycle (adjustedDaysIntoCycle).
+    //       3) If we're within T * intervalDays, check if it's exactly on a multiple 
+    //          of intervalDays. If yes, occurrence resets each cycle (partialEvents + 1).
+    //
+    //   Returns occurrence (Number) or false.
     function checkEventDay(dInDays) {
-        if(!hasSkip){
-            // Pas de saut : l'événement se produit tous les intervalDays jours
-            return (dInDays % intervalDays === 0);
-        }else{
-            // Avec saut
-            const daysIntoCycle = ((dInDays) + (O - 1) * intervalDays) % cycleLength;
-            const adjustedDaysIntoCycle = daysIntoCycle < 0 ? cycleLength + daysIntoCycle : daysIntoCycle;
-            
-            if(adjustedDaysIntoCycle < T * intervalDays){
-                return (adjustedDaysIntoCycle % intervalDays === 0);
-            };
-
+        if (!hasSkip) {
+            // No skip: simple check for multiples of intervalDays
+            if (dInDays % intervalDays === 0) {
+                // Occurrence is 1-based: e.g., diffInDays=0 => occurrence=1
+                const occurrence = Math.floor(dInDays / intervalDays) + 1;
+                return occurrence;
+            }
             return false;
-        };
-    };
+        } else {
+            // With skip logic:
+            const offsetDays = dInDays + (O - 1) * intervalDays;
+            const daysIntoCycle = mod(offsetDays, cycleLength);
 
-    if(diffInDays >= 0){
+            // Shift negative mod result into positive range
+            const adjustedDaysIntoCycle = daysIntoCycle < 0
+                ? cycleLength + daysIntoCycle
+                : daysIntoCycle;
+
+            // If we’re within T "active" events in the cycle:
+            if (adjustedDaysIntoCycle < T * intervalDays) {
+                // Check if it's exactly on a multiple of intervalDays:
+                if (adjustedDaysIntoCycle % intervalDays === 0) {
+                    // partialEvents = how many intervals within the *current* cycle
+                    // Reset the occurrence each cycle:
+                    const partialEvents = Math.floor(adjustedDaysIntoCycle / intervalDays);
+                    const occurrence = partialEvents + 1; 
+                    return occurrence;
+                }
+            }
+            // Past T events or not exactly on a day => skip region / not scheduled
+            return false;
+        }
+    }
+
+    // -------------------------------------
+    // 8. Main logic to determine the result
+    // -------------------------------------
+    if (diffInDays >= 0) {
+        // If diffInDays >= 0, just check if C is an event day.
         return checkEventDay(diffInDays);
-    }else{
-        // WAS SCHEDULED
-        // Vérifions si C est un jour d'événement
-        const C_isEvent = checkEventDay(diffInDays);
+    } else {
+        // For negative offsets, we handle the specialized case for "before the first scheduled date."
 
-        // Vérifions l'espacement
-        const dayDifference = Math.round((zeroAM(D, "date") - zeroAM(C, "date")) / millisecondsPerDay); 
-        // dayDifference devrait être positif puisque C < D
+        // 8.1. Check if C meets the pattern even though it's before D.
+        const occurrence = checkEventDay(diffInDays);
+        if (!occurrence) {
+            // Not an event day by pattern
+            return false;
+        }
+
+        // 8.2. Ensure the spacing between C and D is exactly intervalDays
+        //      so that C is presumably the event immediately before D.
+        const dayDifference = Math.round(
+            (zeroAM(D, "date") - zeroAM(C, "date")) / millisecondsPerDay
+        );
         const correctSpacing = (dayDifference === intervalDays);
 
-        // Si C est un événement, D est un événement, et C est exactement intervalDays jours avant D
-        // alors C est l'événement n - 1 (immédiatement précédent D), on retourne true.
-        const C_isToday = C.getTime() == getToday("timestamp");
-        const isShifted = ID ? hasBeenShifted["data"][ID] : true
+        // 8.3. Additional checks:
+        //      - C_isToday ensures we only consider "today" if that's required
+        //      - isShifted references external "shift" logic
+        const C_isToday = (C.getTime() === getToday("timestamp"));
+        const isShifted = ID ? hasBeenShifted["data"][ID] : true;
 
-        if(C_isEvent && correctSpacing && C_isToday && !isShifted){
-            return true;
-        };
+        // 8.4. If all conditions align, keep the occurrence from checkEventDay.
+        if (correctSpacing && C_isToday && !isShifted) {
+            return occurrence;
+        }
 
+        // Otherwise, it's not considered scheduled.
         return false;
     };
 };

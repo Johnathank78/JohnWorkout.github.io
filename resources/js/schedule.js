@@ -190,22 +190,21 @@ async function uniq_reschedulerSESSION(id){
     notif = isScheduled(session_list[index]);
 
     let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
-    let lastOccurence = false; 
-    let newOccurence = false;
+    let nextDateData = false;
 
     if(notif["scheduleData"]["scheme"] == "Day"){
         id = id.slice(-1) == "1" ? id.slice(0, -1) + "2" : id.slice(0, -1) + "1";
 
         notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-        lastOccurence = notif["dateList"][0];
         
         if(Date.now() <= notif["dateList"][0] && sessionToBeDone["data"][session_list[index]["id"]] && !sessionDone['data'][session_list[index]["id"]]){
-            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif, 1);
+            nextDateData = closestNextDate(notif["dateList"][0], notif, 1)
         }else{
-            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
+            nextDateData = closestNextDate(notif["dateList"][0], notif)
         };
 
-        newOccurence = notif["dateList"][0];
+        notif["dateList"][0] = nextDateData['timestamp'];
+        notif["occurence"] = nextDateData['occurence'];
 
         if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
             notif["dateList"][0] -= toSubstract;
@@ -221,15 +220,15 @@ async function uniq_reschedulerSESSION(id){
         id = id.slice(-1) == "1" ? id.slice(0, -1) + "2" : id.slice(0, -1) + "1";
 
         notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-        lastOccurence = notif["dateList"][z];
 
         if(Date.now() <= notif["dateList"][z] && sessionToBeDone["data"][session_list[index]["id"]] && !sessionDone['data'][session_list[index]["id"]]){
-            notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif, 1);
+            nextDateData = closestNextDate(notif["dateList"][z], notif, 1)
         }else{
-            notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
+            nextDateData = closestNextDate(notif["dateList"][z], notif)
         };
 
-        newOccurence = notif["dateList"][z];
+        notif["dateList"][z] = nextDateData['timestamp'];
+        notif["occurence"] = nextDateData['occurence'];
 
         if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
             notif["dateList"][z] -= toSubstract;
@@ -239,8 +238,6 @@ async function uniq_reschedulerSESSION(id){
             await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session_list[index][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
         };
     };
-
-    if(zeroAM(lastOccurence, "timestamp") != zeroAM(newOccurence, "timestamp")){nextOccurence(notif)};
 
     if(platform == "Mobile"){
         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
@@ -267,12 +264,17 @@ async function uniq_scheduler(id, reminderOrSession){
         };
 
         let notif = isScheduled(input[i]);
+        let nextDateData = false;
 
         if(notif["scheduleData"]["scheme"] == "Day"){
             id = id.slice(0, -1) + "1";
 
             notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
+            
+            nextDateData = closestNextDate(notif["dateList"][0], notif)
+            
+            notif["dateList"][0] = nextDateData['timestamp'];
+            notif["occurence"] = nextDateData['occurence'];
 
             if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
                 notif["dateList"][0] -= toSubstract;
@@ -293,7 +295,11 @@ async function uniq_scheduler(id, reminderOrSession){
                 id = "2" + (z+1) + idy + "1";
 
                 notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-                notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
+                
+                nextDateData = closestNextDate(notif["dateList"][z], notif)
+            
+                notif["dateList"][z] = nextDateData['timestamp'];
+                notif["occurence"] = nextDateData['occurence'];
 
                 if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
                     notif["dateList"][z] -= toSubstract;
@@ -325,21 +331,25 @@ async function uniq_scheduler(id, reminderOrSession){
 };
 
 async function shiftSchedule(session, toSubstract){
-    if(isScheduled(session)){
+    let notif = isScheduled(session);
 
-        let notif = isScheduled(session);
-
+    if(notif){
         if(platform == "Mobile"){
             await removeAllNotifsFromSession(session);
         };
-
+        
         let idx = await getShownId(session["id"].toString());
+        let nextDateData = false;
 
         if(getScheduleScheme(session) == "Day"){
             let id = idx;
 
             notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
+            
+            nextDateData = closestNextDate(notif["dateList"][0], notif)
+            
+            notif["dateList"][0] = nextDateData['timestamp'];
+            notif["occurence"] = nextDateData['occurence'];
 
             if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
                 notif["dateList"][0] -= toSubstract;
@@ -359,7 +369,11 @@ async function shiftSchedule(session, toSubstract){
                 let id = "2" + (z+1).toString() + idy + "1";
 
                 notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-                notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
+                
+                nextDateData = closestNextDate(notif["dateList"][z], notif)
+            
+                notif["dateList"][z] = nextDateData['timestamp'];
+                notif["occurence"] = nextDateData['occurence'];
 
                 if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
                     notif["dateList"][z] -= toSubstract;
@@ -384,13 +398,11 @@ async function rescheduler(){
     async function reschedulerCORE(input){
 
         for(let i=0; i<input.length; i++){
-            if(isScheduled(input[i])){
-                
-                let lastOccurence = false; 
-                let newOccurence = false;
+            let notif = isScheduled(input[i]);
 
-                let notif = isScheduled(input[i]);
+            if(notif){
                 let idx = await getShownId(input[i]["id"].toString()) // IF FIRST DAY OF WEEK SWITCH FROM 1 to 2, IT WILL RESCHEDULE OTHER DAYS, closestNextDate() PREVENT ERROR BUT NOT CLEAN;
+                let nextDateData = false;
 
                 if(getScheduleScheme(input[i]) == "Day"){
 
@@ -399,15 +411,15 @@ async function rescheduler(){
                         let isAnticipated = isNotificationAnticipated(notif["dateList"][0], notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]);
 
                         notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-                        lastOccurence = notif["dateList"][0];
                         
                         if(isAnticipated && Date.now() < notif["dateList"][0] && isToday(notif["dateList"][0])){
-                            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif, 1);
+                            nextDateData = closestNextDate(notif["dateList"][0], notif, 1)
                         }else{
-                            notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
+                            nextDateData = closestNextDate(notif["dateList"][0], notif)
                         };
 
-                        newOccurence = notif["dateList"][0];
+                        notif["dateList"][0] = nextDateData['timestamp'];
+                        notif["occurence"] = nextDateData['occurence'];
 
                         if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
                             notif["dateList"][0] -= toSubstract;
@@ -430,15 +442,15 @@ async function rescheduler(){
                             let isAnticipated = isNotificationAnticipated(notif["dateList"][z], notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]);
 
                             notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-                            lastOccurence = notif["dateList"][z];
 
                             if(isAnticipated && Date.now() < notif["dateList"][z] && isToday(notif["dateList"][z])){
-                                notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif, 1);
+                                nextDateData = closestNextDate(notif["dateList"][z], notif, 1)
                             }else{
-                                notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
+                                nextDateData = closestNextDate(notif["dateList"][z], notif)
                             };
 
-                            newOccurence = notif["dateList"][z];
+                            notif["dateList"][z] = nextDateData['timestamp'];
+                            notif["occurence"] = nextDateData['occurence'];
 
                             if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
                                 notif["dateList"][z] -= toSubstract;
@@ -454,8 +466,6 @@ async function rescheduler(){
                         };
                     };
                 };
-
-                if(zeroAM(lastOccurence, "timestamp") != zeroAM(newOccurence, "timestamp")){nextOccurence(notif)};
             };
         };
     };
@@ -483,15 +493,21 @@ async function scheduler(){
 
     async function schedulerCORE(input){
         for(let i=0; i<input.length; i++){
-            if(isScheduled(input[i])){
-                let notif = isScheduled(input[i]);
+            let notif = isScheduled(input[i]);
+
+            if(notif){
                 let sessionID = input[i]["id"];
+                let nextDateData = false;
                 
                 if(getScheduleScheme(input[i]) == "Day"){
                     let id = "1" + sessionID + "1"; 
 
                     notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-                    notif["dateList"][0] = closestNextDate(notif["dateList"][0], notif);
+                    
+                    nextDateData = closestNextDate(notif["dateList"][0], notif)
+            
+                    notif["dateList"][0] = nextDateData['timestamp'];
+                    notif["occurence"] = nextDateData['occurence'];
 
                     if(toSubstract != 0 && notif["dateList"][0] - toSubstract > Date.now() + 5000){
                         notif["dateList"][0] -= toSubstract;
@@ -510,7 +526,11 @@ async function scheduler(){
                         let id = "2" + (z+1).toString() + sessionID + "1";
 
                         notif["dateList"][z] = setHoursMinutes(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
-                        notif["dateList"][z] = closestNextDate(notif["dateList"][z], notif);
+                        
+                        nextDateData = closestNextDate(notif["dateList"][z], notif)
+            
+                        notif["dateList"][z] = nextDateData['timestamp'];
+                        notif["occurence"] = nextDateData['occurence'];
 
                         if(toSubstract != 0 && notif["dateList"][z] - toSubstract > Date.now() + 5000){
                             notif["dateList"][z] -= toSubstract;

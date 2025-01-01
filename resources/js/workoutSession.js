@@ -2283,6 +2283,13 @@ $(document).ready(function(){
                     "rest" : get_time_u($(exercise).find('.session_next_exercise_rest').first().text()),
                     "id" : false
                 }));
+            }else if(type == "Wrm."){
+                sessionPart["exoList"].push(generateExoObj({
+                    "type" : type,
+                    "name" : name,
+                    "hint": false,
+                    "id" : false
+                }));
             };
         };
 

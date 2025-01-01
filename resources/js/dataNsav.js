@@ -720,7 +720,7 @@ function session_read(set=false){
 
     if(set){data = set; $(".selection_session_container").children().remove()};
 
-    if (data === null || data == ""){
+    if(data === null || data == ""){
         calendar_dict = calendar_read([]);
         return [];
     }else{
@@ -733,7 +733,7 @@ function session_read(set=false){
         if(previousWeightUnit != parameters['weightUnit']){
             updateWeightUnits(data[0], previousWeightUnit, parameters['weightUnit']);
         };
-        
+
         return data[0];
     };
 };

@@ -261,18 +261,20 @@ function get_session_time(session, uniFix=false){
                     total += exo["setNb"] * (exo["reps"]*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
                 };
             }else if(exo["type"] == "Uni."){
-                let repsDuration = time_unstring(exo["reps"]) * repTime;
+                let repsDuration = exo["reps"] * repTime;
                 let setsDone = uniFix ? Math.floor(exo["setNb"]/2) : exo["setNb"];
- 
+                
                 total += setsDone * (2*repsDuration + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
             }else if(exo["type"] == "Pause"){
                 if(i != session["exoList"].length - 1){total += time_unstring(exo["rest"])};
             }else if(exo['type'] == "Wrm."){
                 total += wrmTime;
             };
+
+            total += transitionTime;
         });
 
-        return total;
+        return total * 1.05;
     };
 };
 
@@ -587,23 +589,27 @@ function areSessionEquallyCompleted(currentHistory, pastHistory, type){
                 if(pastExo){
                     exo["exoList"].forEach(subExo => {
                         pastSubExo = findHistoryExoByID(pastExo, subExo["id"]);
+                        
+                        if(pastSubExo){
+                            setList = subExo["setList"].filter(set => set["work"] != "X");
+                            pastSetList = pastSubExo["setList"].filter(set => set["work"] != "X");
         
-                        setList = subExo["setList"].filter(set => set["work"] != "X");
-                        pastSetList = pastSubExo["setList"].filter(set => set["work"] != "X");
-    
-                        if(pastSubExo && setList.length < pastSetList.length){
-                            areEqual = false;
+                            if(setList.length < pastSetList.length){
+                                areEqual = false;
+                            };
                         };
                     });
                 };
             }else{
                 pastExo = findHistoryExoByID(pastHistory, exo["id"]);
-    
-                setList = exo["setList"].filter(set => set["reps"] != 0);
-                pastSetList = pastExo["setList"].filter(set => set["reps"] != 0);
-        
-                if(pastExo && setList.length < pastSetList.length){
-                    areEqual = false;
+                
+                if(pastExo){
+                    setList = exo["setList"].filter(set => set["reps"] != 0);
+                    pastSetList = pastExo["setList"].filter(set => set["reps"] != 0);
+            
+                    if(setList.length < pastSetList.length){
+                        areEqual = false;
+                    };
                 };
             };
         });
@@ -611,11 +617,13 @@ function areSessionEquallyCompleted(currentHistory, pastHistory, type){
         currentHistory["exoList"].forEach(exo => {
             pastExo = findHistoryExoByID(pastHistory, exo["id"]);
     
-            setList = exo["setList"].filter(set => set["work"] != "X");
-            pastSetList = pastExo["setList"].filter(set => set["work"] != "X");
-    
-            if(pastExo && setList.length < pastSetList.length){
-                areEqual = false;
+            if(pastExo){
+                setList = exo["setList"].filter(set => set["work"] != "X");
+                pastSetList = pastExo["setList"].filter(set => set["work"] != "X");
+                
+                if(setList.length < pastSetList.length){
+                    areEqual = false;
+                };
             };
         });
     };
@@ -751,21 +759,6 @@ function hasHourPassed(date, hours, minutes){
     return hours*3600 + minutes*60 > date.getHours()*3600 + date.getMinutes()*60;
 };
 
-function getScheduleIntervall(fromTimestamp, timestamp, gap, intervalType) {
-    let out = new Date(timestamp);
-    let now = new Date(fromTimestamp);
-
-    let inc = intervalType === "Day" ? 1 : 7;
-
-    // Calculate the number of intervals needed to reach the next valid date
-    if (out.getTime() >= now.getTime()) {
-        let intervalsNeeded = Math.ceil((out.getTime() - now.getTime()) / (gap * inc * 24 * 60 * 60 * 1000));
-        return intervalsNeeded;
-    };
-
-    return -1;
-};
-
 function zeroAM(data, mode = "date"){
     var date = new Date(data);
 
@@ -827,6 +820,8 @@ function parseDate(dateString) {
 function setHoursMinutes(date, hours, minutes){
     date.setHours(hours);
     date.setMinutes(minutes);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
 
     return date;
 };
@@ -878,7 +873,10 @@ function closestNextDate(D, notif, offset = 0) {
     if(typeof D !== "number"){return false};
 
     const now = new Date();
-    const studyDate = new Date(D)
+    const today = getToday('date')
+    const studyDate = new Date(D);
+
+    var isInPast = studyDate <= now;
 
     const X = notif["scheduleData"]["count"];
     const Y = notif["scheduleData"]["scheme"];
@@ -891,25 +889,32 @@ function closestNextDate(D, notif, offset = 0) {
     const minutes = notif["scheduleData"]["minutes"];
 
     // Start searching from max(D, now) so we look for future occurrences
-    let testDate = new Date(Math.max(studyDate.getTime(), now.getTime()));
+    let testDate = new Date(Math.max(studyDate.getTime(), today.getTime()));
+    let eventOccurence = isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O);
 
     // Increment day-by-day until we find a scheduled event
-    while(!isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)){
+    while(!eventOccurence || isInPast){
+        isInPast = false;
+
         testDate.setDate(testDate.getDate() + 1);
+        eventOccurence = isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O);
     };
 
     // Once found, if offset is given, move forward by (offset * X * inc) days
+
     let offsetCount = 0;
     while (offsetCount != offset) {
         testDate.setDate(testDate.getDate() + 1);
-        if(isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)){
+        eventOccurence = isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O)
+
+        if(eventOccurence){
             offsetCount += 1;
         };
     };
 
     testDate = setHoursMinutes(testDate, hours, minutes);
-
-    return testDate.getTime();
+    
+    return {'timestamp': testDate.getTime(), 'occurence': eventOccurence};
 };
 
 function smallestAvailableId(data, idKey){
@@ -1007,14 +1012,6 @@ function getScheduleScheme(session){
         return scheduleData["scheduleData"]["scheme"];
     }else{
         return false;
-    };
-};
-
-function nextOccurence(notif){
-    if(notif["occurence"] + 1 > notif["jumpData"]["everyVal"]){
-        notif["occurence"] = 1;
-    }else{
-        notif["occurence"] += 1;
     };
 };
 
