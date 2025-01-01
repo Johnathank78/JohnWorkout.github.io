@@ -396,8 +396,9 @@ function parametersChecknUpdate(){
         parameters_save(parameters);
 
         if(parameters["weightUnit"] != previousWeightUnit){
-            exercisesHTML = exercisesHTML.replaceAll('placeholder="' + previousWeightUnit + '"', 'placeholder="' + parameters["weightUnit"] + '"');
-            stats_set([stats["timeSpent"], stats["workedTime"], stats["weightLifted"], stats["repsDone"], since, nbMissed]);
+            exercisesHTML = exercisesHTML.replaceAll(previousWeightUnit, parameters["weightUnit"]);
+
+            stats_set(stats);
             updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
         };
 

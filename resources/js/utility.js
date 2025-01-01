@@ -1119,7 +1119,7 @@ function updateWeightUnits(data, from, to){
     data.forEach(session => {
         if(session["type"] == "W"){
             session['exoList'].forEach(exo => {
-                if(exo["type"] == "Int." || exo["type"] == "Bi."){
+                if(exo["type"] == "Uni." || exo["type"] == "Bi."){
                     exo["weight"] = convertToUnit(exo["weight"], from, to);
                 };
             });
@@ -1130,14 +1130,30 @@ function updateWeightUnits(data, from, to){
     previousWeightUnit = parameters["weightUnit"];
 };
 
-function weightUnitgroup(val, unit){
+function weightUnitgroup(val, unit) {
+    // Convert to kg for consistency in calculations
     val = convertToUnit(val, "kg", unit);
 
-    if(unit == "kg"){
-        return val >= 1000 ? (val/1000).toFixed(2)+"t" : val != parseInt(val) ? val.toFixed(1)+"kg" : parseInt(val)+"kg";
-    }else if(unit == "lbs"){
-        return val != parseInt(val) ? val.toFixed(2)+"lbs" : parseInt(val)+"lbs";
-    };
+    if (unit === "kg") {
+        if (val >= 1e15) {
+            return (val / 1e15).toFixed(2) + "Gt"; // Gigatonne
+        } else if (val >= 1e12) {
+            return (val / 1e12).toFixed(2) + "Mt"; // Megatonne
+        } else if (val >= 1000) {
+            return (val / 1000).toFixed(2) + "t";  // Tonne
+        } else {
+            return val !== parseInt(val) ? val.toFixed(1) + "kg" : parseInt(val) + "kg";
+        }
+    } else if (unit === "lbs") {
+        // Grouping for pounds
+        if (val >= 2.20462e6) { // Convert to megatonnes equivalent
+            return (val / 2.20462e6).toFixed(2) + "Mlb"; // Megapound
+        } else if (val >= 2204.62) { // Convert to kilotonnes equivalent
+            return (val / 2204.62).toFixed(2) + "Klb"; // Kilopound
+        } else {
+            return val !== parseInt(val) ? val.toFixed(2) + "lbs" : parseInt(val) + "lbs";
+        }
+    }
 };
 
 function roundToNearestHalf(num) {

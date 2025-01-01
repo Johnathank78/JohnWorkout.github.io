@@ -309,8 +309,11 @@ function stats_set(data){
     $(".selection_info_WorkedTime").text(get_time_u(timeFormat(parseInt(data["workedTime"]))));
     $(".selection_info_WeightLifted").text(weightUnitgroup(data["weightLifted"], parameters['weightUnit']));
     $(".selection_info_RepsDone").text(parseInt(data["repsDone"]));
-    $(".selection_info_Missed").text(data["missedSessions"]["val"]);
     $(".selection_infoStart_value").text(formatDate(data["since"]));
+    
+    if(data["missedSessions"]){
+        $(".selection_info_Missed").text(data["missedSessions"]["val"]);
+    };
 };
 
 
