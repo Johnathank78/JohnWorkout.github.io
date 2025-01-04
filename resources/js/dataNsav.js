@@ -280,15 +280,7 @@ function stats_read(set=false){
         data = JSON.parse(data);
         data = JSONiseStats(data);
 
-        // FIX
-
-        if(!isDict(data['missedSessions'])){
-            data['missedSessions'] = {"val": 0, "year": getToday('date').getFullYear()}
-        };
-
-        // ---
-
-        if(getToday('date').getFullYear() != data['missedSessions']['year']){
+        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1735945200000){
             data['missedSessions']['val'] = 0;
         };
     };
@@ -1038,7 +1030,7 @@ function sessionToBeDone_read(){
     if(formatDate(new Date(data["creationDate"])) != formatDate(getToday("date"))){
         let sessionDone = localStorage.getItem("session_done");
 
-        let count = nbSessionScheduled(getToday("date"));
+        let count = nbSessionScheduled(getToday("date", -1));
         let elapsedDays = daysBetweenTimestamps(data["creationDate"], getToday("date"));
 
         if(!(sessionDone === null || sessionDone == "") && elapsedDays > 1){

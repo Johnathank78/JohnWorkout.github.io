@@ -759,7 +759,7 @@ function hasHourPassed(date, hours, minutes){
     return hours*3600 + minutes*60 > date.getHours()*3600 + date.getMinutes()*60;
 };
 
-function zeroAM(data, mode = "date"){
+function zeroAM(data, mode){
     var date = new Date(data);
 
     date.setHours(0);
@@ -838,8 +838,9 @@ function isToday(data){
     };
 };
 
-function getToday(mode = "date"){
-    const today = zeroAM(new Date(), "date");
+function getToday(mode, offset = 0){
+    var today = zeroAM(new Date(), "date");
+    today.setDate(today.getDate() + offset);
 
     if(mode == "timestamp"){
         return today.getTime();
