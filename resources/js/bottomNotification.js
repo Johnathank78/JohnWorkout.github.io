@@ -27,7 +27,7 @@ function bottomNotification(from, target="", queued=false){
 
     $('.bottomNotification_Icon').css("transform", "unset");
 
-    if(from == "scheduled" || from == "created" || from == "imported" || from == "exported" || from == "parameters"){
+    if(["scheduled", "created", "imported", "exported", "parameters"].includes(from)){
         $('.bottomNotification_Icon').css('filter', greenFilter);
         $(".bottomNotification_msg").css('color', greenText);
         $('.bottomNotification').css("backgroundColor", greenBG);
@@ -46,12 +46,12 @@ function bottomNotification(from, target="", queued=false){
         }else if(from == "parameters"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['parameters']);
         };
-    }else if(from == "unscheduled" || from == "deleted" || from == "write" || from == "read"){
+    }else if(["unscheduled", "deleted", "write", "read"].includes(from)){
         $('.bottomNotification_Icon').css('filter', redFilter);
         $(".bottomNotification_msg").css('color', redText);
         $('.bottomNotification').css("backgroundColor", redBG);
 
-        if(from == "write" || from == "read"){
+        if(["write", "read"].includes(from)){
             $(".bottomNotification_Icon").attr('src', addIMG);
             $('.bottomNotification_Icon').css("transform", "rotate(45deg)");
         }else{
@@ -96,6 +96,15 @@ function bottomNotification(from, target="", queued=false){
         $(".bottomNotification_Icon").attr('src', tickIMG);
 
         $(".bottomNotification_msg").text(textAssets[parameters["language"]]["bottomNotif"]['exchanged']);
+    }else if(from == "fixSound"){
+        $('.bottomNotification_Icon').css('filter', greenFilter);
+        $(".bottomNotification_msg").css('color', greenText);
+        $('.bottomNotification').css("backgroundColor", greenBG);
+
+        $(".bottomNotification_Icon").css('scale', "1");
+        $(".bottomNotification_Icon").attr('src', tickIMG);
+
+        $(".bottomNotification_msg").text(textAssets[parameters["language"]]["bottomNotif"]['fixSound']);
     };
 
     setTimeout(() => {summonBottomNotification()}, 300);

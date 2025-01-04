@@ -53,6 +53,9 @@ async function launchSession(index){
         };
     };
 
+    beepPlayer = constructPlayer(beepPath, 1000);
+    beep2x3Player = constructPlayer(beep2x3Path, 1000);
+
     $(".main_page").css("display", "none");
     $(".session_page").css("display", "block");
     $(".session_volume_slider_container").css("display", "flex");
@@ -1174,8 +1177,17 @@ $(document).ready(function(){
     
         $(document).on("mouseup", function(){sliderMouseUp()});
     };
-    
 
+    $(document).on('longClicked', '.session_volume_slider_container', function(){
+        beepPlayer = null;
+        beep2x3Player = null;
+
+        beepPlayer = constructPlayer(beepPath, 1000);
+        beep2x3Player = constructPlayer(beep2x3Path, 1000);
+        
+        bottomNotification("fixSound")
+    });
+    
     // RECOVERY;
 
     $(document).on('click', ".selection_recovery_btn_n", function(e){

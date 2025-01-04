@@ -285,6 +285,14 @@ async function resumeApp(){
     };
 };
 
+function NotificationMouseDownHandler() {
+    Notification.requestPermission().then((result) => {
+        haveWebNotificationsBeenAccepted = result === "granted";
+    });
+
+    $(document).off("click", NotificationMouseDownHandler);
+};
+
 if(platform == "Mobile"){
     App.addListener('backButton', () => {
         goBack(platform);
@@ -563,15 +571,7 @@ $(document).ready(function(){
         };
     });
 
-    if(platform == "Web"){
-        function NotificationMouseDownHandler() {
-            Notification.requestPermission().then((result) => {
-                haveWebNotificationsBeenAccepted = result === "granted";
-            });
-
-            $(document).off("click", NotificationMouseDownHandler);
-        };
-        
+    if(platform == "Web"){    
         //$(document).on("click", NotificationMouseDownHandler); // GRAND NOTIFICATION
     };
 });

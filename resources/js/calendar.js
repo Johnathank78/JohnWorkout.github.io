@@ -439,7 +439,6 @@ function generateBaseCalendar(page){
 
         if(i == 1){
             $(".selection_page_calendar_header_M").first().text(textAssets[parameters["language"]]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]]);
-            $(".selection_page_calendar_header_Y").text(tempDate.getFullYear());
         };
 
         if(i == end){$(".selection_page_calendar_header_M").last().text(textAssets[parameters["language"]]["misc"]["abrMonthLabels"][monthofyear[tempDate.getMonth()]])};
@@ -452,6 +451,8 @@ function generateBaseCalendar(page){
             $(dayz).eq(i).data("time", false);
         }
     };
+
+    $(".selection_page_calendar_header_Y").text(tempDate.getFullYear());
 };
 
 function updateCalendar(data, page){

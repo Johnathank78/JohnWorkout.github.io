@@ -1,5 +1,6 @@
 const platform = "Web";
 const mobile = "Android";
+
 const isWebMobile = /Mobi/.test(navigator.userAgent);
 const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches;
 
@@ -284,7 +285,8 @@ const textAssets = {
             "write": "Permission d'écriture refusée",
             "audioBroken": "Contrôle du son non disponible",
             "longClickable": "Appuie longtemps pour valider",
-            "exchanged": "Séance échangé avec succès"
+            "exchanged": "Séance échangé avec succès",
+            "fixSound": "Son réparé avec succès"
         },
         "sessionEnd": {
             "mainText": {
@@ -625,7 +627,8 @@ const textAssets = {
             "write": "Write permission error",
             "audioBroken": "Sound control not available",
             "longClickable": "Long press to confirm",
-            "exchanged": "Session successfully exchanged"
+            "exchanged": "Session successfully exchanged",
+            "fixSound": "Sound successfully fixed"
         },
         "sessionEnd": {
             "mainText": {

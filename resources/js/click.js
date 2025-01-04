@@ -1,6 +1,30 @@
 var longClickTS = false;
 var isReactShowin = false;
 
+function loadColors(item){
+    let color1 = false;
+    let color2 = false;
+
+    if($(item).data("tempColor")){
+        [color1, color2] = $(item).data("tempColor");
+        return [color1, color2];
+    };
+ 
+    if(!$(item).data("color")){
+        color1 = $(item).css('backgroundColor');
+    }else{
+        color1 = $(item).data("color");
+    };
+
+    if(!$(item).data("darkColor")){
+        color2 = color1;
+    }else{
+        color2 = $(item).data("darkColor");
+    };
+
+    return [color1, color2];
+};  
+
 function darkenColor(rgbString, value){
     const RGBToHSL = (r, g, b) => {
         r /= 255;
@@ -55,8 +79,8 @@ function longClickDownHandler(){
     let LC_speed = $(this).data("speed");
     let LC_step = (100/LC_speed)*10;
 
-    let LC_color = $(this).data("color");
-    let LC_darkColor = $(this).data("darkColor");
+    let [LC_color, LC_darkColor] = loadColors(this);
+    $(this).data("tempColor", [LC_color, LC_darkColor]);
 
     $(this).data("onIntervall", setInterval(() => {
         if($(this).data("counter") < 100){
@@ -116,8 +140,7 @@ function longClickUpHandler(){
     let LC_speed = $(this).data("speedOut");
     let LC_step = (100/LC_speed)*10;
 
-    let LC_color = $(this).data("color");
-    let LC_darkColor = $(this).data("darkColor");
+    let [LC_color, LC_darkColor] = loadColors(this);
 
     $(this).data("offIntervall", setInterval(() => {
         if($(this).data("counter") > 0){
@@ -134,6 +157,8 @@ function longClickUpHandler(){
 
             $(this).css("background", "unset");
             $(this).css("backgroundColor", LC_color);
+
+            $(this).data("tempColor", false);
 
             clearInterval($(this).data("offIntervall"));
             $(this).data("offIntervall", false);
@@ -178,10 +203,14 @@ $(document).ready(function(){
 
         $(this).data("completed", false);
 
-        $(this).data("color", $(this).css("backgroundColor"));
+        if(this.getAttribute("color") === null){
+            $(this).data("color", false);
+        }else{
+            $(this).data("color", $(this).css("backgroundColor"));
+        };
         
         if(this.getAttribute("darken") === null){
-            $(this).data("darkColor", $(this).css("backgroundColor"));
+            $(this).data("darkColor", false);
         }else{
             $(this).data("darkColor", darkenColor($(this).css("backgroundColor"), parseInt(this.getAttribute("darken"))));
         };
