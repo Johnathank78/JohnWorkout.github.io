@@ -97,28 +97,18 @@ async function pauseApp(){
             currentSide = "I";
             start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
             title = textAssets[parameters["language"]]["notification"]["restOver"];
-            body = textAssets[parameters["language"]]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
+            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
 
-            if(haveWebNotificationsBeenAccepted){
-                activeNotification = new Notification(title, {
-                    body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                    icon: './resources/imgs/appLogo.png'
-                });
-            };
+            if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         }else if(intervall_state == 1){
             currentSide = "W";
             start = new Date(Date.now() + ((restDat - Xspent) * 1000));
             start = (iWork_time - Ispent) * 1000;
             title = textAssets[parameters["language"]]["notification"]["workOver"];
-            body = textAssets[parameters["language"]]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
+            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
 
-            if(haveWebNotificationsBeenAccepted){
-                activeNotification = new Notification(title, {
-                    body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                    icon: './resources/imgs/appLogo.png'
-                });
-            };
-        }
+            if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
+        };
     }else if(ongoing == "workout"){
 
         let nextThing = $(".session_next_exercise_name").first().text();
@@ -127,30 +117,20 @@ async function pauseApp(){
             currentSide = "X";
             start = new Date(Date.now() + ((restDat - Xspent) * 1000));
             title = textAssets[parameters["language"]]["notification"]["xRestOver"];
-            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
-            if(haveWebNotificationsBeenAccepted){
-                activeNotification = new Notification(title, {
-                    body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                    icon: './resources/imgs/appLogo.png'
-                });
-            };
-        }
+            if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
+        };
 
         if(extype == "Bi."){
             if(Ltimer){
                 currentSide += "L";
                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
                 title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
-                if(haveWebNotificationsBeenAccepted){
-                    activeNotification = new Notification(title, {
-                        body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                        icon: './resources/imgs/appLogo.png'
-                    });
-                };
-            }
+                if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
+            };
         }else if(extype == "Uni."){
             if(Ltimer && Rtimer){
                 currentSide += "LR";
@@ -163,64 +143,41 @@ async function pauseApp(){
 
                 if(mini == textAssets[parameters["language"]]["misc"]["leftInitial"]){
                     start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
+                    body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body;
 
-                    if(haveWebNotificationsBeenAccepted){
-                activeNotification = new Notification(title, {
-                    body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                    icon: './resources/imgs/appLogo.png'
-                });
-            };
+                    if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
                 }else if(mini == textAssets[parameters["language"]]["misc"]["rightInitial"]){
                     start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
-
-                    if(haveWebNotificationsBeenAccepted){
-                        activeNotification = new Notification(title, {
-                            body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                            icon: './resources/imgs/appLogo.png'
-                        });
-            };
-                }
+                    body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body;
+                    
+                    if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
+                };
             }else if(Ltimer){
                 currentSide += "L";
                 nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["rightInitial"];
 
                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
                 title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
-                if(haveWebNotificationsBeenAccepted){
-                    activeNotification = new Notification(title, {
-                        body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                        icon: './resources/imgs/appLogo.png'
-                    });
-                };
+                if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             }else if(Rtimer){
                 currentSide += "R";
                 nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["leftInitial"];
 
                 start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
                 title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
-                if(haveWebNotificationsBeenAccepted){
-                    activeNotification = new Notification(title, {
-                        body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                        icon: './resources/imgs/appLogo.png'
-                    });
-                };
+                if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             }
         }else if(extype == "Pause"){
             currentSide += "L";
             start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
             title = textAssets[parameters["language"]]["notification"]["breakOver"];
-            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
-            if(haveWebNotificationsBeenAccepted){
-                activeNotification = new Notification(title, {
-                    body: textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body,
-                    icon: './resources/imgs/appLogo.png'
-                });
-            };
+            if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         };
     };
 };
@@ -232,7 +189,7 @@ async function resumeApp(){
         await undisplayAndCancelNotification(1234);
         await undisplayAndCancelNotification(1235);
     }else{
-        if(activeNotification){activeNotification.close()};
+        if(activeNotification){deleteNotif()};
     }
 
     let elapsedTime = parseInt((new Date().getTime() - backgroundTimestamp) / 1000);
@@ -288,12 +245,12 @@ async function resumeApp(){
 // Notification 
 
 function showNotif({ title, body }) {
-    if (!('Notification' in window)) {
+    if(!('Notification' in window)){
         console.warn('Notifications are not supported in this browser.');
         return;
     }
 
-    if (Notification.permission === 'default') {
+    if(Notification.permission === 'default'){
         Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
                 sendNotification(title, body, './resources/imgs/appLogo.png');
@@ -301,16 +258,16 @@ function showNotif({ title, body }) {
                 console.warn('Notification permission denied.');
             };
         });
-    } else if (Notification.permission === 'granted') {
+    }else if(Notification.permission === 'granted'){
         sendNotification(title, body, './resources/imgs/appLogo.png');
-    } else {
+    }else{
         console.warn('Notifications are disabled.');
     };
 };
 
-function sendNotification(title, body, icon) {
-    navigator.serviceWorker.ready.then(registration => {
-        registration.showNotification(title, {
+function sendNotification(title, body, icon){
+    navigator.serviceWorker.ready.then(registration =>{
+        registration.showNotification(title,{
             body,
             icon,
             tag: 'simple-notification'
@@ -322,18 +279,17 @@ function sendNotification(title, body, icon) {
     });
 };
 
-function deleteNotif() {
-    if (activeNotification) {
+function deleteNotif(){
+    if (activeNotification){
         activeNotification.close(); // Close the notification
         activeNotification = null; // Clear the reference
         console.log('Notification deleted.');
-    } else {
+    }else{
         console.warn('No active notification to delete.');
-    }
-}
+    };
+};
 
-
-function deleteNotif() {
+function deleteNotif(){
     if (activeNotification) {
         activeNotification.close();
         console.log('Notification closed.');
@@ -343,7 +299,7 @@ function deleteNotif() {
     };
 };
 
-function NotificationGrantMouseDownHandler() {
+function NotificationGrantMouseDownHandler(){
     Notification.requestPermission().then((result) => {
         haveWebNotificationsBeenAccepted = result === "granted";
         console.log(haveWebNotificationsBeenAccepted);
