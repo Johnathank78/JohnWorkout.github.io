@@ -1179,11 +1179,8 @@ $(document).ready(function(){
     };
 
     $(document).on('longClicked', '.session_volume_slider_container', function(){
-        beepPlayer = null;
-        beep2x3Player = null;
-
-        beepPlayer = constructPlayer(beepPath, 1000);
-        beep2x3Player = constructPlayer(beep2x3Path, 1000);
+        beepPlayer.resumeAudioContext();
+        beep2x3Player.resumeAudioContext();
         
         bottomNotification("fixSound")
     });

@@ -159,6 +159,8 @@ function longClickUpHandler(){
             $(this).css("backgroundColor", LC_color);
 
             $(this).data("tempColor", false);
+            $(this).data("startX", 0);
+            $(this).data("startY", 0);
 
             clearInterval($(this).data("offIntervall"));
             $(this).data("offIntervall", false);
@@ -168,15 +170,53 @@ function longClickUpHandler(){
     );
 };
 
+function longClickMoveHandler(e) {
+    // If the element cannot long-click, or is not pressed, do nothing
+    if (!$(this).data("canLongClick")) {
+        return;
+    };
+    // If our "onIntervall" timer is running, it means the long click is in progress
+    if ($(this).data("onIntervall")) {
+        // Retrieve our stored starting positions
+        let startX = $(this).data("startX");
+        let startY = $(this).data("startY");
+
+        // Determine current pointer position
+        // (Works on both mouse or touch events if you check correctly)
+        let pageX, pageY;
+        if (e.type.indexOf("touch") === 0) {
+            // For touch events
+            pageX = e.originalEvent.touches[0].pageX;
+            pageY = e.originalEvent.touches[0].pageY;
+        } else {
+            // For mouse events
+            pageX = e.pageX;
+            pageY = e.pageY;
+        };
+
+        let dx = pageX - startX;
+        let dy = pageY - startY;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+
+        // If user moved more than X px, cancel the long-click
+        if (distance > 5) {
+            // Call the existing longClickUpHandler
+            longClickUpHandler.call(this, e);
+        };
+    };
+};
+
 // ----
 
 $(document).ready(function(){
     if(isWebMobile){
         $(document).on("touchstart", ".longClickable", longClickDownHandler);
         $(document).on("touchend", ".longClickable", longClickUpHandler);
+        $(document).on("touchmove", ".longClickable", longClickMoveHandler);
     }else{
         $(document).on("mousedown", ".longClickable", longClickDownHandler);
         $(document).on("mouseup", ".longClickable", longClickUpHandler);
+        $(document).on("touchmove", ".longClickable", longClickMoveHandler);
     };
 
     $(document).on("fantomClicked", ".rest_react", function(){
@@ -200,6 +240,9 @@ $(document).ready(function(){
 
         $(this).data("onIntervall", false);
         $(this).data("offIntervall", false);
+
+        $(this).data("startX", 0);
+        $(this).data("startY", 0);
 
         $(this).data("completed", false);
 
