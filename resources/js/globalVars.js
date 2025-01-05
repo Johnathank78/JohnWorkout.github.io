@@ -1,5 +1,3 @@
-import Konsole from './Konsole.js
-
 const platform = "Web";
 const mobile = "Android";
 
