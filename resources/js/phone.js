@@ -285,9 +285,65 @@ async function resumeApp(){
     };
 };
 
+// Notification 
+
+function showNotif({ title, body, icon }) {
+    if (!('Notification' in window)) {
+        console.warn('Notifications are not supported in this browser.');
+        return;
+    }
+
+    // Request permission if needed
+    if (Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                createNotification(title, body, icon);
+            } else {
+                console.warn('Notification permission denied.');
+            }
+        });
+    } else if (Notification.permission === 'granted') {
+        createNotification(title, body, icon);
+    } else {
+        console.warn('Notifications are disabled.');
+    }
+};
+
+function createNotification(title, body, icon) {
+    // Close any existing notification before creating a new one
+    if (activeNotification) {
+        activeNotification.close();
+    }
+
+    // Create a new notification
+    activeNotification = new Notification(title, {
+        body,
+        icon,
+    });
+
+    // Optional: Add a click listener to the notification
+    activeNotification.onclick = () => {
+        console.log('Notification clicked!');
+        // Add custom click logic here
+    };
+
+    console.log('Notification displayed:', activeNotification);
+};
+
+function deleteNotif() {
+    if (activeNotification) {
+        activeNotification.close();
+        console.log('Notification closed.');
+        activeNotification = null; // Clear the reference
+    } else {
+        console.warn('No active notification to delete.');
+    }
+};
+
 function NotificationMouseDownHandler() {
     Notification.requestPermission().then((result) => {
         haveWebNotificationsBeenAccepted = result === "granted";
+        showNotif("test", "test2", './resources/imgs/appLogo.png');
     });
 
     $(document).off("click", NotificationMouseDownHandler);
@@ -571,7 +627,8 @@ $(document).ready(function(){
         };
     });
 
-    if(platform == "Web"){    
-        //$(document).on("click", NotificationMouseDownHandler); // GRAND NOTIFICATION
+    if(platform == "Web"){
+        $(document).on("click", NotificationMouseDownHandler); // GRAND NOTIFICATION
+
     };
 });
