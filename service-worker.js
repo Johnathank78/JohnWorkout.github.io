@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v6.2';
+const CACHE_NAME = 'app-cache-v6.3';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -175,17 +175,13 @@ self.addEventListener('fetch', event => {
 });
 
 self.addEventListener('notificationclick', event => {
-    event.notification.close(); // Close the notification on click
+    event.notification.close();
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
-            // Focus the first open client (tab) if available
-            if (clientList.length > 0) {
-                return clientList[0].focus();
-            };
+            if(clientList.length > 0){return clientList[0].focus()};
 
-            // Otherwise, open a new tab to the app's start URL
-            return clients.openWindow('/'); // Replace '/' with your app's desired entry point
+            return clients.openWindow('/');
         })
     );
 });
