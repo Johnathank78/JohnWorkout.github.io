@@ -190,6 +190,8 @@ async function resumeApp(){
     if(platform == "Mobile"){
         await undisplayAndCancelNotification(1234);
         await undisplayAndCancelNotification(1235);
+    }else{
+        deleteNotif();
     };
 
     let elapsedTime = parseInt((new Date().getTime() - backgroundTimestamp) / 1000);
@@ -289,6 +291,16 @@ function NotificationGrantMouseDownHandler(){
     });
 
     $(document).off("click", NotificationGrantMouseDownHandler);
+};
+
+function deleteNotif(tag = 'simple-notification'){
+    navigator.serviceWorker.ready.then(registration => {
+        registration.getNotifications({ tag }).then(notifications => {
+            notifications.forEach(notification => notification.close());
+        });
+    }).catch(err => {
+        console.error('Failed to send notification via Service Worker:', err);
+    });
 };
 
 // INIT
