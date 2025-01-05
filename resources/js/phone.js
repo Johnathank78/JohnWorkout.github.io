@@ -297,19 +297,19 @@ function showNotif({ title, body }) {
     if (Notification.permission === 'default') {
         Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
-                createNotification(title, body, './resources/imgs/appLogo.png');
+                createNotification(title, body);
             } else {
                 console.warn('Notification permission denied.');
             }
         });
     } else if (Notification.permission === 'granted') {
-        createNotification(title, body, './resources/imgs/appLogo.png');
+        createNotification(title, body);
     } else {
         console.warn('Notifications are disabled.');
     }
 };
 
-function createNotification(title, body, icon) {
+function createNotification(title, body) {
     // Close any existing notification before creating a new one
     if (activeNotification) {
         activeNotification.close();
@@ -317,17 +317,15 @@ function createNotification(title, body, icon) {
 
     // Create a new notification
     activeNotification = new Notification(title, {
-        body,
-        icon,
+        body
     });
 
     // Optional: Add a click listener to the notification
     activeNotification.onclick = () => {
         console.log('Notification clicked!');
-        // Add custom click logic here
     };
 
-    console.log('Notification displayed:', activeNotification);
+    console.log('Notification displayed:', activeNotification.toString());
 };
 
 function deleteNotif() {
@@ -337,7 +335,7 @@ function deleteNotif() {
         activeNotification = null; // Clear the reference
     } else {
         console.warn('No active notification to delete.');
-    }
+    };
 };
 
 function NotificationGrantMouseDownHandler() {
@@ -348,252 +346,6 @@ function NotificationGrantMouseDownHandler() {
 
     $(document).off("click", NotificationGrantMouseDownHandler);
 };
-
-if(platform == "Mobile"){
-    App.addListener('backButton', () => {
-        goBack(platform);
-    });
-
-    App.addListener('appStateChange', async (state) => {
-        if(state.isActive && ongoing && (hasStarted || sIntervall)){
-            await resumeApp();
-            isIdle = false;
-        }else if(!state.isActive && ongoing && (hasStarted || sIntervall)){
-            const pauseProcess = await BackgroundTask.beforeExit(async () => {
-
-                isIdle = true;
-
-                let start = false;
-                let title = false;
-                let body = false;
-                let actionTypeId = false;
-
-                await undisplayAndCancelNotification(1234);
-                await undisplayAndCancelNotification(1235);
-
-                backgroundTimestamp = new Date().getTime();
-                currentSide = "";
-
-                if(ongoing == "intervall" && !paused){
-                    if(intervall_state == 2){
-                        currentSide = "I";
-                        start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
-                        title = textAssets[parameters["language"]]["notification"]["restOver"];
-                        body = textAssets[parameters["language"]]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
-                        actionTypeId = "resting";
-
-                        await LocalNotifications.schedule({
-                            notifications: [
-                                {
-                                    title: title,
-                                    body: body,
-                                    id: 1234,
-                                    sound: "notification/silent.wav",
-                                    schedule: { at: start, repeats: false },
-                                    actionTypeId: actionTypeId
-                                }
-                            ]
-                        });
-                    }else if(intervall_state == 1){
-                        currentSide = "W"
-                        start = new Date(Date.now() + ((iWork_time - Ispent) * 1000))
-                        title = textAssets[parameters["language"]]["notification"]["workOver"]
-                        body = textAssets[parameters["language"]]["updatePage"]["rest"] + " : " + get_time_u(iRest_time)
-                        actionTypeId = "resting"
-
-                        await LocalNotifications.schedule({
-                            notifications: [
-                                {
-                                    title: title,
-                                    body: body,
-                                    id: 1234,
-                                    sound: "notification/silent.wav",
-                                    schedule: { at: start, repeats: false },
-                                    actionTypeId: actionTypeId
-                                }
-                            ]
-                        });
-                    }
-                }else if(ongoing == "workout"){
-
-                    let nextThing = $($(".session_next_exercise_name")[0]).text()
-
-                    if(Xtimer){
-                        currentSide = "X"
-                        start = new Date(Date.now() + ((restDat - Xspent) * 1000))
-                        title = textAssets[parameters["language"]]["notification"]["xRestOver"]
-                        body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
-                        actionTypeId = "resting"
-
-                        await LocalNotifications.schedule({
-                            notifications: [
-                                {
-                                    title: title,
-                                    body: body,
-                                    id: 1235,
-                                    sound: "notification/silent.wav",
-                                    schedule: { at: start, repeats: false },
-                                    actionTypeId: actionTypeId
-                                }
-                            ]
-                        });
-                    }
-
-                    if(extype == "Bi."){
-                        if(Ltimer){
-                            currentSide += "L"
-                            start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
-                            title = textAssets[parameters["language"]]["notification"]["restOver"]
-                            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
-                            actionTypeId = "resting"
-
-                            await LocalNotifications.schedule({
-                                notifications: [
-                                    {
-                                        title: title,
-                                        body: body,
-                                        id: 1234,
-                                        sound: "notification/silent.wav",
-                                        schedule: { at: start, repeats: false },
-                                        actionTypeId: actionTypeId
-                                    }
-                                ]
-                            });
-                        }
-                    }else if(extype == "Uni."){
-                        if(Ltimer && Rtimer){
-                            currentSide += "LR"
-
-                            let mini = getSmallesRest()
-                            nextThing = nextThing.split(" - ")[0] + " - " + mini
-
-                            title = textAssets[parameters["language"]]["notification"]["restOver"]
-                            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
-                            actionTypeId = "resting"
-
-                            if(mini == textAssets[parameters["language"]]["misc"]["leftInitial"]){
-                                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
-
-                                await LocalNotifications.schedule({
-                                    notifications: [
-                                        {
-                                            title: title,
-                                            body: body,
-                                            id: 1234,
-                                            sound: "notification/silent.wav",
-                                            schedule: { at: start, repeats: false },
-                                            actionTypeId: actionTypeId
-                                        }
-                                    ]
-                                });
-                            }else if(mini == textAssets[parameters["language"]]["misc"]["rightInitial"]){
-                                start = new Date(Date.now() + ((RrestTime - Rspent) * 1000))
-
-                                await LocalNotifications.schedule({
-                                    notifications: [
-                                        {
-                                            title: title,
-                                            body: body,
-                                            id: 1234,
-                                            sound: "notification/silent.wav",
-                                            schedule: { at: start, repeats: false },
-                                            actionTypeId: actionTypeId
-                                        }
-                                    ]
-                                });
-                            }
-                        }else if(Ltimer){
-                            currentSide += "L"
-                            nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["rightInitial"]
-
-                            start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
-                            title = textAssets[parameters["language"]]["notification"]["restOver"]
-                            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
-                            actionTypeId = "resting"
-
-                            await LocalNotifications.schedule({
-                                notifications: [
-                                    {
-                                        title: title,
-                                        body: body,
-                                        id: 1234,
-                                        sound: "notification/silent.wav",
-                                        schedule: { at: start, repeats: false },
-                                        actionTypeId: actionTypeId
-                                    }
-                                ]
-                            });
-                        }else if(Rtimer){
-                            currentSide += "R"
-                            nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["leftInitial"]
-
-                            start = new Date(Date.now() + ((RrestTime - Rspent) * 1000))
-                            title = textAssets[parameters["language"]]["notification"]["restOver"]
-                            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
-                            actionTypeId = "resting"
-
-                            await LocalNotifications.schedule({
-                                notifications: [
-                                    {
-                                        title: title,
-                                        body: body,
-                                        id: 1234,
-                                        sound: "notification/silent.wav",
-                                        schedule: { at: start, repeats: false },
-                                        actionTypeId: actionTypeId
-                                    }
-                                ]
-                            });
-                        }
-                    }else if(extype == "Pause"){
-                        currentSide += "L"
-                        start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
-                        title = textAssets[parameters["language"]]["notification"]["breakOver"]
-                        body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
-                        actionTypeId = "resting"
-
-                        await LocalNotifications.schedule({
-                            notifications: [
-                                {
-                                    title: title,
-                                    body: body,
-                                    id: 1234,
-                                    sound: "notification/silent.wav",
-                                    schedule: { at: start, repeats: false },
-                                    actionTypeId: actionTypeId
-                                }
-                            ]
-                        });
-                    }
-                }
-
-                BackgroundTask.finish({ pauseProcess });
-            });
-        };
-    });
-}else{
-    document.addEventListener("visibilitychange", async () => {
-        if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
-            isIdle = true;
-            beepPlayer.suspendAudioContext();
-            beep2x3Player.suspendAudioContext();
-            pauseApp();
-        }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
-            await resumeApp();
-            beepPlayer.resumeAudioContext();
-            beep2x3Player.resumeAudioContext();
-            isIdle = false;
-        };
-    });
-};
-
-$(document).on("reorderStarted", function(){
-    if(platform == "Mobile"){
-        Haptics.impact({ style: ImpactStyle.Light });
-    }else if('vibrate' in navigator){
-        navigator.vibrate(300, 2);
-    };
-});
 
 // INIT
 
@@ -613,6 +365,253 @@ if(platform == "Mobile"){
 }
 
 $(document).ready(function(){
+    if(platform == "Mobile"){
+        App.addListener('backButton', () => {
+            goBack(platform);
+        });
+    
+        App.addListener('appStateChange', async (state) => {
+            if(state.isActive && ongoing && (hasStarted || sIntervall)){
+                await resumeApp();
+                isIdle = false;
+            }else if(!state.isActive && ongoing && (hasStarted || sIntervall)){
+                const pauseProcess = await BackgroundTask.beforeExit(async () => {
+    
+                    isIdle = true;
+    
+                    let start = false;
+                    let title = false;
+                    let body = false;
+                    let actionTypeId = false;
+    
+                    await undisplayAndCancelNotification(1234);
+                    await undisplayAndCancelNotification(1235);
+    
+                    backgroundTimestamp = new Date().getTime();
+                    currentSide = "";
+    
+                    if(ongoing == "intervall" && !paused){
+                        if(intervall_state == 2){
+                            currentSide = "I";
+                            start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
+                            title = textAssets[parameters["language"]]["notification"]["restOver"];
+                            body = textAssets[parameters["language"]]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
+                            actionTypeId = "resting";
+    
+                            await LocalNotifications.schedule({
+                                notifications: [
+                                    {
+                                        title: title,
+                                        body: body,
+                                        id: 1234,
+                                        sound: "notification/silent.wav",
+                                        schedule: { at: start, repeats: false },
+                                        actionTypeId: actionTypeId
+                                    }
+                                ]
+                            });
+                        }else if(intervall_state == 1){
+                            currentSide = "W"
+                            start = new Date(Date.now() + ((iWork_time - Ispent) * 1000))
+                            title = textAssets[parameters["language"]]["notification"]["workOver"]
+                            body = textAssets[parameters["language"]]["updatePage"]["rest"] + " : " + get_time_u(iRest_time)
+                            actionTypeId = "resting"
+    
+                            await LocalNotifications.schedule({
+                                notifications: [
+                                    {
+                                        title: title,
+                                        body: body,
+                                        id: 1234,
+                                        sound: "notification/silent.wav",
+                                        schedule: { at: start, repeats: false },
+                                        actionTypeId: actionTypeId
+                                    }
+                                ]
+                            });
+                        }
+                    }else if(ongoing == "workout"){
+    
+                        let nextThing = $($(".session_next_exercise_name")[0]).text()
+    
+                        if(Xtimer){
+                            currentSide = "X"
+                            start = new Date(Date.now() + ((restDat - Xspent) * 1000))
+                            title = textAssets[parameters["language"]]["notification"]["xRestOver"]
+                            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                            actionTypeId = "resting"
+    
+                            await LocalNotifications.schedule({
+                                notifications: [
+                                    {
+                                        title: title,
+                                        body: body,
+                                        id: 1235,
+                                        sound: "notification/silent.wav",
+                                        schedule: { at: start, repeats: false },
+                                        actionTypeId: actionTypeId
+                                    }
+                                ]
+                            });
+                        }
+    
+                        if(extype == "Bi."){
+                            if(Ltimer){
+                                currentSide += "L"
+                                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
+                                title = textAssets[parameters["language"]]["notification"]["restOver"]
+                                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                                actionTypeId = "resting"
+    
+                                await LocalNotifications.schedule({
+                                    notifications: [
+                                        {
+                                            title: title,
+                                            body: body,
+                                            id: 1234,
+                                            sound: "notification/silent.wav",
+                                            schedule: { at: start, repeats: false },
+                                            actionTypeId: actionTypeId
+                                        }
+                                    ]
+                                });
+                            }
+                        }else if(extype == "Uni."){
+                            if(Ltimer && Rtimer){
+                                currentSide += "LR"
+    
+                                let mini = getSmallesRest()
+                                nextThing = nextThing.split(" - ")[0] + " - " + mini
+    
+                                title = textAssets[parameters["language"]]["notification"]["restOver"]
+                                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                                actionTypeId = "resting"
+    
+                                if(mini == textAssets[parameters["language"]]["misc"]["leftInitial"]){
+                                    start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
+    
+                                    await LocalNotifications.schedule({
+                                        notifications: [
+                                            {
+                                                title: title,
+                                                body: body,
+                                                id: 1234,
+                                                sound: "notification/silent.wav",
+                                                schedule: { at: start, repeats: false },
+                                                actionTypeId: actionTypeId
+                                            }
+                                        ]
+                                    });
+                                }else if(mini == textAssets[parameters["language"]]["misc"]["rightInitial"]){
+                                    start = new Date(Date.now() + ((RrestTime - Rspent) * 1000))
+    
+                                    await LocalNotifications.schedule({
+                                        notifications: [
+                                            {
+                                                title: title,
+                                                body: body,
+                                                id: 1234,
+                                                sound: "notification/silent.wav",
+                                                schedule: { at: start, repeats: false },
+                                                actionTypeId: actionTypeId
+                                            }
+                                        ]
+                                    });
+                                }
+                            }else if(Ltimer){
+                                currentSide += "L"
+                                nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["rightInitial"]
+    
+                                start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
+                                title = textAssets[parameters["language"]]["notification"]["restOver"]
+                                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                                actionTypeId = "resting"
+    
+                                await LocalNotifications.schedule({
+                                    notifications: [
+                                        {
+                                            title: title,
+                                            body: body,
+                                            id: 1234,
+                                            sound: "notification/silent.wav",
+                                            schedule: { at: start, repeats: false },
+                                            actionTypeId: actionTypeId
+                                        }
+                                    ]
+                                });
+                            }else if(Rtimer){
+                                currentSide += "R"
+                                nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["leftInitial"]
+    
+                                start = new Date(Date.now() + ((RrestTime - Rspent) * 1000))
+                                title = textAssets[parameters["language"]]["notification"]["restOver"]
+                                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                                actionTypeId = "resting"
+    
+                                await LocalNotifications.schedule({
+                                    notifications: [
+                                        {
+                                            title: title,
+                                            body: body,
+                                            id: 1234,
+                                            sound: "notification/silent.wav",
+                                            schedule: { at: start, repeats: false },
+                                            actionTypeId: actionTypeId
+                                        }
+                                    ]
+                                });
+                            }
+                        }else if(extype == "Pause"){
+                            currentSide += "L"
+                            start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
+                            title = textAssets[parameters["language"]]["notification"]["breakOver"]
+                            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                            actionTypeId = "resting"
+    
+                            await LocalNotifications.schedule({
+                                notifications: [
+                                    {
+                                        title: title,
+                                        body: body,
+                                        id: 1234,
+                                        sound: "notification/silent.wav",
+                                        schedule: { at: start, repeats: false },
+                                        actionTypeId: actionTypeId
+                                    }
+                                ]
+                            });
+                        }
+                    }
+    
+                    BackgroundTask.finish({ pauseProcess });
+                });
+            };
+        });
+    }else{
+        document.addEventListener("visibilitychange", async () => {
+            if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
+                isIdle = true;
+                beepPlayer.suspendAudioContext();
+                beep2x3Player.suspendAudioContext();
+                pauseApp();
+                showNotif({title: "test", body: "test"});
+            }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
+                await resumeApp();
+                beepPlayer.resumeAudioContext();
+                beep2x3Player.resumeAudioContext();
+                isIdle = false;
+            };
+        });
+    };
+    
+    $(document).on("reorderStarted", function(){
+        if(platform == "Mobile"){
+            Haptics.impact({ style: ImpactStyle.Light });
+        }else if('vibrate' in navigator){
+            navigator.vibrate(300, 2);
+        };
+    });
+
     if(isStandalonePWA && isWebMobile){
         $('.IOSbacker').css('display', "block");
     };
