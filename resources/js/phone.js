@@ -594,7 +594,6 @@ $(document).ready(function(){
                 beepPlayer.suspendAudioContext();
                 beep2x3Player.suspendAudioContext();
                 pauseApp();
-                showNotif({title: "test", body: "test"});
             }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
                 await resumeApp();
                 beepPlayer.resumeAudioContext();
