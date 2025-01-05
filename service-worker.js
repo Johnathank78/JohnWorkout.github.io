@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v6.5';
+const CACHE_NAME = 'app-cache-v6.6';
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -175,7 +175,7 @@ self.addEventListener('fetch', event => {
 });
 
 self.addEventListener('notificationclick', event => {
-    event.notification.close();
+    //event.notification.close();
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {

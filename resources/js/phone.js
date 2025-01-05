@@ -273,7 +273,6 @@ function sendNotification(title, body, icon){
     navigator.serviceWorker.ready.then(registration => {
         registration.getNotifications({ tag }).then(notifications => {
             notifications.forEach(notification => {
-                console.log(notification.toString());
                 notification.close()
             });
         });
