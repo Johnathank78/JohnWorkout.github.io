@@ -628,6 +628,6 @@ $(document).ready(function(){
     });
 
     if(platform == "Web"){
-        //$(document).on("click", NotificationGrantMouseDownHandler);
+        $(document).on("click", NotificationGrantMouseDownHandler);
     };
 });

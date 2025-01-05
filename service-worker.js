@@ -127,7 +127,7 @@ self.addEventListener('install', event => {
 
             const cachePromises = urlsToCache.map(url => {
                 return cache.add(url).then(() => {
-                    console.log(`Successfully cached: ${url}`);
+                    //console.log(`Successfully cached: ${url}`);
                 }).catch(error => {
                     console.error(`Failed to cache ${url}:`, error);
                 });
