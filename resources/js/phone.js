@@ -340,13 +340,13 @@ function deleteNotif() {
     }
 };
 
-function NotificationMouseDownHandler() {
+function NotificationGrantMouseDownHandler() {
     Notification.requestPermission().then((result) => {
         haveWebNotificationsBeenAccepted = result === "granted";
         showNotif({title: "test", body: "test2", icon: './resources/imgs/appLogo.png'});
     });
 
-    $(document).off("click", NotificationMouseDownHandler);
+    $(document).off("click", NotificationGrantMouseDownHandler);
 };
 
 if(platform == "Mobile"){
@@ -628,7 +628,6 @@ $(document).ready(function(){
     });
 
     if(platform == "Web"){
-        $(document).on("click", NotificationMouseDownHandler); // GRAND NOTIFICATION
-
+        //$(document).on("click", NotificationGrantMouseDownHandler);
     };
 });
