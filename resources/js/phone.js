@@ -293,40 +293,45 @@ function showNotif({ title, body }) {
         return;
     }
 
-    // Request permission if needed
     if (Notification.permission === 'default') {
         Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
-                createNotification(title, body);
+                sendNotification(title, body, './resources/imgs/appLogo.png');
             } else {
                 console.warn('Notification permission denied.');
-            }
+            };
         });
     } else if (Notification.permission === 'granted') {
-        createNotification(title, body);
+        sendNotification(title, body, './resources/imgs/appLogo.png');
     } else {
         console.warn('Notifications are disabled.');
-    }
-};
-
-function createNotification(title, body) {
-    // Close any existing notification before creating a new one
-    if (activeNotification) {
-        activeNotification.close();
-    }
-
-    // Create a new notification
-    activeNotification = new Notification(title, {
-        body
-    });
-
-    // Optional: Add a click listener to the notification
-    activeNotification.onclick = () => {
-        console.log('Notification clicked!');
     };
-
-    console.log('Notification displayed:', activeNotification.toString());
 };
+
+function sendNotification(title, body, icon) {
+    navigator.serviceWorker.ready.then(registration => {
+        registration.showNotification(title, {
+            body,
+            icon,
+            tag: 'simple-notification'
+        });
+
+        console.log('Notification sent via Service Worker.');
+    }).catch(err => {
+        console.error('Failed to send notification via Service Worker:', err);
+    });
+};
+
+function deleteNotif() {
+    if (activeNotification) {
+        activeNotification.close(); // Close the notification
+        activeNotification = null; // Clear the reference
+        console.log('Notification deleted.');
+    } else {
+        console.warn('No active notification to delete.');
+    }
+}
+
 
 function deleteNotif() {
     if (activeNotification) {
