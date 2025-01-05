@@ -266,6 +266,8 @@ function showNotif({ title, body }) {
 };
 
 function sendNotification(title, body, icon){
+    let tag = 'simple-notification';
+
     navigator.serviceWorker.ready.then(registration => {
         registration.getNotifications({ tag }).then(notifications => {
             notifications.forEach(notification => notification.close());
@@ -274,7 +276,7 @@ function sendNotification(title, body, icon){
         registration.showNotification(title,{
             body,
             icon,
-            tag: 'simple-notification'
+            tag
         });
     }).catch(err => {
         console.error('Failed to send notification via Service Worker:', err);
