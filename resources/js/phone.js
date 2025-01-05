@@ -3,7 +3,6 @@ var backgroundTimestamp = 0;
 var currentSide = "";
 var isIdle = false;
 var haveWebNotificationsBeenAccepted = false;
-var activeNotification = false;
 
 function goBack(platform){
     if(current_page == "selection"){
@@ -112,6 +111,9 @@ async function pauseApp(){
     }else if(ongoing == "workout"){
 
         let nextThing = $(".session_next_exercise_name").first().text();
+        if(nextThing.includes("- R") || nextThing.includes("- D")){
+            nextThing = nextThing.split(' - ')[0];
+        };
 
         if(Xtimer){
             currentSide = "X";
@@ -188,9 +190,7 @@ async function resumeApp(){
     if(platform == "Mobile"){
         await undisplayAndCancelNotification(1234);
         await undisplayAndCancelNotification(1235);
-    }else{
-        if(activeNotification){deleteNotif()};
-    }
+    };
 
     let elapsedTime = parseInt((new Date().getTime() - backgroundTimestamp) / 1000);
 
@@ -266,43 +266,24 @@ function showNotif({ title, body }) {
 };
 
 function sendNotification(title, body, icon){
-    navigator.serviceWorker.ready.then(registration =>{
+    navigator.serviceWorker.ready.then(registration => {
+        registration.getNotifications({ tag }).then(notifications => {
+            notifications.forEach(notification => notification.close());
+        });
+
         registration.showNotification(title,{
             body,
             icon,
             tag: 'simple-notification'
         });
-
-        console.log('Notification sent via Service Worker.');
     }).catch(err => {
         console.error('Failed to send notification via Service Worker:', err);
     });
 };
 
-function deleteNotif(){
-    if (activeNotification){
-        activeNotification.close(); // Close the notification
-        activeNotification = null; // Clear the reference
-        console.log('Notification deleted.');
-    }else{
-        console.warn('No active notification to delete.');
-    };
-};
-
-function deleteNotif(){
-    if (activeNotification) {
-        activeNotification.close();
-        console.log('Notification closed.');
-        activeNotification = null; // Clear the reference
-    } else {
-        console.warn('No active notification to delete.');
-    };
-};
-
 function NotificationGrantMouseDownHandler(){
     Notification.requestPermission().then((result) => {
         haveWebNotificationsBeenAccepted = result === "granted";
-        console.log(haveWebNotificationsBeenAccepted);
     });
 
     $(document).off("click", NotificationGrantMouseDownHandler);
