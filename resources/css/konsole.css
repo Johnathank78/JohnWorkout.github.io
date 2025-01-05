@@ -10,7 +10,7 @@
     height: 500px;
 
     left: 50%;
-    bottom: 0px;
+    bottom: -455px;
     
     transform: translateX(-50%);
 }
