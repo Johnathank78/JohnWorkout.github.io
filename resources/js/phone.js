@@ -343,7 +343,7 @@ function deleteNotif() {
 function NotificationGrantMouseDownHandler() {
     Notification.requestPermission().then((result) => {
         haveWebNotificationsBeenAccepted = result === "granted";
-        showNotif({title: "test", body: "test2", icon: './resources/imgs/appLogo.png'});
+        $('.main_title').text(result);
     });
 
     $(document).off("click", NotificationGrantMouseDownHandler);
