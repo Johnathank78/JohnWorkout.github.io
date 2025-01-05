@@ -1,5 +1,5 @@
 .konsole__container{
-    z-index: 998;
+    z-index: 1000;
     position: absolute;
 
     display: flex;
