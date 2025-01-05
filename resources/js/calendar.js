@@ -1144,6 +1144,8 @@ $(document).ready(function(){
     $(document).on("click", ".main_title_block" , function(){
         if(!isAbleToClick("calendar")){return};
 
+        showNotif({title: "test", body: "test"});
+
         if(!calendarState){
             cannotClick = "calendar";
             calendarState = true;

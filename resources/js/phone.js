@@ -287,7 +287,7 @@ async function resumeApp(){
 
 // Notification 
 
-function showNotif({ title, body, icon }) {
+function showNotif({ title, body }) {
     if (!('Notification' in window)) {
         console.warn('Notifications are not supported in this browser.');
         return;
@@ -297,13 +297,13 @@ function showNotif({ title, body, icon }) {
     if (Notification.permission === 'default') {
         Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
-                createNotification(title, body, icon);
+                createNotification(title, body, './resources/imgs/appLogo.png');
             } else {
                 console.warn('Notification permission denied.');
             }
         });
     } else if (Notification.permission === 'granted') {
-        createNotification(title, body, icon);
+        createNotification(title, body, './resources/imgs/appLogo.png');
     } else {
         console.warn('Notifications are disabled.');
     }
@@ -343,7 +343,7 @@ function deleteNotif() {
 function NotificationGrantMouseDownHandler() {
     Notification.requestPermission().then((result) => {
         haveWebNotificationsBeenAccepted = result === "granted";
-        $('.main_title').text(result);
+        console.log(haveWebNotificationsBeenAccepted);
     });
 
     $(document).off("click", NotificationGrantMouseDownHandler);
