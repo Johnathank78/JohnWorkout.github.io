@@ -1,4 +1,4 @@
-export default class Konsole{
+class Konsole{
     constructor(container){
         this.container = container
         this.width = $(this.container).width() - 30
