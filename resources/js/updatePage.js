@@ -1112,7 +1112,7 @@ $(document).ready(function(){
 
                 if(scheme == "Day"){
                     let date = new Date(Math.min(...dateList));
-                    id = await getPendingId(update_current_item['id']);
+                    id = "1" + update_current_item['id'] + "1";
 
                     date = setHoursMinutes(date, hours, minutes);
 
@@ -1124,9 +1124,9 @@ $(document).ready(function(){
 
                     if(platform == "Mobile"){
                         if(reminderOrSession == "session"){
-                            await scheduleId(date, count, scheme.toLowerCase(), title, body, id, "session");
+                            await scheduleId(date, title, body, id, "session");
                         }else if(reminderOrSession == "reminder"){
-                            await scheduleId(date, count, scheme.toLowerCase(), title, body, id, "reminder");
+                            await scheduleId(date, title, body, id, "reminder");
                         };
                     };
                     
@@ -1154,7 +1154,7 @@ $(document).ready(function(){
                     let idy = update_current_item['id'];
 
                     dateList.forEach(async(date, i) => {
-                        id = (i+1).toString() + idy + "1";
+                        id = "2" + (i+1).toString() + idy + "1";
 
                         date = new Date(date);
 
@@ -1167,9 +1167,9 @@ $(document).ready(function(){
 
                         if(platform == "Mobile"){
                             if(reminderOrSession == "session"){
-                                await scheduleId(date, count, scheme.toLowerCase(), title, body, id, "session");
+                                await scheduleId(date, title, body, id, "session");
                             }else if(reminderOrSession == "reminder"){
-                                await scheduleId(date, count, scheme.toLowerCase(), title, body, id, "reminder");
+                                await scheduleId(date, title, body, id, "reminder");
                             };
                         };
 

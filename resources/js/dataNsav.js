@@ -244,8 +244,8 @@ function generateJumpDataObj({jumpType, jumpVal, everyVal}){
     };
 };
 
-
 // -----------
+
 
 function JSONiseStats(data){
     if(isDict(data)){return data};

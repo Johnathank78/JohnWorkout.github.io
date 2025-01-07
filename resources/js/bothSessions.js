@@ -242,7 +242,10 @@ async function quit_session(failed=false){
     if(Lrest){clearInterval(Lrest); Lrest = false};
     if(Rrest){clearInterval(Rrest); Rrest = false};
     if(TPtimer){clearInterval(TPtimer); TPtimer = false};
+
     if(sIntervall){clearInterval(sIntervall); sIntervall = false};
+    if(sWorkIntervall){clearInterval(sWorkIntervall); sWorkIntervall = false};
+    if(sRestIntervall){clearInterval(sRestIntervall); sRestIntervall = false};
     
     extype = false; next_exo = false; finished = false; hasReallyStarted = false;
     ongoing = false; hasStarted = false; lastExo = false;

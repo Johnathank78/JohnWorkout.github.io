@@ -211,7 +211,7 @@ async function uniq_reschedulerSESSION(id){
         };
 
         if(platform == "Mobile"){
-            await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session_list[index][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
+            await scheduleId(new Date(notif["dateList"][0]), session_list[index][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
         };
 
     }else if(notif["scheduleData"]["scheme"] == "Week"){
@@ -235,7 +235,7 @@ async function uniq_reschedulerSESSION(id){
         };
 
         if(platform == "Mobile"){
-            await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session_list[index][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
+            await scheduleId(new Date(notif["dateList"][z]), session_list[index][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session_list[index])), id, 'session');
         };
     };
 
@@ -282,9 +282,9 @@ async function uniq_scheduler(id, reminderOrSession){
 
             if(platform == "Mobile"){
                 if(reminderOrSession == "reminder"){
-                    await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
+                    await scheduleId(new Date(notif["dateList"][0]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                 }else if(reminderOrSession == "session"){
-                    await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                    await scheduleId(new Date(notif["dateList"][0]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                 };
             };
 
@@ -307,9 +307,9 @@ async function uniq_scheduler(id, reminderOrSession){
 
                 if(platform == "Mobile"){
                     if(reminderOrSession == "reminder"){
-                        await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
+                        await scheduleId(new Date(notif["dateList"][z]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                     }else if(reminderOrSession == "session"){
-                        await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                        await scheduleId(new Date(notif["dateList"][z]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                     };
                 };
             };
@@ -357,9 +357,9 @@ async function shiftSchedule(session, toSubstract){
 
             if(platform == "Mobile"){
                 if(session[0] == "R"){
-                    await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], session[2], id, 'reminder');
+                    await scheduleId(new Date(notif["dateList"][0]), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], session[2], id, 'reminder');
                 }else{
-                    await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session)), id, 'session');
+                    await scheduleId(new Date(notif["dateList"][0]), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session)), id, 'session');
                 };
             };
         }else if(getScheduleScheme(session) == "Week"){
@@ -381,9 +381,9 @@ async function shiftSchedule(session, toSubstract){
 
                 if(platform == "Mobile"){
                     if(session[0] == "R"){
-                        await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], session[2], id, "reminder");
+                        await scheduleId(new Date(notif["dateList"][z]), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], session[2], id, "reminder");
                     }else{
-                        await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session)), id, "session");
+                        await scheduleId(new Date(notif["dateList"][z]), session[1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(session)), id, "session");
                     };
                 };
             };
@@ -427,9 +427,9 @@ async function rescheduler(){
 
                         if(platform == "Mobile"){
                             if(input[i]["type"] == "R"){
-                                await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
+                                await scheduleId(new Date(notif["dateList"][0]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                             }else{
-                                await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                                await scheduleId(new Date(notif["dateList"][0]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                             };
                         };
                     };
@@ -458,9 +458,9 @@ async function rescheduler(){
 
                             if(platform == "Mobile"){
                                 if(input[i]["type"] == "R"){
-                                    await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
+                                    await scheduleId(new Date(notif["dateList"][z]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                                 }else{
-                                    await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                                    await scheduleId(new Date(notif["dateList"][z]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                                 };
                             };
                         };
@@ -515,9 +515,9 @@ async function scheduler(){
 
                     if(platform == "Mobile"){
                         if(input[i]["type"] == "R"){
-                            await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
+                            await scheduleId(new Date(notif["dateList"][0]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                         }else{
-                            await scheduleId(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                            await scheduleId(new Date(notif["dateList"][0]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                         };
                     };
                 }else if(getScheduleScheme(input[i]) == "Week"){
@@ -538,9 +538,9 @@ async function scheduler(){
 
                         if(platform == "Mobile"){
                             if(input[i]["type"] == "R"){
-                                await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, "reminder");
+                                await scheduleId(new Date(notif["dateList"][z]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, "reminder");
                             }else{
-                                await scheduleId(new Date(notif["dateList"][z]), parseInt(notif["scheduleData"]["count"]), notif["scheduleData"]["scheme"].toLowerCase(), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, "session");
+                                await scheduleId(new Date(notif["dateList"][z]), input[i][1]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, "session");
                             };
                         };
                     };
@@ -565,8 +565,7 @@ async function scheduler(){
 
 //-------------;
 
-async function scheduleId(start, count, every, title, body, id, from){
-
+async function scheduleId(start, title, body, id, from){
     id = parseInt(id);
 
     await LocalNotifications.schedule({
@@ -576,12 +575,12 @@ async function scheduleId(start, count, every, title, body, id, from){
                 body: body,
                 id: id,
                 sound: "basic.wav",
-                schedule: { at: start, every: every, repeats: false },
+                schedule: { at: start },
                 actionTypeId: from
             }
         ]
     });
-
+    
     return true;
 };
 

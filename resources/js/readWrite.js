@@ -6,14 +6,13 @@ async function writeToFile(data, folderName, fileName) {
         const permission = await Filesystem.checkPermissions();
 
         if (permission.publicStorage !== 'granted') {
-            bottomNotification("write", "");
+            bottomNotification("write");
             console.log('L\'autorisation est refusée.');
             return;
         };
 
         const directory = Directory.ExternalStorage;
 
-        // Write the file to the folder;
         await Filesystem.writeFile({
             path: `${folderName}/${fileName}`,
             data: JSON.stringify(data),
@@ -24,7 +23,8 @@ async function writeToFile(data, folderName, fileName) {
 
         return "Done";
     }catch(error){
-        console.error(`Failed to write file: ${error.message}`);
+        bottomNotification("write");
+        console.error(error);
     };
 };
 
@@ -36,7 +36,7 @@ async function readFromFile(folderName, fileName) {
         const permission = await Filesystem.checkPermissions();
 
         if (permission.publicStorage !== 'granted') {
-            bottomNotification("read")
+            bottomNotification("read");
             console.log('L\'autorisation est refusée.');
             return
         }
@@ -48,10 +48,9 @@ async function readFromFile(folderName, fileName) {
         });
 
         return result.data;
-
     } catch (error) {
-        console.error(`Error reading file: ${error}`);
-        return null;
+        bottomNotification("read");
+        return;
     };
 };
 
@@ -114,11 +113,13 @@ $(document).ready(function(){
                 $(".selection_saveLoad_btn_submit").text(textAssets[parameters["language"]]["preferences"]["export"]);
                 $('.selection_saveLoad_emptyMsg').css('display', 'none');
 
-
                 $(".selection_saveLoad_btn_submit").css('display', 'flex');
                 $(".selection_saveLoad_headerText").css('display', 'inline-block');
 
                 $(".selection_saveLoad_page").children(":not(.selection_saveLoad_emptyMsg)").css('display', 'flex');
+
+                $('#selection_saveLoad_sl').parent().css('display', session_list.length == 0 ? 'none' : 'flex');
+                $('#selection_saveLoad_rl').parent().css('display', reminder_list.length == 0 ? 'none' : 'flex');
 
                 closePanel('parameters');
                 showBlurPage('selection_saveLoad_page');
@@ -225,56 +226,65 @@ $(document).ready(function(){
         if($(this).text() == textAssets[parameters["language"]]["preferences"]["import"]){
             if(platform == "Mobile"){
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0){
-                    temp = await localFiles[i].text();
+                    temp = await readFromFile("Workout", 'parameters.txt');
 
-                    parameters = JSON.parse(temp);
+                    if(temp){
+                        parameters = JSON.parse(temp);
+    
+                        previousWeightUnit = parameters["weightUnit"];
+                        parametersMemory = JSON.stringify(parameters);
+                        changeLanguage(parameters['language'], true);
+    
+                        parameters_set(parameters)
+                        parameters_save(parameters);
+                        schedule = true;
+                    };
 
-                    previousWeightUnit = parameters["weightUnit"];
-                    parametersMemory = JSON.stringify(parameters);
-                    changeLanguage(parameters['language'], true);
-
-                    parameters_set(parameters)
-                    parameters_save(parameters);
-                    schedule = true;
                 };
                 if(checked.filter($('#selection_saveLoad_sl')).length > 0){
                     temp = await readFromFile("Workout", 'session_list.txt');
 
-                    localStorage.removeItem("calendar_shown");
-
-                    session_list = session_read(temp);
-                    
-                    sessionSchemeVarsReset();
-                    session_pusher(session_list);
-
-                    calendar_dict = calendar_reset(session_list);
-                    calendar_save(calendar_dict);
-                    calendar_read(session_list)
-
-                    updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
-                    session_save(session_list);
-
-                    restoreDoneSessions(session_list);
-
-                    schedule = true;
+                    if(temp){
+                        localStorage.removeItem("calendar_shown");
+    
+                        session_list = session_read(temp);
+                        
+                        sessionSchemeVarsReset();
+                        session_pusher(session_list);
+    
+                        calendar_dict = calendar_reset(session_list);
+                        calendar_save(calendar_dict);
+                        calendar_read(session_list)
+    
+                        updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
+                        session_save(session_list);
+    
+                        restoreDoneSessions(session_list);
+    
+                        schedule = true;
+                    };
                 };
                 if(checked.filter($('#selection_saveLoad_rl')).length > 0){
                     temp = await readFromFile("Workout", 'reminder_list.txt');
 
-                    reminder_list = reminder_read(temp);
-                    reminder_pusher(reminder_list);
+                    if(temp){
+                        reminder_list = reminder_read(temp);
+                        reminder_pusher(reminder_list);
+    
+                        reminder_save(reminder_list);
+                        schedule = true;
+                    };
 
-                    reminder_save(reminder_list);
-                    schedule = true;
                 };
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
                     temp = await readFromFile("Workout", 'stats.txt');
 
-                    stats = stats_read(temp);
+                    if(temp){
+                        stats = stats_read(temp);
+                    };
                 };
 
                 if(schedule){scheduler()};
-
             }else if(platform == "Web"){
                 for(let i=0; i<localFiles.length;i++){
                     if(checked.filter($('#selection_saveLoad_pa')).length > 0 && localFiles[i].name == "parameters.txt"){

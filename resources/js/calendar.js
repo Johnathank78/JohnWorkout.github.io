@@ -1,3 +1,6 @@
+var selectedDates = false;
+var rowIndex = 0;
+
 var updateCalendarPage = 1;
 var selectCalendarPage = 1;
 
@@ -401,7 +404,6 @@ function generateBaseCalendar(page){
     $(dayz).each(function(i){
         $(dayz).eq(i).data("sList", []);
         $(dayz).eq(i).data("iteration", []);
-        $(dayz).eq(i).data("alpha", 0);
     });
 
     if(page == 1){
@@ -457,7 +459,6 @@ function generateBaseCalendar(page){
 
 function updateCalendar(data, page){
     let end = 20;
-    let min = 1800;
 
     let today = dayofweek_conventional.indexOf(dayofweek[new Date().getDay()]);
     let todaysDate = getToday("date");
@@ -501,7 +502,6 @@ function updateCalendar(data, page){
                     };
 
                     let match = findChanged(associatedDate.getTime(), ["from", data[i]["id"]])["element"];
-                    let alphaToAdd = 0
 
                     if(match){
                         let matchedSession = data[getSessionIndexByID(match['to'])];
@@ -550,7 +550,6 @@ function updateCalendar(data, page){
                             $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession["id"], "iteration": getSwapedSessionBeforeDate(associatedDate, matchedSession["id"], "add") + matchedHistoryCount + 1});  
                         };
 
-                        alphaToAdd = parseFloat(get_session_time(matchedSession)/min);
                         $(dayz).eq(dayInd).data("sList").push([[matchedSession["id"], matchedSession["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                     }else{
                         $(dayz).eq(dayInd).data("iteration").push({"id": id, "iteration": getIterationNumber(
@@ -567,11 +566,8 @@ function updateCalendar(data, page){
                             id
                         )});
 
-                        alphaToAdd = parseFloat(get_session_time(data[i])/min);
                         $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                     };
-
-                    let alpha = $(dayz).eq(dayInd).data("alpha");
 
                     if((!match
                         && ((calendar_dict[data[i]["id"]] && !sessionDone["data"][id])
@@ -580,8 +576,6 @@ function updateCalendar(data, page){
                         && (!sessionDone["data"][match['to']] 
                         || (sessionDone["data"][match['to']] && nbdayz != today)))
                     ){
-                        $(dayz).eq(dayInd).data("alpha", alpha + alphaToAdd);
-
                         if(match && scheduleDate.getTime() == todaysDate.getTime()){
                             sessionToBeDone["data"][match['to']] = true;
                         }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
@@ -619,7 +613,6 @@ function updateCalendar(data, page){
                         };
 
                         let match = findChanged(associatedDate.getTime(), ["from", id])["element"];
-                        let alphaToAdd = 0;
 
                         if(match){
                             let matchedSession = data[getSessionIndexByID(match['to'])];
@@ -668,7 +661,6 @@ function updateCalendar(data, page){
                                 $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession["id"], "iteration": getSwapedSessionBeforeDate(associatedDate, matchedSession["id"], "add") + matchedHistoryCount + 1});  
                             };
     
-                            alphaToAdd = parseFloat(get_session_time(matchedSession)/min);
                             $(dayz).eq(dayInd).data("sList").push([[matchedSession["id"], matchedSession["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                         }else{
                             $(dayz).eq(dayInd).data("iteration").push({"id": id, "iteration": getIterationNumber(
@@ -685,11 +677,8 @@ function updateCalendar(data, page){
                                 id
                             )}); 
 
-                            alphaToAdd = parseFloat(get_session_time(data[i])/min);
                             $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                         };
-
-                        let alpha = $(dayz).eq(dayInd).data("alpha");
 
                         if((!match
                             && ((calendar_dict[data[i]["id"]] && !sessionDone["data"][id])
@@ -698,8 +687,6 @@ function updateCalendar(data, page){
                             && (!sessionDone["data"][match['to']]
                             || (sessionDone["data"][match['to']] && nbdayz != today)))
                         ){
-                            $(dayz).eq(dayInd).data("alpha", alpha + alphaToAdd);
-
                             if(match && scheduleDate.getTime() == todaysDate.getTime()){
                                 sessionToBeDone["data"][match['to']] = true;
                             }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
@@ -717,7 +704,7 @@ function updateCalendar(data, page){
     $(dayz).each(function(i){
         let sList = $(dayz).eq(i).data("sList");
 
-        if(sList.length == 0 || $(dayz).eq(i).data("alpha") == 0){return};
+        if(sList.length == 0){return};
 
         let longest = false;
         let time = false;
@@ -740,12 +727,9 @@ function updateCalendar(data, page){
         };
 
         if(longest === false){return};
-
-        let alpha = $(dayz).eq(i).data("alpha") > 1 ? 1 : $(dayz).eq(i).data("alpha");
         let color = session_list[getSessionIndexByID(longest)]['color'];
-        let rgba = color.replace(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/, 'rgba($1, $2, $3, ') + alpha.toString() + ")";
 
-        $(dayz).eq(i).css('backgroundColor', rgba);
+        $(dayz).eq(i).css('backgroundColor', color);
     });
 
     sessionToBeDone_save(sessionToBeDone);
@@ -781,9 +765,9 @@ async function shiftPlusOne(){
 
                     if(platform == "Mobile"){
                         if(input[i]["type"] == "R"){
-                            await scheduleId(new Date(notif["dateList"][0]), notif["scheduleData"]["count"], notif["scheduleData"]["scheme"].toLowerCase(), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
+                            await scheduleId(new Date(notif["dateList"][0]), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                         }else{
-                            await scheduleId(new Date(notif["dateList"][0]), notif["scheduleData"]["count"], notif["scheduleData"]["scheme"].toLowerCase(), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                            await scheduleId(new Date(notif["dateList"][0]), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                         };
                     };
                 }else if(getScheduleScheme(input[i]) == "Week"){
@@ -809,9 +793,9 @@ async function shiftPlusOne(){
 
                         if(platform == "Mobile"){
                             if(input[i]["type"] == "R"){
-                                await scheduleId(new Date(notif["dateList"][z]), notif["scheduleData"]["count"], notif["scheduleData"]["scheme"].toLowerCase(), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
+                                await scheduleId(new Date(notif["dateList"][z]), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], input[i]["body"], id, 'reminder');
                             }else{
-                                await scheduleId(new Date(notif["dateList"][z]), notif["scheduleData"]["count"], notif["scheduleData"]["scheme"].toLowerCase(), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
+                                await scheduleId(new Date(notif["dateList"][z]), input[i]["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(input[i])), id, 'session');
                             };
                         };
                     };
@@ -1314,10 +1298,10 @@ $(document).ready(function(){
             
             if(!match || (match && match["element"]["from"] != idTo)){
                 let notifToID = "9" + swapID + idTo + "1";
-                await scheduleId(start, 0, "day", sessionTo["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionTo)), notifToID, 'session');
+                await scheduleId(start, sessionTo["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionTo)), notifToID, 'session');
             }else if(match && match["element"]["from"] == idTo && isToday(time)){
                 let notifToID = getNotifFirstIdChar(sessionTo) + sessionTo["id"] + "1";
-                await scheduleId(start, 0, getScheduleScheme(sessionTo), sessionTo["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionTo)), notifToID, 'session');
+                await scheduleId(start, sessionTo["name"]+" | "+notif["scheduleData"]["hours"]+":"+notif["scheduleData"]["minutes"], textAssets[parameters["language"]]["notification"]["duration"] + " : " + get_time(get_session_time(sessionTo)), notifToID, 'session');
             };
         };
 
@@ -1354,25 +1338,35 @@ $(document).ready(function(){
         cannotClick = 'focus';
         activePreviewItem = this;
         focusShown = true;
-        
+
         let optString = '<option value="[idVAL]">[sessionVAL]</option>';
         let beforeList = get_time_u($(this).data('time'), true);
         let afterList = get_time_u($(this).data('time') + Math.ceil(get_session_time(session_list[getSessionIndexByID($(this).data("id"))])), true);
         let number = null;
 
-        try{    
-            number = $(actualRowDay).data('iteration').filter(data => data["id"] == $(this).data("id"))[0]['iteration'];
-        }catch(error){
-            number = "?";
-        }
+        number = $(actualRowDay).data('iteration').filter(data => data["id"] == $(this).data("id"))[0]['iteration'];
 
         $('.selection_dayPreview_focusforChange').children().remove();
 
-        session_list.forEach(session => {
-            if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session['id'])){
-                $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session["id"]).replace('[sessionVAL]', session["name"])))
-            };
-        });
+        if(session_list.length == 1){
+            $('.selection_dayPreview_focusBody').css("display", "none");
+            $('.selection_dayPreview_focusHeader').css({
+                "border-bottom-right-radius": "15px",
+                "border-bottom-left-radius": "15px"
+            });
+        }else{
+            $('.selection_dayPreview_focusBody').css("display", "flex");
+            $('.selection_dayPreview_focusHeader').css({
+                "border-bottom-right-radius": "unset",
+                "border-bottom-left-radius": "unset"
+            });
+
+            session_list.forEach(session => {
+                if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session['id'])){
+                    $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session["id"]).replace('[sessionVAL]', session["name"])))
+                };
+            });
+        };
 
         $('.selection_dayPreview_focusTitle').text($(this).text());
         $('.selection_dayPreview_focusSubTitle').text("n°"+number);
@@ -1587,7 +1581,6 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.update_schedule_datePicker', function(e){
-
         isDatePicking = true;
 
         $('.update_datePicker').append($(".selection_page_calendar"));

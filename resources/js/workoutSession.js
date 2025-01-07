@@ -1176,9 +1176,6 @@ function woIntervallLeave(){
     if(platform == "Mobile" && mobile != "IOS"){if(!isSaving){StatusBar.setBackgroundColor({color: color })}};
 
     update_soundSlider();
-    
-    clearInterval(sIntervall);
-    sIntervall = false;
 
     exit_confirm("dark");
     infoStyle('session');
