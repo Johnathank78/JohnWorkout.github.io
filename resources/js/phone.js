@@ -81,6 +81,10 @@ async function loadSoundz(){
     });
 };
 
+function getHourFormated(date){
+    return date.getHours().toString().padStart(2, '0') + "h" + date.getMinutes().toString().padStart(2, '0') + "m" + date.getSeconds().toString().padStart(2, '0') + "s";
+};
+
 async function pauseApp(){
     isIdle = true;
 
@@ -96,7 +100,7 @@ async function pauseApp(){
             currentSide = "I";
             start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
             title = textAssets[parameters["language"]]["notification"]["restOver"];
-            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
+            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
 
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         }else if(intervall_state == 1){
@@ -104,7 +108,7 @@ async function pauseApp(){
             start = new Date(Date.now() + ((restDat - Xspent) * 1000));
             start = (iWork_time - Ispent) * 1000;
             title = textAssets[parameters["language"]]["notification"]["workOver"];
-            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
+            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
 
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         };
@@ -119,7 +123,7 @@ async function pauseApp(){
             currentSide = "X";
             start = new Date(Date.now() + ((restDat - Xspent) * 1000));
             title = textAssets[parameters["language"]]["notification"]["xRestOver"];
-            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         };
@@ -129,7 +133,7 @@ async function pauseApp(){
                 currentSide += "L";
                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
                 title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
                 if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             };
@@ -145,12 +149,12 @@ async function pauseApp(){
 
                 if(mini == textAssets[parameters["language"]]["misc"]["leftInitial"]){
                     start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-                    body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body;
+                    body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + body;
 
                     if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
                 }else if(mini == textAssets[parameters["language"]]["misc"]["rightInitial"]){
                     start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
-                    body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + body;
+                    body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + body;
                     
                     if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
                 };
@@ -160,7 +164,7 @@ async function pauseApp(){
 
                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
                 title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
                 if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             }else if(Rtimer){
@@ -169,7 +173,7 @@ async function pauseApp(){
 
                 start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
                 title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
                 if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             }
@@ -177,7 +181,7 @@ async function pauseApp(){
             currentSide += "L";
             start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
             title = textAssets[parameters["language"]]["notification"]["breakOver"];
-            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + start.getHours().toString().padStart(2, '0') + "h" + start.getMinutes().toString().padStart(2, '0') + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
 
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         };
@@ -246,7 +250,7 @@ async function resumeApp(){
 
 // Notification 
 
-function showNotif({ title, body }) {
+function showNotif({ title, body }){
     if(!('Notification' in window)){
         console.warn('Notifications are not supported in this browser.');
         return;

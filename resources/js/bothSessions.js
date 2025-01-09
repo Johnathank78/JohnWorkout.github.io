@@ -156,138 +156,132 @@ async function launchSession(index){
 };
 
 async function quit_session(failed=false){
-    try {
-        
-        current_page = "selection";
-    
-        audio_set(0);
-        beepPlayer = null;
-        beep2x3Player = null;
-    
-        color = dark_blue;
-    
-        infoStyle("selection");
-        $("html").css("background-color", dark_blue);
-	$(".footer").css("background-color", mid_dark_blue);
-        
-        $(".selection_header_secondRow").append($(".selection_info_page"));
-        $(".session_next_exercises_container").css("maxHeight", "calc(19vh - 45px)");
-        $(".session_exercise_Lrest_btn, .session_exercise_Rrest_btn").css('opacity', '1');
-        
-        updateRestBtnStyle('Reset');
-        behindExerciseContainer(true);
-    
-        $(".selection_infoStart").css("display", "flex");
-        $(".selection_info_item").eq(4).css("display", "flex");
-        $(".screensaver").click();
-    
-        if(platform == "Mobile"){
-            if(mobile != "IOS"){StatusBar.setBackgroundColor({color : dark_blue})};
-    
-            await undisplayAndCancelNotification(1234);
-            await undisplayAndCancelNotification(1235);
-        };
-    
-        if(parameters["keepAwake"]){keepAwakeToggle(false)};
-    
-        if(!((current_session["type"] == "W" && (tempStats["timeSpent"] <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session["type"] == "I" && tempStats["timeSpent"] <= 60)){
-    
-            fillSessionEnd(tempNewHistory, current_history, failed);
-    
-            if(current_history["state"] == true){
-                tempNewHistory["duration"] = tempStats["timeSpent"];
-                current_history["historyList"].push(tempNewHistory);
-            };
-            
-            current_history["historyCount"] += 1;
-            session_save(session_list);
-    
-            stats["timeSpent"] += tempStats["timeSpent"];
-            stats["workedTime"] += tempStats["workedTime"];
-            stats["weightLifted"] += tempStats["weightLifted"];
-            stats["repsDone"] += tempStats["repsDone"];
-            
-            stats_save(stats);
-    
-            sessionDone["data"][current_session["id"]] = true;
-            sessionDone_save(sessionDone);
-    
-            // Notification related;
-    
-            if(isScheduled(current_session)){
-                let id = await getTodayPendingId(current_session["id"], getScheduleScheme(current_session));
-    
-                if(platform == "Mobile"){
-                    await undisplayAndCancelNotification(id);
-                };
-    
-                await uniq_reschedulerSESSION(id);
-            };
-        };
-    
-        stats_set(stats);
-        updateCalendar(session_list, updateCalendarPage);
-    
-        
-    
-        sets_reorder.avoidIndexes = [];
-    
-        Ltimer = false; Rtimer = false; 
-        Ldone = false; Rdone = false;
-        Llast = false; Rlast = false;
-        Lspent = false; Rspent = false;
-        skip = true; ncState = false;
-        actual_setL = 0; actual_setR = 0; actual_setNb = 0;
-    
-        stopXtimer();
-    
-        if(Lrest){clearInterval(Lrest); Lrest = false};
-        if(Rrest){clearInterval(Rrest); Rrest = false};
-        if(TPtimer){clearInterval(TPtimer); TPtimer = false};
-    
-        if(sIntervall){clearInterval(sIntervall); sIntervall = false};
-        if(sWorkIntervall){clearInterval(sWorkIntervall); sWorkIntervall = false};
-        if(sRestIntervall){clearInterval(sRestIntervall); sRestIntervall = false};
-        
-        extype = false; next_exo = false; finished = false; hasReallyStarted = false;
-        ongoing = false; hasStarted = false; lastExo = false;
-        beforeExercise = false; noMore = false; Ifinished = false;
-        iCurrent_cycle = false; iActualSet = false;
-    
-        if(paused){
-            $(".selection_icon_play_pause").attr("src", pauseIMG);
-            $(".selection_icon_play_pause").removeClass("selection_icon_play_pause_fix");
-            paused = false;
-        };
-    
-        $(".session_workout_historyNotes_inp").val("").change();
-        $(".session_next_exercises_container").children().remove();
-        $(".session_remaining_cycle, .session_intervall_timer").text("");
-        $(".main_page").css("display", "flex");
-        $(".main_page").css("flex-direction", "column");
-        $(".session_continue_btn, .session_page, .Ltimer, .Rtimer, .session_current_exercise_specs_before, .screensaver_Ltimer_prefix, .screensaver_RtextContainer, .session_exercise_Rrest_btn, .session_hint").css("display", "none");
-        $(".Lrest, Rrest").css("display", "block");
-        $(".session_exercise_Lrest_btn").css("cursor", "pointer");
-        $(".session_exercise_Rrest_btn").css("cursor", "pointer");
-        $(".session_intervall_btn_container").css("display", "flex");
-        $('.session_intervall_next_btn').css('display', 'none');
-        
-        $('.lockTouch').css('display', 'none');
-        $(".session_exercise_rest_btn_label").css('display', 'none');
-        $('.session_undo').css('display', 'none');
-        $(".session_current_exercise_specs").css('display', 'flex');
-        $('.session_next_exercise_expander').css("display", "flex");
-    
-        emptyExoObserver.disconnect();
-    
-        recovery = false;
-        undoMemory = [];
-        localStorage.removeItem("recovery");
-        canNowClick("allowed");
-    } catch (error) {
-        console.error(error)
-    }
+    current_page = "selection";
 
+    audio_set(0);
+    beepPlayer = null;
+    beep2x3Player = null;
+
+    color = dark_blue;
+
+    infoStyle("selection");
+    $("html").css("background-color", dark_blue);
+	$(".footer").css("background-color", mid_dark_blue);
+    
+    $(".selection_header_secondRow").append($(".selection_info_page"));
+    $(".session_next_exercises_container").css("maxHeight", "calc(19vh - 45px)");
+    $(".session_exercise_Lrest_btn, .session_exercise_Rrest_btn").css('opacity', '1');
+    
+    updateRestBtnStyle('Reset');
+    behindExerciseContainer(true);
+
+    $(".selection_infoStart").css("display", "flex");
+    $(".selection_info_item").eq(4).css("display", "flex");
+    $(".screensaver").click();
+
+    if(platform == "Mobile"){
+        if(mobile != "IOS"){StatusBar.setBackgroundColor({color : dark_blue})};
+
+        await undisplayAndCancelNotification(1234);
+        await undisplayAndCancelNotification(1235);
+    };
+
+    if(parameters["keepAwake"]){keepAwakeToggle(false)};
+
+    if(!((current_session["type"] == "W" && (tempStats["timeSpent"] <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session["type"] == "I" && tempStats["timeSpent"] <= 60)){
+
+        fillSessionEnd(tempNewHistory, current_history, failed);
+
+        if(current_history["state"] == true){
+            tempNewHistory["duration"] = tempStats["timeSpent"];
+            current_history["historyList"].push(tempNewHistory);
+        };
+        
+        current_history["historyCount"] += 1;
+        session_save(session_list);
+
+        stats["timeSpent"] += tempStats["timeSpent"];
+        stats["workedTime"] += tempStats["workedTime"];
+        stats["weightLifted"] += tempStats["weightLifted"];
+        stats["repsDone"] += tempStats["repsDone"];
+        
+        stats_save(stats);
+
+        sessionDone["data"][current_session["id"]] = true;
+        sessionDone_save(sessionDone);
+
+        // Notification related;
+
+        if(isScheduled(current_session)){
+            let id = await getTodayPendingId(current_session["id"], getScheduleScheme(current_session));
+
+            if(platform == "Mobile"){
+                await undisplayAndCancelNotification(id);
+            };
+
+            await uniq_reschedulerSESSION(id);
+        };
+    };
+
+    stats_set(stats);
+    updateCalendar(session_list, updateCalendarPage);
+
+    
+
+    sets_reorder.avoidIndexes = [];
+
+    Ltimer = false; Rtimer = false; 
+    Ldone = false; Rdone = false;
+    Llast = false; Rlast = false;
+    Lspent = false; Rspent = false;
+    skip = true; ncState = false;
+    actual_setL = 0; actual_setR = 0; actual_setNb = 0;
+
+    stopXtimer();
+
+    if(Lrest){clearInterval(Lrest); Lrest = false};
+    if(Rrest){clearInterval(Rrest); Rrest = false};
+    if(TPtimer){clearInterval(TPtimer); TPtimer = false};
+
+    if(sIntervall){clearInterval(sIntervall); sIntervall = false};
+    if(sWorkIntervall){clearInterval(sWorkIntervall); sWorkIntervall = false};
+    if(sRestIntervall){clearInterval(sRestIntervall); sRestIntervall = false};
+    
+    extype = false; next_exo = false; finished = false; hasReallyStarted = false;
+    ongoing = false; hasStarted = false; lastExo = false;
+    beforeExercise = false; noMore = false; Ifinished = false;
+    iCurrent_cycle = false; iActualSet = false; Iskip = false; IjustSkipped = false;
+
+    if(paused){
+        $(".selection_icon_play_pause").attr("src", pauseIMG);
+        $(".selection_icon_play_pause").removeClass("selection_icon_play_pause_fix");
+        paused = false;
+    };
+
+    $(".session_workout_historyNotes_inp").val("").change();
+    $(".session_next_exercises_container").children().remove();
+    $(".session_remaining_cycle, .session_intervall_timer").text("");
+    $(".main_page").css("display", "flex");
+    $(".main_page").css("flex-direction", "column");
+    $(".session_continue_btn, .session_page, .Ltimer, .Rtimer, .session_current_exercise_specs_before, .screensaver_Ltimer_prefix, .screensaver_RtextContainer, .session_exercise_Rrest_btn, .session_hint").css("display", "none");
+    $(".Lrest, Rrest").css("display", "block");
+    $(".session_exercise_Lrest_btn").css("cursor", "pointer");
+    $(".session_exercise_Rrest_btn").css("cursor", "pointer");
+    $(".session_intervall_btn_container").css("display", "flex");
+    $('.session_intervall_next_btn').css('display', 'none');
+    
+    $('.lockTouch').css('display', 'none');
+    $(".session_exercise_rest_btn_label").css('display', 'none');
+    $('.session_undo').css('display', 'none');
+    $(".session_current_exercise_specs").css('display', 'flex');
+    $('.session_next_exercise_expander').css("display", "flex");
+
+    emptyExoObserver.disconnect();
+
+    recovery = false;
+    undoMemory = [];
+    localStorage.removeItem("recovery");
+    canNowClick("allowed");
 };
 
 function manageSessionEndTabs(){
