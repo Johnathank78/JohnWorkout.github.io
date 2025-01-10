@@ -18,6 +18,13 @@ var pastSelectedDates = [];
 var pastSelectedPage = 1;
 var pastSelectedRow = 0;
 
+function applyHoursMinutes(date, prov){
+    date.setHours(prov.getHours());
+    date.setMinutes(prov.getMinutes());
+
+    return date;
+}
+
 function getAssociatedDate(dayIndex){
     return zeroAM($(".selection_page_calendar_row_day").eq(dayIndex).data('time'), "date");
 };
@@ -52,7 +59,9 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, F, { maxI, i }, ID = false) 
     function mod(a, b) {
       return ((a % b) + b) % b;
     }
-  
+
+    if(ID && sessionToBeDone && sessionToBeDone["data"][ID] && !isToday(D)){F += 1};
+
     // -------------------------------------
     // 2. Input parameters explanation
     // -------------------------------------
@@ -188,29 +197,28 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, F, { maxI, i }, ID = false) 
     const eventsInFullCycles = cycles * T;
   
     if (Y === "Day") {
-      return (
-        F +
-        eventsInFullCycles +
-        partialEvents -
-        O +
-        1 +
-        swapOffset
-      );
+        return (
+            F +
+            eventsInFullCycles +
+            partialEvents -
+            O +
+            1 +
+            swapOffset
+        );
+
     } else if (Y === "Week") {
-      //
-      // We also keep your extra weekOffset logic for skip:
-      //
-      const weekOffset = (maxI - 1) * Math.floor(diffInDays / cycleLength);
-      return (
-        F +
-        eventsInFullCycles +
-        partialEvents -
-        O +
-        1 +
-        weekOffset +
-        swapOffset +
-        i
-      );
+        // We also keep your extra weekOffset logic for skip:
+        const weekOffset = (maxI - 1) * Math.floor(diffInDays / cycleLength);
+        return (
+            F +
+            eventsInFullCycles +
+            partialEvents -
+            O +
+            1 +
+            weekOffset +
+            swapOffset +
+            i
+        );
     }
 };
 
@@ -367,7 +375,6 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
         // 8.1. Check if C meets the pattern even though it's before D.
         const occurrence = checkEventDay(diffInDays);
         if (!occurrence) {
-            // Not an event day by pattern
             return false;
         }
 
@@ -711,9 +718,12 @@ function updateCalendar(data, page){
         
         for(let x = 0; x < sList.length; x++){
             const element = sList[x];
-            
+
+            let associatedDate = getAssociatedDate(i);
             let sessionID = element[0][0];
-            let visibility = calendar_dict[sessionID] || !Object.keys(calendar_dict).includes(sessionID)
+
+            let visibility = (calendar_dict[sessionID] || !Object.keys(calendar_dict).includes(sessionID)) 
+                                && !(isToday(associatedDate) && sessionDone['data'][sessionID]);
 
             if(longest === false && visibility){
                 longest = sessionID;

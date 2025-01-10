@@ -831,11 +831,7 @@ function daysBetweenTimestamps(timestamp1, timestamp2){
 };
 
 function isToday(data){
-    if(typeof data === 'number'){
-        return getToday("timestamp") == zeroAM(data, "timestamp");
-    }else{
-        return getToday("date") == zeroAM(data, "date");
-    };
+    return getToday("timestamp") == zeroAM(data, "timestamp");
 };
 
 function getToday(mode, offset = 0){

@@ -726,6 +726,14 @@ function session_read(set=false){
             updateWeightUnits(data[0], previousWeightUnit, parameters['weightUnit']);
         };
 
+        //fix
+
+        data[0].forEach(session => {
+            if(isNaI(session['id'])){
+                session['id'] = smallestAvailableId(data[0], "id")
+            };
+        });
+
         return data[0];
     };
 };
@@ -1049,6 +1057,29 @@ function sessionToBeDone_read(){
         // --------------------
 
         data = emptySessionScheme();
+        session_list.forEach((session, ID) => {
+            let notif = session['notif'];
+
+            if(notif){
+                let scheduleDateId = getClosestWeekIteration(getToday("timestamp"), notif['dateList']);
+                let jumpData = notif['jumpData'];
+                
+                if(isEventScheduled(
+                    getToday("date"),
+                    notif["dateList"][scheduleDateId],
+                    notif["scheduleData"]["count"], 
+                    notif["scheduleData"]["scheme"], 
+                    jumpData['jumpVal'], 
+                    jumpData['jumpType'], 
+                    jumpData['everyVal'], 
+                    notif['occurence'], 
+                    session['id']
+                )){
+                    data['data'][session['id']] = true;
+                };
+            };
+        });
+
         sessionToBeDone_save(data)
     };
 
