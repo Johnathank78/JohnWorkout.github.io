@@ -753,13 +753,11 @@ async function shiftPlusOne(){
 
                 let notif = isScheduled(input[i]);
                 let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
-
+                
                 let id = await getPendingId(input[i]["id"]);
 
                 if(getScheduleScheme(input[i]) == "Day"){
-                    if(input[i]["type"] == "R" && notif["scheduleData"]["count"] == 1){continue};
-                    
-                    isShifted = true;
+                    if(input[i]["type"] == "R" && notif["scheduleData"]["count"] == 1){continue};                        
                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
 
                     notif["dateList"][0] = setHoursMinutes(new Date(notif["dateList"][0]), parseInt(notif["scheduleData"]["hours"]), parseInt(notif["scheduleData"]["minutes"])).getTime();
@@ -783,7 +781,6 @@ async function shiftPlusOne(){
                 }else if(getScheduleScheme(input[i]) == "Week"){
 
                     if(input[i]["type"] == "R" && notif["dateList"].length == 7){continue};
-                    isShifted = true;
 
                     for(let z=0; z<notif["dateList"].length; z++){
                         let idx = (z+1).toString() + id.slice(1, id.length);

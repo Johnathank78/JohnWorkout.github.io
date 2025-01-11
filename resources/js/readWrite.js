@@ -1,6 +1,6 @@
 var localFiles = false;
 
-async function writeToFile(data, folderName, fileName) {
+async function writeToFile(data, folderName, fileName){
 
     try{
         const permission = await Filesystem.checkPermissions();
@@ -28,7 +28,7 @@ async function writeToFile(data, folderName, fileName) {
     };
 };
 
-async function readFromFile(folderName, fileName) {
+async function readFromFile(folderName, fileName){
 
     const directory = Directory.ExternalStorage
 
@@ -54,7 +54,7 @@ async function readFromFile(folderName, fileName) {
     };
 };
 
-async function fileExists(folderName, fileName) {
+async function fileExists(folderName, fileName){
     const directory = Directory.ExternalStorage;
 
     try {

@@ -473,12 +473,11 @@ function historyDay(i, history){
     let set_elem = $('<div class="update_history_container_set"><div class="update_history_container_reps_container"><input class="update_history_container_reps strictlyNumeric resizingInp" type="tel" value=""><span class="update_history_container_Expectedreps"></span></div><span>x</span><div class="update_history_container_weight_container"><input class="update_history_container_weight strictlyFloatable resizingInp" type="tel" value=""><span class="update_history_container_Expectedweight"></span></div><span class="update_history_container_weightUnit"></span></div>');;
     let intSet_elem = $(`<div class="update_history_container_set" style="padding: unset;"><div class="update_history_container_work_container"><span class="udpate_history_workTitle">Work</span><div class="udpate_history_workData"><span class="update_history_container_work"></span><span class="update_history_container_Expectedwork"></span></div></div><div class="update_history_container_rest_container"><span class="udpate_history_restTitle">Rest</span><div class="udpate_history_restData"><span class="update_history_container_rest"></span><span class="update_history_container_Expectedrest"></span></div></div></div>`);
     
-    let date = 0; let day = 0; let exo = 0; let subExo =  0; 
+    let date = 0; let time = 0; let day = 0; let exo = 0; let subExo =  0; 
     let expectedWeightUnit = 0; let expectedReps = 0; let expectedWeight = 0; let expectedSets = 0; 
     let expectedWork = 0; let expectedRest = 0; 
-    let sets = 0;  let set = 0; let actualWeight = 0; 
+    let sets = 0;  let set = 0; let actualWeight = 0; let actualReps = 0;
     let formatedName = "";
-    let time = 0;
 
     let out = [[],[]];
 

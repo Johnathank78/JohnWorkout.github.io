@@ -730,7 +730,7 @@ function session_read(set=false){
 
         data[0].forEach(session => {
             if(isNaI(session['id'])){
-                session['id'] = smallestAvailableId(data[0], "id")
+                session['id'] = smallestAvailableId(data[0], "id");
             };
         });
 

@@ -155,10 +155,10 @@ async function launchSession(index){
     $(".selection_info_item").eq(4).css("display", "none");
 };
 
-async function quit_session(failed=false){
+async function quit_session(failed=false){      
     current_page = "selection";
-
     audio_set(0);
+    
     beepPlayer = null;
     beep2x3Player = null;
 
@@ -250,7 +250,7 @@ async function quit_session(failed=false){
     extype = false; next_exo = false; finished = false; hasReallyStarted = false;
     ongoing = false; hasStarted = false; lastExo = false;
     beforeExercise = false; noMore = false; Ifinished = false;
-    iCurrent_cycle = false; iActualSet = false; Iskip = false; IjustSkipped = false;
+    iCurrent_cycle = false; iActualSet = false;
 
     if(paused){
         $(".selection_icon_play_pause").attr("src", pauseIMG);

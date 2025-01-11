@@ -528,8 +528,8 @@ function smallestAvailableExoId(mode){
         });
     };
 
-    let max = Math.max(...idList);
-
+    let max = Math.max(...idList.filter(id => !isNaI(id)));
+    
     for(let i=1; i<max; i++){
         if(!idList.includes(i)){
             return i.toString();
@@ -922,8 +922,9 @@ function smallestAvailableId(data, idKey){
         idList.push(parseInt(data[i][idKey]));
     };
 
-    let max = Math.max(...idList);
-
+    
+    let max = Math.max(...idList.filter(id => !isNaI(id)));
+    
     for(let i=1; i<max; i++){
         if(!idList.includes(i)){
             return i.toString();
