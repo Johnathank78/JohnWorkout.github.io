@@ -58,7 +58,7 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, F, { maxI, i }, ID = false) 
     // -------------------------------------
     function mod(a, b) {
       return ((a % b) + b) % b;
-    }
+    };
 
     if(ID && sessionToBeDone && sessionToBeDone["data"][ID] && !isToday(D)){F += 1};
 
@@ -810,6 +810,7 @@ async function shiftPlusOne(){
 
                 if(input[i]["type"] != "R"){
                     hasBeenShifted["data"][input[i]["id"]] = true;
+                    sessionToBeDone["data"][input[i]["id"]] = false;
                 };
             };
         };
