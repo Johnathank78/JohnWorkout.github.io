@@ -208,14 +208,10 @@ class FlexReorder{
         //--------------;
 
         if(this.mobile){
-            $(this.container).on("touchstart", ".reorder__child", (e) => {
-                if(($(e.target).closest(".reorder__avoid").length != 0 && !$(e.target).closest(".reorder__avoid").hasClass("reorder__child")) || ($(e.target).hasClass("reorder__child") && $(e.target).hasClass("reorder__avoid")) || $(e.target).is($(this.container))){return};
-                
-                if($(e.target).is('.reorder__input')){
+            $(this.container).on("touchstart", ".reorder__child", (e) => {                
+                if($(e.target).is('.reorder__input') && !this.inputCursorPos){
                     this.inputCursorPos = this.getClosestLetterIndex(this.getInputLetters(e), e);
                 };
-
-                if($(document.activeElement).is('input, textarea')){return}
 
                 if(this.draggedItem){this.mouseup()};
 
@@ -303,8 +299,6 @@ class FlexReorder{
                     e.target.focus();
                     e.target.setSelectionRange(this.inputCursorPos, this.inputCursorPos);
 
-                    $(e.target).removeClass("reorder__noselect");
-
                     this.inputCursorPos = false;
                 }else if($(e.target).closest(".reorder__child").length > 0){
                     this.selectionAborted();
@@ -312,11 +306,13 @@ class FlexReorder{
             });
 
             $(this.container).on("focusout", '.reorder__input', (e) => {
-                $(e.target).addClass("reorder__noselect")
+                $(e.target).addClass("reorder__noselect");
+                $(e.target).removeClass("reorder__avoid");
             });
-
+            
             $(this.container).on("focusin", '.reorder__input', (e) => {
-                $(e.target).removeClass("reorder__noselect")
+                $(e.target).addClass("reorder__avoid");
+                $(e.target).removeClass("reorder__noselect");
             });
         };
 

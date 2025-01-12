@@ -1160,7 +1160,7 @@
 
     border: none;
     border-radius: 50px;
-    cursor: pointer;
+    cursor: pointer !important;
 }   
 
 .selection_session_tile_extra_btn_container{
