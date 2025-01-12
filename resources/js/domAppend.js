@@ -7,11 +7,11 @@ function reminder_tile(reminder){
                 <span class="selection_reminder_name noselect">`+reminder["name"]+`</span>
                 <div class="selection_session_button_container">
                     <button class="reorder__avoid selection_round_btn selection_bin_btn">
-                        <img src="`+binIMG+`" draggable="False" alt="" class="selection_icon_btn noselect">
+                        <img src="`+binIMG+`" draggable="False" alt="" class="selection_icon_btn">
                     </button>
 
                     <button class="reorder__avoid selection_round_btn selection_edit_btn">
-                        <img src="`+editIMG+`" draggable="False" alt="" class="selection_icon_btn noselect">
+                        <img src="`+editIMG+`" draggable="False" alt="" class="selection_icon_btn">
                     </button>
 
                     <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule selection_reminder_btn reorder__avoid" style="background-color:`+schedule_color+`;">`+textAssets[parameters["language"]]["sessionItem"]["schedule"]+`</span>
@@ -36,15 +36,15 @@ function session_tile(session){
                 </div>
                 <div class="selection_session_button_container">
                     <button class="reorder__avoid selection_round_btn selection_bin_btn">
-                        <img src="`+binIMG+`" draggable=False alt="" class="selection_icon_btn noselect">
+                        <img src="`+binIMG+`" draggable=False alt="" class="selection_icon_btn">
                     </button>
 
                     <button class="reorder__avoid selection_round_btn selection_edit_btn">
-                        <img src="`+editIMG+`" draggable=False alt="" class="selection_icon_btn noselect">
+                        <img src="`+editIMG+`" draggable=False alt="" class="selection_icon_btn">
                     </button>
 
                     <button class="reorder__avoid selection_round_btn selection_play_btn">
-                        <img src="`+playIMG+`" draggable=False alt="" class="selection_icon_fix_btn noselect">
+                        <img src="`+playIMG+`" draggable=False alt="" class="selection_icon_fix_btn">
                     </button>
                 </div>
 

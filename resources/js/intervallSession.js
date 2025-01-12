@@ -88,6 +88,7 @@ function intervall(data, from_wo = false){
                 color = green;
                 light_color = light_green;
                 mid_color = mid_green;
+                
                 update_soundSlider();
                 
                 $(".session_state").text(exoName.toUpperCase());

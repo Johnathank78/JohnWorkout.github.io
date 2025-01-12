@@ -126,6 +126,52 @@ function SHA256(s){
     return binb2hex(core_sha256(str2binb(s), s.length * chrsz));
 };
 
+function hexToRgb(hex) {
+    hex = hex.replace(/^#/, '');
+  
+    if (hex.length === 3) {
+      hex = hex.split('').map(char => char + char).join('');
+    }
+  
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+  
+    return `rgb(${r}, ${g}, ${b})`;
+};
+
+function RGBToHSL(r, g, b){
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const l = Math.max(r, g, b);
+    const s = l - Math.min(r, g, b);
+    const h = s
+      ? l === r
+        ? (g - b) / s
+        : l === g
+        ? 2 + (b - r) / s
+        : 4 + (r - g) / s
+      : 0;
+
+    return [
+      60 * h < 0 ? 60 * h + 360 : 60 * h,
+      100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0),
+      (100 * (2 * l - s)) / 2,
+    ];
+};
+
+function HSLToRGB(h, s, l){
+    s /= 100;
+    l /= 100;
+
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+
+    return [255 * f(0), 255 * f(8), 255 * f(4)];
+};
+
 function findDifferentCharacter(str1, str2) {
     if(str1.length >= str2.length){return};
 

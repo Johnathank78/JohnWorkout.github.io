@@ -1,8 +1,16 @@
+const DRAG_THRESHOLD = 15;
+const MAX_PULL = 30;
+let isBacking = false;
+var backerY = 0;
 var backerX = 0;
+
 var backgroundTimestamp = 0;
 var currentSide = "";
+
 var isIdle = false;
 var haveWebNotificationsBeenAccepted = false;
+
+// BACKER 
 
 function goBack(platform){
     if(current_page == "selection"){
@@ -59,31 +67,94 @@ function goBack(platform){
     canNowClick("allowed");
 };
 
-async function loadSoundz(){
-    let audio_lv = audio_read()[0];
+function backerMousedownHandler(e){
+    const clientX = (e.type === "mousedown")
+    ? e.clientX
+    : e.originalEvent.touches[0].clientX;
+    
+    const clientY = (e.type === "mousedown")
+    ? e.pageY
+    : e.originalEvent.touches[0].clientY;
 
-    await NativeAudio.configure({ focus: false, fade: false });
+    backerY = clientY;
 
-    await NativeAudio.preload({
-        assetId: "beep",
-        assetPath: "assets/sounds/beep.mp3",
-        volume: audio_lv * 0.32,
-        audioChannelNum: 1,
-        isUrl: false
+    if(clientX < DRAG_THRESHOLD){
+        isBacking = true;
+
+        $("#IOSbackerUI").css({
+            background: darkenColor(hexToRgb(color), 15),
+            transition: "none",
+            "-webkit-transition": "none"
+        });
+
+        $("#backerUIbackArrow").css({
+            top: backerY + "px",
+            opacity: 1
+        });
+    };
+};
+
+function backerMousemoveHandler(e){
+    if (!isBacking) return;
+    
+    const pointerX = (e.type === "mousemove")
+    ? e.pageX
+    : e.originalEvent.touches[0].pageX;
+
+    backerX = pointerX;
+
+    const windowH = $(window).height();
+
+    const upperBound = Math.max(0, backerY - Math.round(windowH * 0.40)); 
+    const lowerBound = Math.min(windowH, backerY + Math.round(windowH * 0.40)); 
+    
+    const highCurveHandleX = Math.min(pointerX, MAX_PULL);
+    const highCurveHandleY = backerY;
+    const lowCurveHandleX = Math.min(pointerX, MAX_PULL);
+    const lowCurveHandleY = backerY;
+
+    const pathData = `M 0 ${upperBound} C ${highCurveHandleX} ${highCurveHandleY} ${lowCurveHandleX} ${lowCurveHandleY} 0 ${lowerBound}`;
+
+    $("#IOSbackerUI").css({
+        "clip-path": `path("${pathData}")`,
+        "-webkit-clip-path": `path("${pathData}")`
+    });
+};
+
+function backerMouseupHandler(e){
+    if (!isBacking) return;
+    isBacking = false;
+    
+    $("#IOSbackerUI").css({
+        transition: "clip-path 0.3s ease, -webkit-clip-path 0.3s ease",
+        "-webkit-transition": "clip-path 0.3s ease, -webkit-clip-path 0.3s ease",
     });
 
-    await NativeAudio.preload({
-        assetId: "beep2x3",
-        assetPath: "assets/sounds/beep2x3.mp3",
-        volume: audio_lv * 0.32,
-        audioChannelNum: 1,
-        isUrl: false
+    const windowH = $(window).height();
+
+    const upperBound = Math.max(0, backerY - Math.round(windowH * 0.40)); 
+    const lowerBound = Math.min(windowH, backerY + Math.round(windowH * 0.40)); 
+
+    const pathData = `M 0 ${upperBound} C 0 ${backerY} 0 ${backerY} 0 ${lowerBound}`;
+
+    $("#IOSbackerUI").css({
+        "clip-path": `path("${pathData}")`,
+        "-webkit-clip-path": `path("${pathData}")`
     });
+
+    $("#backerUIbackArrow").css("opacity", "0");
+
+    if(backerX >= MAX_PULL){
+        const event = new CustomEvent('backed', { bubbles: true });
+        $('#IOSbackerUI')[0].dispatchEvent(event);
+    };
 };
 
 function getHourFormated(date){
     return date.getHours().toString().padStart(2, '0') + "h" + date.getMinutes().toString().padStart(2, '0') + "m" + date.getSeconds().toString().padStart(2, '0') + "s";
 };
+
+// VISIBILITY HANDLE
 
 async function pauseApp(){
     isIdle = true;
@@ -248,7 +319,7 @@ async function resumeApp(){
     };
 };
 
-// Notification 
+// NOTIFICATION 
 
 function showNotif({ title, body }){
     if(!('Notification' in window)){
@@ -309,6 +380,28 @@ function deleteNotif(tag = 'simple-notification'){
 
 // INIT
 
+async function loadSoundz(){
+    let audio_lv = audio_read()[0];
+
+    await NativeAudio.configure({ focus: false, fade: false });
+
+    await NativeAudio.preload({
+        assetId: "beep",
+        assetPath: "assets/sounds/beep.mp3",
+        volume: audio_lv * 0.32,
+        audioChannelNum: 1,
+        isUrl: false
+    });
+
+    await NativeAudio.preload({
+        assetId: "beep2x3",
+        assetPath: "assets/sounds/beep2x3.mp3",
+        volume: audio_lv * 0.32,
+        audioChannelNum: 1,
+        isUrl: false
+    });
+};
+
 if(platform == "Mobile"){
     LocalNotifications.requestPermissions();
     Filesystem.requestPermissions();
@@ -325,6 +418,7 @@ if(platform == "Mobile"){
 }
 
 $(document).ready(function(){
+
     if(platform == "Mobile"){
         App.addListener('backButton', () => {
             goBack(platform);
@@ -571,19 +665,19 @@ $(document).ready(function(){
         };
     });
 
-    if(isStandalonePWA && isWebMobile){
-        $('.IOSbacker').css('display', "block");
-    };
+    if(isStandalonePWA && isWebMobile || true){
+        $('#IOSbackerUI').css('display', "block");
 
-    $(".IOSbacker").on("touchstart", function(e){
-        e.preventDefault();
-    }).on("touchmove", function(e){
-        backerX = e.touches[0].clientX;
-    }).on("touchend", function(){
-        if(backerX > 50){
+        $(document).on("touchstart", backerMousedownHandler);
+        $(document).on("touchmove", backerMousemoveHandler);
+        $(document).on("touchend", backerMouseupHandler);
+
+        $('#IOSbackerUI').on('backed', function(){
             goBack(platform);
-        };
-    });
+        });
+    }else{
+        $('#IOSbackerUI').remove();
+    };
 
     if(platform == "Web"){
         $(document).on("click", NotificationGrantMouseDownHandler);

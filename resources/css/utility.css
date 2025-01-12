@@ -1,14 +1,38 @@
-.IOSbacker{
-    z-index: 10000;
-    position: absolute;
-    
-    height: 100%;
-    width: 25px;
+#IOSbackerUI {
+    z-index: 999;
+    position: fixed;
 
-    background-color: rgba(31, 28, 45, 0);
+    top: 0;
+    left: 0;
+    width: 100vw; 
+    height: 100dvh;
+    background: black; /* or any background/gradient */
 
-    top : 0;
+    /* Fallback polygon for older browsers → zero-width strip on the left. */
+    clip-path: polygon(0 0, 0 100%, 0 100%);
+    -webkit-clip-path: polygon(0 0, 0 100%, 0 100%);
+  
+    /* Transition for snap-back */
+    transition: clip-path 0.3s ease, -webkit-clip-path 0.3s ease;
+    -webkit-transition: clip-path 0.3s ease, -webkit-clip-path 0.3s ease;;
+          
+    /* So this div doesn't block interaction with the page behind it. */
+    pointer-events: none;
     display: none;
+}
+
+#backerUIbackArrow{
+    z-index: 999;
+    position: absolute;
+
+    width: 10px;
+    left: 8px;
+
+    filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(1%) hue-rotate(169deg) brightness(103%) contrast(102%);
+    transform: rotate(90deg);
+
+    opacity: 1;
+    pointer-events: none;
 }
 
 .noselect{
