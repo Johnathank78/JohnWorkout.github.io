@@ -1,5 +1,5 @@
 const platform = "Web";
-const mobile = "Android";
+const mobile = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "IOS" : "Android";
 
 const isWebMobile = /Mobi/.test(navigator.userAgent);
 const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches;
@@ -725,8 +725,7 @@ const textAssets = {
     }
 };
 
-var expanderOpenedHeight = mobile == "IOS" ? "calc(83vh - 65px)" : "calc(90vh - 65px)";
-
+var expanderOpenedHeight = false;
 var current_page = "selection";
 
 var color = dark_blue; 
@@ -756,6 +755,14 @@ $(document).ready(function(){
     exchangeIMG = $('#linkIMG').attr('src');
 
     $("img").attr("draggable", false);
+
+    if(platform == "Mobile" &amp;&amp; mobile == "IOS"){
+        $('.app').css('height', '96%');
+        $('.selection_SR_container').css('height', 'calc(93.5vh - 175px)');
+        expanderOpenedHeight = "calc(83vh - 65px)";
+    }else{
+        expanderOpenedHeight = "calc(90vh - 65px)";
+    };
     
     /*KONSOLEADD
 

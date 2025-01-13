@@ -118,7 +118,10 @@ function closePanel(src, notAnimated=false){
             $('.selection_dayPreview_focus').css('display', 'none');
             focusShown = false;
             break;
-
+        case "preview":
+            $('.blurBG').css('display', 'none');
+            previewShown = false;
+            break;
         case "deleteHistoryConfirm":
             $('.blurBG').css('display', 'none');
             deleteHistoryConfirmShown = false;
@@ -228,9 +231,7 @@ function unfocusDivs(e){
     };
 
     if(notTargeted(e.target, ".selection_dayPreview_page") && previewShown && current_page == "selection"){
-        $('.blurBG').css('display', 'none');
-        previewShown = false;
-
+        closePanel('preview');
         canNowClick();
     };
 
@@ -287,7 +288,6 @@ function unfocusDivs(e){
 $(document).ready(function(){
     if(!isWebMobile){
         $(document).on("mousedown", function(e){
-            if(e.clientX < 15){return};
             unfocusDivs(e);
         }).on("mouseup", function(e){
             if(!$(e.target).is('.lockTouch') && lockState){
@@ -304,7 +304,7 @@ $(document).ready(function(){
         });
     }else{
         $(document).on("touchstart", function(e){
-            if(e.originalEvent.touches[0].clientX < 15 && isStandalonePWA && isWebMobile){return};
+            if(e.originalEvent.touches[0].clientX < 15 && isWebMobile){return};
             unfocusDivs(e);
         }).on("touchend", function(e){
             if(!$(e.target).is('.lockTouch') && lockState){

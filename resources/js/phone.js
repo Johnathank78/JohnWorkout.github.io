@@ -22,6 +22,8 @@ function goBack(platform){
             closePanel('parameters');
         }else if(statOpened){
             closePanel('stat');
+        }else if(previewShown){
+            closePanel("preview");
         }else if(calendarState){
             closePanel('calendar');
         }else if(isExtraOut){
@@ -669,7 +671,7 @@ $(document).ready(function(){
         };
     });
 
-    if(isStandalonePWA && isWebMobile){
+    if(isWebMobile){
         $('#IOSbackerUI').css('display', "block");
 
         $(document).on("touchstart", backerMousedownHandler);
