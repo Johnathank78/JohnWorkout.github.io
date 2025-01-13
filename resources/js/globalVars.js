@@ -756,7 +756,7 @@ $(document).ready(function(){
 
     $("img").attr("draggable", false);
 
-    if(platform == "Mobile" &amp;&amp; mobile == "IOS"){
+    if(platform == "Mobile" && mobile == "IOS"){
         $('.app').css('height', '96%');
         $('.selection_SR_container').css('height', 'calc(93.5vh - 175px)');
         expanderOpenedHeight = "calc(83vh - 65px)";
