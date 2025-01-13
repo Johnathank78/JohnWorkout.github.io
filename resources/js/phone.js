@@ -132,8 +132,8 @@ function backerMouseupHandler(){
     isBacking = false;
     
     $("#IOSbackerUI").css({
-        transition: "clip-path 0.3s ease, -webkit-clip-path 0.3s ease",
-        "-webkit-transition": "clip-path 0.3s ease, -webkit-clip-path 0.3s ease",
+        transition: "clip-path 0.4s ease, -webkit-clip-path 0.4s ease",
+        "-webkit-transition": "clip-path 0.4s ease, -webkit-clip-path 0.4s ease",
     });
 
     const windowH = $(window).innerHeight();

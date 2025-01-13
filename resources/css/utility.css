@@ -13,8 +13,8 @@
     -webkit-clip-path: polygon(0 0, 0 100%, 0 100%);
   
     /* Transition for snap-back */
-    transition: clip-path 0.3s ease, -webkit-clip-path 0.3s ease;
-    -webkit-transition: clip-path 0.3s ease, -webkit-clip-path 0.3s ease;;
+    transition: clip-path 0.4s ease, -webkit-clip-path 0.4s ease;
+    -webkit-transition: clip-path 0.4s ease, -webkit-clip-path 0.4s ease;;
           
     /* So this div doesn't block interaction with the page behind it. */
     pointer-events: none;

@@ -42,6 +42,7 @@
 .main_title{
     font-size: 38px;
     font-weight: 500;
+    cursor: pointer;
 }
 
 .selection_sessionFinished{

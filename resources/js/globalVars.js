@@ -752,17 +752,10 @@ $(document).ready(function(){
     previewIMG = $('#previewIMG').attr('src');
     backArrowIMG = $('#backArrowIMG').attr('src');
     exchangeIMG = $('#exchangeIMG').attr('src');
-    exchangeIMG = $('#linkIMG').attr('src');
+    linkIMG = $('#linkIMG').attr('src');
+    stopIMG = $('#stopIMG').attr('src');
 
     $("img").attr("draggable", false);
-
-    if(platform == "Mobile" && mobile == "IOS"){
-        $('.app').css('height', '96%');
-        $('.selection_SR_container').css('height', 'calc(93.5vh - 175px)');
-        expanderOpenedHeight = "calc(83vh - 65px)";
-    }else{
-        expanderOpenedHeight = "calc(90vh - 65px)";
-    };
     
     /*KONSOLEADD
 
