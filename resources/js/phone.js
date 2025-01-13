@@ -88,7 +88,7 @@ function backerMousedownHandler(e){
         });
 
         $("#backerUIbackArrow").css({
-            top: backerY + "px",
+            top: backerY - Math.floor($("#backerUIbackArrow").height()/2) + "px",
             opacity: 1
         });
     };
@@ -103,10 +103,10 @@ function backerMousemoveHandler(e){
 
     backerX = pointerX;
 
-    const windowH = $(window).height();
+    const windowH = $(window).innerHeight();
 
-    const upperBound = Math.max(0, backerY - Math.round(windowH * 0.40)); 
-    const lowerBound = Math.min(windowH, backerY + Math.round(windowH * 0.40)); 
+    const upperBound = Math.max(0, backerY - Math.round(windowH * 0.30)); 
+    const lowerBound = Math.min(windowH, backerY + Math.round(windowH * 0.30)); 
     
     const highCurveHandleX = Math.min(pointerX, MAX_PULL);
     const highCurveHandleY = backerY;
@@ -121,7 +121,7 @@ function backerMousemoveHandler(e){
     });
 };
 
-function backerMouseupHandler(e){
+function backerMouseupHandler(){
     if (!isBacking) return;
     isBacking = false;
     
@@ -130,7 +130,7 @@ function backerMouseupHandler(e){
         "-webkit-transition": "clip-path 0.3s ease, -webkit-clip-path 0.3s ease",
     });
 
-    const windowH = $(window).height();
+    const windowH = $(window).innerHeight();
 
     const upperBound = Math.max(0, backerY - Math.round(windowH * 0.40)); 
     const lowerBound = Math.min(windowH, backerY + Math.round(windowH * 0.40)); 
@@ -645,13 +645,13 @@ $(document).ready(function(){
         document.addEventListener("visibilitychange", async () => {
             if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
                 isIdle = true;
-                beepPlayer.suspendAudioContext();
-                beep2x3Player.suspendAudioContext();
+                //GHADD_beepPlayer.suspendAudioContext();
+                //GHADD_beep2x3Player.suspendAudioContext();
                 pauseApp();
             }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
                 await resumeApp();
-                beepPlayer.resumeAudioContext();
-                beep2x3Player.resumeAudioContext();
+                //GHADD_beepPlayer.resumeAudioContext();
+                //GHADD_beep2x3Player.resumeAudioContext();
                 isIdle = false;
             };
         });
@@ -665,7 +665,7 @@ $(document).ready(function(){
         };
     });
 
-    if(isStandalonePWA && isWebMobile || true){
+    if(isStandalonePWA && isWebMobile){
         $('#IOSbackerUI').css('display', "block");
 
         $(document).on("touchstart", backerMousedownHandler);
