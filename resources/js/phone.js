@@ -649,13 +649,13 @@ $(document).ready(function(){
         document.addEventListener("visibilitychange", async () => {
             if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
                 isIdle = true;
-                //GHADD_beepPlayer.suspendAudioContext();
-                //GHADD_beep2x3Player.suspendAudioContext();
+                beepPlayer.suspendAudioContext();
+                beep2x3Player.suspendAudioContext();
                 pauseApp();
             }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
                 await resumeApp();
-                //GHADD_beepPlayer.resumeAudioContext();
-                //GHADD_beep2x3Player.resumeAudioContext();
+                beepPlayer.resumeAudioContext();
+                beep2x3Player.resumeAudioContext();
                 isIdle = false;
             };
         });
