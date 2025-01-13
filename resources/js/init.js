@@ -26,9 +26,11 @@ var session_reorder = false; var reminder_reorder = false; var workout_reorder =
 var intervall_reorder = false; var sets_reorder = false;
 
 function isIntruder(){
-    $('.failed').css('display', 'flex');
+    $('.selection_sessionFinished_subPage:not(.failed)').css('display', 'none');
     $('.failed').find('img').attr('src', stopIMG);
 
+    $('.footer').css('display', 'none');
+    
     $('.selection_sessionFinished').css('paddingBottom', '30px');
     $('.selection_sessionFinished_navigator').css('display', 'none');
 
