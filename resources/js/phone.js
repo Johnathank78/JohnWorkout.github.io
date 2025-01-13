@@ -669,7 +669,7 @@ $(document).ready(function(){
         };
     });
 
-    if(isStandalonePWA && isWebMobile || true){
+    if(isStandalonePWA && isWebMobile){
         $('#IOSbackerUI').css('display', "block");
 
         $(document).on("touchstart", backerMousedownHandler);
