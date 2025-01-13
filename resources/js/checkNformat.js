@@ -287,7 +287,7 @@ function unfocusDivs(e){
 $(document).ready(function(){
     if(!isWebMobile){
         $(document).on("mousedown", function(e){
-            if(e.clientX < 15 && isStandalonePWA && isWebMobile){return};
+            if(e.clientX < 15){return};
             unfocusDivs(e);
         }).on("mouseup", function(e){
             if(!$(e.target).is('.lockTouch') && lockState){

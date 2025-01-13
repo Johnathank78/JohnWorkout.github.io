@@ -207,6 +207,7 @@ function intervall(data, from_wo = false){
         iCurrent_cycle = totalCycle;
         currentExoIndexSAV = 0;
     }else{
+        hasReallyStarted = true;
         iActualSet = recovery["varSav"]['iActualSet'];
         iCurrent_cycle = recovery["varSav"]["iCurrent_cycle"];
         currentExoIndexSAV = recovery["varSav"]['currentExoIndex'];
@@ -400,6 +401,7 @@ function intervall(data, from_wo = false){
                 update_timer($(".screensaver_Ltimer"), 5, Ispent);
 
                 if(Ispent == 5){
+                    hasReallyStarted = true;
                     intervall.prepEndProcess();
                 };
             };

@@ -46,6 +46,8 @@ function goBack(platform){
             closePanel('historyNotes');
         }else if(!isXin){
             closePanel("xin");
+        }else if(!hasReallyStarted){
+            quit_session();
         }else{
             current_page = "session_leave";
             showBlurPage("session_exit_confirm");
@@ -68,6 +70,8 @@ function goBack(platform){
 };
 
 function backerMousedownHandler(e){
+    if(current_page == "selection" && !add_state && !timeInputShown && !rotation_state && !statOpened && !calendarState && !isExtraOut){return};
+    
     const clientX = (e.type === "mousedown")
     ? e.clientX
     : e.originalEvent.touches[0].clientX;
@@ -88,7 +92,7 @@ function backerMousedownHandler(e){
         });
 
         $("#backerUIbackArrow").css({
-            top: backerY + "px",
+            top: backerY - Math.floor($("#backerUIbackArrow").height()/2) + "px",
             opacity: 1
         });
     };
@@ -103,10 +107,10 @@ function backerMousemoveHandler(e){
 
     backerX = pointerX;
 
-    const windowH = $(window).height();
+    const windowH = $(window).innerHeight();
 
-    const upperBound = Math.max(0, backerY - Math.round(windowH * 0.40)); 
-    const lowerBound = Math.min(windowH, backerY + Math.round(windowH * 0.40)); 
+    const upperBound = Math.max(0, backerY - Math.round(windowH * 0.30)); 
+    const lowerBound = Math.min(windowH, backerY + Math.round(windowH * 0.30)); 
     
     const highCurveHandleX = Math.min(pointerX, MAX_PULL);
     const highCurveHandleY = backerY;
@@ -121,7 +125,7 @@ function backerMousemoveHandler(e){
     });
 };
 
-function backerMouseupHandler(e){
+function backerMouseupHandler(){
     if (!isBacking) return;
     isBacking = false;
     
@@ -130,7 +134,7 @@ function backerMouseupHandler(e){
         "-webkit-transition": "clip-path 0.3s ease, -webkit-clip-path 0.3s ease",
     });
 
-    const windowH = $(window).height();
+    const windowH = $(window).innerHeight();
 
     const upperBound = Math.max(0, backerY - Math.round(windowH * 0.40)); 
     const lowerBound = Math.min(windowH, backerY + Math.round(windowH * 0.40)); 
@@ -674,6 +678,7 @@ $(document).ready(function(){
 
         $('#IOSbackerUI').on('backed', function(){
             goBack(platform);
+            $("#IOSbackerUI").css({background: darkenColor(hexToRgb(color), 15)});
         });
     }else{
         $('#IOSbackerUI').remove();

@@ -126,7 +126,7 @@ function SHA256(s){
     return binb2hex(core_sha256(str2binb(s), s.length * chrsz));
 };
 
-function hexToRgb(hex) {
+function hexToRgb(hex){
     hex = hex.replace(/^#/, '');
   
     if (hex.length === 3) {
