@@ -1337,6 +1337,17 @@ function changeLanguage(lang, first=false){
     $(".session_btnLabelL").text(textAssets[lang]["misc"]["left"]);
     $(".session_btnLabelR").text(textAssets[lang]["misc"]["right"]);
 
+    $('.session_pastData_title').eq(0).text(textAssets[lang]["inSession"]["pastData"]);
+
+    $('.session_pastData_sideTitle').eq(0).text(textAssets[lang]["misc"]["left"]);
+    $('.session_pastData_sideTitle').eq(1).text(textAssets[lang]["misc"]["right"]);
+
+    if(lang == "french"){
+        $('.session_pastData_sideTitle').css('width', '68px');
+    }else if(lang == "english"){
+        $('.session_pastData_sideTitle').css('width', '53px');
+    };
+
     // Recovery;
 
     $('.selection_recovery_headerText').text(textAssets[lang]["recovery"]["recovery"]);

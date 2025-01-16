@@ -1331,18 +1331,6 @@
     display: none;
 }
 
-.update_schedule_separator{
-    flex-grow: 0;
-    flex-shrink: 0;
-
-    height: 5px;
-    width: 40px;
-
-    opacity: 0.125;
-    background-color: white;
-    border-radius: 999px;
-}
-
 .update_schedule_fline{
     display: flex;
     flex-direction: row;

@@ -213,6 +213,7 @@ const textAssets = {
             "cancel": "Annuler",
             "exitQuestion": "Quitter la séance ?",
             "exitDetails": "Votre progression pourrait être perdue",
+            "pastData": "Données passées",
             "remaining": {
                 "reSets": "Séries restantes",
                 "reReps": "Répétitions restantes",
@@ -555,6 +556,7 @@ const textAssets = {
             "cancel": "Cancel",
             "exitQuestion": "Exit the session ?",
             "exitDetails": "Your progression could be lost",
+            "pastData": "Past data",
             "remaining": {
                 "reSets": "Sets remaining",
                 "reReps": "Reps remaining",

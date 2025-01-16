@@ -330,27 +330,17 @@ function behindExerciseContainer(shown){
         let header_bottomBorder = $('.session_header').offset().top + $(".session_header").outerHeight() + 30;
         let name_bottomBorder = $(".session_current_exercise_name").offset().top + $(".session_current_exercise_name").outerHeight() + 30;
         let specs_bottomBorder = $(".session_current_exercise_specs").offset().top + $(".session_current_exercise_specs").outerHeight() + 30;
-        let specs_before_bottomBorder = $(".session_current_exercise_specs_before").offset().top + $(".session_current_exercise_specs_before").outerHeight() + 15;
         let Lrest_bottomBorder = $(".session_exercise_Lrest_btn").offset().top + $(".session_exercise_Lrest_btn").outerHeight() + 30;
         let Rrest_bottomBorder = $(".session_exercise_Rrest_btn").offset().top + $(".session_exercise_Rrest_btn").outerHeight() + 30;
 
         if(virtualHeight < header_bottomBorder){$('.session_header, .selection_info').css("opacity", "0")};
-
         if(virtualHeight < name_bottomBorder){$(".session_current_exercise_name, .session_workout_extraTimer_container, .session_hint").css("opacity", "0")};
-        if(virtualHeight < specs_bottomBorder){$(".session_current_exercise_specs").css("opacity", "0")};
-        if(virtualHeight < specs_before_bottomBorder){$(".session_current_exercise_specs_before").css("opacity", "0")};
+        if(virtualHeight < specs_bottomBorder){$(".session_current_exercise_specs, .session_specsPastData").css("opacity", "0")};
         if(virtualHeight < Lrest_bottomBorder){$(".session_exercise_Lrest_btn").css("opacity", "0")};
-
-        if(extype == "Uni"){
-            if(virtualHeight < specs_before_bottomBorder){$(".session_current_exercise_specs_before").css("opacity", "0")};
-            if(virtualHeight < Rrest_bottomBorder){$(".session_exercise_Rrest_btn").css("opacity", "0")};
-        }else if(extype == "Bi"){
-            if(virtualHeight < specs_before_bottomBorder){$(".session_current_exercise_specs_before").css("opacity", "0")};
-        };
-
+        if(virtualHeight < Rrest_bottomBorder){$(".session_exercise_Rrest_btn").css("opacity", "0")};
     }else{
-        if(extype == "Pause" || extype == "Int"){
-            $(".session_workout_extraTimer_container, .session_header, .selection_info, .session_workout_extraTimer_container, .session_current_exercise_specs, .session_current_exercise_name").css("opacity", "1");
+        if(extype == "Pause" || extype == "Int."){
+            $(".session_workout_extraTimer_container, .session_header, .selection_info, .session_workout_extraTimer_container, .session_current_exercise_specs, .session_specsPastData, .session_current_exercise_name").css("opacity", "1");
             if(!Ltimer){
                 $('.session_exercise_Lrest_btn').css('opacity', '1');
             }else{
@@ -362,8 +352,8 @@ function behindExerciseContainer(shown){
             }else{
                 $('.session_exercise_Rrest_btn').css('opacity', '.7');
             };
-        }else if(extype == "Uni"){
-            $(".session_workout_extraTimer_container, .session_hint, .session_header, .selection_info, .session_workout_extraTimer_container, .session_current_exercise_specs, .session_current_exercise_name, .session_current_exercise_specs_before").css("opacity", "1");
+        }else if(extype == "Uni."){
+            $(".session_workout_extraTimer_container, .session_hint, .session_header, .selection_info, .session_workout_extraTimer_container, .session_current_exercise_specs, .session_specsPastData, .session_current_exercise_name").css("opacity", "1");
             if(!Ltimer){
                 $('.session_exercise_Lrest_btn').css('opacity', '1');
             }else{
@@ -376,7 +366,7 @@ function behindExerciseContainer(shown){
                 $('.session_exercise_Rrest_btn').css('opacity', '.7');
             };
         }else{
-            $(".session_workout_extraTimer_container, .session_hint, .session_header, .selection_info, .session_workout_extraTimer_container, .session_current_exercise_specs, .session_current_exercise_name, .session_current_exercise_specs_before").css("opacity", "1");
+            $(".session_workout_extraTimer_container, .session_hint, .session_header, .selection_info, .session_workout_extraTimer_container, .session_current_exercise_specs, .session_specsPastData, .session_current_exercise_name").css("opacity", "1");
             if(!Ltimer){
                 $('.session_exercise_Lrest_btn').css('opacity', '1');
             }else{

@@ -1,5 +1,5 @@
 #IOSbackerUI {
-    z-index: 999;
+    z-index: 1001;
     position: fixed;
 
     top: 0;
@@ -36,7 +36,6 @@
 }
 
 .noselect{
-    cursor: default;
     -webkit-touch-callout: none;
         -webkit-user-select: none;
         -khtml-user-select: none;

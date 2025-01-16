@@ -530,13 +530,23 @@
                 </div>
             </div>
 
-            <div class="session_setPreviewBody noselect">
-                <span class="session_setPreviewTitle"></span>
-                <div class="session_setPreviewInfoContainer">
-                    <span class="session_setPreviewInfo"></span>
-                    <span class="session_setPreviewPastInfo"></span>
+            <div class="session_setPreview_container noselect">
+                <div class="session_setPreview_header">
+                    <span class="session_setPreview_title">Past Data</span>
                 </div>
-                <span class="session_setPreviewRest"></span>
+                <div class="session_setPreview_wrapper">
+                    <div class="session_setPreview_side session_setPreview_sideL">
+                        <span class="session_setPreview_sideTitle">Goal</span>
+                        <span class="session_setPreview_sideData">6 x 10kg</span>
+                    </div>
+                    
+                    <div class="session_setPreview_separator"></div>
+                    
+                    <div class="session_setPreview_side session_setPreview_sideR">
+                        <span class="session_setPreview_sideTitle">Past</span>
+                        <span class="session_setPreview_sideData">6 x 10kg</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -907,10 +917,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="session_header_secondRow">
-                    
-                </div>
             </div>
             
             <div class="session_intervall_container noselect">
@@ -956,10 +962,29 @@
                         <div class="session_current_exercise_specs">
                             <input class="strictlyNumeric session_current_exercise_specs_details_inp session_current_exercise_specs_reps resizingInp" type="tel" value="">
                             <span class="session_current_exercise_specs_pause">x</span>
+                            
                             <input class="strictlyFloatable session_current_exercise_specs_details_inp session_current_exercise_specs_weight resizingInp" type="tel" value="">
                             <span class="session_current_exercise_specs_weight_unit"></span>
+
+                            <img src="./resources/imgs/preview.png" alt="" class="session_specsPastData noselect" draggable="false">
+                            <div class="session_pastData_container">
+                                <div class="session_pastData_header">
+                                    <span class="session_pastData_title">Past Data</span>
+                                </div>
+                                <div class="session_pastData_wrapper">
+                                    <div class="session_pastData_side session_pastData_sideL">
+                                        <span class="session_pastData_sideTitle">Left</span>
+                                        <span class="session_pastData_sideData">6 x 10kg</span>
+                                    </div>
+                                    
+                                    <div class="session_pastData_side session_pastData_sideR">
+                                        <span class="session_pastData_sideTitle">Right</span>
+                                        <span class="session_pastData_sideData">6 x 10kg</span>
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <span class="session_current_exercise_specs_before"></span>
                     </div>
     
                     <div class="sessions_rests_container">
@@ -993,7 +1018,7 @@
                         </div>
                     </div>
                     
-                    <button class="selection_round_btn session_workout_next_btn"><img src="./resources/imgs/next.svg" alt="" class="session_workout_next_icon"></button>
+                    <button class="selection_round_btn session_workout_next_btn"><img src="./resources/imgs/next.svg" alt="" class="session_workout_next_icon noselect"></button>
                 </div>
 
             </div>

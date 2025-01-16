@@ -273,6 +273,7 @@ async function quit_session(failed=false){
     $('.lockTouch').css('display', 'none');
     $(".session_exercise_rest_btn_label").css('display', 'none');
     $('.session_undo').css('display', 'none');
+    $('.session_specsPastData').css('display', 'none');
     $(".session_current_exercise_specs").css('display', 'flex');
     $('.session_next_exercise_expander').css("display", "flex");
 

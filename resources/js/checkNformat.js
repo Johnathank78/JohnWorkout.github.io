@@ -159,6 +159,11 @@ function closePanel(src, notAnimated=false){
             }, 200);
 
             break;
+        case "pastData":
+            $(".session_pastData_container").css("display", "none");
+            pastDataShown = false;
+            
+            break;
         default:
             console.warn(`Unknown src: ${src}`);
             break;
@@ -206,7 +211,7 @@ function unfocusDivs(e){
         canNowClick();
     };
 
-    if(notTargeted(e.target, ".session_next_exercises_container, .session_setPreviewBody ") && current_page == "session" && ncState && !$(e.target).is($(".blurBG"))){
+    if(notTargeted(e.target, ".session_next_exercises_container, .session_setPreview_container ") && current_page == "session" && ncState && !$(e.target).is($(".blurBG"))){
         closePanel("expander");
         canNowClick();
     };
@@ -281,6 +286,11 @@ function unfocusDivs(e){
     
     if(notTargeted(e.target, '.selection_page_calendar') && isDatePicking){
         closePanel('datePicker');
+        canNowClick();
+    };
+
+    if(notTargeted(e.target, '.session_pastData_container, .session_specsPastData') && pastDataShown){
+        closePanel('pastData');
         canNowClick();
     };
 };

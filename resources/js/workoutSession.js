@@ -38,6 +38,7 @@ var lastExo = false;
 
 var undoMemory = [];
 var undoCapture = false;
+var pastDataShown = false;
 
 const emptyExoObserver = new MutationObserver(function (mutationList) {
     for (const mutation of mutationList) {
@@ -50,12 +51,16 @@ const emptyExoObserver = new MutationObserver(function (mutationList) {
     };
 });
 
+function getIDFromExoElem(elem){
+    return $(elem).find(".session_exercise_id").text();
+};
+
 function getHint(session, id){
     return session["exoList"].filter(exo => exo["id"] === id).map(exo => exo["hint"])[0];
 };
 
-function updateRestBtnStyle(data){
-    if(data == "Uni."){
+function updateRestBtnStyle(extype){
+    if(extype == "Uni."){
         $('.session_exercise_Lrest_btn, .session_exercise_Rrest_btn').css({
             "display" : 'flex',
             "width" : '130px',
@@ -67,7 +72,7 @@ function updateRestBtnStyle(data){
         $('.rest_react').css("height", 'calc(100% + 20px)');
         
         $(".session_exercise_rest_btn_label").css('display', 'flex');
-    }else if(data == "Reset"){
+    }else if(extype == "Reset"){
         $('.session_exercise_Lrest_btn').css({
             "width" : '150px',
             "height": '55px',
@@ -77,13 +82,53 @@ function updateRestBtnStyle(data){
         
         $('.rest_react').css("height", '100%');
         $(".session_exercise_rest_btn_label").css('display', 'none');
-    }else if(data == "end"){
+    }else if(extype == "end"){
         $('.session_exercise_Lrest_btn, .session_exercise_Rrest_btn').css({
             "width" : '150px',
             "height": '55px',
             "border-bottom-right-radius": "8px",
             "border-bottom-left-radius": "8px"
         });
+    };
+};
+
+function updatePastDataStyle(extype){
+    $('.session_pastData_side').css('display', 'flex');
+
+    if(extype == "Uni."){
+        $('.session_pastData_side').eq(0).find('.session_pastData_sideTitle').css('display', 'block');
+        $('.session_pastData_side').eq(0).find('.session_pastData_sideData').css('border-radius', '0 8px 8px 0');
+    }else{
+        $('.session_pastData_side').eq(0).find('.session_pastData_sideTitle').css('display', 'none');
+        $('.session_pastData_side').eq(0).find('.session_pastData_sideData').css('border-radius', '8px');
+        $('.session_pastData_side').eq(1).css('display', 'none');
+    };
+};
+
+function updateSetPreviewStyle(extype, isPast=false){
+    $('.session_setPreview_side').css('display', 'flex');
+    $('.session_setPreview_separator').css('display', isPast ? 'block' : 'none');
+
+    if(extype == "Int."){
+        $('.session_setPreview_side').eq(0).find('.session_setPreview_sideTitle').css('display', 'block');
+        $('.session_setPreview_side').eq(0).find('.session_setPreview_sideData').css('border-radius', '0 8px 8px 0');
+
+        $('.session_setPreview_sideTitle').eq(0).text("Work");
+        $('.session_setPreview_sideTitle').eq(1).text("Rest");
+
+        $('.session_setPreview_side').eq(1).css('display', 'flex');
+    }else if(extype == "Pause" || !isPast){
+        $('.session_setPreview_side').eq(0).find('.session_setPreview_sideTitle').css('display', 'none');
+        $('.session_setPreview_side').eq(0).find('.session_setPreview_sideData').css('border-radius', '8px');
+        $('.session_setPreview_side').eq(1).css('display', 'none');
+    }else if(extype == "Uni." || extype == "Bi."){
+        $('.session_setPreview_side').eq(0).find('.session_setPreview_sideTitle').css('display', 'block');
+        $('.session_setPreview_side').eq(0).find('.session_setPreview_sideData').css('border-radius', '0 8px 8px 0');
+
+        $('.session_setPreview_sideTitle').eq(0).text("Goal");
+        $('.session_setPreview_sideTitle').eq(1).text("Past");
+
+        $('.session_setPreview_side').eq(1).css('display', 'flex');
     };
 };
 
@@ -892,32 +937,20 @@ async function next_exercise(first){
     };
 };
 
-function getIntervallSpecs(nextExo, isBreak=false){
-    let intervallData = JSON.parse($(nextExo).find(".session_next_exercise_intervallData").text());
-    
-    let out = false;
-    let workRest = [0, 0];
+function getIntervallSpecs(id){
+    let intervallData = current_session["exoList"][getExoIndexById(current_session, id)]["exoList"];
+    let workRest = {"work": 0, "rest": 0};
 
     intervallData.forEach(exo => {
         if(exo["type"] == "Int."){
-            workRest[0] += (exo["cycle"] * time_unstring(exo["work"]));
-            workRest[1] += (exo["cycle"] - 1) * time_unstring(exo["rest"]);
+            workRest["work"] += (exo["cycle"] * time_unstring(exo["work"]));
+            workRest["rest"] += (exo["cycle"] - 1) * time_unstring(exo["rest"]);
         }else if(exo["type"] == "Pause"){
-            workRest[1] += time_unstring(exo["rest"]);
+            workRest["rest"] += time_unstring(exo["rest"]);
         };
     });
 
-    if(workRest[1] > 0){
-        out = "Work : " + get_time_u(workRest[0]) + "\n" + "Rest : " + get_time_u(workRest[1]);
-    }else{
-        out = "Work : " + get_time_u(workRest[0]);
-    };
-
-    if(isBreak){
-        return textAssets[parameters["language"]]["inSession"]["next"] + " : \n" + out;
-    }else{
-        return out;
-    };
+    return workRest;
 };
 
 function update_info_vars(index = 0){
@@ -931,7 +964,7 @@ function update_info_vars(index = 0){
         next_specs = [0, 0];
         next_rest = 0;
 
-        $(".session_current_exercise_specs, .session_current_exercise_specs_before").css('display', 'none');
+        $(".session_current_exercise_specs, .session_specsPastData").css('display', 'none');
     }else{
         $(".session_current_exercise_specs").css('display', 'flex');
     };
@@ -958,7 +991,15 @@ function update_info_vars(index = 0){
 
         intervallData = JSON.parse($(nextExo).find(".session_next_exercise_intervallData").text());
         next_name = $(nextExo).find(".session_next_exercise_name").eq(0).text();
-        next_specs = getIntervallSpecs(nextExo);
+
+        let intervallSpecs = getIntervallSpecs(getIDFromExoElem(nextExo));
+        next_specs = "";
+
+        if(intervallSpecs["rest"] > 0){
+            next_specs = "Work : " + get_time_u(intervallSpecs["work"]) + "\n" + "Rest : " + get_time_u(intervallSpecs["rest"]);
+        }else{
+            next_specs = "Work : " + get_time_u(intervallSpecs["work"]);
+        };
     }else if (extype == "Pause"){
         let adjacentExo = $('.session_next_exercise').eq(index + 1);
         actual_setNb = 0;
@@ -970,7 +1011,14 @@ function update_info_vars(index = 0){
 
         if($(".session_next_exercise_name").length != 1){   
             if($(adjacentExo).find(".session_next_exerciseType").eq(0).text() == "Int.") {
-                next_specs = getIntervallSpecs(adjacentExo, false); // true
+                let intervallSpecs = getIntervallSpecs(getIDFromExoElem(adjacentExo));
+                next_specs = "";
+
+                if(intervallSpecs["rest"] > 0){
+                    next_specs = "Work : " + get_time_u(intervallSpecs["work"]) + "\n" + "Rest : " + get_time_u(intervallSpecs["rest"]);
+                }else{
+                    next_specs = "Work : " + get_time_u(intervallSpecs["work"]);
+                };
             }else{
                 next_specs = textAssets[parameters["language"]]["inSession"]["next"] + " : " + unitRound($(".session_next_exercise_weight").eq(0).text()) + parameters["weightUnit"];
             };
@@ -984,7 +1032,7 @@ function update_specs(reps, weight){
     if(extype == "Pause" || extype == "Int."){
         $('.session_current_exercise_specs_details_inp, .session_current_exercise_specs_details_inp, .session_current_exercise_specs_weight_unit').css("display", "none");
         $('.session_current_exercise_specs_pause').text(next_specs);
-        $(".session_current_exercise_specs_before").css("display", 'none');
+        $(".session_current_exercise_specs_before, .session_specsPastData").css("display", 'none');
     }else{
         $('.session_current_exercise_specs_details_inp, .session_current_exercise_specs_details_inp, .session_current_exercise_specs_weight_unit').css("display", "inline-block");
         $(".session_current_exercise_specs_reps").val(reps);
@@ -994,12 +1042,12 @@ function update_specs(reps, weight){
     };
 };
 
-function display_info(){
+function display_info(past_data = true){
     $(".session_current_exercise_name").text(next_name);
     update_hint();
     update_specs(next_specs[0], next_specs[1]);
 
-    if(extype != "Int."){update_pastData()};
+    if(extype != "Int." && past_data){update_pastData()};
 
     $(".session_next_exercises_container").animateFullScrollUp(
         parseInt($('.session_next_exercises_container').scrollTop())/1600*1350
@@ -1013,7 +1061,7 @@ function update_info(update=false){
     check_lastSet();
 
     if(extype == "Wrm."){
-        $(".session_current_exercise_specs, .session_current_exercise_specs_before").css('display', 'none');
+        $(".session_current_exercise_specs, .session_current_exercise_specs_before, .session_specsPastData").css('display', 'none');
     }else{
         $(".session_current_exercise_specs").css('display', 'flex');
     };
@@ -1023,69 +1071,63 @@ function update_info(update=false){
 
 };
 
-function update_pastData(){
+function getPastData(extype, id, actual_set){
+    if(['Bi.', 'Uni.'].includes(extype)){
+        historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), id);
+
+        if(historyIndex != -1){
+            past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
+
+            if(past_data["setList"].length > actual_set && past_data["setList"][actual_set]["reps"] != 0){
+                return past_data["setList"][actual_set]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_set]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"];
+            }else{
+                return false;
+            };
+        };
+    };
+
+    return false;
+};
+
+function update_pastData(exoIndex = 0){
     if(current_history["historyList"].length > 0){
-        let out = "";   
+        updatePastDataStyle(extype);
+
+        let result = false;
+        let filled = false;
+        let id = $('.session_next_exercise').eq(exoIndex).find('.session_next_exercise_set').eq(0).find('.session_exercise_id').text();
+
+        if($('.session_next_exercise').eq(exoIndex).children().lenght == 0 || next_id != id && exoIndex == 0){
+            id = next_id;
+        };
 
         if(extype == "Uni."){
-            historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id+"_1");
-            if(historyIndex != -1){
-                past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
-                if(past_data["setList"].length > actual_setL && past_data["setList"][actual_setL]["reps"] != 0){
-                    $(".session_current_exercise_specs_before").css("display", 'block');
-                    out += "[" + textAssets[parameters["language"]]["misc"]["leftInitial"] + " : "+past_data["setList"][actual_setL]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setL]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"];
-                    $(".session_current_exercise_specs_before").text(out);
-                }else{
-                    if(!out.includes(textAssets[parameters["language"]]["misc"]["rightInitial"]+" :")){
-                        $(".session_current_exercise_specs_before").css("display", 'none');
-                    };
-                };
+
+            result = getPastData(extype, id+"_1", actual_setL);
+            if(result){
+                $(".session_specsPastData").css("display", 'block');
+                $('.session_pastData_side').eq(0).find('.session_pastData_sideData').text(result);
+                filled = true;
             }else{
-                if(!out.includes(textAssets[parameters["language"]]["misc"]["rightInitial"]+" :")){
-                    $(".session_current_exercise_specs_before").css("display", 'none');
-                };
+                $('.session_pastData_side').eq(0).css('display', 'none');
             };
 
             //----- R -----//;
 
-            historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id+"_2");
-            if(historyIndex != -1){
-                past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
-                if(past_data["setList"].length > actual_setR && past_data["setList"][actual_setR]["reps"] != 0){
-                    $(".session_current_exercise_specs_before").css("display", 'block');
-                    if(out != ""){
-                        $(".session_current_exercise_specs_before").text(out + " | "+textAssets[parameters["language"]]["misc"]["rightInitial"]+" : "+past_data["setList"][actual_setR]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setR]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
-                    }else{
-                        $(".session_current_exercise_specs_before").text(out + "["+textAssets[parameters["language"]]["misc"]["rightInitial"]+" : "+past_data["setList"][actual_setR]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setR]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
-                    };
-
-                }else{
-                    if(!out.includes(textAssets[parameters["language"]]["misc"]["leftInitial"] + " :")){
-                        $(".session_current_exercise_specs_before").css("display", 'none');
-                    }else{
-                        $(".session_current_exercise_specs_before").text(out + " ]");
-                    };
-                };
+            result = getPastData(extype, id+"_2", actual_setR);
+            if(result){
+                $(".session_specsPastData").css("display", 'block');
+                $('.session_pastData_side').eq(1).find('.session_pastData_sideData').text(result);
+                filled = true;
             }else{
-                if(!out.includes(textAssets[parameters["language"]]["misc"]["leftInitial"] + " :")){
-                    $(".session_current_exercise_specs_before").css("display", 'none');
-                }else{
-                    $(".session_current_exercise_specs_before").text(out + " ]");
-                };
-            };
+                $('.session_pastData_side').eq(1).css('display', 'none');
+            }
 
         }else if(extype == "Bi."){
-            historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), next_id);
-            if(historyIndex != -1){
-                past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
-                if(past_data["setList"].length > actual_setL && past_data["setList"][actual_setL]["reps"] != 0){
-                    $(".session_current_exercise_specs_before").css("display", 'block');
-                    $(".session_current_exercise_specs_before").text("[ "+past_data["setList"][actual_setL]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_setL]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
-                }else{
-                    $(".session_current_exercise_specs_before").css("display", 'none');
-                };
-            }else{
-                $(".session_current_exercise_specs_before").css("display", 'none');
+            result = getPastData(extype, id, actual_setL);
+            if(result){
+                $(".session_specsPastData").css("display", 'block');
+                $('.session_pastData_side').eq(0).find('.session_pastData_sideData').text(result);
             };
         };
     };
@@ -1899,8 +1941,10 @@ $(document).ready(function(){
             }else{
                 if($($('.session_next_exercise_type')[1]).text() == "Pause"){
                     update_info_vars(2);
-                    update_pastData();
-                    display_info();
+                    update_pastData(2);
+
+                    display_info(false);
+
                     await Promise.all([
                         dropExo_animated($(".session_next_bigExercise")[0]),
                         dropExo_animated($(".session_next_bigExercise")[1])
@@ -1909,9 +1953,12 @@ $(document).ready(function(){
                     if($($('.session_next_exercise_type')[1]).text() == "Wrm."){
                         $('.Lrest').text(textAssets[parameters["language"]]["inSession"]["next"]);
                     };
+
                     update_info_vars(1);
-                    update_pastData();
-                    display_info();
+                    update_pastData(1);
+
+                    display_info(false);
+
                     await dropExo_animated($(".session_next_bigExercise")[0]);
                 };
 
@@ -1937,6 +1984,19 @@ $(document).ready(function(){
         };
         
         canSkip = true;
+    });
+
+    // PAST DATA
+
+    $('.session_specsPastData').on('click', function(){
+        if(!pastDataShown){
+            cannotClick = "pastData";
+
+            pastDataShown = true;
+            $(".session_pastData_container").css("display", "flex");
+        }else{
+            closePanel("pastData");
+        };
     });
 
     // LONGCLICKED;
@@ -2038,16 +2098,18 @@ $(document).ready(function(){
         if(cannotClick && !isAbleToClick("expander")){return};
 
         let id = $(this).find(".session_exercise_id").text();
+        
         let name = $(this).find(".session_next_exercise_name").text();
         if(name == textAssets[parameters["language"]]["inSession"]["noMore"]){return};
         
-        let side = false;
-
         if(name.includes(' - G') || name.includes(' - L')){
-            side = "_1"
+            id += "_1"
         }else if(name.includes(' - D') || name.includes(' - R')){
-            side = "_2"
+            id += "_2"
         };
+
+        let past = false;
+        let actual_set = false;
 
         let extype = $(this).find(".session_next_exerciseType").text();
         let reps = $(this).find(".session_next_exercise_reps").text();
@@ -2055,52 +2117,31 @@ $(document).ready(function(){
         let rest = $(this).find(".session_next_exercise_rest").text();
 
         isSetPreviewing = true;
+        $(".session_setPreview_title").text(name);
 
         if(extype == "Pause"){
-            $(".session_setPreviewRest").css('display', 'inline-block');
-            $(".session_setPreviewInfoContainer").css("display", 'none');
-
-            $(".session_setPreviewTitle").text(name);
-            $(".session_setPreviewRest").text(get_time(rest));
+            $(".session_setPreview_sideData").eq(0).text(get_time(rest));
         }else if(extype == "Int."){
-            $(".session_setPreviewInfo").css("display", 'flex');
-            $(".session_setPreviewRest").css("display", 'none');
-            $(".session_setPreviewTitle").text(name);
-            $(".session_setPreviewInfo").text($(this).find(".session_next_exercise_cycle").text() + " x " + get_time_u($(this).find(".session_next_exercise_work").text()) + " x " + get_time_u($(this).find(".session_next_exercise_rest").text()));
+            let intervallSpecs = getIntervallSpecs(id);
+            $(".session_setPreview_sideData").eq(0).text(get_time_u(intervallSpecs['work']));
+            $(".session_setPreview_sideData").eq(1).text(get_time_u(intervallSpecs['rest']));
         }else if(extype == "Bi." || extype == "Uni."){
-            $(".session_setPreviewInfoContainer, .session_setPreviewInfo").css("display", 'flex');
-            $(".session_setPreviewRest").css('display', 'none');
+            actual_set = parseInt($(this).find(".session_setPreviewId").text());
+            past = getPastData(extype, id, actual_set);
 
-            let actual_set = parseInt($(this).find(".session_setPreviewId").text());
+            $(".session_setPreview_title").text(name);
+            $(".session_setPreview_sideData").eq(0).text(reps + " x " + weight + parameters["weightUnit"]);
 
-            $(".session_setPreviewTitle").text(name);
-            $(".session_setPreviewInfo").text(reps + " x " + weight + parameters["weightUnit"]);
-
-            if(current_history["historyList"].length > 0){
-                if(extype == "Bi."){
-                    historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), id);
-                }else{
-                    historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), id+side);
-                };
-
-                if(historyIndex != -1){
-                    past_data = getLastHistoryDay(current_history)["exoList"][historyIndex];
-                    if(past_data["setList"].length > actual_set && past_data["setList"][actual_set]["reps"] != 0){
-                        $(".session_setPreviewPastInfo").css("display", 'inline-block');
-                        $(".session_setPreviewPastInfo").text("[ "+past_data["setList"][actual_set]["reps"]+" x "+unitRound(convertToUnit(past_data["setList"][actual_set]["weight"], past_data["expectedStats"]["weightUnit"], parameters["weightUnit"]))+parameters["weightUnit"]+" ]");
-                    }else{
-                        $(".session_setPreviewPastInfo").css("display", 'none');
-                    };
-                }else{
-                    $(".session_setPreviewPastInfo").css("display", 'none');
-                };
-            };
-        }else if(extype == "Wrm."){
-            $(".session_setPreviewTitle").text(name);
-            $('.session_setPreviewInfo, .session_setPreviewInfoContainer, .session_setPreviewRest').css('display', 'none')
+            if(past){$(".session_setPreview_sideData").eq(1).text(past)};
         }; 
 
-        showBlurPage('session_setPreviewBody');
+        if(extype != "Wrm."){
+            updateSetPreviewStyle(extype, past != false);
+            showBlurPage('session_setPreview_container');
+        }else{
+            canNowClick("allowed");
+        };
+
     });
 
     $(document).on("click", ".session_next_exercise_expander", function(e){
