@@ -214,12 +214,12 @@ function generateHistorySetObj({type, reps, weight, work, rest}){
 
 //NOTIF
 
-function generateNotifObj({scheduleData, dateList, jumpData}){
+function generateNotifObj({scheduleData, dateList, jumpData, occurence = 1}){
     return {
         "scheduleData": scheduleData,
         "dateList": dateList,
         "jumpData": jumpData,
-        "occurence": 1
+        "occurence": occurence
     };
 };
 

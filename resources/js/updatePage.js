@@ -1063,7 +1063,7 @@ $(document).ready(function(){
         }else if(current_page == "schedule"){
             let toHashString = isScheduled(update_current_item);
             let beforeUpdateHash = SHA256(JSON.stringify(toHashString));
-
+            
             let inp_list = $(".update_schedule_input");
             let scheme = $(".update_schedule_select_every").val();
 
@@ -1092,6 +1092,7 @@ $(document).ready(function(){
                 
                 let title = $('.update_data_name').val() + " | " + hours+":"+minutes;
                 let totaltime = false; let body = false;
+                let occurence = isScheduled(update_current_item) ? update_current_item["notif"]["occurence"] : 1;
 
                 if(reminderOrSession == "session"){
                     totaltime = get_time(get_session_time(update_current_item));
@@ -1100,7 +1101,7 @@ $(document).ready(function(){
                     body = update_current_item["body"];
                 };
 
-                let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
+                let toSubstract = time_unstring(parameters['notifBefore']) * 1000;
 
                 let id = 0;
                 let firston = 0;
@@ -1115,7 +1116,6 @@ $(document).ready(function(){
                     id = "1" + update_current_item['id'] + "1";
 
                     date = setHoursMinutes(date, hours, minutes);
-
                     firston = date.getTime() - toSubstract;
 
                     if(firston - 5000 > Date.now()){
@@ -1142,13 +1142,14 @@ $(document).ready(function(){
                         "jumpVal" : jumpVal, 
                         "everyVal" : everyVal
                     })
-
+                    
                     notifJson = generateNotifObj({
                         "scheduleData": scheduleData,
                         "dateList": [date.getTime()],
                         "jumpData": jumpData,
-                        "occurence": 1
+                        "occurence": occurence
                     });
+
                 }else if(scheme == "Week"){
                     let selectedTS = [];
                     let idy = update_current_item['id'];
@@ -1193,7 +1194,7 @@ $(document).ready(function(){
                         "scheduleData": scheduleData,
                         "dateList": selectedTS,
                         "jumpData": jumpData,
-                        "occurence": 1
+                        "occurence": occurence
                     });
                 };
 
@@ -1220,7 +1221,6 @@ $(document).ready(function(){
                 };
 
                 if(reminderOrSession == "session"){hasBeenShifted["data"][update_current_item["id"]] = false};
-
             }else{
                 return;
             };
