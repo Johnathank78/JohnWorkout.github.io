@@ -203,21 +203,23 @@ $(document).ready(function(){
     });
 
     $(document).on("click", '.info_icon', function(){
-        try {
-            if(!isAbleToClick("stat")){return};
-    
-            if(statOpened){
-                closePanel("stat");
-                canNowClick("allowed");
-            }else{
-                cannotClick = "stat";
-                statOpened = true;
-    
-                $('.selection_info_page').css("display", "flex");
-            };
-        } catch (error) {
-            console.error(error);
-        }
+        console.log(!isAbleToClick("stat"));
+        console.log(cannotClick);
+
+        if(!isAbleToClick("stat")){return};
+
+        console.log('passed');
+        console.log(statOpened)
+
+        if(statOpened){
+            closePanel("stat");
+            canNowClick("allowed");
+        }else{
+            cannotClick = "stat";
+            statOpened = true;
+
+            $('.selection_info_page').css("display", "flex");
+        };
     });
 
     // MAIN BTNS;
