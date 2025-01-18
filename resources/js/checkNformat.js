@@ -191,7 +191,7 @@ function notTargeted(target, classs){
 function unfocusDivs(e){
     if($(e.target).is(".IOSbacker")){return};
 
-    if(notTargeted(e.target, ".selection_info_page, .selection_info") && statOpened && (current_page == "selection" || current_page == "session")){
+    if(notTargeted(e.target, ".selection_info_page, .info_icon") && statOpened && (current_page == "selection" || current_page == "session")){
         closePanel("stat");
         canNowClick();
     };

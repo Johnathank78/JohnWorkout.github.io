@@ -203,13 +203,7 @@ $(document).ready(function(){
     });
 
     $(document).on("click", '.info_icon', function(){
-        console.log(!isAbleToClick("stat"));
-        console.log(cannotClick);
-
         if(!isAbleToClick("stat")){return};
-
-        console.log('passed');
-        console.log(statOpened)
 
         if(statOpened){
             closePanel("stat");
