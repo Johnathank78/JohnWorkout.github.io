@@ -1784,23 +1784,23 @@ $(document).ready(function(){
     
     $(".session_exercise_Lrest_btn").on("click", function(){
         if(LrestLongClicked){LrestLongClicked = false; return};
-        if(LinputShown || cannotClick || isDeleting){return};
+        if(LinputShown || cannotClick || isDeleting || Ltimer || Ldone){return};
 
-        if(hasStarted){undoMemorise('in')};
-
-        if(hasStarted && !hasReallyStarted){
-            hasReallyStarted = true;
+        if(hasStarted){
+            undoMemorise('in');
             $('.session_undo').css('display', 'block');
-        };  
+        };
+
+        if(hasStarted && !hasReallyStarted && extype != "Wrm."){hasReallyStarted = true};  
 
         if(!hasStarted){
             startWorkout();
         }else if(beforeExercise){
             next_exercise(false);
-        }else if((extype == "Bi." || extype == "Uni." && !Ldone) && !Ltimer){
+        }else if(extype == "Bi." || extype == "Uni."){
             //STATS UPDATE;
 
-            if(extype != "Pause" && extype != "Int." && !Ltimer){
+            if(extype != "Pause" && extype != "Int."){
                 next_specs[0] = parseInt($(".session_current_exercise_specs_reps").val());
                 next_specs[1] = parseFloat($(".session_current_exercise_specs_weight").val());
 
@@ -1849,7 +1849,7 @@ $(document).ready(function(){
                 $(".session_workout_remaining_sets").text(remaining_sets);
 
                 next_exercise(true);
-            }else if(!Ltimer){
+            }else{
                 timerLaunch("L");
             };
         }else if(extype == "Int."){
@@ -1870,18 +1870,16 @@ $(document).ready(function(){
 
     $(".session_exercise_Rrest_btn").on("click", function(){
         if(RrestLongClicked){RrestLongClicked = false; return};
-        if(RinputShown || cannotClick || isDeleting){return};
+        if(RinputShown || cannotClick || isDeleting || Rtimer || Rdone){return};
 
-        if(hasStarted){undoMemorise('in')};
-
-        if(hasStarted && !hasReallyStarted){
-            hasReallyStarted = true;
+        if(hasStarted){
+            undoMemorise('in');
             $('.session_undo').css('display', 'block');
         };
 
-        if(!Rtimer && !Rdone){
-            //STATS UPDATE;
+        if(hasStarted && !hasReallyStarted && extype != "Wrm."){hasReallyStarted = true};
 
+        if(extype == 'Uni.'){
             next_specs[0] = parseInt($(".session_current_exercise_specs_reps").val());
             next_specs[1] = parseFloat($(".session_current_exercise_specs_weight").val());
 
@@ -1909,7 +1907,7 @@ $(document).ready(function(){
         }else if(next_exo){
             next_exo = false;
             next_exercise(true);
-        }else if(!Rtimer){
+        }else{
             timerLaunch("R");
         };
     });

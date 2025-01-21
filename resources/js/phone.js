@@ -3,6 +3,7 @@ const MAX_PULL = 30;
 let isBacking = false;
 var backerY = 0;
 var backerX = 0;
+var wasLocked = false;
 
 var backgroundTimestamp = 0;
 var currentSide = "";
@@ -38,6 +39,8 @@ function goBack(platform){
             closePanel('stat');
         }else if(isSaving && !lockState){
             screensaver_toggle(false);
+        }else if(pastDataShown){
+            closePanel('pastData');
         }else if(isSetPreviewing){
             closePanel('setPreview');
         }else if(isSetPreviewingHint){
@@ -434,10 +437,19 @@ $(document).ready(function(){
             if(state.isActive && ongoing && (hasStarted || sIntervall)){
                 await resumeApp();
                 isIdle = false;
+
+                if(wasLocked){keepAwakeToggle(true)};
             }else if(!state.isActive && ongoing && (hasStarted || sIntervall)){
                 const pauseProcess = await BackgroundTask.beforeExit(async () => {
     
                     isIdle = true;
+
+                    if(wakeLock){
+                        wasLocked = true;
+                        keepAwakeToggle(false);
+                    }else{
+                        wasLocked = false;
+                    };
     
                     let start = false;
                     let title = false;

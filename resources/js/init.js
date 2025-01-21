@@ -91,7 +91,7 @@ $(document).ready(async function(){
         };
     
         if(isStandalonePWA && isWebMobile){
-            //window.screen.orientation.lock('portrait');
+            window.screen.orientation.lock('portrait');
             $(".selection_SR_container").css('height', 'calc(100vh - 170px)');
             $('.footer').css('height', '40px');
             $('.app').css('height', 'calc(100% - 40px)');

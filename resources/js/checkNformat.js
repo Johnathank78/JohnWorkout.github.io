@@ -282,6 +282,7 @@ function unfocusDivs(e){
 
     if(notTargeted(e.target, '.update_colorChooserUI') && colorPickerShown){
         closePanel('colorPicker');
+        canNowClick();
     };
     
     if(notTargeted(e.target, '.selection_page_calendar') && isDatePicking){
