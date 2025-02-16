@@ -366,66 +366,119 @@ $(document).ready(function(){
         };
     });
 
-    $(document).on("keyup", '.strictlyNumeric, .strictlyFloatable, .update_schedule_input_hours, .update_schedule_input_minutes, .timeString', function(e){
+    $(document).on("keydown", ".strictlyNumeric", function (e) {
+        let allowedKeys = [..."0123456789", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
 
-        function deleteFromStr(str1, pos){
-            tweaked = true;
-            return str1.slice(0, pos) + str1.slice(pos + 1);
-        };
+        if (!allowedKeys.includes(e.key)) {
+            e.preventDefault();
+        }
+    });
 
-        let previous_state = false;
-        if($(this).data('val') === undefined){
-            previous_state = $(this).val();
-            $(this).data('val', previous_state);
-        }else{
-            previous_state = $(this).data('val');
-        };
+    $(document).on("keydown", ".strictlyFloatable", function (e) {
+        let allowedKeys = [..."0123456789.", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
+        
+        // Prevent multiple dots
+        if (e.key === "." && $(this).val().includes(".")) {
+            e.preventDefault();
+        }
 
-        let actual_state = $(this).val();
-        let diff = findDifferentCharacter(previous_state, actual_state);
-        let tweaked = false;
+        if (!allowedKeys.includes(e.key)) {
+            e.preventDefault();
+        }
+    });
 
-        if(diff){
-            let txt = diff.value;
-            let pos = diff.position;
+    $(document).on("keydown", ".update_schedule_input_hours", function (e) {
+        let allowedKeys = [..."0123456789", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
+        let val = $(this).val();
+    
+        // Prevent non-numeric input
+        if (!allowedKeys.includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
+    
+        // Prevent more than 2 characters
+        if (val.length >= 2 && !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
+    
+        // Ensure valid hour range (00-23)
+        if (val.length === 1) {
+            if (val === "2" && !["0", "1", "2", "3", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(e.key)) {
+                e.preventDefault();
+            }
+        }
 
-            if($(this).is(".strictlyNumeric")){
-                if(!txt.match(/[0-9]/)){
-                    $(this).val(deleteFromStr(actual_state, pos));
-                };
-            };
+        if (val.length === 0 && !["0", "1", "2", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
+    
+    $(document).on("keydown", ".update_schedule_input_minutes", function (e) {
+        let allowedKeys = [..."0123456789", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
+        let val = $(this).val();
+    
+        // Prevent non-numeric input
+        if (!allowedKeys.includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
+    
+        // Prevent more than 2 characters
+        if (val.length >= 2 && !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
+    
+        // Ensure valid minute range (00-59)
+        if (val.length === 0 && !["0", "1", "2", "3", "4", "5", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(e.key)) {
+            e.preventDefault();
+        }
+    });
 
-            if($(this).is(".strictlyFloatable")){
-                if(!txt.match(/[0-9.]/)){
-                    $(this).val(deleteFromStr(actual_state, pos));
-                };
-            };
+    $(document).on("keydown", ".timeString", function (e) {
+        let allowedNumbers = "0123456789";
+        let allowedLetters = "ywdhms";
+        let allowedKeys = ["Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
 
-            if($(this).is(".update_schedule_input_hours, .update_schedule_input_minutes")){
-                if(actual_state.length == 3){
-                    $(this).val(deleteFromStr(actual_state, pos));
-                };
-            };
+        let unitOrder = ["y", "w", "d", "h", "m", "s"]; // Order from largest to smallest
+        let currentValue = $(this).val();
+        let lastChar = currentValue.slice(-1);
+        let existingLetters = currentValue.match(/[ywdhms]/g) || [];
+        let lastUsedUnit = existingLetters.length ? existingLetters[existingLetters.length - 1] : null;
 
-            if($(this).is(".timeString")){
-                let previous = actual_state[pos - 1];
+        // Prevent any input after "s"
+        if (existingLetters.includes("s") && !allowedKeys.includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
 
-                if((isNaN(previous) || previous == "") && txt.match(/[ywdhms]/)){
-                    $(this).val(deleteFromStr(actual_state, pos));
-                };
+        // Allow numbers and control keys
+        if (allowedNumbers.includes(e.key) || allowedKeys.includes(e.key)) {
+            return;
+        }
 
-                if(txt.match(/[ywdhms]/) && previous_state.includes(txt)){
-                    $(this).val(deleteFromStr(actual_state, pos));
-                };
+        // Prevent duplicate time units
+        if (existingLetters.includes(e.key)) {
+            e.preventDefault();
+            return;
+        }
 
-                if(!txt.match(/[0123456789ywdhms]/)){
-                    $(this).val(deleteFromStr(actual_state, pos));
-                };
-            };
+        // Prevent consecutive letters (must have a number before a letter)
+        if (allowedLetters.includes(e.key) && allowedLetters.includes(lastChar)) {
+            e.preventDefault();
+            return;
+        }
 
-            if(tweaked){this.setSelectionRange(pos, pos)};
-        };
-
-        $(this).data('val', $(this).val());
+        // Enforce correct order based on last used unit
+        if (allowedLetters.includes(e.key)) {
+            if (lastUsedUnit && unitOrder.indexOf(e.key) <= unitOrder.indexOf(lastUsedUnit)) {
+                e.preventDefault();
+                return;
+            }
+        } else {
+            e.preventDefault();
+        }
     });
 });//readyEnd

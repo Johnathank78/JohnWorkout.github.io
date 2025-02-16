@@ -728,6 +728,7 @@ const textAssets = {
 };
 
 var expanderOpenedHeight = false;
+var expanderClosedHeight = false;
 var current_page = "selection";
 
 var color = dark_blue; 
