@@ -900,7 +900,7 @@
 }
 
 .selection_session_name{
-    z-index: -1;
+    z-index: 0;
     position: absolute;
 
     top: 12px;
@@ -911,7 +911,7 @@
 }
 
 .selection_reminder_name{
-    z-index: -1;
+    z-index: 0;
     position: absolute;
 
     top: 50%;
@@ -924,7 +924,7 @@
 }
 
 .selection_session_details{
-    z-index: -1;
+    z-index: 0;
     position: relative;
 
     margin-right: 8px;
@@ -954,7 +954,7 @@
 
 
 .selection_session_tile_hider{
-    z-index: -1;
+    z-index: 0;
     position: absolute;
 
     width: 245px;
