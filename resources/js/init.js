@@ -100,9 +100,9 @@ $(document).ready(async function(){
         if(platform == "Mobile" && mobile == "IOS"){
             $('.app').css('height', '96%');
             $('.selection_SR_container').css('height', 'calc(93.5vh - 175px)');
-            expanderOpenedHeight = "calc(81vh - 65px)";
+            expanderOpenedHeight = "calc(83vh - 65px)";
         }else{
-            expanderOpenedHeight = "calc(90vh - 65px)";
+            expanderOpenedHeight = "calc(86vh - 65px)";
         };
 
         expanderClosedHeight = $('.selection_SR_container').css('height');
