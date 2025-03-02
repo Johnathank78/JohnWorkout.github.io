@@ -159,7 +159,7 @@
                         <div class="timeSelectorBtn timeSelectorBtn_up noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
                         </div>
-                        <input type="tel" value="0" class="timeSelectorInput strictlyNumeric">
+                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric">
                         <div class="timeSelectorBtn timeSelectorBtn_down noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
                         </div>
@@ -169,7 +169,7 @@
                         <div class="timeSelectorBtn timeSelectorBtn_up noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
                         </div>
-                        <input type="tel" value="0" class="timeSelectorInput strictlyNumeric">
+                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric">
                         <div class="timeSelectorBtn timeSelectorBtn_down noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
                         </div>
@@ -179,7 +179,7 @@
                         <div class="timeSelectorBtn timeSelectorBtn_up noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
                         </div>
-                        <input type="tel" value="0" class="timeSelectorInput strictlyNumeric">
+                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric">
                         <div class="timeSelectorBtn timeSelectorBtn_down noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
                         </div>
@@ -840,9 +840,9 @@
                         <div class="update_schedule_fline_sblock">
                             <span class="update_schedule_span noselect">At</span>
                             <div class="update_schedule_fline_sblock_input_container">
-                                <input type="tel" placeholder="18" class="strictlyNumeric update_schedule_input update_schedule_input_hours">
+                                <input type="text" inputmode="numeric" placeholder="18" class="strictlyNumeric update_schedule_input update_schedule_input_hours">
                                 <span class="update_schedule_span">:</span>
-                                <input type="tel" placeholder="00" class="strictlyNumeric update_schedule_input update_schedule_input_minutes">
+                                <input type="text" inputmode="numeric" placeholder="00" class="strictlyNumeric update_schedule_input update_schedule_input_minutes">
                             </div>  
                         </div>
                     </div>
@@ -850,7 +850,7 @@
                     <div class="update_schedule_sline">
                         <span class="update_schedule_span noselect">Every</span>
                         <div class="update_schedule_sline_sblock_input_container">
-                            <input type="tel" placeholder="2" class="strictlyNumeric update_schedule_input update_schedule_input_count">
+                            <input type="text" inputmode="numeric" placeholder="2" class="strictlyNumeric update_schedule_input update_schedule_input_count">
                             <select name="" id="" class="update_schedule_select update_schedule_select_every">
                                 <option class="update_schedule_opt" value="Day">Day</option>  
                                 <option class="update_schedule_opt" value="Week">Week</option> 
@@ -864,7 +864,7 @@
                             <div class="toggle jump_toggle" state="false" moveState="true"><div class="toggle_dot"></div></div>
                         </div>
                         <div class="update_schedule_tline_sblock">
-                            <input type="tel" placeholder="2" class="strictlyNumeric update_schedule_input update_schedule_jump_count">
+                            <input type="text" inputmode="numeric" placeholder="2" class="strictlyNumeric update_schedule_input update_schedule_jump_count">
                             <select name="" id="" class="update_schedule_select update_schedule_select_jumpEvery">
                                 <option class="update_schedule_opt" value="Day">Day</option>  
                                 <option class="update_schedule_opt" value="Week">Week</option> 
@@ -873,7 +873,7 @@
 
                             <div class="update_schedule_small_span update_schedule_everyText noselect">Every</div>
 
-                            <input type="tel" placeholder="2" class="strictlyNumeric update_schedule_input update_schedule_every_count">
+                            <input type="text" inputmode="numeric" placeholder="2" class="strictlyNumeric update_schedule_input update_schedule_every_count">
                             <span class="update_schedule_select update_schedule_jumpEveryText noselect">Time</span>
                         </div>
                     </div>
@@ -961,10 +961,10 @@
                     <div class="session_current_exercise_info_container noselect">
                         <span class="session_current_exercise_name"></span>
                         <div class="session_current_exercise_specs">
-                            <input class="strictlyNumeric session_current_exercise_specs_details_inp session_current_exercise_specs_reps resizingInp" type="tel" value="">
+                            <input class="strictlyNumeric session_current_exercise_specs_details_inp session_current_exercise_specs_reps resizingInp" type="text" inputmode="numeric" value="">
                             <span class="session_current_exercise_specs_pause">x</span>
                             
-                            <input class="strictlyFloatable session_current_exercise_specs_details_inp session_current_exercise_specs_weight resizingInp" type="tel" value="">
+                            <input class="strictlyFloatable session_current_exercise_specs_details_inp session_current_exercise_specs_weight resizingInp" type="text" inputmode="decimal" value="">
                             <span class="session_current_exercise_specs_weight_unit"></span>
 
                             <img src="./resources/imgs/preview.png" alt="" class="session_specsPastData noselect" draggable="false">

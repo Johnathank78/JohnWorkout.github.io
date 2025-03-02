@@ -375,16 +375,18 @@ $(document).ready(function(){
     });
 
     $(document).on("keydown", ".strictlyFloatable", function (e) {
-        let allowedKeys = [..."0123456789.", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
-        
-        // Prevent multiple dots
-        if (e.key === "." && $(this).val().includes(".")) {
+        let allowedKeys = [..."0123456789.,", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
+
+        if((e.key === "," || e.key === ".") && !$(this).val().includes(".")){
             e.preventDefault();
-        }
+            $(this).val($(this).val() + ".");
+        }else if((e.key === "," || e.key === ".") && $(this).val().includes(".")){
+            e.preventDefault();
+        };
 
         if (!allowedKeys.includes(e.key)) {
             e.preventDefault();
-        }
+        };
     });
 
     $(document).on("keydown", ".update_schedule_input_hours", function (e) {
