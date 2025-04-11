@@ -290,6 +290,10 @@ function intervall(data, from_wo = false){
             if(!from_wo){
                 udpate_recovery("intervall", data);
             }else{
+                stopPrepIntervall();
+                stopRestIntervall();
+                stopWorkIntervall();
+
                 woIntervallLeave();
                 screensaver_toggle(false);
                 return;

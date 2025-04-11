@@ -202,7 +202,7 @@ function iserror_exo(mname, isEdit){
                 $(".update_error_msg").text(textAssets[parameters["language"]]["error"]["updatePage"]["goToSleep"]);
                 return true;
             };
-        }else if(type == "Int." && $(items).eq(i).data('data') === undefined){
+        }else if(type == "Int." && $(items).eq(i).attr('exo-data') === undefined){
             $(".update_error_container").css("display", "block");
             $(".update_error_msg").text(textAssets[parameters["language"]]["error"]["updatePage"]["fillAllEntries"]);
             return true;

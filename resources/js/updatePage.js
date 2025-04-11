@@ -260,6 +260,9 @@ $(document).ready(function(){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "none");
         };
+
+        $(this).find('option').removeAttr('selected');
+        $(this).find('option[value="'+$(this).val()+'"]').attr('selected', 'selected');
     });
 
     $(document).on("click", '.update_workout_intervallEdit_container', function(){
@@ -299,7 +302,7 @@ $(document).ready(function(){
             $('.update_intervallLink').append($(optString.replace('[idVAL]', "999").replace('[sessionVAL]', 'No Intervall session registered')))
         };
 
-        let elementData = $(currentIntervallItem).data('data');
+        let elementData = $(currentIntervallItem).attr('exo-data') ? JSON.parse($(currentIntervallItem).attr('exo-data')) : undefined;
 
         if(elementData){
             if(isIntervallLinked(elementData)){
@@ -341,6 +344,11 @@ $(document).ready(function(){
             
             $(".update_intervallList_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
         }else{
+            $('.update_linkBtn').css({
+                backgroundColor: '#34394C',
+                opacity: 1
+            });
+            
             $(".update_data_name").val("");
             $('.update_intervallList_container').append(Iintervall_tile());
             $(".update_intervallList_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
@@ -378,7 +386,7 @@ $(document).ready(function(){
             "linkId": session["id"]
         });
 
-        $(currentIntervallItem).data('data', data);
+        $(currentIntervallItem).attr('exo-data', JSON.stringify(data));
         $(currentIntervallItem).find('.update_workout_intervallName').text(session["name"]);
 
         leaveIntervallEdit();
@@ -672,7 +680,7 @@ $(document).ready(function(){
 
                             if(type == "Int."){
                                 hint = $(exo).find(".udpate_workout_hint_txtarea").val();
-                                data = $(exo).data('data');
+                                data = JSON.parse($(exo).attr('exo-data'));
 
                                 if(hint == ""){hint = false};
 
@@ -890,7 +898,7 @@ $(document).ready(function(){
 
                             if(type == "Int."){
                                 hint = $(exo).find(".udpate_workout_hint_txtarea").val();
-                                data = $(exo).data('data');
+                                data = JSON.parse($(exo).attr('exo-data'));
 
                                 if(hint == ""){hint = false};
 
@@ -1280,8 +1288,8 @@ $(document).ready(function(){
                         }));
                     };
                 });
-    
-                $(currentIntervallItem).data('data', data);
+                
+                $(currentIntervallItem).attr('exo-data', JSON.stringify(data));
                 $(currentIntervallItem).find('.update_workout_intervallName').text($('.update_data_name').val());
     
                 leaveIntervallEdit();

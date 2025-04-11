@@ -326,9 +326,9 @@ $(document).ready(function(){
                         $(".update_workoutList_container").append(exercise_tile(exo));
     
                         if(isIntervallLinked(exo)){
-                            $(".update_workoutList_container").children().last().data('data', {"type": exo["type"], "linkId": exo["linkId"]});
+                            $(".update_workoutList_container").children().last().attr('exo-data', JSON.stringify({"type": exo["type"], "linkId": exo["linkId"]}));
                         }else{
-                            $(".update_workoutList_container").children().last().data('data', {"type": exo["type"], "name": exo["name"], "exoList": exo["exoList"]});
+                            $(".update_workoutList_container").children().last().attr('exo-data', JSON.stringify({"type": exo["type"], "name": exo["name"], "exoList": exo["exoList"]}));
                         };
     
                         if(exo['hint']){showHint(".update_workoutList_container")};

@@ -915,11 +915,8 @@ async function deleteRelatedSwap(from){
 function closestNextDate(D, notif, offset = 0) {
     if(typeof D !== "number"){return false};
 
-    const now = new Date();
     const today = getToday('date')
     const studyDate = new Date(D);
-
-    var isInPast = studyDate <= now;
 
     const X = notif["scheduleData"]["count"];
     const Y = notif["scheduleData"]["scheme"];
@@ -936,9 +933,7 @@ function closestNextDate(D, notif, offset = 0) {
     let eventOccurence = isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O);
 
     // Increment day-by-day until we find a scheduled event
-    while(!eventOccurence || isInPast){
-        isInPast = false;
-
+    while(!eventOccurence){
         testDate.setDate(testDate.getDate() + 1);
         eventOccurence = isEventScheduled(testDate, studyDate, X, Y, Z, U, T, O);
     };
@@ -956,7 +951,6 @@ function closestNextDate(D, notif, offset = 0) {
     };
 
     testDate = setHoursMinutes(testDate, hours, minutes);
-    
     return {'timestamp': testDate.getTime(), 'occurence': eventOccurence};
 };
 

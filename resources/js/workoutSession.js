@@ -938,7 +938,11 @@ async function next_exercise(first){
 };
 
 function getIntervallSpecs(id){
-    let intervallData = current_session["exoList"][getExoIndexById(current_session, id)]["exoList"];
+
+    let intervallData = isIntervallLinked(current_session["exoList"][getExoIndexById(current_session, id)]) 
+        ? session_list[getSessionIndexByID(current_session["exoList"][getExoIndexById(current_session, id)]["linkId"])]['exoList']
+        : current_session["exoList"][getExoIndexById(current_session, id)]["exoList"];
+
     let workRest = {"work": 0, "rest": 0};
 
     intervallData.forEach(exo => {
@@ -1207,6 +1211,7 @@ function woIntervallLeave(){
     $(".session_intervall_container").css("display", "none");
     $(".session_continue_btn").css("display", "none");
     $('.session_workout_footer').css("display", "flex");
+    $('.lockTouch').css('display', 'none');
     $(".session_workout_container").css("display", "flex");
 
     color = dark_blue;

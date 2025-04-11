@@ -113,6 +113,24 @@ $(document).ready(async function(){
         intervall_reorder = new FlexReorder($(".update_intervallList_container")[0]);
         sets_reorder = new FlexReorder($(".session_next_exercises_container")[0]);
     };
+
+    // let dateee = new Date(session_list[0].notif.dateList[0]);
+
+    // dateee.setDate(dateee.getDate() - 3);
+    // console.log(dateee)
+    
+    // dateee = dateee.getTime();
+
+    // session_list[0].notif.dateList[0] = dateee;
+    // session_list[0].notif.occurence = 2;
+
+    // let closestData = closestNextDate(session_list[0].notif.dateList[0], session_list[0].notif, 0)
+
+    // console.log(new Date(closestData.timestamp))
+    // console.log(closestData.occurence)
+
+    // session_list[0].notif.dateList[0] = closestData.timestamp;
+    // session_list[0].notif.occurence = closestData.occurence;
     
     //$('.main_title').text([window.screen.width, window.screen.height, window.devicePixelRatio, window.matchMedia("(orientation: portrait)").matches ? "portrait" : 'landscape'].join(','))
 });//readyEnd

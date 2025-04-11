@@ -355,9 +355,11 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
                     // Reset the occurrence each cycle:
                     const partialEvents = Math.floor(adjustedDaysIntoCycle / intervalDays);
                     const occurrence = partialEvents + 1; 
+
                     return occurrence;
                 }
             }
+
             // Past T events or not exactly on a day => skip region / not scheduled
             return false;
         }
@@ -366,6 +368,7 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
     // -------------------------------------
     // 8. Main logic to determine the result
     // -------------------------------------
+     
     if (diffInDays >= 0) {
         // If diffInDays >= 0, just check if C is an event day.
         return checkEventDay(diffInDays);
@@ -388,7 +391,7 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
         // 8.3. Additional checks:
         //      - C_isToday ensures we only consider "today" if that's required
         //      - isShifted references external "shift" logic
-        const C_isToday = (C.getTime() === getToday("timestamp"));
+        const C_isToday = (zeroAM(C, "timestamp") === getToday("timestamp"));
         const isShifted = ID ? hasBeenShifted["data"][ID] : true;
 
         // 8.4. If all conditions align, keep the occurrence from checkEventDay.
