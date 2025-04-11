@@ -255,14 +255,16 @@ function intervall(data, from_wo = false){
         startWorkIntervall();
     };
 
-    intervall.workEndProcess = function(){
+    intervall.workEndProcess = function(skipped = false){
         Ispent = Ispent > iWork_time ? iWork_time : Ispent;
         let smallestTime = iWork_time * 0.1 < 5 ? 5 : iWork_time * 0.1 > 60 ? 60 : iWork_time * 0.1;
     
         iCurrent_cycle--;
-        
-        tempStats["workedTime"] += iWork_time;
-        tempStats["repsDone"] += iWork_time/2.1;
+
+        if(!skipped){
+            tempStats["workedTime"] += iWork_time;
+            tempStats["repsDone"] += iWork_time/2.1;
+        };
     
         if(intExType == "Int."){
             if(Ispent > smallestTime){
@@ -513,7 +515,7 @@ $(document).ready(function(){
         if(intervall_state == 2){
             intervall.restEndProcess();
         }else if(intervall_state == 1){
-            intervall.workEndProcess();
+            intervall.workEndProcess(true);
         };
     });
 });//readyEnd 

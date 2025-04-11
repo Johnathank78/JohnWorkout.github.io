@@ -80,7 +80,7 @@ class FlexReorder{
         });
 
         this.movers = this.children;
-        $(this.children).css("z-index", "0");
+        //$(this.children).css("z-index", "0");
 
         this.mobile_longPress = false;
         this.mobile_hovered = false;
