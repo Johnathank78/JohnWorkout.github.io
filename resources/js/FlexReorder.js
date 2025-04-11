@@ -20,7 +20,7 @@ RESTRICTIONS;
 
 - Container must have css property "transform.translate[axis]" set (even 0%) (for the moment) INVESTIGATE;
 - As mentionned, the reorder is strictly uni-dimensional;
-- Every ".reorder__child" Z-Index will be set to 0;
+- Every ".reorder__child" Z-Index will be set to 1;
 - Every ".reorder__child" cursor will be override by "grabb/grabbing";
 ------------------------------;
 
@@ -80,7 +80,7 @@ class FlexReorder{
         });
 
         this.movers = this.children;
-        //$(this.children).css("z-index", "0");
+        $(this.children).css("z-index", "1");
 
         this.mobile_longPress = false;
         this.mobile_hovered = false;
@@ -128,6 +128,8 @@ class FlexReorder{
                 }
                 this.movers = this.children;
             };
+
+            $(this.container).children(".reorder__child").css("z-index", "1");
         });
 
         this.observer.observe($(this.container)[0], { childList: true });
@@ -925,7 +927,7 @@ class FlexReorder{
             "display" : "block",
             "position" : "absolute",
 
-            "z-index" : "-1",
+            "z-index" : "0",
         });
 
         $(".reorder__fantom_tile, .reorder__dark_basement").children().removeClass("reorder__child");
@@ -958,7 +960,7 @@ class FlexReorder{
 
         this.deepClone($(this.draggedItem), $(".reorder__fantom_tile"));
         $(this.draggedItem).css("opacity", "0");
-        $(this.draggedItem).css("z-index", "-1");
+        $(this.draggedItem).css("z-index", "0");
     };
 
     mousemove(){
