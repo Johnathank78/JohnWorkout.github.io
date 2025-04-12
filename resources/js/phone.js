@@ -77,13 +77,10 @@ function goBack(platform){
 function backerMousedownHandler(e){
     if(current_page == "selection" && !add_state && !timeInputShown && !rotation_state && !statOpened && !calendarState && !isExtraOut){return};
     
-    const clientX = (e.type === "mousedown")
-    ? e.clientX
-    : e.originalEvent.touches[0].clientX;
-    
-    const clientY = (e.type === "mousedown")
-    ? e.pageY
-    : e.originalEvent.touches[0].clientY;
+    const coo = getPointerCoo(e);
+
+    const clientX = coo.x;
+    const clientY = coo.y;
 
     backerY = clientY;
 
@@ -106,9 +103,7 @@ function backerMousedownHandler(e){
 function backerMousemoveHandler(e){
     if (!isBacking) return;
     
-    const pointerX = (e.type === "mousemove")
-    ? e.pageX
-    : e.originalEvent.touches[0].pageX;
+    const pointerX = getPointerCoo(e).x;
 
     backerX = pointerX;
 

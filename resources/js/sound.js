@@ -4,84 +4,93 @@ const beep2x3Path = './resources/sounds/beep2x3.mp3';
 var beepPlayer = false;
 var beep2x3Player = false;
 
-function constructPlayer(url, interval, volume = false){
-    volume = muted ? 0 : !volume && !audio_lv ? 0.5 : audio_lv;
-    
+function constructPlayer(url, interval, volume = false) {
+    volume = muted ? 0 : (!volume && !audio_lv ? 0.5 : audio_lv);
+
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const gainNode = audioCtx.createGain();
-    
-    let times = 1;
     gainNode.gain.value = volume;
+    gainNode.connect(audioCtx.destination);
 
-    function setTimes(newTimes) {
-        times = newTimes;
+    let times = 1;
+    let audioBuffer = null;
+    let isBufferLoaded = false;
+
+    // Préchargement
+    const request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+
+    request.onload = function () {
+        audioCtx.decodeAudioData(request.response, function (buffer) {
+            audioBuffer = buffer;
+            isBufferLoaded = true;
+        }, function (error) {
+            console.error('decodeAudioData error', error);
+        });
     };
 
-    function setVolume(newVolume) {
-        gainNode.gain.value = newVolume;
+    request.onerror = function () {
+        console.error('Error loading sound file');
     };
 
-    function suspendAudioContext() {
-        if (audioCtx.state === 'running') {
-            audioCtx.suspend();
-        };
-    };
-
-    function resumeAudioContext() {
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        };
-    };
-
-    function loadSound(url, callback) {
-        const request = new XMLHttpRequest();
-        request.open('GET', url, true);
-        request.responseType = 'arraybuffer';
-
-        request.onload = function() {
-            audioCtx.decodeAudioData(request.response, function(buffer) {
-                callback(buffer);
-            }, function(error) {
-                console.error('decodeAudioData error', error);
-            });
-        };
-
-        request.onerror = function() {
-            console.error('Error loading sound file');
-        };
-
-        request.send();
-    };
+    request.send();
 
     function playSound(buffer) {
         const source = audioCtx.createBufferSource();
         source.buffer = buffer;
-
         source.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
         source.start();
-    };
+    }
 
     return {
-        setVolume,
-        setTimes,
-        play: function() {
-            loadSound(url, function(buffer) {
-                playSound(buffer);
-                let count = 0;
-                const intervalId = setInterval(function() {
-                    if (count >= times - 1) {
-                        clearInterval(intervalId);
-                    }else{
-                        count++;
-                        playSound(buffer);
-                    }
-                }, interval);
-            });
+        setVolume(newVolume) {
+            gainNode.gain.value = newVolume;
         },
-        suspendAudioContext,
-        resumeAudioContext
+        setTimes(newTimes) {
+            times = newTimes;
+        },
+        suspendAudioContext() {
+            if (audioCtx.state === 'running') {
+                audioCtx.suspend().catch((e) => console.warn('suspend error', e));
+            }
+        },
+        async resumeAudioContext() {
+            if (audioCtx.state === 'suspended') {
+                try {
+                    await audioCtx.resume();
+                } catch (e) {
+                    console.warn('resume error', e);
+                }
+            }
+        },
+        isContextValid() {
+            return audioCtx && audioCtx.state !== 'closed';
+        },
+        close() {
+            try {
+                audioCtx.close();
+            } catch (e) {
+                console.warn('close error', e);
+            }
+        },
+        play() {
+            if (!isBufferLoaded) {
+                console.warn('Audio buffer not ready yet');
+                return;
+            }
+
+            playSound(audioBuffer);
+            let count = 0;
+            const intervalId = setInterval(() => {
+                if (count >= times - 1) {
+                    clearInterval(intervalId);
+                } else {
+                    count++;
+                    playSound(audioBuffer);
+                }
+            }, interval);
+        }
     };
 };
 

@@ -36,7 +36,7 @@ function darkenColor(rgbString, value){
     return "rgb("+parseInt(rgb[0]).toString()+","+parseInt(rgb[1]).toString()+","+parseInt(rgb[2]).toString()+")";
 };
 
-function longClickDownHandler(){
+function longClickDownHandler(e){
     if(!$(this).data("canLongClick")){return};
 
     longClickTS = Date.now();
@@ -46,6 +46,11 @@ function longClickDownHandler(){
 
     let LC_speed = $(this).data("speed");
     let LC_step = (100/LC_speed)*10;
+
+    let coo = getPointerCoo(e);
+
+    $(this).data("startX", coo.x);
+    $(this).data("startY", coo.y);
 
     let [LC_color, LC_darkColor] = loadColors(this);
     $(this).data("tempColor", [LC_color, LC_darkColor]);
@@ -108,6 +113,9 @@ function longClickUpHandler(){
     let LC_speed = $(this).data("speedOut");
     let LC_step = (100/LC_speed)*10;
 
+    $(this).data("startX", 0);
+    $(this).data("startY", 0);
+
     let [LC_color, LC_darkColor] = loadColors(this);
 
     $(this).data("offIntervall", setInterval(() => {
@@ -151,23 +159,18 @@ function longClickMoveHandler(e) {
 
         // Determine current pointer position
         // (Works on both mouse or touch events if you check correctly)
-        let pageX, pageY;
-        if (e.type.indexOf("touch") === 0) {
-            // For touch events
-            pageX = e.originalEvent.touches[0].pageX;
-            pageY = e.originalEvent.touches[0].pageY;
-        } else {
-            // For mouse events
-            pageX = e.pageX;
-            pageY = e.pageY;
-        };
+        let coo = getPointerCoo(e);
+
+        let pageX = coo.x;
+        let pageY = coo.y;
 
         let dx = pageX - startX;
         let dy = pageY - startY;
+
         let distance = Math.sqrt(dx * dx + dy * dy);
 
         // If user moved more than X px, cancel the long-click
-        if (distance > 5) {
+        if (distance > 75) {
             // Call the existing longClickUpHandler
             longClickUpHandler.call(this, e);
         };
@@ -184,7 +187,7 @@ $(document).ready(function(){
     }else{
         $(document).on("mousedown", ".longClickable", longClickDownHandler);
         $(document).on("mouseup", ".longClickable", longClickUpHandler);
-        $(document).on("touchmove", ".longClickable", longClickMoveHandler);
+        $(document).on("mousemove", ".longClickable", longClickMoveHandler);
     };
 
     $(document).on("fantomClicked", ".rest_react", function(){

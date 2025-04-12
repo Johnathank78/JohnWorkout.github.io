@@ -263,6 +263,20 @@ function cloneOBJ(obj){
     return JSON.parse(JSON.stringify(obj));
 };
 
+function getPointerCoo(e){
+    let pageX, pageY;
+
+    if (e.type.indexOf("touch") === 0) {
+        pageX = e.originalEvent.touches[0].pageX;
+        pageY = e.originalEvent.touches[0].pageY;
+    } else {
+        pageX = e.pageX;
+        pageY = e.pageY;
+    };
+
+    return {x: pageX, y: pageY};
+};
+
 // Session
 
 function update_timer(item, ref, i){
@@ -1194,7 +1208,6 @@ function weightUnitgroup(val, unit) {
 function roundToNearestHalf(num) {
     return Math.round(num * 2) / 2;
 };
-  
 
 // Language
 

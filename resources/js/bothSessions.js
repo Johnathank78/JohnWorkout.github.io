@@ -1182,11 +1182,22 @@ $(document).ready(function(){
         $(document).on("mouseup", function(){sliderMouseUp()});
     };
 
-    $(document).on('longClicked', '.session_volume_slider_container', function(){
-        beepPlayer.resumeAudioContext();
-        beep2x3Player.resumeAudioContext();
-        
-        bottomNotification("fixSound")
+    $(document).on('longClicked', '.session_volume_slider_container', function () {
+        if(beepPlayer && beepPlayer.close){
+            beepPlayer.close();
+        };
+
+        if(beep2x3Player && beep2x3Player.close){
+            beep2x3Player.close();
+        };
+    
+        beepPlayer = null;
+        beep2x3Player = null;
+    
+        beepPlayer = constructPlayer(beepPath, 1000);
+        beep2x3Player = constructPlayer(beep2x3Path, 1000);
+    
+        bottomNotification("fixSound");
     });
     
     // RECOVERY;
