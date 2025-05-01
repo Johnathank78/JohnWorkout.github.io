@@ -1,6 +1,3 @@
-var selectedDates = false;
-var rowIndex = 0;
-
 var updateCalendarPage = 1;
 var selectCalendarPage = 1;
 
@@ -12,11 +9,69 @@ var previewShown = false;
 var actualRowDay = false;
 var focusShown = false;
 
-const datePicker = ".update_schedule_datePicker";
+const datePicker = {
+    _pendingSelection: [], // [timestamp, timestamp, ...]
+    _selection: [], // [timestamp, timestamp, ...]
+    _page: 1,
+    _row: 0,
 
-var pastSelectedDates = [];
-var pastSelectedPage = 1;
-var pastSelectedRow = 0;
+    setPage: function(page){
+        this._page = page;
+    },
+
+    getPage: function(){
+        return this._page;
+    },
+
+    setRow: function(row){
+        this._row = row;
+    },
+
+    getRow: function(){
+        return this._row;
+    },
+
+    getPendingSelection: function(){
+        return this._pendingSelection;
+    },
+
+    setPendingSelection: function(userSelection){
+        this._pendingSelection = userSelection;
+    },
+
+    clearPendingSelection: function(){
+        this._pendingSelection = [];    
+    },
+
+    shrinkPendingSelection: function(){
+        this._pendingSelection = [this._pendingSelection[0]];
+    },
+
+    togglePendingSelectionElement: function(time){
+        if(this._pendingSelection.includes(time)){
+            this._pendingSelection = this._pendingSelection.filter((t) => t !== time);
+            return false;
+        }else{
+            this._pendingSelection.push(time);
+            return true;
+        };
+    },
+
+    initSelection: function(existingSelection){
+        this._selection = existingSelection;
+        this.clearPendingSelection();
+    },
+
+    getSelection: function(){
+        return this._selection;
+    },
+
+    confirmSelection: function(){
+        this._selection = this._pendingSelection;
+        this._page = selectCalendarPage;
+        this._pendingSelection = [];
+    }
+};
 
 function applyHoursMinutes(date, prov){
     date.setHours(prov.getHours());
@@ -1030,7 +1085,7 @@ function calendarGoPicker(mode, page){
             page -= 1;
 
             generateBaseCalendar(page);
-            setCalendarSelection();
+            setCalendarSelection(page);
         }else if(page == 2){
             $(".calendarGoBack").css({
                 opacity: .5,
@@ -1065,7 +1120,6 @@ function generateDateString(selectedDates, lang){
     if (lang == "french") {
         locale = "fr-FR";
     } else if(lang == "english") {
-        // Default to English if unsupported or "EN"
         locale = "en-US";
     }
 
@@ -1093,41 +1147,44 @@ function currentTimeSelection(notif){
     return {"info": datePicker_selectionInfo, "dates": selectedDates};
 };
 
-function setPastUserSelection(generatedData){
+function initUserSelection(generatedData){
     let selectedString = generateDateString(generatedData["dates"], parameters["language"]);
-    
-    setNodeData(datePicker, "selectedDates", generatedData["dates"]);
-    setNodeData(datePicker, "selectedPage", generatedData["info"]["page"]);
-    setNodeData(datePicker, "selectedRow", generatedData["info"]["rowIndex"]);
+
+    selectCalendarPage = generatedData["info"]["page"];
+
+    datePicker.initSelection(generatedData["dates"]);
+    datePicker.setPage(generatedData["info"]["page"]);
+    datePicker.setRow(generatedData["info"]["rowIndex"]);
 
     $('.update_schedule_datePicker').text(selectedString);
 };
 
 function setCalendarSelection(page){
-
-    let selectedDates = getNodeData(datePicker, "selectedDates");
-
-    if(selectedDates.length == 0){
+    if(datePicker.getPendingSelection().length == 0){
         $(".selection_page_calendar_row_day").css("backgroundColor", 'rgb(76, 83, 104)');
     }else{
         if($('.update_schedule_select_every').val() == "Day"){
-            selectedDates = [Math.min(...selectedDates)];
-            setNodeData(datePicker, "selectedDates", selectedDates);
+            let firstDay = datePicker.getPendingSelection().sort()[0];
+            
+            datePicker.clearPendingSelection();
+            datePicker.togglePendingSelectionElement(firstDay);
+
             $(".selection_page_calendar_row_day").css("backgroundColor", 'rgb(76, 83, 104)');
             
             $(".selection_page_calendar_row_day").filter((_, dayEl) => {
-                return selectedDates.includes($(dayEl).data('time'));
+                return datePicker.getPendingSelection().includes($(dayEl).data('time'));
             }).css("background-color", 'rgb(29, 188, 96)');
         }else if($('.update_schedule_select_every').val() == "Week"){
             $(".selection_page_calendar_row_day").css("backgroundColor", 'rgb(76, 83, 104)');
-            if(getNodeData(datePicker, "selectedPage") == page){
+            
+            if(datePicker.getPage() == page){
                 $(".selection_page_calendar_row_day").css("opacity", ".3");
-                $(".selection_page_calendar_row").eq(getNodeData(datePicker, "selectedRow")).children().filter((_, dayEl) => {
+                $(".selection_page_calendar_row").eq(datePicker.getRow()).children().filter((_, dayEl) => {
                     return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
                 ).css("opacity", "1");
         
                 $(".selection_page_calendar_row_day").filter((_, dayEl) => {
-                    return selectedDates.includes($(dayEl).data('time'));
+                    return datePicker.getPendingSelection().includes($(dayEl).data('time'));
                 }).css("background-color", 'rgb(29, 188, 96)');
             };
         };
@@ -1552,40 +1609,48 @@ $(document).ready(function(){
             let dayOrWeek = $(".update_schedule_select_every").val();
 
             if(dayOrWeek == "Day"){
+                let rowIndex = $(".selection_page_calendar_row").index($(this).parent());
+
+                datePicker.setRow(rowIndex);
+                datePicker.setPage(selectCalendarPage);
+
                 $('.selection_page_calendar_row_day').filter((_, dayEl) => {
                     return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
                 ).css({"backgroundColor": 'rgb(76, 83, 104)', 'opacity': '1'});
-                
-                if($(this).data('time') == getNodeData(datePicker, "selectedDates")[0]){
+
+                if($(this).data('time') == datePicker.getSelection()[0]){
                     $(this).css("backgroundColor", 'rgb(76, 83, 104)');
-                    setNodeData(datePicker, "selectedDates", []);
+                    datePicker.clearPendingSelection();
                 }else{
                     $(this).css("backgroundColor", 'rgb(29, 188, 96)');
-                    setNodeData(datePicker, "selectedDates", [$(this).data('time')]);
-                    setNodeData(datePicker, "selectedPage", selectCalendarPage);
+                    datePicker.clearPendingSelection();
+                    datePicker.togglePendingSelectionElement($(this).data('time'));
                 };
-
             }else if(dayOrWeek == "Week"){
-                let rowIndex = $(".selection_page_calendar_row").index($(this).parent())
+                let rowIndex = $(".selection_page_calendar_row").index($(this).parent());
 
-                if(rowIndex != getNodeData(datePicker, "selectedRow") || selectCalendarPage != getNodeData(datePicker, "selectedPage")){
-                    setNodeData(datePicker, "selectedDates", []);
+                if(rowIndex != datePicker.getRow() || selectCalendarPage != datePicker.getPage()){
+                    datePicker.clearPendingSelection();
                 };
 
-                setNodeData(datePicker, "selectedRow", rowIndex);
-                setNodeData(datePicker, "selectedPage", selectCalendarPage);
+                datePicker.setRow(rowIndex);
+                datePicker.setPage(selectCalendarPage);
+
+                let lit = datePicker.togglePendingSelectionElement($(this).data('time'));
+
+                if(datePicker.getPendingSelection().length == 0){
+                    $(".selection_page_calendar_row_day").css('opacity', '1');
+                }else{
+                    $(".selection_page_calendar_row").filter((i) => i !== datePicker.getRow()).children().css({'opacity': '.3', "backgroundColor": 'rgb(76, 83, 104)'});
+                    $(".selection_page_calendar_row").filter((i) => i === datePicker.getRow()).children().filter((_, dayEl) => {
+                        return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")} 
+                    ).css('opacity', '1');
+                };
                 
-                $(".selection_page_calendar_row").filter((i) => i !== getNodeData(datePicker, "selectedRow")).children().css({'opacity': '.3', "backgroundColor": 'rgb(76, 83, 104)'});
-                $(".selection_page_calendar_row").filter((i) => i === getNodeData(datePicker, "selectedRow")).children().filter((_, dayEl) => {
-                    return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
-                ).css('opacity', '1');  
-                
-                if(!getNodeData(datePicker, "selectedDates").includes($(this).data('time'))){
+                if(lit){
                     $(this).css("backgroundColor", 'rgb(29, 188, 96)');
-                    getNodeData(datePicker, "selectedDates").push($(this).data('time'));
                 }else{
                     $(this).css("backgroundColor", 'rgb(76, 83, 104)');
-                    setNodeData(datePicker, "selectedDates", getNodeData(datePicker, "selectedDates").filter(item => item !== $(this).data('time')));
                 };
             };
         };
@@ -1601,31 +1666,27 @@ $(document).ready(function(){
         $(".selection_page_calendar").css({
             "display": 'flex',
             "position": 'relative'
-        }); 
+        });
 
-        selectedDates = getNodeData(datePicker, "selectedDates");
-        selectCalendarPage = getNodeData(datePicker, "selectedPage");
-        rowIndex = getNodeData(datePicker, "selectedRow");
+        datePicker.setPendingSelection(cloneOBJ(datePicker.getSelection()));
 
-        calendarGoPicker("static", selectCalendarPage);
+        calendarGoPicker("static", datePicker.getPage());
         showBlurPage('update_datePicker');
     });
 
     $(document).on('click', '.calendarPickerSubmit', function(e){
-        let dateString = generateDateString(getNodeData(datePicker, "selectedDates"), parameters["language"]);
+        datePicker.confirmSelection();
+        console.log(datePicker.getSelection());
 
-        if(getNodeData(datePicker, "selectedDates").length > 0){
+        let dateString = generateDateString(datePicker.getSelection(), parameters["language"]);
+
+        if(datePicker.getSelection().length > 0){
             $('.update_schedule_datePicker').css('justify-content', "flex-start");
         }else{
             $('.update_schedule_datePicker').css('justify-content', "center");
-        }
+        };
         
         $('.update_schedule_datePicker').text(dateString);
-
-        pastSelectedDates = getNodeData(datePicker, "selectedDates");
-        pastSelectedPage = getNodeData(datePicker, "selectedPage");
-        pastSelectedRow = getNodeData(datePicker, "selectedRow");
-
         closePanel("datePicker");
-    }); 
+    });
 });//readyEnd

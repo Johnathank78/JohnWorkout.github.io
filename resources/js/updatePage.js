@@ -159,10 +159,10 @@ $(document).ready(function(){
     });
 
     $(document).on("change", ".update_schedule_select_every", function(){
-        if($(".update_schedule_select_every").val() == "Week"){
-            $(".update_schedule_select_day").attr("multiple", true);
+        if($(".update_schedule_select_every").val() == "Week" && datePicker.getSelection().length > 1){
+            $(".update_schedule_datePicker").text($(".update_schedule_datePicker").text() + '...');
         }else{
-            $(".update_schedule_select_day").attr("multiple", false);
+            $(".update_schedule_datePicker").text($(".update_schedule_datePicker").text().replace('...', ''));
         };
     });
 
@@ -1091,7 +1091,7 @@ $(document).ready(function(){
             };
 
             let count = $(inp_list).eq(2).val();
-            let dateList = $('.update_schedule_datePicker').data("selectedDates").sort();
+            let dateList = datePicker.getSelection().sort();
 
             let error = schedule_iserror(dateList, hours, minutes, count, jumpVal, everyVal);
 

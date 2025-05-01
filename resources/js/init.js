@@ -66,8 +66,15 @@ $(document).ready(async function(){
     
         session_list = session_read();
         reminder_list = reminder_read();
-    
+ 
         sessionSwapped = sessionSwapped_read();
+
+        // SESSION MISSED TEST
+
+        //console.log(nbSessionScheduled(getToday("date", -1)));
+
+        // -------------------
+        
         hasBeenShifted = hasBeenShifted_read();
         sessionToBeDone = sessionToBeDone_read();
         sessionDone = sessionDone_read();

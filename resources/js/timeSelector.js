@@ -1,6 +1,6 @@
 var timeInputShown = false;
 var slideStartingPoint = 0;
-var travelLength = 10;
+var travelLength = 20;
 
 function isAbleToGrow(val, elem){
     let classs = $(elem).parent().attr('class').split(' ')[1];
@@ -35,6 +35,7 @@ function summonTimeSelector(target){
 
 function updateTimeSelectorVal(target, vec){
     let val = parseInt($(target).val());
+    val = isNaN(val) ? 0 : val;
 
     let up = $(target).parent().find(".timeSelectorBtnLabel_up");
     let down = $(target).parent().find(".timeSelectorBtnLabel_down");
@@ -143,6 +144,16 @@ $(document).ready(function(){
 
     $(document).on('click', '.timeString', function(e){
         summonTimeSelector($(this));
+    });
+
+    $(document).on('blur', '.timeSelectorInput', function(e){
+        if($(this).val() == ""){
+            $(this).val(0);
+        };
+    });
+
+    $(document).on('input', '.timeSelectorInput', function(e){
+        updateTimeSelectorVal(this, 0);
     });
 
     if(isWebMobile){

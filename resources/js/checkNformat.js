@@ -133,12 +133,6 @@ function closePanel(src, notAnimated=false){
             break;
         
         case "datePicker":
-            if(pastSelectedDates != getNodeData(datePicker, "selectedDates")){
-                setNodeData(datePicker, "selectedDates", pastSelectedDates);
-                setNodeData(datePicker, "selectedPage", pastSelectedPage);
-                setNodeData(datePicker, "selectedRow", pastSelectedRow);
-            };
-
             $('.blurBG').css('display', 'none');
             $(".calendarPickerSubmit").css('display', 'none');
             
@@ -151,7 +145,6 @@ function closePanel(src, notAnimated=false){
 
             isDatePicking = false;
             break;
-        
         case "xtraContainer":
             isExtraOut = false;
             $('.selection_session_tile_extra_container').animate({
@@ -389,56 +382,84 @@ $(document).ready(function(){
         };
     });
 
-    $(document).on("keydown", ".update_schedule_input_hours", function (e) {
-        let allowedKeys = [..."0123456789", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
+    $(document).on("keydown", ".striclyHours", function (e) {
+        let caretPos = this.selectionStart;
         let val = $(this).val();
+        let key = e.key;
     
-        // Prevent non-numeric input
-        if (!allowedKeys.includes(e.key)) {
+        const allowedKeys = [..."0123456789", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
+    
+        if (!allowedKeys.includes(key)) {
             e.preventDefault();
+            return;
+        }
+    
+        // Allow control/navigation keys
+        if (["Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(key)) {
             return;
         }
     
         // Prevent more than 2 characters
-        if (val.length >= 2 && !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+        if (val.length >= 2 && this.selectionStart === this.selectionEnd) {
             e.preventDefault();
             return;
         }
     
-        // Ensure valid hour range (00-23)
-        if (val.length === 1) {
-            if (val === "2" && !["0", "1", "2", "3", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(e.key)) {
+        if (caretPos === 0 && val.length == 1) {
+            if(val > 3 && ![..."01"].includes(key)){
                 e.preventDefault();
+                return;
+            }else if(![..."012"].includes(key)) {
+                e.preventDefault();
+                return;
             }
         }
-
-        if (val.length === 0 && !["0", "1", "2", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(e.key)) {
-            e.preventDefault();
+    
+        if (caretPos === 1 && val.length == 1) {
+            if (val == 2 && ![..."0123"].includes(key)) {
+                e.preventDefault();
+                return;
+            }else if(val > 3){
+                e.preventDefault();
+                return;
+            }
         }
     });
-    
-    $(document).on("keydown", ".update_schedule_input_minutes", function (e) {
-        let allowedKeys = [..."0123456789", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
+
+    $(document).on("keydown", ".striclyMinutesSeconds", function (e) {
+        let caretPos = this.selectionStart;
         let val = $(this).val();
+        let key = e.key;
     
-        // Prevent non-numeric input
-        if (!allowedKeys.includes(e.key)) {
+        const allowedKeys = [..."0123456789", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
+    
+        if (!allowedKeys.includes(key)) {
             e.preventDefault();
+            return;
+        }
+    
+        // Allow control/navigation keys
+        if (["Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(key)) {
             return;
         }
     
         // Prevent more than 2 characters
-        if (val.length >= 2 && !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+        if (val.length >= 2 && this.selectionStart === this.selectionEnd) {
             e.preventDefault();
             return;
         }
     
-        // Ensure valid minute range (00-59)
-        if (val.length === 0 && !["0", "1", "2", "3", "4", "5", "Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"].includes(e.key)) {
+        if (caretPos === 0 && val.length == 1 && key > 5) {
             e.preventDefault();
+            return;
+        }
+    
+        if (caretPos === 1 && val.length == 1 && val > 5) {
+            e.preventDefault();
+            return;
         }
     });
-
+    
     $(document).on("keydown", ".timeString", function (e) {
         let allowedNumbers = "0123456789";
         let allowedLetters = "ywdhms";

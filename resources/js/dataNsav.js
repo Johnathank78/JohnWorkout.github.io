@@ -1039,7 +1039,6 @@ function sessionToBeDone_read(){
         let sessionDone = localStorage.getItem("session_done");
 
         let count = nbSessionScheduled(getToday("date", -1));
-        console.log(count)
         let elapsedDays = daysBetweenTimestamps(data["creationDate"], getToday("date"));
 
         if(!(sessionDone === null || sessionDone == "") && elapsedDays > 1){

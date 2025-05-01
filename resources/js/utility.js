@@ -1,5 +1,19 @@
 // Global
 
+function wrapMethods(obj){
+    for (const key of Object.keys(obj)) {
+        const val = obj[key];
+        if (typeof val === 'function') {
+            obj[key] = function (...args) {
+            console.log(`Appel de la méthode « ${key} »`);
+            return val.apply(this, args);
+            };
+        };
+    };
+
+    return obj;
+};
+
 function SHA256(s){
     var chrsz = 8;
     var hexcase = 0;

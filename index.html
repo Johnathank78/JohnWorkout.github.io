@@ -159,7 +159,7 @@
                         <div class="timeSelectorBtn timeSelectorBtn_up noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
                         </div>
-                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric">
+                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric striclyHours">
                         <div class="timeSelectorBtn timeSelectorBtn_down noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
                         </div>
@@ -169,7 +169,7 @@
                         <div class="timeSelectorBtn timeSelectorBtn_up noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
                         </div>
-                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric">
+                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric striclyMinutesSeconds">
                         <div class="timeSelectorBtn timeSelectorBtn_down noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
                         </div>
@@ -179,7 +179,7 @@
                         <div class="timeSelectorBtn timeSelectorBtn_up noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_up"></span>
                         </div>
-                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric">
+                        <input type="text" inputmode="numeric" value="0" class="timeSelectorInput strictlyNumeric striclyMinutesSeconds">
                         <div class="timeSelectorBtn timeSelectorBtn_down noselect">
                             <span class="timeSelectorBtnLabel timeSelectorBtnLabel_down"></span>
                         </div>
@@ -834,15 +834,15 @@
                     <div class="update_schedule_fline">
                         <div class="update_schedule_fline_fblock">
                             <span class="update_schedule_span noselect">On</span>
-                            <span name="" id="" class="update_schedule_select update_schedule_datePicker">Choose a date</span>
+                            <span name="" id="" class="update_schedule_select update_schedule_datePicker noselect">Choose a date</span>
                         </div>
                             
                         <div class="update_schedule_fline_sblock">
                             <span class="update_schedule_span noselect">At</span>
                             <div class="update_schedule_fline_sblock_input_container">
-                                <input type="text" inputmode="numeric" placeholder="18" class="strictlyNumeric update_schedule_input update_schedule_input_hours">
+                                <input type="text" inputmode="numeric" placeholder="18" class="strictlyNumeric update_schedule_input striclyHours">
                                 <span class="update_schedule_span">:</span>
-                                <input type="text" inputmode="numeric" placeholder="00" class="strictlyNumeric update_schedule_input update_schedule_input_minutes">
+                                <input type="text" inputmode="numeric" placeholder="00" class="strictlyNumeric update_schedule_input striclyMinutesSeconds">
                             </div>  
                         </div>
                     </div>

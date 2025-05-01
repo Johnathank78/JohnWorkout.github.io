@@ -558,11 +558,7 @@ $(document).ready(function(){
             generateBaseCalendar(page);
             
             let currentData = currentTimeSelection(notif);
-            setPastUserSelection(currentData);
-
-            pastSelectedDates = getNodeData(datePicker, "selectedDates");
-            pastSelectedPage = getNodeData(datePicker, "selectedPage");
-            pastSelectedRow = getNodeData(datePicker, "selectedRow");
+            initUserSelection(currentData);
 
             $('.update_schedule_select_every option[value="'+getScheduleScheme(update_current_item)+'"]').prop('selected', true);
 
@@ -582,13 +578,9 @@ $(document).ready(function(){
             $(".update_schedule_select_day").attr("multiple", false);
             $('.update_colorChooser').css('backgroundColor', colorList[Math.floor(Math.random() * colorList.length)]);
 
-            setNodeData(datePicker, "selectedDates", []);
-            setNodeData(datePicker, "selectedPage", 1);
-            setNodeData(datePicker, "selectedRow", 0);
-
-            pastSelectedDates = [];
-            pastSelectedPage = 1;
-            pastSelectedRow = 0;
+            datePicker.initSelection([]);
+            datePicker.setPage(1);
+            datePicker.setRow(0);
 
             $('.update_schedule_datePicker').css('justify-content', "center");
             $('.update_schedule_datePicker').text(textAssets[parameters["language"]]["updatePage"]["pickDate"]);

@@ -81,7 +81,7 @@ function resize_update(){
 function update_pageReset(){
     $('.update_backArrow').css('display', 'none');
     $('.update_colorChooser').css("display", 'none');
-    $(".update_name_tile, .udpate_reminder_body, .update_intervall_container").css("pointer-events", "all");
+    $(".update_name_tile, .udpate_reminder_body, .update_intervall_container, .update_colorChooser").css("pointer-events", "all");
 
     $(".update_workout_container, .update_intervall_container, .update_reminder_container, .update_schedule_container, .update_history_container").css("display", "none");
     $(".update_tile_overHeader, .update_workout_button_container, .update_schedule_bin, .update_workout_add, .update_workout_pause").css("display", "none");
@@ -206,6 +206,8 @@ function update_pageFormat(from){
         $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["delete"]);
     }else if(from == "schedule"){
         $(".update_name_tile").css("pointer-events", "none");
+        $(".update_colorChooser").css("display", "flex");
+        $(".update_colorChooser").css("pointer-events", "none");
 
         $(".update_schedule_container").css("display", "flex");
         $(".update_workout_button_container, .update_schedule_bin").css("display", "flex");
