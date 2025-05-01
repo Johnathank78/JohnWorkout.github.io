@@ -554,7 +554,7 @@ $(document).ready(function(){
         let notif = isScheduled(update_current_item);
 
         if(notif){
-            let page = currentTimeSelection(notif)["info"]["page"];
+            let page = getPageOfDate(notif["dateList"].map(timestamp => zeroAM(timestamp, "timestamp"))[0]);
             generateBaseCalendar(page);
             
             let currentData = currentTimeSelection(notif);
@@ -579,8 +579,6 @@ $(document).ready(function(){
             $('.update_colorChooser').css('backgroundColor', colorList[Math.floor(Math.random() * colorList.length)]);
 
             datePicker.initSelection([]);
-            datePicker.setPage(1);
-            datePicker.setRow(0);
 
             $('.update_schedule_datePicker').css('justify-content', "center");
             $('.update_schedule_datePicker').text(textAssets[parameters["language"]]["updatePage"]["pickDate"]);

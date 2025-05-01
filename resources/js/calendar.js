@@ -12,27 +12,13 @@ var focusShown = false;
 const datePicker = {
     _pendingSelection: [], // [timestamp, timestamp, ...]
     _selection: [], // [timestamp, timestamp, ...]
-    _page: 1,
-    _row: 0,
-
-    setPage: function(page){
-        this._page = page;
-    },
-
-    getPage: function(){
-        return this._page;
-    },
-
-    setRow: function(row){
-        this._row = row;
-    },
-
-    getRow: function(){
-        return this._row;
-    },
 
     getPendingSelection: function(){
         return this._pendingSelection;
+    },
+
+    getFirstPendingElement: function(){
+        return this._pendingSelection[0];
     },
 
     setPendingSelection: function(userSelection){
@@ -68,7 +54,6 @@ const datePicker = {
 
     confirmSelection: function(){
         this._selection = this._pendingSelection;
-        this._page = selectCalendarPage;
         this._pendingSelection = [];
     }
 };
@@ -1102,17 +1087,6 @@ function calendarGoPicker(mode, page){
     return page;
 };
 
-function getPageOfDate(D){
-    const now = getToday("date");
-    const oneDay = 24 * 60 * 60 * 1000;
-    const firstDate = new Date(now.setDate(now.getDate() - dayofweek_conventional.indexOf(dayofweek[now.getDay()])));
-    
-    const diff = Math.floor((zeroAM(D, "timestamp") - zeroAM(firstDate, "timestamp")) / oneDay);
-    const page = Math.floor(diff / 21) + 1;
-
-    return page;
-};
-
 function generateDateString(selectedDates, lang){
     if(selectedDates.length == 0){return textAssets[parameters["language"]]["updatePage"]["pickDate"]};
 
@@ -1135,26 +1109,31 @@ function generateDateString(selectedDates, lang){
     return selectedDates.length > 1 ? formattedDate + "..." : formattedDate;
 };
 
-function currentTimeSelection(notif){
-    if(!notif){return};
-    
-    let selectedDates = notif["dateList"].map(timestamp => zeroAM(timestamp, "timestamp"));  
-    let rowIndex = $(".selection_page_calendar_row").index($(".selection_page_calendar_row_day").filter((_, dayEl) => {return selectedDates.includes($(dayEl).data('time'))}).last().parent());
-    let selectCalendarPage = getPageOfDate(new Date(selectedDates[0]));
-
-    let datePicker_selectionInfo = {"rowIndex": rowIndex, "page": selectCalendarPage}; 
-
-    return {"info": datePicker_selectionInfo, "dates": selectedDates};
+function getRowIndex(D){
+    return $(".selection_page_calendar_row").index($(".selection_page_calendar_row_day").filter((_, dayEl) => {return $(dayEl).data('time') == D}).parent());
 };
 
-function initUserSelection(generatedData){
-    let selectedString = generateDateString(generatedData["dates"], parameters["language"]);
+function getPageOfDate(D){
+    const now = getToday("date");
+    const oneDay = 24 * 60 * 60 * 1000;
+    const firstDate = new Date(now.setDate(now.getDate() - dayofweek_conventional.indexOf(dayofweek[now.getDay()])));
+    
+    const diff = Math.floor((zeroAM(D, "timestamp") - zeroAM(firstDate, "timestamp")) / oneDay);
+    const page = Math.floor(diff / 21) + 1;
 
-    selectCalendarPage = generatedData["info"]["page"];
+    return page;
+};
 
-    datePicker.initSelection(generatedData["dates"]);
-    datePicker.setPage(generatedData["info"]["page"]);
-    datePicker.setRow(generatedData["info"]["rowIndex"]);
+function currentTimeSelection(notif){
+    if(!notif){return};
+    return notif["dateList"].map(timestamp => zeroAM(timestamp, "timestamp"));
+};
+
+function initUserSelection(selectedDates){
+    let selectedString = generateDateString(selectedDates, parameters["language"]);
+
+    datePicker.initSelection(selectedDates);
+    selectCalendarPage = getPageOfDate(new Date(selectedDates[0]));
 
     $('.update_schedule_datePicker').text(selectedString);
 };
@@ -1165,7 +1144,7 @@ function setCalendarSelection(page){
     }else{
         if($('.update_schedule_select_every').val() == "Day"){
             let firstDay = datePicker.getPendingSelection().sort()[0];
-            
+
             datePicker.clearPendingSelection();
             datePicker.togglePendingSelectionElement(firstDay);
 
@@ -1175,11 +1154,14 @@ function setCalendarSelection(page){
                 return datePicker.getPendingSelection().includes($(dayEl).data('time'));
             }).css("background-color", 'rgb(29, 188, 96)');
         }else if($('.update_schedule_select_every').val() == "Week"){
+            let selectionRow = getRowIndex(datePicker.getFirstPendingElement());
+            let selectionPage = getPageOfDate(datePicker.getFirstPendingElement());
+
             $(".selection_page_calendar_row_day").css("backgroundColor", 'rgb(76, 83, 104)');
             
-            if(datePicker.getPage() == page){
+            if(selectionPage == page){
                 $(".selection_page_calendar_row_day").css("opacity", ".3");
-                $(".selection_page_calendar_row").eq(datePicker.getRow()).children().filter((_, dayEl) => {
+                $(".selection_page_calendar_row").eq(selectionRow).children().filter((_, dayEl) => {
                     return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
                 ).css("opacity", "1");
         
@@ -1609,11 +1591,6 @@ $(document).ready(function(){
             let dayOrWeek = $(".update_schedule_select_every").val();
 
             if(dayOrWeek == "Day"){
-                let rowIndex = $(".selection_page_calendar_row").index($(this).parent());
-
-                datePicker.setRow(rowIndex);
-                datePicker.setPage(selectCalendarPage);
-
                 $('.selection_page_calendar_row_day').filter((_, dayEl) => {
                     return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
                 ).css({"backgroundColor": 'rgb(76, 83, 104)', 'opacity': '1'});
@@ -1629,20 +1606,23 @@ $(document).ready(function(){
             }else if(dayOrWeek == "Week"){
                 let rowIndex = $(".selection_page_calendar_row").index($(this).parent());
 
-                if(rowIndex != datePicker.getRow() || selectCalendarPage != datePicker.getPage()){
+                let selectionRow = getRowIndex(datePicker.getFirstPendingElement());
+                let selectionPage = getPageOfDate(datePicker.getFirstPendingElement());
+
+                if(rowIndex != selectionRow || selectCalendarPage != selectionPage){
                     datePicker.clearPendingSelection();
                 };
 
-                datePicker.setRow(rowIndex);
-                datePicker.setPage(selectCalendarPage);
-
                 let lit = datePicker.togglePendingSelectionElement($(this).data('time'));
+
+                selectionRow = getRowIndex(datePicker.getFirstPendingElement());
+                selectionPage = getPageOfDate(datePicker.getFirstPendingElement());
 
                 if(datePicker.getPendingSelection().length == 0){
                     $(".selection_page_calendar_row_day").css('opacity', '1');
                 }else{
-                    $(".selection_page_calendar_row").filter((i) => i !== datePicker.getRow()).children().css({'opacity': '.3', "backgroundColor": 'rgb(76, 83, 104)'});
-                    $(".selection_page_calendar_row").filter((i) => i === datePicker.getRow()).children().filter((_, dayEl) => {
+                    $(".selection_page_calendar_row").filter((i) => i !== selectionRow).children().css({'opacity': '.3', "backgroundColor": 'rgb(76, 83, 104)'});
+                    $(".selection_page_calendar_row").filter((i) => i === selectionRow).children().filter((_, dayEl) => {
                         return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")} 
                     ).css('opacity', '1');
                 };
@@ -1670,13 +1650,12 @@ $(document).ready(function(){
 
         datePicker.setPendingSelection(cloneOBJ(datePicker.getSelection()));
 
-        calendarGoPicker("static", datePicker.getPage());
+        calendarGoPicker("static", getPageOfDate(datePicker.getFirstPendingElement()));
         showBlurPage('update_datePicker');
     });
 
     $(document).on('click', '.calendarPickerSubmit', function(e){
         datePicker.confirmSelection();
-        console.log(datePicker.getSelection());
 
         let dateString = generateDateString(datePicker.getSelection(), parameters["language"]);
 
