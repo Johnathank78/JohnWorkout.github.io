@@ -619,20 +619,6 @@ function updateCalendar(data, page){
                         $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                     };
 
-                    if((!match
-                        && ((calendar_dict[data[i]["id"]] && !sessionDone["data"][id])
-                        || (calendar_dict[data[i]["id"]] && sessionDone["data"][id] && nbdayz != today))) 
-                    || (match 
-                        && (!sessionDone["data"][match['to']] 
-                        || (sessionDone["data"][match['to']] && nbdayz != today)))
-                    ){
-                        if(match && scheduleDate.getTime() == todaysDate.getTime()){
-                            sessionToBeDone["data"][match['to']] = true;
-                        }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
-                            sessionToBeDone["data"][data[i]['id']] = true;
-                        };
-                    };
-
                     nbdayz += 1
                 };
             }else if(getScheduleScheme(data[i]) == "Week"){
@@ -730,20 +716,6 @@ function updateCalendar(data, page){
                             $(dayz).eq(dayInd).data("sList").push([[data[i]["id"], data[i]["name"]], [notif["scheduleData"]["hours"], notif["scheduleData"]["minutes"]]]);
                         };
 
-                        if((!match
-                            && ((calendar_dict[data[i]["id"]] && !sessionDone["data"][id])
-                            || (calendar_dict[data[i]["id"]] && sessionDone["data"][id] && nbdayz != today)))
-                        || (match
-                            && (!sessionDone["data"][match['to']]
-                            || (sessionDone["data"][match['to']] && nbdayz != today)))
-                        ){
-                            if(match && scheduleDate.getTime() == todaysDate.getTime()){
-                                sessionToBeDone["data"][match['to']] = true;
-                            }else if(!match && scheduleDate.getTime() == todaysDate.getTime()){
-                                sessionToBeDone["data"][id] = true;
-                            };
-                        };
-
                         nbdayz += 1;
                     };
                 };
@@ -784,8 +756,6 @@ function updateCalendar(data, page){
 
         $(dayz).eq(i).css('backgroundColor', color);
     });
-
-    sessionToBeDone_save(sessionToBeDone);
 };
 
 async function shiftPlusOne(){
@@ -1330,8 +1300,12 @@ $(document).ready(function(){
 
         bottomNotification("exchanged");
 
-        sessionToBeDone["data"][previousID] = false;
-        sessionToBeDone["data"][idTo] = true;
+        if(time == getToday("timestamp")){
+            sessionToBeDone["data"][previousID] = false;
+            sessionToBeDone["data"][idTo] = true;
+            
+            sessionToBeDone_save(sessionToBeDone);
+        };
 
         if(platform == "Mobile"){
             let toSubstract = time_unstring(parameters['notifBefore']) * 1000;
@@ -1355,7 +1329,6 @@ $(document).ready(function(){
             };
         };
 
-        sessionToBeDone_save(sessionToBeDone)
         sessionSwapped_save(sessionSwapped);
         updateCalendar(session_list, updateCalendarPage);
 
@@ -1595,7 +1568,7 @@ $(document).ready(function(){
                     return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")}
                 ).css({"backgroundColor": 'rgb(76, 83, 104)', 'opacity': '1'});
 
-                if($(this).data('time') == datePicker.getSelection()[0]){
+                if($(this).data('time') == datePicker.getPendingSelection()[0]){
                     $(this).css("backgroundColor", 'rgb(76, 83, 104)');
                     datePicker.clearPendingSelection();
                 }else{
@@ -1619,7 +1592,9 @@ $(document).ready(function(){
                 selectionPage = getPageOfDate(datePicker.getFirstPendingElement());
 
                 if(datePicker.getPendingSelection().length == 0){
-                    $(".selection_page_calendar_row_day").css('opacity', '1');
+                    $(".selection_page_calendar_row_day").filter((_, dayEl) => {
+                        return zeroAM($(dayEl).data('time'), "timestamp") >= getToday("timestamp")} 
+                    ).css('opacity', '1');
                 }else{
                     $(".selection_page_calendar_row").filter((i) => i !== selectionRow).children().css({'opacity': '.3', "backgroundColor": 'rgb(76, 83, 104)'});
                     $(".selection_page_calendar_row").filter((i) => i === selectionRow).children().filter((_, dayEl) => {

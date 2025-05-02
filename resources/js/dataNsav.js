@@ -21,11 +21,15 @@ function cleanSessionScheme(drop){
 
 function sessionSchemeVarsReset(){
     hasBeenShifted = emptySessionScheme();
-    sessionDone = emptySessionScheme();
-    sessionToBeDone = emptySessionScheme();
-
     hasBeenShifted_save(hasBeenShifted);
+    
+    sessionDone = emptySessionScheme();
     sessionDone_save(sessionDone);
+    
+    sessionSwapped = [];
+    sessionSwapped_save(sessionSwapped);
+    
+    sessionToBeDone = fillSessionToBeDone();
     sessionToBeDone_save(sessionToBeDone);
 };
 
@@ -280,7 +284,7 @@ function stats_read(set=false){
         data = JSON.parse(data);
         data = JSONiseStats(data);
 
-        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1744322400000){
+        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1746136800000){
             data['missedSessions']['val'] = 0;
         };
     };
@@ -1002,6 +1006,7 @@ function hasBeenShifted_save(data){
     localStorage.setItem("hasBeenShifted", JSON.stringify(data));
 };
 
+
 function sessionSwapped_read(){
     let data = localStorage.getItem("sessionSwapped");
     let now = getToday('timestamp');
@@ -1023,11 +1028,47 @@ function sessionSwapped_save(data){
 };
 
 
+function fillSessionToBeDone(){
+    data = emptySessionScheme();
+
+    session_list.forEach((session) => {
+        let notif = session['notif'];
+
+        if(notif){
+            let scheduleDateId = getClosestWeekIteration(getToday("timestamp"), notif['dateList']);
+            let jumpData = notif['jumpData'];
+            
+            if(isEventScheduled(
+                getToday("date"),
+                notif["dateList"][scheduleDateId],
+                notif["scheduleData"]["count"], 
+                notif["scheduleData"]["scheme"], 
+                jumpData['jumpVal'], 
+                jumpData['jumpType'], 
+                jumpData['everyVal'], 
+                notif['occurence'], 
+                session['id']
+            )){
+                data['data'][session['id']] = true;
+            };
+        };
+    });
+
+    sessionSwapped.forEach((swap) => {
+        if(swap.time == getToday("timestamp")){
+            data['data'][swap.from] = false;
+            data['data'][swap.to] = true;
+        };
+    });
+
+    return data;
+};
+
 function sessionToBeDone_read(){
     let data = localStorage.getItem("sessionToBeDone");
 
     if (data === null || data == ""){
-        data = emptySessionScheme();
+        data = fillSessionToBeDone();
         localStorage.setItem("sessionToBeDone", JSON.stringify(data));
 
         return data;
@@ -1056,31 +1097,8 @@ function sessionToBeDone_read(){
 
         // --------------------
 
-        data = emptySessionScheme();
-        session_list.forEach((session) => {
-            let notif = session['notif'];
-
-            if(notif){
-                let scheduleDateId = getClosestWeekIteration(getToday("timestamp"), notif['dateList']);
-                let jumpData = notif['jumpData'];
-                
-                if(isEventScheduled(
-                    getToday("date"),
-                    notif["dateList"][scheduleDateId],
-                    notif["scheduleData"]["count"], 
-                    notif["scheduleData"]["scheme"], 
-                    jumpData['jumpVal'], 
-                    jumpData['jumpType'], 
-                    jumpData['everyVal'], 
-                    notif['occurence'], 
-                    session['id']
-                )){
-                    data['data'][session['id']] = true;
-                };
-            };
-        });
-
-        sessionToBeDone_save(data)
+        data = fillSessionToBeDone();
+        sessionToBeDone_save(data);
     };
 
     return data;
@@ -1088,4 +1106,5 @@ function sessionToBeDone_read(){
 
 function sessionToBeDone_save(data){
     localStorage.setItem("sessionToBeDone", JSON.stringify(data));
+    return;
 };

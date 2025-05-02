@@ -68,12 +68,6 @@ $(document).ready(async function(){
         reminder_list = reminder_read();
  
         sessionSwapped = sessionSwapped_read();
-
-        // SESSION MISSED TEST
-
-        //console.log(nbSessionScheduled(getToday("date", -1)));
-
-        // -------------------
         
         hasBeenShifted = hasBeenShifted_read();
         sessionToBeDone = sessionToBeDone_read();
@@ -138,6 +132,27 @@ $(document).ready(async function(){
 
     // session_list[0].notif.dateList[0] = closestData.timestamp;
     // session_list[0].notif.occurence = closestData.occurence;
+
+    // SESSION MISSED TEST
+
+        // let dateee = new Date(session_list[0].notif.dateList[0]);
+
+        // dateee.setDate(dateee.getDate() - 3);
+        // console.log(dateee)
+
+        // let dateee2 = new Date(sessionSwapped[0].time);
+
+        // dateee2.setDate(dateee2.getDate() - 3);
+        // console.log(dateee2)
+
+        // sessionSwapped[0].time = dateee2.getTime()
+
+        // session_list[0].notif.dateList[0] = dateee.getTime();
+        // session_list[0].notif.occurence = 9;
+
+        //console.log(nbSessionScheduled(getToday("date", -1)));
+
+    // -------------------
     
     //$('.main_title').text([window.screen.width, window.screen.height, window.devicePixelRatio, window.matchMedia("(orientation: portrait)").matches ? "portrait" : 'landscape'].join(','))
 });//readyEnd
