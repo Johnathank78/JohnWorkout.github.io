@@ -284,7 +284,7 @@ function stats_read(set=false){
         data = JSON.parse(data);
         data = JSONiseStats(data);
 
-        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1746136800000){
+        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1746655200000){
             data['missedSessions']['val'] = 0;
         };
     };
