@@ -577,7 +577,8 @@ $(document).ready(function(){
         }else{
             $(".update_schedule_select_day").attr("multiple", false);
             $('.update_colorChooser').css('backgroundColor', colorList[Math.floor(Math.random() * colorList.length)]);
-
+            
+            generateBaseCalendar(1);
             datePicker.initSelection([]);
 
             $('.update_schedule_datePicker').css('justify-content', "center");

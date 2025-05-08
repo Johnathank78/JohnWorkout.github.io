@@ -730,11 +730,17 @@ function session_read(set=false){
             updateWeightUnits(data[0], previousWeightUnit, parameters['weightUnit']);
         };
 
-        //fix
+        // FIX
 
         data[0].forEach(session => {
-            if(isNaI(session['id'])){
-                session['id'] = smallestAvailableId(data[0], "id");
+            if(isNaI(session['id'])) session['id'] = smallestAvailableId(data[0], "id");
+
+            if(session['history']['state'] == 'true'){
+                console.log(session['name'], true)
+                session['history']['state'] = true;
+            }else if(session['history']['state'] == 'false'){
+                console.log(session['name'], false)
+                session['history']['state'] = false;
             };
         });
 
@@ -1029,24 +1035,33 @@ function sessionSwapped_save(data){
 
 
 function fillSessionToBeDone(){
-    data = emptySessionScheme();
-
+    let data = emptySessionScheme();
+    
     session_list.forEach((session) => {
         let notif = session['notif'];
-
+        
         if(notif){
-            let scheduleDateId = getClosestWeekIteration(getToday("timestamp"), notif['dateList']);
             let jumpData = notif['jumpData'];
             
+            let dateToTest = getToday("date");
+            let scheduleDate = false;
+            
+            if(getScheduleScheme(session) == "Day"){
+                scheduleDate = zeroAM(notif["dateList"][0], "date");
+            }else{
+                let i = getClosestWeekIteration(getToday("timestamp"), notif['dateList']);
+                scheduleDate = zeroAM(notif["dateList"][i], "date");
+            };
+
             if(isEventScheduled(
-                getToday("date"),
-                notif["dateList"][scheduleDateId],
+                dateToTest,
+                scheduleDate,
                 notif["scheduleData"]["count"], 
                 notif["scheduleData"]["scheme"], 
                 jumpData['jumpVal'], 
                 jumpData['jumpType'], 
                 jumpData['everyVal'], 
-                notif['occurence'], 
+                notif["occurence"], 
                 session['id']
             )){
                 data['data'][session['id']] = true;
@@ -1065,28 +1080,28 @@ function fillSessionToBeDone(){
 };
 
 function sessionToBeDone_read(){
-    let data = localStorage.getItem("sessionToBeDone");
+    let sessionToBeDone = localStorage.getItem("sessionToBeDone");
 
-    if (data === null || data == ""){
-        data = fillSessionToBeDone();
-        localStorage.setItem("sessionToBeDone", JSON.stringify(data));
+    if (sessionToBeDone === null || sessionToBeDone == ""){
+        sessionToBeDone = fillSessionToBeDone();
+        localStorage.setItem("sessionToBeDone", JSON.stringify(sessionToBeDone));
 
-        return data;
+        return sessionToBeDone;
     };
 
-    data = JSON.parse(data);
+    sessionToBeDone = JSON.parse(sessionToBeDone);
 
-    if(formatDate(new Date(data["creationDate"])) != formatDate(getToday("date"))){
+    if(formatDate(new Date(sessionToBeDone["creationDate"])) != formatDate(getToday("date"))){
         let sessionDone = localStorage.getItem("session_done");
 
         let count = nbSessionScheduled(getToday("date", -1));
-        let elapsedDays = daysBetweenTimestamps(data["creationDate"], getToday("date"));
+        let elapsedDays = daysBetweenTimestamps(sessionToBeDone["creationDate"], getToday("date"));
 
         if(!(sessionDone === null || sessionDone == "") && elapsedDays > 1){
             sessionDone = JSON.parse(sessionDone);
 
-            Object.keys(data["data"]).forEach(function(key){
-                if(data["data"][key] && sessionDone["data"][key]){
+            Object.keys(sessionToBeDone["data"]).forEach(function(key){
+                if(sessionToBeDone["data"][key] && sessionDone["data"][key]){
                     count -= 1;
                 };
             });
@@ -1097,11 +1112,11 @@ function sessionToBeDone_read(){
 
         // --------------------
 
-        data = fillSessionToBeDone();
-        sessionToBeDone_save(data);
+        sessionToBeDone = fillSessionToBeDone();
+        sessionToBeDone_save(sessionToBeDone);
     };
 
-    return data;
+    return sessionToBeDone;
 };
 
 function sessionToBeDone_save(data){

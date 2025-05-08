@@ -511,8 +511,6 @@ function updateCalendar(data, page){
     let end = 20;
 
     let today = dayofweek_conventional.indexOf(dayofweek[new Date().getDay()]);
-    let todaysDate = getToday("date");
-
     let dayz = $(".selection_page_calendar_row_day");
 
     generateBaseCalendar(page);
@@ -1625,7 +1623,7 @@ $(document).ready(function(){
 
         datePicker.setPendingSelection(cloneOBJ(datePicker.getSelection()));
 
-        calendarGoPicker("static", getPageOfDate(datePicker.getFirstPendingElement()));
+        calendarGoPicker("static", getPageOfDate(datePicker.getFirstPendingElement() || getToday("timestamp")));
         showBlurPage('update_datePicker');
     });
 

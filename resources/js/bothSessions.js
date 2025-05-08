@@ -155,7 +155,7 @@ async function launchSession(index){
     $(".selection_info_item").eq(4).css("display", "none");
 };
 
-async function quit_session(failed=false){      
+async function quit_session(failed=false){
     current_page = "selection";
     audio_set(0);
     
@@ -204,7 +204,6 @@ async function quit_session(failed=false){
         stats["workedTime"] += tempStats["workedTime"];
         stats["weightLifted"] += tempStats["weightLifted"];
         stats["repsDone"] += tempStats["repsDone"];
-        
         stats_save(stats);
 
         sessionDone["data"][current_session["id"]] = true;
