@@ -742,6 +742,18 @@ function session_read(set=false){
                 console.log(session['name'], false)
                 session['history']['state'] = false;
             };
+            
+            // for (let h = 0; h < session['history']['historyList'].length; h++) {
+            //     let history = session['history']['historyList'][h];
+            //     for (let e = 0; e < history['exoList'].length; e++) {
+            //         let exo = history['exoList'][e];
+            //         if (exo['setList'] === undefined) continue;
+            //         for (let s = 0; s < exo['setList'].length; s++) {
+            //             let set = exo['setList'][s];
+            //             if (!isDict(set)) exo['setList'][s] = set[0];
+            //         };
+            //     };
+            // };
         });
 
         return data[0];

@@ -526,15 +526,16 @@ function historyDay(i, history){
     
                 for(let y=0;y<exo["setList"].length;y++){
                     set = exo["setList"][y];
-    
+
                     expectedWeightUnit = exo["expectedStats"]["weightUnit"];
 
                     actualReps = set["reps"]
                     expectedReps = exo["expectedStats"]["reps"];
-        
+                    
+
                     actualWeight = convertToUnit(set["weight"], expectedWeightUnit, parameters["weightUnit"]);
                     expectedWeight = convertToUnit(exo["expectedStats"]["weight"], expectedWeightUnit, parameters["weightUnit"]);
-                    
+
                     if(actualReps != 0){
                         out[1][out[1].length - 1].push(fillElem('set', [actualReps, '/'+expectedReps, unitRound(actualWeight), '/'+unitRound(expectedWeight), parameters["weightUnit"]]));
                     };

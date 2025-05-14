@@ -1819,11 +1819,11 @@ $(document).ready(function(){
                         "weight": weight
                     })) : 
                     next_name.includes("Alt.") ? 
-                        tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push([generateHistorySetObj({
+                        tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push(generateHistorySetObj({
                             "type": extype,
                             "reps": Math.round(reps/2),
                             "weight": weight
-                        })]) : 
+                        })) : 
                         tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["setList"].push(generateHistorySetObj({
                             "type": extype,
                             "reps": reps,

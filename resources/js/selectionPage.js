@@ -496,7 +496,7 @@ $(document).ready(function(){
 
         let item = $(e.target).closest(".selection_session_tile, .selection_reminder_tile");
         trackItem(item, "session");
-
+        
         $(".update_data_name").val(update_current_item["name"]);
         $(".update_history_container_day, .update_history_loadMore_btn").remove();
 
@@ -549,6 +549,8 @@ $(document).ready(function(){
         if(cannotClick && reminderOrSession == "reminder"){return}else{canNowClick('allowed')};
 
         trackItem(item, reminderOrSession);
+
+        $('.update_colorChooser').css('backgroundColor', update_current_item['color']);
 
         let inp_list = $(".update_schedule_input");
         let notif = isScheduled(update_current_item);

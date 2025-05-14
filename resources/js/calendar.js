@@ -408,7 +408,7 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
     // -------------------------------------
     // 8. Main logic to determine the result
     // -------------------------------------
-     
+
     if (diffInDays >= 0) {
         // If diffInDays >= 0, just check if C is an event day.
         return checkEventDay(diffInDays);
@@ -417,9 +417,7 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
 
         // 8.1. Check if C meets the pattern even though it's before D.
         const occurrence = checkEventDay(diffInDays);
-        if (!occurrence) {
-            return false;
-        }
+        if (!occurrence) return false;
 
         // 8.2. Ensure the spacing between C and D is exactly intervalDays
         //      so that C is presumably the event immediately before D.
@@ -435,9 +433,7 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
         const isShifted = ID ? hasBeenShifted["data"][ID] : true;
 
         // 8.4. If all conditions align, keep the occurrence from checkEventDay.
-        if (correctSpacing && C_isToday && !isShifted) {
-            return occurrence;
-        }
+        if (correctSpacing && C_isToday && !isShifted) return occurrence;
 
         // Otherwise, it's not considered scheduled.
         return false;
