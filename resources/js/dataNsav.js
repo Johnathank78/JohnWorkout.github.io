@@ -284,7 +284,7 @@ function stats_read(set=false){
         data = JSON.parse(data);
         data = JSONiseStats(data);
 
-        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1746655200000){
+        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1748556000000){
             data['missedSessions']['val'] = 0;
         };
     };
@@ -736,10 +736,8 @@ function session_read(set=false){
             if(isNaI(session['id'])) session['id'] = smallestAvailableId(data[0], "id");
 
             if(session['history']['state'] == 'true'){
-                console.log(session['name'], true)
                 session['history']['state'] = true;
             }else if(session['history']['state'] == 'false'){
-                console.log(session['name'], false)
                 session['history']['state'] = false;
             };
             
@@ -1106,10 +1104,10 @@ function sessionToBeDone_read(){
     if(formatDate(new Date(sessionToBeDone["creationDate"])) != formatDate(getToday("date"))){
         let sessionDone = localStorage.getItem("session_done");
 
+        // let elapsedDays = daysBetweenTimestamps(sessionToBeDone["creationDate"], getToday("date"));
         let count = nbSessionScheduled(getToday("date", -1));
-        let elapsedDays = daysBetweenTimestamps(sessionToBeDone["creationDate"], getToday("date"));
 
-        if(!(sessionDone === null || sessionDone == "") && elapsedDays > 1){
+        if(!(sessionDone === null || sessionDone == "")){
             sessionDone = JSON.parse(sessionDone);
 
             Object.keys(sessionToBeDone["data"]).forEach(function(key){

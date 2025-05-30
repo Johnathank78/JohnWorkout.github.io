@@ -59,6 +59,19 @@ function getHint(session, id){
     return session["exoList"].filter(exo => exo["id"] === id).map(exo => exo["hint"])[0];
 };
 
+function openHint(){
+    if(!getHint(current_session, next_id)) return;
+    
+    if($(".session_hintText").width()/$(".session_hintText").parent().width() <= 0.60){
+        $(".session_hintText").css('text-align', 'center');
+    }else{
+        $(".session_hintText").css('text-align', 'left');
+    };
+
+    isSetPreviewingHint = true;
+    showBlurPage('session_hintBody');
+};
+
 function updateRestBtnStyle(extype){
     if(extype == "Uni."){
         $('.session_exercise_Lrest_btn, .session_exercise_Rrest_btn').css({
@@ -932,7 +945,9 @@ async function next_exercise(first){
             update_info(true);
         };
 
+        if(extype != "Pause") openHint();
         check_lastSet();
+
         if(hasReallyStarted && extype != "Int."){udpate_recovery("workout")};
     };
 };
@@ -1048,6 +1063,7 @@ function update_specs(reps, weight){
 
 function display_info(past_data = true){
     $(".session_current_exercise_name").text(next_name);
+
     update_hint();
     update_specs(next_specs[0], next_specs[1]);
 
@@ -2079,14 +2095,7 @@ $(document).ready(function(){
     $(document).on("click", ".session_hint", function(){
         if(cannotClick && !isAbleToClick("expander")){return};
 
-        isSetPreviewingHint = true;
-        showBlurPage('session_hintBody');
-
-        if($(".session_hintText").width()/$(".session_hintText").parent().width() <= 0.60){
-            $(".session_hintText").css('text-align', 'center');
-        }else{
-            $(".session_hintText").css('text-align', 'left');
-        };
+        openHint();
     });
 
     // UNDO;

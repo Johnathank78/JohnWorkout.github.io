@@ -188,7 +188,7 @@ async function quit_session(failed=false){
 
     if(parameters["keepAwake"]){keepAwakeToggle(false)};
 
-    if(!((current_session["type"] == "W" && (tempStats["timeSpent"] <= 90 || isHistoryDayEmpty(tempNewHistory))) || current_session["type"] == "I" && tempStats["timeSpent"] <= 60)){
+    if(!((current_session["type"] == "W" && (tempStats["timeSpent"] <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session["type"] == "I" && tempStats["timeSpent"] <= 60)){
 
         fillSessionEnd(tempNewHistory, current_history, failed);
 
