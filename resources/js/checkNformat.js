@@ -157,6 +157,15 @@ function closePanel(src, notAnimated=false){
             pastDataShown = false;
             
             break;
+        case "archive":
+            current_page = "selection";
+            global_pusher(session_list, reminder_list, archive = false);
+
+            $('.update_backArrow').css('display', 'none');
+            $('.main_title_block').css('display', 'inline-block');
+            $('.selection_add_btn, .selection_info, .selection_parameters').css('display', 'flex');
+            
+            break;
         default:
             console.warn(`Unknown src: ${src}`);
             break;

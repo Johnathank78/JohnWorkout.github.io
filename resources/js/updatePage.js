@@ -1361,14 +1361,7 @@ $(document).ready(function(){
 
     $(document).on('click', ".update_backArrow", function(e){
         if(current_page != "archive") return;
-
-        current_page = "selection";
-
-        global_pusher(session_list, reminder_list, archive = false);
-
-        $('.update_backArrow').css('display', 'none');
-        $('.main_title_block').css('display', 'inline-block');
-        $('.selection_add_btn, .selection_info, .selection_parameters').css('display', 'flex');
+        closePanel('archive');
     });
 
     $(document).on('click', '.update_delete_archiverContainer', async function(e){

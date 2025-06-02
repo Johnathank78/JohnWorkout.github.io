@@ -14,7 +14,9 @@ var haveWebNotificationsBeenAccepted = false;
 // BACKER 
 
 function goBack(platform){
-    if(current_page == "selection"){
+    if(current_page == "archive"){
+        closePanel('archive');
+    }else if(current_page == "selection"){
         if(add_state){
             closePanel('addContainer');
         }else if(timeInputShown){

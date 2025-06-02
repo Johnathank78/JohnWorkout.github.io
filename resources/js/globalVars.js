@@ -139,7 +139,7 @@ const textAssets = {
             "schedule": "Programmer",
             "history": "Historique",
             "addASession": "Créer une séance",
-            "archive": "Aucune séance",
+            "archive": "Aucune archive",
             "unarchived": "Déarchiver",
         },
         "updatePage": {
@@ -486,7 +486,7 @@ const textAssets = {
             "schedule": "Schedule",
             "history": "History",
             "addASession": "Create a session",
-            "archive": "No session archived yet",
+            "archive": "No archive yet",
             "unarchived": "Unarchive",
         },
         "updatePage": {
