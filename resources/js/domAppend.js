@@ -1,67 +1,92 @@
-function reminder_tile(reminder){
+function reminder_tile(reminder, archived = false){
 
     let schedule_color = false;
     if(isScheduled(reminder)){schedule_color = "#1dbc60"}else{schedule_color = "#363949"};
 
-    return `<div class="selection_reminder_tile reorder__child noselect grab" style="z-index: 0;">
-                <span class="selection_reminder_name noselect">`+reminder["name"]+`</span>
-                <div class="selection_session_button_container">
-                    <button class="reorder__avoid selection_round_btn selection_bin_btn">
-                        <img src="`+binIMG+`" draggable="False" alt="" class="selection_icon_btn">
-                    </button>
-
-                    <button class="reorder__avoid selection_round_btn selection_edit_btn">
-                        <img src="`+editIMG+`" draggable="False" alt="" class="selection_icon_btn">
-                    </button>
-
-                    <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule selection_reminder_btn reorder__avoid" style="background-color:`+schedule_color+`;">`+textAssets[parameters["language"]]["sessionItem"]["schedule"]+`</span>
-                </div>
-            </div>`;
+    if(!archived){
+        return `<div class="selection_reminder_tile reorder__child noselect grab" tileid="`+reminder['id']+`" style="z-index: 0;">
+                    <span class="selection_reminder_name noselect">`+reminder["name"]+`</span>
+                    <div class="selection_session_button_container">
+                        <button class="reorder__avoid selection_round_btn selection_bin_btn">
+                            <img src="`+binIMG+`" draggable="False" alt="" class="selection_icon_btn">
+                        </button>
+    
+                        <button class="reorder__avoid selection_round_btn selection_edit_btn">
+                            <img src="`+editIMG+`" draggable="False" alt="" class="selection_icon_btn">
+                        </button>
+    
+                        <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule selection_reminder_btn reorder__avoid" style="background-color:`+schedule_color+`;">`+textAssets[parameters["language"]]["sessionItem"]["schedule"]+`</span>
+                    </div>
+                </div>`;
+    }else{
+        return `<div class="selection_reminder_tile reorder__child noselect grab" tileid="`+reminder['id']+`" style="z-index: 0;">
+                    <span class="selection_reminder_name noselect">`+reminder["name"]+`</span>
+                    <div class="selection_session_button_container">    
+                        <span class="selection_session_tile_extra_element selection_unarchived_btn reorder__avoid" style="background-color:`+"#363949"+`;">`+textAssets[parameters["language"]]["sessionItem"]["unarchived"]+`</span>
+                    </div>
+                </div>`;
+    };
 };
 
-function session_tile(session){
+function session_tile(session, archived = false){
     
     let time = get_session_time(session)
     let schedule_color = false;
 
     if(isScheduled(session)){schedule_color = "#1dbc60"}else{schedule_color = "#363949"};
 
-    return `<div class="selection_session_tile reorder__child noselect">
-                <span class="selection_session_name noselect">`+session["name"]+`</span>
-                <div class="selection_session_details_container">
-                    <span class="selection_session_details selection_session_totaltime noselect">`+get_time(time)+`</span>
-                    <span class="selection_session_details selection_session_cycle noselect">`+get_session_exoCount(session)+` Exercises</span>
-                    <span class="selection_session_details selection_session_work noselect"></span>
-                    <span class="selection_session_details selection_session_rest noselect"></span>
-                </div>
-                <div class="selection_session_button_container">
-                    <button class="reorder__avoid selection_round_btn selection_bin_btn">
-                        <img src="`+binIMG+`" draggable=False alt="" class="selection_icon_btn">
-                    </button>
-
-                    <button class="reorder__avoid selection_round_btn selection_edit_btn">
-                        <img src="`+editIMG+`" draggable=False alt="" class="selection_icon_btn">
-                    </button>
-
-                    <button class="reorder__avoid selection_round_btn selection_play_btn">
-                        <img src="`+playIMG+`" draggable=False alt="" class="selection_icon_fix_btn">
-                    </button>
-                </div>
-
-                <div class="selection_session_tile_extra_container reorder__avoid">
-                    <div class="selection_session_tile_grabber"></div>
-
-                    <div class="selection_session_tile_extra_btn_container">
-                        <div class="selection_round_btn selection_session_tile_extra_btn selection_session_tile_extra_confirm"><img src="`+timer2IMG+`" draggable=False alt="" class="selection_session_tile_extra_btn_icon selection_session_tile_extra_confirm_icon noselect"></div>
-                        <div class="selection_round_btn selection_session_tile_extra_btn selection_session_tile_extra_delete"><img src="`+addIMG+`" draggable=False alt="" class="selection_session_tile_extra_btn_icon selection_session_tile_extra_delete_icon noselect"></div>
+    if(!archived){
+        return `<div class="selection_session_tile reorder__child noselect" tileid="`+session["id"]+`">
+                    <span class="selection_session_name noselect">`+session["name"]+`</span>
+                    <div class="selection_session_details_container">
+                        <span class="selection_session_details selection_session_totaltime noselect">`+get_time(time)+`</span>
+                        <span class="selection_session_details selection_session_cycle noselect">`+get_session_exoCount(session)+` Exercises</span>
+                        <span class="selection_session_details selection_session_work noselect"></span>
+                        <span class="selection_session_details selection_session_rest noselect"></span>
                     </div>
-
-                    <div class="selection_session_tile_extra">
-                        <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule" style=background-color:`+schedule_color+`;>`+textAssets[parameters["language"]]["sessionItem"]["schedule"]+`</span>
-                        <span class="selection_session_tile_extra_element selection_session_tile_extra_history">`+textAssets[parameters["language"]]["sessionItem"]["history"]+`</span>
+                    <div class="selection_session_button_container">
+                        <button class="reorder__avoid selection_round_btn selection_bin_btn">
+                            <img src="`+binIMG+`" draggable=False alt="" class="selection_icon_btn">
+                        </button>
+    
+                        <button class="reorder__avoid selection_round_btn selection_edit_btn">
+                            <img src="`+editIMG+`" draggable=False alt="" class="selection_icon_btn">
+                        </button>
+    
+                        <button class="reorder__avoid selection_round_btn selection_play_btn">
+                            <img src="`+playIMG+`" draggable=False alt="" class="selection_icon_fix_btn">
+                        </button>
                     </div>
-                </div>
-            </div>`;
+    
+                    <div class="selection_session_tile_extra_container reorder__avoid">
+                        <div class="selection_session_tile_grabber"></div>
+    
+                        <div class="selection_session_tile_extra_btn_container">
+                            <div class="selection_round_btn selection_session_tile_extra_btn selection_session_tile_extra_confirm"><img src="`+timer2IMG+`" draggable=False alt="" class="selection_session_tile_extra_btn_icon selection_session_tile_extra_confirm_icon noselect"></div>
+                            <div class="selection_round_btn selection_session_tile_extra_btn selection_session_tile_extra_delete"><img src="`+addIMG+`" draggable=False alt="" class="selection_session_tile_extra_btn_icon selection_session_tile_extra_delete_icon noselect"></div>
+                        </div>
+    
+                        <div class="selection_session_tile_extra">
+                            <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule" style=background-color:`+schedule_color+`;>`+textAssets[parameters["language"]]["sessionItem"]["schedule"]+`</span>
+                            <span class="selection_session_tile_extra_element selection_session_tile_extra_history">`+textAssets[parameters["language"]]["sessionItem"]["history"]+`</span>
+                        </div>
+                    </div>
+                </div>`;
+    }else{
+        return `<div class="selection_session_tile reorder__child noselect" tileid="`+session["id"]+`">
+                    <span class="selection_session_name noselect">`+session["name"]+`</span>
+                    <div class="selection_session_details_container">
+                        <span class="selection_session_details selection_session_totaltime noselect">`+get_time(time)+`</span>
+                        <span class="selection_session_details selection_session_cycle noselect">`+get_session_exoCount(session)+` Exercises</span>
+                        <span class="selection_session_details selection_session_work noselect"></span>
+                        <span class="selection_session_details selection_session_rest noselect"></span>
+                    </div>
+                    <div class="selection_session_button_container">
+                        <span class="selection_session_tile_extra_element selection_unarchived_btn reorder__avoid" style="background-color:`+"#363949"+`;">`+textAssets[parameters["language"]]["sessionItem"]["unarchived"]+`</span>
+                    </div>
+                </div>`;
+    };
+
 };
 
 function Iintervall_tile(data = false){

@@ -138,7 +138,9 @@ const textAssets = {
         "sessionItem": {
             "schedule": "Programmer",
             "history": "Historique",
-            "addASession": "Créer une séance"
+            "addASession": "Créer une séance",
+            "archive": "Aucune séance",
+            "unarchived": "Déarchiver",
         },
         "updatePage": {
             "linkWith": "Lier avec",
@@ -287,7 +289,9 @@ const textAssets = {
             "audioBroken": "Contrôle du son non disponible",
             "longClickable": "Appuie longtemps pour valider",
             "exchanged": "Séance échangé avec succès",
-            "fixSound": "Son réparé avec succès"
+            "fixSound": "Son réparé avec succès",
+            "archived": "archivée avec succès",
+            "unarchived": "déarchivée avec succès"
         },
         "sessionEnd": {
             "mainText": {
@@ -481,7 +485,9 @@ const textAssets = {
         "sessionItem": {
             "schedule": "Schedule",
             "history": "History",
-            "addASession": "Create a session"
+            "addASession": "Create a session",
+            "archive": "No session archived yet",
+            "unarchived": "Unarchive",
         },
         "updatePage": {
             "linkWith": "Link with",
@@ -630,7 +636,9 @@ const textAssets = {
             "audioBroken": "Sound control not available",
             "longClickable": "Long press to confirm",
             "exchanged": "Session successfully exchanged",
-            "fixSound": "Sound successfully fixed"
+            "fixSound": "Sound successfully fixed",
+            "archived": "archived successfully",
+            "unarchived": "unarchived successfully"
         },
         "sessionEnd": {
             "mainText": {
@@ -757,6 +765,7 @@ $(document).ready(function(){
     exchangeIMG = $('#exchangeIMG').attr('src');
     linkIMG = $('#linkIMG').attr('src');
     stopIMG = $('#stopIMG').attr('src');
+    archiveIMG = $('#archiveIMG').attr('src');
 
     $("img").attr("draggable", false);
     

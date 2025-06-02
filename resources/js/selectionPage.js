@@ -14,24 +14,27 @@ var update_current_item = null;
 var update_current_index = null;
 var update_current_node = null;
 
-function trackItem(item, reminderOrSession){
+function trackItem(item, reminderOrSession, archive = false){
     let node_list = false;
+    let item_List = false;
 
     if(reminderOrSession == "reminder"){
+        item_List = reminder_list.filter(reminder => reminder['isArchived'] === archive);
         node_list = $(".selection_reminder_tile");
 
         update_current_node = $(item).closest(".selection_reminder_tile");
         update_current_index = $(node_list).index(update_current_node);
 
-        update_current_item = reminder_list[update_current_index];
+        update_current_item = item_List[update_current_index];
 
     }else if(reminderOrSession == "session"){
+        item_List = session_list.filter(session => session['isArchived'] === archive);
         node_list = $(".selection_session_tile");
 
         update_current_node = $(item).closest(".selection_session_tile");
         update_current_index = $(node_list).index(update_current_node);
         
-        update_current_item = session_list[update_current_index];
+        update_current_item = item_List[update_current_index];
     };
 };
 

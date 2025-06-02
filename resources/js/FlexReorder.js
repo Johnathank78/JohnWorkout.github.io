@@ -920,7 +920,7 @@ class FlexReorder{
             "position" : "absolute",
 
             "pointer-events" : "none",
-            "z-index" : "999",
+            "z-index" : "9999",
         });
 
         $(this.container).children(".reorder__dark_basement").css({

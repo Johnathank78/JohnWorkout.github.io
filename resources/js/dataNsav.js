@@ -72,7 +72,8 @@ function generateReminderObj({type, name, body, notif, color, id}){
         "body": body,
         "notif": notif,
         "color": color,
-        "id": id
+        "id": id,
+        "isArchived": false
     };
 };
 
@@ -103,7 +104,8 @@ function generateSessionObj({type, name, exoList, history, notif, hint, color, l
             "history": history,
             "notif": notif,
             "color": color,
-            "id": id
+            "id": id,
+            "isArchived": false
         };
     }
 };
@@ -714,7 +716,7 @@ function JSONiseList(list){
 function session_read(set=false){
     let data = localStorage.getItem("sessions_list");
 
-    if(set){data = set; $(".selection_session_container").children().remove()};
+    if(set) data = set;
 
     if(data === null || data == ""){
         calendar_dict = calendar_read([]);
@@ -734,6 +736,7 @@ function session_read(set=false){
 
         data[0].forEach(session => {
             if(isNaI(session['id'])) session['id'] = smallestAvailableId(data[0], "id");
+            if(session.hasOwnProperty("isArchived") === false) session['isArchived'] = false;
 
             if(session['history']['state'] == 'true'){
                 session['history']['state'] = true;
@@ -763,10 +766,14 @@ function session_save(data){
     return;
 };
 
-function session_pusher(session_list){
+function session_pusher(session_list, archive = false, global = false){
+    let filteredSessionList = session_list.filter(session => session['isArchived'] === archive);
+    let filteredReminderList = reminder_list.filter(reminder => reminder['isArchived'] === archive);
+
+    $(".selection_session_container").children().remove();
 
     if(reminder_list){
-        if(reminder_list.length != 0){
+        if(filteredReminderList.length != 0){
             $(".selection_SR_separator").css("display", "flex");
         };
     };
@@ -774,25 +781,31 @@ function session_pusher(session_list){
     $(".selection_session_container").css("display", "flex");
     $(".selection_empty_msg").css("display", "none");
 
-    session_list.forEach(session => {
-        $(".selection_session_container").append(session_tile(session));
+    filteredSessionList.forEach(session => {
+        $(".selection_session_container").append(session_tile(session, archive));
     });
 
-    manageHomeContainerStyle();
-    resize_update();
+    if(!global){
+        manageHomeContainerStyle(archive);
+    };
 };
 
 
 function reminder_read(set=false){
     let data = localStorage.getItem("reminders_list");
 
-    if(set){data = set; $(".selection_reminder_container").children().remove()};
+    if(set) data = set;
 
     if (data === null || data == ""){
         return [];
     }else{
         data = JSON.parse(data);
         data = JSONiseList(data);
+
+        data.forEach(reminder => {
+            if(isNaI(reminder['id'])) reminder['id'] = smallestAvailableId(data, "id");
+            if(reminder.hasOwnProperty("isArchived") === false) reminder['isArchived'] = false;
+        });
 
         return data;
     };
@@ -803,22 +816,36 @@ function reminder_save(data){
     return;
 };
 
-function reminder_pusher(reminder_list){
+function reminder_pusher(reminder_list, archive = false, global = false){
     $(".selection_empty_msg").css("display", "none");
 
-    if(session_list.length == 0){
+    let filteredSessionList = session_list.filter(session => session['isArchived'] === archive);
+    let filteredReminderList = reminder_list.filter(reminder => reminder['isArchived'] === archive);
+
+    $(".selection_reminder_container").children().remove();
+
+    if(filteredSessionList.length == 0){
         $(".selection_reminder_container").css("display", "flex");
         $(".selection_session_container").css("display", "none");
     }else{
         $(".selection_SR_separator, .selection_reminder_container").css("display", "flex");
     };
 
-    reminder_list.forEach(reminder => {
-        $(".selection_reminder_container").append(reminder_tile(reminder));
+    filteredReminderList.forEach(reminder => {
+        $(".selection_reminder_container").append(reminder_tile(reminder, archive));
     });
 
-    manageHomeContainerStyle();
-    resize_update();
+    if(!global){
+        manageHomeContainerStyle(archive);
+    };
+};
+
+
+function global_pusher(session_list, reminder_list, archive = false){
+    session_pusher(session_list, archive, true);
+    reminder_pusher(reminder_list, archive, true);
+
+    manageHomeContainerStyle(archive);
 };
 
 

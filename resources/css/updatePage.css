@@ -16,6 +16,8 @@
 }
 
 .update_backArrow{
+    z-index: 1001;
+    
     position: absolute;
     left: 20px;
     top: 20px;
@@ -231,6 +233,30 @@
     border-radius: 8px;
 
     display: none;
+}
+
+.update_delete_archiverContainer{
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    height: 35px;
+    width: 35px;
+    
+    cursor: pointer;
+
+    background-color: rgb(76, 83, 104);
+    border-radius: 8px;
+
+    display: none;
+}
+
+.update_delete_archiver{
+    width: 60%;
+    filter: invert(100%) sepia(100%) saturate(2%) hue-rotate(184deg) brightness(107%) contrast(101%);
 }
 
 .update_history_container_empty_msg{

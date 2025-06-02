@@ -1136,6 +1136,12 @@
     height: 44px;
 }
 
+.selection_unarchived_btn{
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 44px;
+}
+
 .selection_session_button_container{
     position: absolute;
     display: flex;

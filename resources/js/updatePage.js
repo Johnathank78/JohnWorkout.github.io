@@ -131,7 +131,7 @@ function leaveIntervallEdit(){
 
 $(document).ready(function(){
     $(document).on("click", ".selection_SR_container, .selection_empty_msg", function(){
-        if($('.selection_empty_msg').css('display') == "none"){return};
+        if($('.selection_empty_msg').css('display') == "none" || current_page == "archive"){return};
 
         $('.selection_add_option_session').click();
     });
@@ -1295,8 +1295,9 @@ $(document).ready(function(){
     });
 
     $(document).on('click', ".update_backArrow", function(e){
-        if(e.target != this){return};
-        if(isEditing){$(isEditing).blur();isEditing = false; return};
+        if(e.target != this) return;
+        if(current_page == "archive") return;
+        if(isEditing){$(isEditing).blur(); isEditing = false; return};
 
         if(notTargeted(e.target, ".update_page", ".blurBG") && ['edit', 'add', 'schedule', 'history', "delete"].includes(current_page)){
             leave_update();
@@ -1305,7 +1306,7 @@ $(document).ready(function(){
         };
 
         canNowClick("allowed");
-    })
+    });
 
     $(document).on('click', ".update_colorChooser", function(e){
         colorPickerShown = true;
@@ -1343,7 +1344,87 @@ $(document).ready(function(){
         closePanel('colorPicker');
     });
 
+    // PARAMETERS
+
+    $(document).on('click', '.selection_parameters_archive_btn', function(e){
+        canNowClick();
+        closePanel('parameters');
+        
+        current_page = "archive";
+        $('.selection_SR_container').scrollTop(0);
+
+        global_pusher(session_list, reminder_list, archive = true);
+
+        $('.update_backArrow').css('display', 'block');
+        $('.selection_add_btn, .selection_info, .main_title_block, .selection_parameters').css('display', 'none');
+    });
+
+    $(document).on('click', ".update_backArrow", function(e){
+        if(current_page != "archive") return;
+
+        current_page = "selection";
+
+        global_pusher(session_list, reminder_list, archive = false);
+
+        $('.update_backArrow').css('display', 'none');
+        $('.main_title_block').css('display', 'inline-block');
+        $('.selection_add_btn, .selection_info, .selection_parameters').css('display', 'flex');
+    });
+
+    $(document).on('click', '.update_delete_archiverContainer', async function(e){
+        let title = update_current_item["name"];
+
+        update_current_item['isArchived'] = true;
+        update_current_item['notif'] = false;
+
+        $(update_current_node).remove();
+
+        if(reminderOrSession == "session"){
+            sessionReorder_update();
+        }else if(reminderOrSession == "reminder"){
+            reminderReorder_update();
+        };
+        
+        if(platform == "Mobile"){
+            await removeAllNotifsFromSession(update_current_item);
+        };
+
+        manageHomeContainerStyle(false);
+
+        update_pageReset();
+        bottomNotification("archived", title);
+        current_page = "selection";
+
+        session_save(session_list);
+        reminder_save(reminder_list);
+    });
+
+    $(document).on('click', '.selection_unarchived_btn', function(e){
+        let item = $(e.target).closest(".selection_session_tile, .selection_reminder_tile");
+        reminderOrSession = $(item).hasClass("selection_session_tile") ? "session" : "reminder";
+
+        trackItem(item, reminderOrSession, archive = true);
+
+        let title = update_current_item["name"];
+
+        update_current_item['isArchived'] = false;
+        $(update_current_node).remove();
+
+        if(reminderOrSession == "session"){
+            sessionReorder_update();
+        }else if(reminderOrSession == "reminder"){
+            reminderReorder_update();
+        };
+
+        manageHomeContainerStyle(true)
+        bottomNotification("unarchived", title);
+
+        session_save(session_list);
+        reminder_save(reminder_list);
+    });
+
     // SCHEDLUE     
+
     $(document).on('change', '.update_schedule_input', function(){
         updateSelectScheduleLabels($(this).val(), this);
     });

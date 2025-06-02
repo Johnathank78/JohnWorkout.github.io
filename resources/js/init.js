@@ -75,10 +75,11 @@ $(document).ready(async function(){
     
         await rescheduler();
         
-        session_pusher(session_list);
-        reminder_pusher(reminder_list);
-        
+        global_pusher(session_list, reminder_list);
+
         session_save(session_list);
+        reminder_save(reminder_list);
+
         deleteHistory();
     
         recovery = recovery_read();

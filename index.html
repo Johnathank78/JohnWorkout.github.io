@@ -123,6 +123,7 @@
 <body>
     <div class="app">
         <div class="imgSet">
+            <img src="./resources/imgs/archive.svg" alt="" id="archiveIMG">
             <img src="./resources/imgs/bin.svg" alt="" id="binIMG">
             <img src="./resources/imgs/add.svg" alt="" id="addIMG">
             <img src="./resources/imgs/edit.svg" alt="" id="editIMG">
@@ -751,6 +752,11 @@
                                 <span class="selection_parameters_text">Auto saver</span>
                                 <div parameter="autoSaver" class="toggle parameters_toggle selection_parameters_autosaver" state="false" moveState="true"><div class="toggle_dot"></div></div>
                             </div>
+
+                            <div class="selection_parameters_archive_container noselect">
+                                <span class="selection_parameters_text">Archives</span>
+                                <span class="selection_parameters_archive_btn selection_parameters_save">Archived sessions</span>
+                            </div>
     
                             <div class="selection_parameters_saveLoad_container noselect">
                                 <span class="selection_parameters_saveLoad_btn selection_parameters_save">Export</span>
@@ -811,6 +817,9 @@
                         <input value="" type="text" class="update_name_tile update_data_name">
                         <div class="update_colorDot update_colorChooser noselect" style="display: none;"></div>
                         <span class="update_history_count noselect">20</span>
+                        <div class="update_delete_archiverContainer">
+                            <img src="./resources/imgs/archive.svg" alt="" class="update_delete_archiver">
+                        </div>
                         <div class="toggle history_toggle noselect" state="false" moveState="true"><div class="toggle_dot"></div></div>
                     </div>
                 </div>

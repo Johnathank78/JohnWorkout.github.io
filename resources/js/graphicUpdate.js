@@ -95,14 +95,13 @@ function update_pageReset(){
     $(".selection_page").css("display", "block");
 
     $('.history_toggle').css('display', "none");
-    $(".update_history_count").css('display', 'none');
+    $(".update_history_count, .update_delete_archiverContainer").css('display', 'none');
 
     $('.update_tile_link').css('display', 'none')
     $('.linkNcreateSeparator').css('display', 'none')
 };
 
 function update_pageFormat(from){
-
     $('.update_backArrow').css('display', 'block');
 
     $(".update_page").css("display", "flex");
@@ -181,6 +180,7 @@ function update_pageFormat(from){
         $(".update_btn").css("background-color", green);
         $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["create"]);
     }else if(from == "deleteWO"){
+        $('.update_delete_archiverContainer').css('display', 'flex');
         $(".update_name_tile").css("pointer-events", "none");
 
         $('.update_workout_button_container').css("display", "none");
@@ -189,6 +189,7 @@ function update_pageFormat(from){
         $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["delete"]);
         $(".update_workout_container").css("display", "flex");
     }else if(from == "deleteIN"){
+        $('.update_delete_archiverContainer').css('display', 'flex');
         $(".update_name_tile, .update_intervall_container").css("pointer-events", "none");
 
         $(".update_intervall_container").css("display", "flex");
@@ -196,6 +197,7 @@ function update_pageFormat(from){
         $(".update_btn").css("background-color", red);
         $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["delete"]);
     }else if(from == "deleteRM"){
+        $('.update_delete_archiverContainer').css('display', 'flex');
         $(".update_name_tile, .udpate_reminder_body").css("pointer-events", "none");
 
         $(".update_workout_item, .update_exercise_pause_item").css("pointer-events", "none");
@@ -241,26 +243,35 @@ function update_pageFormat(from){
     };
 };
 
-function manageHomeContainerStyle(){
+function manageHomeContainerStyle(archive = false){
+    let emptyMsg = archive ? 
+        textAssets[parameters["language"]]["sessionItem"]["archive"] : 
+        textAssets[parameters["language"]]["sessionItem"]["addASession"]
 
-    if(session_list.length > 0){
-        if(reminder_list.length == 0){
+    $(".selection_empty_msg").text(emptyMsg);
+    $(".selection_empty_msg").css("pointer-events", archive ? "none" : "all");
+
+    let filteredSessionList = session_list.filter(session => session['isArchived'] === archive);
+    let filteredReminderList = reminder_list.filter(reminder => reminder['isArchived'] === archive);
+
+    if(filteredSessionList.length > 0){
+        if(filteredReminderList.length == 0){
             $('.selection_session_container').css('padding-bottom', '35px');
         }else{
             $('.selection_session_container').css('padding-bottom', '48px');
         };
     };
 
-    if(session_list.length == 0){
-        if(reminder_list.length == 0){
+    if(filteredSessionList.length == 0){
+        if(filteredReminderList.length == 0){
             $(".selection_empty_msg").css("display", "block");
         };
 
         $('.selection_session_container, .selection_SR_separator').css("display", "none");
     };
 
-    if(reminder_list.length == 0){
-        if(session_list.length == 0){
+    if(filteredReminderList.length == 0){
+        if(filteredSessionList.length == 0){
             $('.selection_session_container').css("display", "flex");
             $(".selection_empty_msg").css("display", "block");
         };
@@ -274,20 +285,21 @@ function manageHomeContainerStyle(){
         $(".selection_page_calendar_btnConainer").css("display", "flex");
     };
 
-    if(session_list.length > 0){
+    if(filteredSessionList.length > 0){
         $('.selection_session_container').css("display", "flex");
         $(".selection_empty_msg").css("display", "none");
     };
 
-    if(reminder_list.length > 0){
+    if(filteredReminderList.length > 0){
         $('.selection_reminder_container').css("display", "flex");
         $(".selection_empty_msg").css("display", "none");
     };
 
-    if(session_list.length > 0 && reminder_list.length > 0){
+    if(filteredSessionList.length > 0 && filteredReminderList.length > 0){
         $(".selection_SR_separator, .selection_reminder_container").css("display", "flex");
     };
 
+    resize_update();
 };
 
 function exit_confirm(style){

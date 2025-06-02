@@ -1006,10 +1006,11 @@ function isScheduled(item){
     return item["notif"];
 };
 
-function noSessionSchedule(){
+function noSessionSchedule(archive = false){
+    let filteredSessionList = session_list.filter(session => session['isArchived'] === archive);
 
-    for (let i = 0; i < session_list.length; i++) {
-        if(isScheduled(session_list[i])){
+    for (let i = 0; i < filteredSessionList.length; i++) {
+        if(isScheduled(filteredSessionList[i])){
             return false;
         };
     };
@@ -1085,7 +1086,6 @@ function getScheduleScheme(session){
 
 function getSession_order(){
     let output = new Array();
-
     let sessions = session_reorder.getOrder();
 
     for(let i=0;i<sessions.length;i++){
@@ -1096,27 +1096,55 @@ function getSession_order(){
 };
 
 function sessionReorder_update(){
+    // 1. IDs dans l’ordre visuel (DOM) et nettoyage
+    const orderedIds = session_reorder
+        .getOrder()                             // collection jQuery
+        .map((_, el) => $(el).attr('tileid'))   // jQuery.fn.map
+        .toArray()                              // → Array natif
+        .filter(Boolean);                       // supprime undefined / ''
 
-    let new_order = getSession_order();
-    let new_list = new Array();
+    // 2. Table id → rang (accès O(1))
+    const rank = new Map(orderedIds.map((id, idx) => [id, idx]));
 
-    new_order.forEach(order => {
-        session_list.forEach(session => {
-            if(session["name"] == order){
-                new_list.push(session);
-            };
-        });
+    // 3. Index d’origine : garantit une stabilité parfaite
+    const originalIndex = new Map(
+        session_list.map((rem, i) => [rem.id, i])
+    );
+
+    // 4. Snapshot pour éviter une sauvegarde inutile
+    const before = JSON.stringify(session_list);
+
+    // 5. Tri en place
+    session_list.sort((a, b) => {
+        /* ---- priorité n°1 : statut d’archive ---- */
+        if (a.isArchived !== b.isArchived) {
+            // false (non archivé) doit précéder true (archivé)
+            return a.isArchived ? 1 : -1;
+        }
+
+        /* ---- priorité n°2 : ordre visuel pour la classe affichée ---- */
+        const ra = rank.get(a.id);
+        const rb = rank.get(b.id);
+
+        // 2-a. Les deux sont visibles → on suit l’ordre DOM
+        if (ra !== undefined && rb !== undefined) return ra - rb;
+
+        // 2-b. Un seul est visible → il passe avant l’invisible
+        if (ra !== undefined) return -1;
+        if (rb !== undefined) return 1;
+
+        /* ---- priorité n°3 : éléments invisibles → on garde l’ordre initial ---- */
+        return originalIndex.get(a.id) - originalIndex.get(b.id);
     });
 
-    if(JSON.stringify(session_list)==JSON.stringify(new_list)){return};
-
-    session_list = cloneOBJ(new_list);
-    session_save(session_list);
+    // 6. Sauvegarde uniquement si l’ordre a changé
+    if (before !== JSON.stringify(session_list)) {
+        session_save(session_list);
+    };
 };
 
 function getReminder_order(){
     let output = new Array();
-
     let reminders = reminder_reorder.getOrder();
 
     for(let i=0;i<reminders.length;i++){
@@ -1127,22 +1155,51 @@ function getReminder_order(){
 };
 
 function reminderReorder_update(){
+    // 1. IDs dans l’ordre visuel (DOM) et nettoyage
+    const orderedIds = reminder_reorder
+        .getOrder()                             // collection jQuery
+        .map((_, el) => $(el).attr('tileid'))   // jQuery.fn.map
+        .toArray()                              // → Array natif
+        .filter(Boolean);                       // supprime undefined / ''
 
-    let new_order = getReminder_order();
-    let new_list = new Array();
+    // 2. Table id → rang (accès O(1))
+    const rank = new Map(orderedIds.map((id, idx) => [id, idx]));
 
-    new_order.forEach(order => {
-        reminder_list.forEach(reminder => {
-            if(reminder["name"] == order){
-                new_list.push(reminder);
-            };
-        });
+    // 3. Index d’origine : garantit une stabilité parfaite
+    const originalIndex = new Map(
+        reminder_list.map((rem, i) => [rem.id, i])
+    );
+
+    // 4. Snapshot pour éviter une sauvegarde inutile
+    const before = JSON.stringify(reminder_list);
+
+    // 5. Tri en place
+    reminder_list.sort((a, b) => {
+        /* ---- priorité n°1 : statut d’archive ---- */
+        if (a.isArchived !== b.isArchived) {
+            // false (non archivé) doit précéder true (archivé)
+            return a.isArchived ? 1 : -1;
+        }
+
+        /* ---- priorité n°2 : ordre visuel pour la classe affichée ---- */
+        const ra = rank.get(a.id);
+        const rb = rank.get(b.id);
+
+        // 2-a. Les deux sont visibles → on suit l’ordre DOM
+        if (ra !== undefined && rb !== undefined) return ra - rb;
+
+        // 2-b. Un seul est visible → il passe avant l’invisible
+        if (ra !== undefined) return -1;
+        if (rb !== undefined) return 1;
+
+        /* ---- priorité n°3 : éléments invisibles → on garde l’ordre initial ---- */
+        return originalIndex.get(a.id) - originalIndex.get(b.id);
     });
 
-    if(JSON.stringify(reminder_list)==JSON.stringify(new_list)){return};
-
-    reminder_list = cloneOBJ(new_list);
-    reminder_save(reminder_list);
+    // 6. Sauvegarde uniquement si l’ordre a changé
+    if (before !== JSON.stringify(reminder_list)) {
+        reminder_save(reminder_list);
+    };
 };
 
 // Weight Unit

@@ -27,7 +27,7 @@ function bottomNotification(from, target="", queued=false){
 
     $('.bottomNotification_Icon').css("transform", "unset");
 
-    if(["scheduled", "created", "imported", "exported", "parameters"].includes(from)){
+    if(["scheduled", "created", "imported", "exported", "parameters", "archived", "unarchived"].includes(from)){
         $('.bottomNotification_Icon').css('filter', greenFilter);
         $(".bottomNotification_msg").css('color', greenText);
         $('.bottomNotification').css("backgroundColor", greenBG);
@@ -45,6 +45,10 @@ function bottomNotification(from, target="", queued=false){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['exported']);
         }else if(from == "parameters"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['parameters']);
+        }else if(from == "archived"){
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['archived']);
+        }else if(from == "unarchived"){
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters["language"]]["bottomNotif"]['unarchived']);
         };
     }else if(["unscheduled", "deleted", "write", "read"].includes(from)){
         $('.bottomNotification_Icon').css('filter', redFilter);
