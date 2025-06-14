@@ -69,6 +69,8 @@ function goBack(platform){
         closePanel('timeSelector');
     }else if(colorPickerShown){
         closePanel('colorPicker');
+    }else if(current_page == "intervallEdit"){
+        leaveIntervallEdit();
     }else{
         leave_update();
     };

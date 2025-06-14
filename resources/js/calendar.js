@@ -100,7 +100,7 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, F, { maxI, i }, ID = false) 
       return ((a % b) + b) % b;
     };
 
-    if(ID && sessionToBeDone && sessionToBeDone["data"][ID] && !isToday(D)){F += 1};
+    //if(ID && sessionToBeDone && sessionToBeDone["data"][ID] && !isToday(D)){F += 1}; ??????
 
     // -------------------------------------
     // 2. Input parameters explanation
@@ -1378,7 +1378,7 @@ $(document).ready(function(){
                 "border-bottom-left-radius": "unset"
             });
 
-            session_list.forEach(session => {
+            session_list.filter(session => session['isArchived'] === false).forEach(session => {
                 if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session['id'])){
                     $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session["id"]).replace('[sessionVAL]', session["name"])))
                 };

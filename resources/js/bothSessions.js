@@ -212,7 +212,7 @@ async function quit_session(failed=false){
         // Notification related;
 
         if(isScheduled(current_session)){
-            let id = await getTodayPendingId(current_session["id"], getScheduleScheme(current_session));
+            let id = await getTodayPendingId(current_session["id"]);
 
             if(platform == "Mobile"){
                 await undisplayAndCancelNotification(id);

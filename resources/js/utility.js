@@ -299,57 +299,90 @@ function update_timer(item, ref, i){
 };
 
 function get_session_time(session, uniFix=false){
+    let computedTime = 0;
+    let effectiveTime = false;
+
     if(session["type"] == "I"){
-        let total = 5;
+        computedTime = 5;
 
         session["exoList"].forEach(exo => {
             if(exo["type"] == "Int."){
-                total += exo["cycle"] * (time_unstring(exo["work"]) + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
+                computedTime += exo["cycle"] * (time_unstring(exo["work"]) + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
             }else if(exo["type"] == "Pause"){
-                total += time_unstring(exo["rest"]);
+                computedTime += time_unstring(exo["rest"]);
             };
         });
 
-        return total;
+        return computedTime;
     }else if(session["type"] == "W"){
-
-        let total = 0;
-
         session["exoList"].forEach((exo, i) => {
             if(exo["type"] == "Int."){
                 if(isIntervallLinked(exo)){ // IS LINKED
-                    total += get_session_time(session_list[getSessionIndexByID(exo["linkId"])]);
+                    computedTime += get_session_time(session_list[getSessionIndexByID(exo["linkId"])]);
                 }else{ // IS CREATED
                     exo["exoList"].forEach(subExo => {
                         if(subExo["type"] == "Int."){
-                            total += subExo["cycle"] * (time_unstring(subExo["work"]) + time_unstring(subExo["rest"])) - time_unstring(subExo["rest"]);
+                            computedTime += subExo["cycle"] * (time_unstring(subExo["work"]) + time_unstring(subExo["rest"])) - time_unstring(subExo["rest"]);
                         }else if(subExo["type"] == "Pause"){
-                            total += time_unstring(subExo["rest"]);
+                            computedTime += time_unstring(subExo["rest"]);
                         };
                     });
                 };
             }else if(exo["type"] == "Bi."){
                 if(exo["name"].includes("Alt.")){
-                    total += exo["setNb"] * (exo["reps"]*2*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
+                    computedTime += exo["setNb"] * (exo["reps"]*2*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
                 }else{
-                    total += exo["setNb"] * (exo["reps"]*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
+                    computedTime += exo["setNb"] * (exo["reps"]*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
                 };
             }else if(exo["type"] == "Uni."){
                 let repsDuration = exo["reps"] * repTime;
                 let setsDone = uniFix ? Math.floor(exo["setNb"]/2) : exo["setNb"];
                 
-                total += setsDone * (2*repsDuration + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
+                computedTime += setsDone * (2*repsDuration + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
             }else if(exo["type"] == "Pause"){
-                if(i != session["exoList"].length - 1){total += time_unstring(exo["rest"])};
+                if(i != session["exoList"].length - 1) computedTime += time_unstring(exo["rest"]);
             }else if(exo['type'] == "Wrm."){
-                total += wrmTime;
+                computedTime += wrmTime;
             };
 
-            total += transitionTime;
+            computedTime += transitionTime;
         });
 
-        return total * 1.05;
+        computedTime = computedTime * 1.05;
     };
+
+    if(!uniFix && session["type"] == "W"){
+        effectiveTime = get_effective_sessionTime(session, computedTime);
+        if(effectiveTime !== null && effectiveTime > 0) return effectiveTime;
+    };
+
+    return computedTime;
+};
+
+function get_effective_sessionTime(sessionObj, computedTime, X = 6, tolerance = 0.30) {
+  if (!sessionObj?.history?.historyList) return null;
+
+  const historyDays = sessionObj.history.historyList;
+
+  // 1. Séances où tous les exercices sont complets
+  const complete = Array.isArray(historyDays)
+  ? historyDays.filter(historyDay => isHistoryDayComplete(historyDay, "W"))
+  : [];
+
+  if (complete.length <= X) return null; // pas assez de séances complètes
+
+  // 2. Garder celles dont la durée observée est dans la tolérance
+  const kept = complete.filter(s => {
+    const expected = computedTime;
+    const observed = s.duration;
+    const delta = Math.abs(observed - expected) / expected;
+    return delta <= tolerance;
+  });
+
+  if (kept.length <= X) return null;
+  const sumObs = kept.reduce((sum, s) => sum + s.duration, 0);
+
+  return Math.round(sumObs / kept.length);
 };
 
 function isIntervallLinked(data){
@@ -490,7 +523,7 @@ function nbSessionScheduled(vsDate){
                     session["id"]
                 );
 
-                if(nb > 0){count += nb};
+                if(nb > 0) count += nb;
             }else if(scheduleType == "Week"){
                 // Jump offsetting the day indexs, may need a (deep) rework
                 iterationData = {"maxI": notif["dateList"].length, "i": getClosestWeekIteration(vsDate, notif["dateList"])};
@@ -510,7 +543,7 @@ function nbSessionScheduled(vsDate){
                     session["id"]
                 );
 
-                if(nb > 0){count += nb};
+                if(nb > 0) count += nb;
             };
         };
     });
@@ -775,12 +808,30 @@ function get_time_u(ref, getList=false){
     let minutes = Math.floor(Math.floor(ref/60) - hours*60 - days*1440 - weeks*10080 - years*524160).toString();
     let secondes = Math.floor(ref - minutes*60 - hours*3600 - days*86400 - weeks*604800 - years*31449600).toString();
 
-    weeks = (weeks.length == 1 && weeks != 0 && ref > 31449600) ? "0"+weeks : weeks;
-    hours = (hours.length == 1 && hours != 0 && ref > 86400) ? "0"+hours : hours;
-    minutes = (minutes.length == 1 && minutes != 0 && ref > 3600) ? "0"+minutes : minutes;
-    secondes = (secondes.length == 1 && secondes != 0 && ref > 60) ? "0"+secondes : secondes;
+    weeks = (weeks.length == 1 && weeks != 0 && ref > 31449600) ? "0" + weeks : weeks;
+    hours = (hours.length == 1 && hours != 0 && ref > 86400) ? "0" + hours : hours;
+    minutes = (minutes.length == 1 && minutes != 0 && ref > 3600) ? "0" + minutes : minutes;
+    secondes = (secondes.length == 1 && secondes != 0 && ref > 60) ? "0" + secondes : secondes;
 
-    if(getList){return [parseInt(years), parseInt(weeks), parseInt(days), parseInt(hours), parseInt(minutes), parseInt(secondes)]}else{return (years != 0 ? years+textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"] : "")+(weeks != 0 ? weeks+"w" : "")+(days != 0 ? days+textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"] : "")+(hours != 0 ? hours+"h" : "")+(minutes != 0 ? minutes+"m" : "")+((secondes != 0 || ref < 60) ? secondes+"s" : "")};
+    if (getList) {
+        return [
+            parseInt(years),
+            parseInt(weeks),
+            parseInt(days),
+            parseInt(hours),
+            parseInt(minutes),
+            parseInt(secondes)
+        ];
+    } else {
+        return (
+            (years != 0 ? years + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["year"]['label'] : "") +
+            (weeks != 0 ? weeks + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["week"]['label'] : "") +
+            (days != 0 ? days + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["day"]['label'] : "") +
+            (hours != 0 ? hours + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["hour"]['label'] : "") +
+            (minutes != 0 ? minutes + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["minute"]['label'] : "") +
+            ((secondes != 0 || ref < 60) ? secondes + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["second"]['label'] : "")
+        );
+    }
 };
 
 function time_unstring(strr, getList=false){
@@ -794,31 +845,44 @@ function time_unstring(strr, getList=false){
         return parseInt(strr);
     };
 
-    let reY = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"]}`, "g");
-    let reD = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"]}`, "g");
-    let reAuth = new RegExp("^"+textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"]+"w"+textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"]+"hms0123456789", "g");
+    const allSymbols = Object.values(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]).map(item => item.label).join("");
+
+    let reY = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["year"]['label']}`, "g");
+    let reW = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["week"]['label']}`, "g");
+    let reD = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["day"]['label']}`, "g");
+    let reH = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["hour"]['label']}`, "g");
+    let reM = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["minute"]['label']}`, "g");
+    let reS = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["second"]['label']}`, "g");
+    let reAuth = new RegExp("^" + allSymbols + "0123456789", "g");
 
     let y = strr.match(reY);
-    let w = strr.match(/\d{1,}w/);
+    let w = strr.match(reW);
     let d = strr.match(reD);
-    let h = strr.match(/\d{1,}h/);
-    let m = strr.match(/\d{1,}m/);
-    let s = strr.match(/\d{1,}s/);
+    let h = strr.match(reH);
+    let m = strr.match(reM);
+    let s = strr.match(reS);
 
     if(y === null && w === null && d === null && h === null && m === null && s === null){
         return false;
     }else if(strr.match(reAuth) !== null){
         return false;
-    }else if(strr.match(textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"]) && y === null || strr.match(/w/) && w === null || strr.match(textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"]) && d === null || strr.match(/h/) && h === null || strr.match(/m/) && m === null || strr.match(/s/) && s === null){
+    }else if(
+        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["year"]['label']) && y === null) ||
+        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["week"]['label']) && w === null) ||
+        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["day"]['label']) && d === null) ||
+        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["hour"]['label']) && h === null) ||
+        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["minute"]['label']) && m === null) ||
+        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["second"]['label']) && s === null)
+    ){
         return false;
     };
 
-    y = (y !== null) ? parseInt(y[0].split(textAssets[parameters["language"]]["misc"]["yearAbbrTimeString"])[0]) : 0;
-    w = (w !== null) ? parseInt(w[0].split("w")[0]) : 0;
-    d = (d !== null) ? parseInt(d[0].split(textAssets[parameters["language"]]["misc"]["dayAbbrTimeString"])[0]) : 0;
-    h = (h !== null) ? parseInt(h[0].split("h")[0]) : 0;
-    m = (m !== null) ? parseInt(m[0].split("m")[0]) : 0;
-    s = (s !== null) ? parseInt(s[0].split("s")[0]) : 0;
+    y = (y !== null) ? parseInt(y[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["year"]['label'])[0]) : 0;
+    w = (w !== null) ? parseInt(w[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["week"]['label'])[0]) : 0;
+    d = (d !== null) ? parseInt(d[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["day"]['label'])[0]) : 0;
+    h = (h !== null) ? parseInt(h[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["hour"]['label'])[0]) : 0;
+    m = (m !== null) ? parseInt(m[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["minute"]['label'])[0]) : 0;
+    s = (s !== null) ? parseInt(s[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["second"]['label'])[0]) : 0;
 
     if(getList){return [y, w, d, h, m, s]}else{return y*31449600+w*604800+d*86400+h*3600+m*60+s};
 };
@@ -1284,7 +1348,6 @@ function roundToNearestHalf(num) {
 
 function changeLanguage(lang, first=false){
     // Time Selector;
-
     $(".timeSelectorSubmit").text(textAssets[lang]["misc"]['submit']);
 
     // Calendar;
@@ -1319,12 +1382,28 @@ function changeLanguage(lang, first=false){
 
     $(".selection_infoStart_value").text(formatDate(stats["since"]));
 
-    $(".selection_info_TimeSpent").text($(".selection_info_TimeSpent").text().replace(textAssets[previousLanguage]["misc"]["yearAbbrTimeString"], textAssets[lang]["misc"]["yearAbbrTimeString"]).replace(textAssets[previousLanguage]["misc"]["dayAbbrTimeString"], textAssets[lang]["misc"]["dayAbbrTimeString"]));
-    $(".selection_info_WorkedTime").text($(".selection_info_WorkedTime").text().replace(textAssets[previousLanguage]["misc"]["yearAbbrTimeString"], textAssets[lang]["misc"]["yearAbbrTimeString"]).replace(textAssets[previousLanguage]["misc"]["dayAbbrTimeString"], textAssets[lang]["misc"]["dayAbbrTimeString"]));
+    $(".selection_info_TimeSpent").text($(".selection_info_TimeSpent").text()
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["year"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["year"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["week"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["week"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["day"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["day"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["hour"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["hour"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["minute"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["minute"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["second"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["second"]['label'])
+    );
+    
+    $(".selection_info_WorkedTime").text($(".selection_info_WorkedTime").text()
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["year"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["year"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["week"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["week"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["day"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["day"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["hour"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["hour"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["minute"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["minute"]['label'])
+        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["second"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["second"]['label'])
+    );
 
     // Preferences;
 
     $(".selection_parameters_title").text(textAssets[lang]["preferences"]["preferences"]);
+    $(".selection_parameters_archive_btn").text(textAssets[lang]["preferences"]["archve"]);
     $(".selection_parameters_text").eq(0).text(textAssets[lang]["preferences"]["language"]);
     $(".selection_parameters_text").eq(1).text(textAssets[lang]["preferences"]["weightUnit"]);
     $(".selection_parameters_text").eq(2).text(textAssets[lang]["preferences"]["notifBefore"]);

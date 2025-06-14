@@ -292,7 +292,6 @@ $(document).ready(function(){
         reminderOrSession = $(item).hasClass("selection_session_tile") ? "session" : "reminder";
 
         trackItem(item, reminderOrSession);
-
         $('.update_colorChooser').css('backgroundColor', update_current_item['color']);
 
         if(reminderOrSession == "session"){
@@ -552,7 +551,6 @@ $(document).ready(function(){
         if(cannotClick && reminderOrSession == "reminder"){return}else{canNowClick('allowed')};
 
         trackItem(item, reminderOrSession);
-
         $('.update_colorChooser').css('backgroundColor', update_current_item['color']);
 
         let inp_list = $(".update_schedule_input");
@@ -577,11 +575,8 @@ $(document).ready(function(){
             updateSelectScheduleLabels(notif["scheduleData"]["count"], $('.update_schedule_input_count'));
             updateSelectScheduleLabels(notif["jumpData"]['jumpVal'], $('.update_schedule_jump_count'));
             updateSelectScheduleLabels(notif["jumpData"]['everyVal'], $('.update_schedule_every_count'));
-
-            $('.update_colorChooser').css('backgroundColor', update_current_item['color']);
         }else{
             $(".update_schedule_select_day").attr("multiple", false);
-            $('.update_colorChooser').css('backgroundColor', colorList[Math.floor(Math.random() * colorList.length)]);
             
             generateBaseCalendar(1);
             datePicker.initSelection([]);

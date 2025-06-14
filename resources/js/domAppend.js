@@ -29,7 +29,6 @@ function reminder_tile(reminder, archived = false){
 };
 
 function session_tile(session, archived = false){
-    
     let time = get_session_time(session)
     let schedule_color = false;
 
@@ -76,7 +75,7 @@ function session_tile(session, archived = false){
         return `<div class="selection_session_tile reorder__child noselect" tileid="`+session["id"]+`">
                     <span class="selection_session_name noselect">`+session["name"]+`</span>
                     <div class="selection_session_details_container">
-                        <span class="selection_session_details selection_session_totaltime noselect">`+get_time(time)+`</span>
+                        <span class="selection_session_details selection_session_totaltime noselect" style="padding-right: 0px">`+get_time(time)+`</span>
                         <span class="selection_session_details selection_session_cycle noselect">`+get_session_exoCount(session)+` Exercises</span>
                         <span class="selection_session_details selection_session_work noselect"></span>
                         <span class="selection_session_details selection_session_rest noselect"></span>

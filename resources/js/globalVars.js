@@ -74,12 +74,36 @@ const textAssets = {
                 "saturday": "S",
                 "sunday": "D"
             },
+            "abrTimeLabels": {
+                "year": {
+                    "symbol": "%",
+                    "label": "a"
+                },
+                "week": {
+                    "symbol": "$",
+                    "label": "w"
+                },
+                "day": {
+                    "symbol": "@",
+                    "label": "j"
+                },
+                "hour": {
+                    "symbol": "|",
+                    "label": "h"
+                },
+                "minute": {
+                    "symbol": "#",
+                    "label": "m"
+                },
+                "second": {
+                    "symbol": "&",
+                    "label": "s"
+                }
+            },
             "rightInitial": "D",
             "leftInitial": "G",
             "right": "Droit",
             "left": "Gauche",
-            "dayAbbrTimeString": "j",
-            "yearAbbrTimeString": "a",
             "submit": "Confirmer"
         },
         "stats": {
@@ -106,6 +130,7 @@ const textAssets = {
             "autoSaver": "Economiseur auto",
             "export": "Exporter",
             "import": "Importer",
+            "archve": "Seances archivées",
             "impExpMenu": {
                 "selectElements": "Choisissez",
                 "sessionList": "Seances",
@@ -421,12 +446,36 @@ const textAssets = {
                 "saturday": "S",
                 "sunday": "S"
             },
+            "abrTimeLabels": {
+                "year": {
+                    "symbol": "%",
+                    "label": "y"
+                },
+                "week": {
+                    "symbol": "$",
+                    "label": "w"
+                },
+                "day": {
+                    "symbol": "@",
+                    "label": "d"
+                },
+                "hour": {
+                    "symbol": "|",
+                    "label": "h"
+                },
+                "minute": {
+                    "symbol": "#",
+                    "label": "m"
+                },
+                "second": {
+                    "symbol": "&",
+                    "label": "s"
+                }
+            },
             "rightInitial": "R",
             "leftInitial": "L",
             "right": "Right",
             "left": "Left",
-            "dayAbbrTimeString": "d",
-            "yearAbbrTimeString": "y",
             "submit": "Submit"
         },
         "stats": {
@@ -453,6 +502,7 @@ const textAssets = {
             "autoSaver": "Auto saver",
             "export": "Export",
             "import": "Import",
+            "archve": "Archived sessions",
             "impExpMenu": {
                 "selectElements": "Select elements",
                 "sessionList": "Sessions",

@@ -72,9 +72,9 @@ $(document).ready(async function(){
         hasBeenShifted = hasBeenShifted_read();
         sessionToBeDone = sessionToBeDone_read();
         sessionDone = sessionDone_read();
-    
+
         await rescheduler();
-        
+
         global_pusher(session_list, reminder_list);
 
         session_save(session_list);
@@ -116,42 +116,23 @@ $(document).ready(async function(){
         sets_reorder = new FlexReorder($(".session_next_exercises_container")[0]);
     };
 
-    // let dateee = new Date(session_list[0].notif.dateList[0]);
-
-    // dateee.setDate(dateee.getDate() - 3);
-    // console.log(dateee)
-    
-    // dateee = dateee.getTime();
-
-    // session_list[0].notif.dateList[0] = dateee;
-    // session_list[0].notif.occurence = 2;
-
-    // let closestData = closestNextDate(session_list[0].notif.dateList[0], session_list[0].notif, 0)
-
-    // console.log(new Date(closestData.timestamp))
-    // console.log(closestData.occurence)
-
-    // session_list[0].notif.dateList[0] = closestData.timestamp;
-    // session_list[0].notif.occurence = closestData.occurence;
-
     // SESSION MISSED TEST
+        // session_list[3].notif.dateList[0] -= 1000 * 60 * 60 * 24 * 3; // +2 days for testing purposes
+        // session_list[3].notif.occurence -= 1
 
-        // let dateee = new Date(session_list[0].notif.dateList[0]);
+        // sessionToBeDone["data"]["12"] = true;
+        // sessionDone["data"]["12"] = false;
+        
+        // let count = nbSessionScheduled(getToday("date", -1));
 
-        // dateee.setDate(dateee.getDate() - 3);
-        // console.log(dateee)
+        // console.log(count)
+        // Object.keys(sessionToBeDone["data"]).forEach(function(key){
+        //     if(sessionToBeDone["data"][key] && sessionDone["data"][key]){
+        //         count -= 1;
+        //     };
+        // });
 
-        // let dateee2 = new Date(sessionSwapped[0].time);
-
-        // dateee2.setDate(dateee2.getDate() - 3);
-        // console.log(dateee2)
-
-        // sessionSwapped[0].time = dateee2.getTime()
-
-        // session_list[0].notif.dateList[0] = dateee.getTime();
-        // session_list[0].notif.occurence = 9;
-
-        //console.log(nbSessionScheduled(getToday("date", -1)));
+        // console.log(count)
 
     // -------------------
     

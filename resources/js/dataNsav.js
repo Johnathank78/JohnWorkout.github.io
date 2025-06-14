@@ -252,6 +252,10 @@ function generateJumpDataObj({jumpType, jumpVal, everyVal}){
 
 // -----------
 
+function saveItem(name, data){
+    localStorage.setItem(name, data);
+    return;
+};
 
 function JSONiseStats(data){
     if(isDict(data)){return data};
@@ -762,7 +766,7 @@ function session_read(set=false){
 };
 
 function session_save(data){
-    localStorage.setItem("sessions_list", JSON.stringify([data, parameters['weightUnit']]));
+    saveItem("session_list", JSON.stringify([data, parameters['weightUnit']]));
     return;
 };
 
@@ -812,7 +816,7 @@ function reminder_read(set=false){
 };
 
 function reminder_save(data){
-    localStorage.setItem("reminders_list", JSON.stringify(data));
+    saveItem("reminders_list", JSON.stringify(data));
     return;
 };
 
@@ -892,7 +896,7 @@ function calendar_read(data){
 };
 
 function calendar_save(data){
-    localStorage.setItem("calendar_shown", JSON.stringify(data));
+    saveItem("calendar_shown", JSON.stringify(data));
     return;
 };
 
@@ -930,7 +934,7 @@ function audio_read(){
 };
 
 function audio_save(val){
-    localStorage.setItem("audio_lv", val);
+    saveItem("audio_lv", val);
     return;
 };
 
@@ -995,7 +999,7 @@ function recovery_read(){
 };
 
 function recovery_save(data){
-    localStorage.setItem("recovery", JSON.stringify(data));
+    saveItem("recovery", JSON.stringify(data));
     return;
 };
 
@@ -1021,7 +1025,8 @@ function sessionDone_read(){
 };
 
 function sessionDone_save(data){
-    localStorage.setItem("session_done", JSON.stringify(data));
+    saveItem("session_done", JSON.stringify(data));
+    return;
 };
 
 
@@ -1046,7 +1051,8 @@ function hasBeenShifted_read(){
 };
 
 function hasBeenShifted_save(data){
-    localStorage.setItem("hasBeenShifted", JSON.stringify(data));
+    saveItem("hasBeenShifted", JSON.stringify(data));
+    return;
 };
 
 
@@ -1066,7 +1072,7 @@ function sessionSwapped_read(){
 };
 
 function sessionSwapped_save(data){
-    localStorage.setItem("sessionSwapped", JSON.stringify(data));
+    saveItem("sessionSwapped", JSON.stringify(data));
     return;
 };
 
@@ -1130,8 +1136,6 @@ function sessionToBeDone_read(){
 
     if(formatDate(new Date(sessionToBeDone["creationDate"])) != formatDate(getToday("date"))){
         let sessionDone = localStorage.getItem("session_done");
-
-        // let elapsedDays = daysBetweenTimestamps(sessionToBeDone["creationDate"], getToday("date"));
         let count = nbSessionScheduled(getToday("date", -1));
 
         if(!(sessionDone === null || sessionDone == "")){
@@ -1157,6 +1161,6 @@ function sessionToBeDone_read(){
 };
 
 function sessionToBeDone_save(data){
-    localStorage.setItem("sessionToBeDone", JSON.stringify(data));
+    saveItem("sessionToBeDone", JSON.stringify(data));
     return;
 };
