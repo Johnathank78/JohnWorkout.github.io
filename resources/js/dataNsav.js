@@ -290,7 +290,7 @@ function stats_read(set=false){
         data = JSON.parse(data);
         data = JSONiseStats(data);
 
-        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1749852000000){
+        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1749938400000){
             data['missedSessions']['val'] = 0;
         };
     };
@@ -747,18 +747,6 @@ function session_read(set=false){
             }else if(session['history']['state'] == 'false'){
                 session['history']['state'] = false;
             };
-            
-            // for (let h = 0; h < session['history']['historyList'].length; h++) {
-            //     let history = session['history']['historyList'][h];
-            //     for (let e = 0; e < history['exoList'].length; e++) {
-            //         let exo = history['exoList'][e];
-            //         if (exo['setList'] === undefined) continue;
-            //         for (let s = 0; s < exo['setList'].length; s++) {
-            //             let set = exo['setList'][s];
-            //             if (!isDict(set)) exo['setList'][s] = set[0];
-            //         };
-            //     };
-            // };
         });
 
         return data[0];
@@ -766,7 +754,7 @@ function session_read(set=false){
 };
 
 function session_save(data){
-    saveItem("session_list", JSON.stringify([data, parameters['weightUnit']]));
+    saveItem("sessions_list", JSON.stringify([data, parameters['weightUnit']]));
     return;
 };
 
