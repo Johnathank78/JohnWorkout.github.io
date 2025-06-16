@@ -264,6 +264,7 @@ $(document).ready(function(){
                         session_save(session_list);
     
                         restoreDoneSessions(session_list);
+                        sessionToBeDone = fillSessionToBeDone();
     
                         schedule = true;
                     };
