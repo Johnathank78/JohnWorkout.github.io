@@ -405,7 +405,7 @@ function pause_tile(data = false){
                     <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.type+`</span>
                 </div>
                 <div class="update_workout_data_container">
-                    <input placeholder="`+textAssets[parameters.language].updatePage.placeHolders.rest+`" value="2m" storevalue="2m" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_pausetime"></input>
+                    <input placeholder="`+textAssets[parameters.language].updatePage.placeHolders.rest+`" value="2m" storevalue="2`+ abrTimeSymols.minute +`" readonly="readonly" class="timeString reorder__avoid update_workout_data update_workout_data_pausetime"></input>
                     <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.pause+`</span>
                 </div>
             </div>

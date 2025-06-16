@@ -120,6 +120,10 @@ $(document).ready(function(){
 
                 $('#selection_saveLoad_sl').parent().css('display', session_list.length == 0 ? 'none' : 'flex');
                 $('#selection_saveLoad_rl').parent().css('display', reminder_list.length == 0 ? 'none' : 'flex');
+                $('#selection_saveLoad_st').parent().css('display', Object.entries(stats).every(([k, v]) => k === 'since' 
+                                                                        || k === 'missedSessions' 
+                                                                        || v === 0) 
+                                                                        ? 'none' : 'flex');
 
                 closePanel('parameters');
                 showBlurPage('selection_saveLoad_page');
