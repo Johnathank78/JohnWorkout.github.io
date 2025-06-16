@@ -159,7 +159,9 @@ function backerMouseupHandler(){
 };
 
 function getHourFormated(date){
-    return date.getHours().toString().padStart(2, '0') + "h" + date.getMinutes().toString().padStart(2, '0') + "m" + date.getSeconds().toString().padStart(2, '0') + "s";
+    return date.getHours().toString().padStart(2, '0') + textAssets[parameters.language].misc.abrTimeLabels.hour 
+        + date.getMinutes().toString().padStart(2, '0') + textAssets[parameters.language].misc.abrTimeLabels.minute 
+        + date.getSeconds().toString().padStart(2, '0') + textAssets[parameters.language].misc.abrTimeLabels.second;
 };
 
 // VISIBILITY HANDLE
@@ -178,16 +180,16 @@ async function pauseApp(){
         if(intervall_state == 2){
             currentSide = "I";
             start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
-            title = textAssets[parameters["language"]]["notification"]["restOver"];
-            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
+            title = textAssets[parameters.language].notification.restOver;
+            body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters.language].updatePage.work + " : " + display_timeString(get_timeString(iWork_time));
 
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         }else if(intervall_state == 1){
             currentSide = "W";
             start = new Date(Date.now() + ((restDat - Xspent) * 1000));
             start = (iWork_time - Ispent) * 1000;
-            title = textAssets[parameters["language"]]["notification"]["workOver"];
-            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["updatePage"]["rest"] + " : " + get_time_u(iRest_time);
+            title = textAssets[parameters.language].notification.workOver;
+            body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters.language].updatePage.rest + " : " + display_timeString(get_timeString(iRest_time));
 
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         };
@@ -201,8 +203,8 @@ async function pauseApp(){
         if(Xtimer){
             currentSide = "X";
             start = new Date(Date.now() + ((restDat - Xspent) * 1000));
-            title = textAssets[parameters["language"]]["notification"]["xRestOver"];
-            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+            title = textAssets[parameters.language].notification.xRestOver;
+            body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters.language].inSession.next + " : " + nextThing;
 
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         };
@@ -211,8 +213,8 @@ async function pauseApp(){
             if(Ltimer){
                 currentSide += "L";
                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-                title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                title = textAssets[parameters.language].notification.restOver;
+                body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters.language].inSession.next + " : " + nextThing;
 
                 if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             };
@@ -223,44 +225,44 @@ async function pauseApp(){
                 let mini = getSmallesRest();
                 nextThing = nextThing.split(" - ")[0] + " - " + mini;
 
-                title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                title = textAssets[parameters.language].notification.restOver;
+                body = textAssets[parameters.language].inSession.next + " : " + nextThing;
 
-                if(mini == textAssets[parameters["language"]]["misc"]["leftInitial"]){
+                if(mini == textAssets[parameters.language].misc.leftInitial){
                     start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-                    body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + body;
+                    body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + body;
 
                     if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
-                }else if(mini == textAssets[parameters["language"]]["misc"]["rightInitial"]){
+                }else if(mini == textAssets[parameters.language].misc.rightInitial){
                     start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
-                    body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + body;
+                    body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + body;
                     
                     if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
                 };
             }else if(Ltimer){
                 currentSide += "L";
-                nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["rightInitial"];
+                nextThing.split(" - ")[0] + " - " + textAssets[parameters.language].misc.rightInitial;
 
                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-                title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                title = textAssets[parameters.language].notification.restOver;
+                body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters.language].inSession.next + " : " + nextThing;
 
                 if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             }else if(Rtimer){
                 currentSide += "R";
-                nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["leftInitial"];
+                nextThing.split(" - ")[0] + " - " + textAssets[parameters.language].misc.leftInitial;
 
                 start = new Date(Date.now() + ((RrestTime - Rspent) * 1000));
-                title = textAssets[parameters["language"]]["notification"]["restOver"];
-                body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+                title = textAssets[parameters.language].notification.restOver;
+                body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters.language].inSession.next + " : " + nextThing;
 
                 if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             }
         }else if(extype == "Pause"){
             currentSide += "L";
             start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
-            title = textAssets[parameters["language"]]["notification"]["breakOver"];
-            body = textAssets[parameters["language"]]["inSession"]["end"] + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing;
+            title = textAssets[parameters.language].notification.breakOver;
+            body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters.language].inSession.next + " : " + nextThing;
 
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         };
@@ -279,7 +281,7 @@ async function resumeApp(){
 
     let elapsedTime = parseInt((new Date().getTime() - backgroundTimestamp) / 1000);
 
-    $(".selection_info_TimeSpent").text(get_time_u(timeFormat(tempStats["timeSpent"])));
+    $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFormat(tempStats.timeSpent))));
 
     if(currentSide.includes("L")){
         hasBeenUpdated = true;
@@ -323,7 +325,7 @@ async function resumeApp(){
     };
 
     if(hasBeenUpdated){
-        tempStats["timeSpent"] += elapsedTime;
+        tempStats.timeSpent += elapsedTime;
     };
 };
 
@@ -465,8 +467,8 @@ $(document).ready(function(){
                         if(intervall_state == 2){
                             currentSide = "I";
                             start = new Date(Date.now() + ((iRest_time - Ispent) * 1000));
-                            title = textAssets[parameters["language"]]["notification"]["restOver"];
-                            body = textAssets[parameters["language"]]["updatePage"]["work"] + " : " + get_time_u(iWork_time);
+                            title = textAssets[parameters.language].notification.restOver;
+                            body = textAssets[parameters.language].updatePage.work + " : " + display_timeString(get_timeString(iWork_time));
                             actionTypeId = "resting";
     
                             await LocalNotifications.schedule({
@@ -484,8 +486,8 @@ $(document).ready(function(){
                         }else if(intervall_state == 1){
                             currentSide = "W"
                             start = new Date(Date.now() + ((iWork_time - Ispent) * 1000))
-                            title = textAssets[parameters["language"]]["notification"]["workOver"]
-                            body = textAssets[parameters["language"]]["updatePage"]["rest"] + " : " + get_time_u(iRest_time)
+                            title = textAssets[parameters.language].notification.workOver
+                            body = textAssets[parameters.language].updatePage.rest + " : " + display_timeString(get_timeString(iRest_time))
                             actionTypeId = "resting"
     
                             await LocalNotifications.schedule({
@@ -508,8 +510,8 @@ $(document).ready(function(){
                         if(Xtimer){
                             currentSide = "X"
                             start = new Date(Date.now() + ((restDat - Xspent) * 1000))
-                            title = textAssets[parameters["language"]]["notification"]["xRestOver"]
-                            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                            title = textAssets[parameters.language].notification.xRestOver
+                            body = textAssets[parameters.language].inSession.next + " : " + nextThing
                             actionTypeId = "resting"
     
                             await LocalNotifications.schedule({
@@ -530,8 +532,8 @@ $(document).ready(function(){
                             if(Ltimer){
                                 currentSide += "L"
                                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
-                                title = textAssets[parameters["language"]]["notification"]["restOver"]
-                                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                                title = textAssets[parameters.language].notification.restOver
+                                body = textAssets[parameters.language].inSession.next + " : " + nextThing
                                 actionTypeId = "resting"
     
                                 await LocalNotifications.schedule({
@@ -554,11 +556,11 @@ $(document).ready(function(){
                                 let mini = getSmallesRest()
                                 nextThing = nextThing.split(" - ")[0] + " - " + mini
     
-                                title = textAssets[parameters["language"]]["notification"]["restOver"]
-                                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                                title = textAssets[parameters.language].notification.restOver
+                                body = textAssets[parameters.language].inSession.next + " : " + nextThing
                                 actionTypeId = "resting"
     
-                                if(mini == textAssets[parameters["language"]]["misc"]["leftInitial"]){
+                                if(mini == textAssets[parameters.language].misc.leftInitial){
                                     start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
     
                                     await LocalNotifications.schedule({
@@ -573,7 +575,7 @@ $(document).ready(function(){
                                             }
                                         ]
                                     });
-                                }else if(mini == textAssets[parameters["language"]]["misc"]["rightInitial"]){
+                                }else if(mini == textAssets[parameters.language].misc.rightInitial){
                                     start = new Date(Date.now() + ((RrestTime - Rspent) * 1000))
     
                                     await LocalNotifications.schedule({
@@ -591,11 +593,11 @@ $(document).ready(function(){
                                 }
                             }else if(Ltimer){
                                 currentSide += "L"
-                                nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["rightInitial"]
+                                nextThing.split(" - ")[0] + " - " + textAssets[parameters.language].misc.rightInitial
     
                                 start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
-                                title = textAssets[parameters["language"]]["notification"]["restOver"]
-                                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                                title = textAssets[parameters.language].notification.restOver
+                                body = textAssets[parameters.language].inSession.next + " : " + nextThing
                                 actionTypeId = "resting"
     
                                 await LocalNotifications.schedule({
@@ -612,11 +614,11 @@ $(document).ready(function(){
                                 });
                             }else if(Rtimer){
                                 currentSide += "R"
-                                nextThing.split(" - ")[0] + " - " + textAssets[parameters["language"]]["misc"]["leftInitial"]
+                                nextThing.split(" - ")[0] + " - " + textAssets[parameters.language].misc.leftInitial
     
                                 start = new Date(Date.now() + ((RrestTime - Rspent) * 1000))
-                                title = textAssets[parameters["language"]]["notification"]["restOver"]
-                                body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                                title = textAssets[parameters.language].notification.restOver
+                                body = textAssets[parameters.language].inSession.next + " : " + nextThing
                                 actionTypeId = "resting"
     
                                 await LocalNotifications.schedule({
@@ -635,8 +637,8 @@ $(document).ready(function(){
                         }else if(extype == "Pause"){
                             currentSide += "L"
                             start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
-                            title = textAssets[parameters["language"]]["notification"]["breakOver"]
-                            body = textAssets[parameters["language"]]["inSession"]["next"] + " : " + nextThing
+                            title = textAssets[parameters.language].notification.breakOver
+                            body = textAssets[parameters.language].inSession.next + " : " + nextThing
                             actionTypeId = "resting"
     
                             await LocalNotifications.schedule({

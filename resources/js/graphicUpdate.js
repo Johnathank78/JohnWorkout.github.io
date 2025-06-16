@@ -114,20 +114,20 @@ function update_pageFormat(from){
         $(".update_workout_button_container, .update_workout_pause, .update_workout_add").css("display", "flex");
 
         $(".update_btn").css("background-color", "#1799d3");
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["update"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.update);
     }else if(from == "editIN"){
         $(".update_intervall_container").css("display", "flex");
         $(".update_colorChooser").css("display", "flex");
         $(".update_workout_button_container, .update_workout_add, .update_workout_pause").css("display", "flex");
 
         $(".update_btn").css("background-color", "#1799d3");
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["update"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.update);
     }else if(from == "editRM"){
         $(".update_reminder_container").css("display", "flex");
         $(".update_colorChooser").css("display", "flex");
 
         $(".update_btn").css("background-color", "#1799d3");
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["update"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.update);
     }else if(from == "addWO"){
         $('.update_mode_intervall').css("background-color", "#34374b");
         $('.update_mode_workout').css("background-color", "#262837");
@@ -147,7 +147,7 @@ function update_pageFormat(from){
         };
 
         $(".update_btn").css("background-color", green);
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["create"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.create);
     }else if(from == "addIN"){
         $('.update_mode_intervall').css("background-color", "#262837");
         $('.update_mode_workout').css("background-color", "#34374b");
@@ -169,7 +169,7 @@ function update_pageFormat(from){
         };
 
         $(".update_btn").css("background-color", green);
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["create"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.create);
     }else if(from == "addRM"){
         closePanel("addContainer");
         canNowClick("allowed");
@@ -178,7 +178,7 @@ function update_pageFormat(from){
         $(".update_reminder_container").css("display", "flex");
 
         $(".update_btn").css("background-color", green);
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["create"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.create);
     }else if(from == "deleteWO"){
         $('.update_delete_archiverContainer').css('display', 'flex');
         $(".update_name_tile").css("pointer-events", "none");
@@ -186,7 +186,7 @@ function update_pageFormat(from){
         $('.update_workout_button_container').css("display", "none");
 
         $(".update_btn").css("background-color", red);
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["delete"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.delete);
         $(".update_workout_container").css("display", "flex");
     }else if(from == "deleteIN"){
         $('.update_delete_archiverContainer').css('display', 'flex');
@@ -195,7 +195,7 @@ function update_pageFormat(from){
         $(".update_intervall_container").css("display", "flex");
 
         $(".update_btn").css("background-color", red);
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["delete"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.delete);
     }else if(from == "deleteRM"){
         $('.update_delete_archiverContainer').css('display', 'flex');
         $(".update_name_tile, .udpate_reminder_body").css("pointer-events", "none");
@@ -205,7 +205,7 @@ function update_pageFormat(from){
         $(".update_reminder_container").css("display", "flex");
 
         $(".update_btn").css("background-color", red);
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["delete"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.delete);
     }else if(from == "schedule"){
         $(".update_name_tile").css("pointer-events", "none");
         $(".update_colorChooser").css("display", "flex");
@@ -215,7 +215,7 @@ function update_pageFormat(from){
         $(".update_workout_button_container, .update_schedule_bin").css("display", "flex");
 
         $(".update_btn").css("backgroundColor", "#4C5368");
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["schedule"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.schedule);
     }else if(from == "history"){
         $('.history_toggle').css('display', "flex");
         $(".update_name_tile").css("pointer-events", "none");
@@ -230,7 +230,7 @@ function update_pageFormat(from){
         $('.linkNcreateSeparator').css('display', 'inline-block');
         
         $(".update_btn").css("backgroundColor", green);
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["create"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.create);
     }else if(from == "intUPDATE"){
         $('.update_tile_link').css('display', 'flex');
         $(".update_intervall_container").css("display", "flex");
@@ -239,20 +239,20 @@ function update_pageFormat(from){
         $('.linkNcreateSeparator').css('display', 'inline-block');
         
         $(".update_btn").css("background-color", "#1799d3");
-        $(".update_btn").text(textAssets[parameters["language"]]["updatePage"]["update"]);
+        $(".update_btn").text(textAssets[parameters.language].updatePage.update);
     };
 };
 
 function manageHomeContainerStyle(archive = false){
     let emptyMsg = archive ? 
-        textAssets[parameters["language"]]["sessionItem"]["archive"] : 
-        textAssets[parameters["language"]]["sessionItem"]["addASession"]
+        textAssets[parameters.language].sessionItem.archive : 
+        textAssets[parameters.language].sessionItem.addASession
 
     $(".selection_empty_msg").text(emptyMsg);
     $(".selection_empty_msg").css("pointer-events", archive ? "none" : "all");
 
-    let filteredSessionList = session_list.filter(session => session['isArchived'] === archive);
-    let filteredReminderList = reminder_list.filter(reminder => reminder['isArchived'] === archive);
+    let filteredSessionList = session_list.filter(session => session.isArchived === archive);
+    let filteredReminderList = reminder_list.filter(reminder => reminder.isArchived === archive);
 
     if(filteredSessionList.length > 0){
         if(filteredReminderList.length == 0){

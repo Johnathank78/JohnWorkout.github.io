@@ -288,10 +288,22 @@ jQuery.fn.getStyleValue = function(prop){
 
 jQuery.fn.val = function(){
     var result = originalVal.apply(this, arguments);
+
     if(this.hasClass('resizingInp')){
         resizeInput(this[0]);
     };
+    
     return result;
+};
+
+jQuery.fn.storeVal = function(data) {
+    if(arguments.length === 0){
+        return this.attr('storevalue');
+    }else{
+        return this.each(function() {
+            $(this).attr('storevalue', data);
+        });
+    };
 };
 
 function resizeArea(area){

@@ -18,8 +18,8 @@ function getInvervallSessionCycleCount(exoList){
     let count = 0;
 
     exoList.forEach(exo => {
-        if(exo["type"] == "Int."){
-            count += parseInt(exo["cycle"]);
+        if(exo.type == "Int."){
+            count += parseInt(exo.cycle);
         };
     });
 
@@ -33,16 +33,16 @@ function getIntervallExoData(cycle, data, update = false){
     for (let i = 0; i < data.length; i++) {
         const exo = data[i];
         
-        if(exo["type"] == "Int."){
+        if(exo.type == "Int."){
             if(cycle > computedCycle){
-                computedCycle += exo["cycle"];
+                computedCycle += exo.cycle;
             };
             
             if(cycle <= computedCycle){
                 if(update){
-                    iWork_time = time_unstring(exo["work"]);
-                    iRest_time = time_unstring(exo["rest"]);
-                    exoName = exo["name"];
+                    iWork_time = time_unstring(exo.work);
+                    iRest_time = time_unstring(exo.rest);
+                    exoName = exo.name;
                 };
                 
                 return index;
@@ -62,15 +62,15 @@ function intervall(data, from_wo = false){
         switch(state){
             case "get_ready":
     
-                screensaver_set(textAssets[parameters["language"]]["inIntervall"]["getReady"], 5);
+                screensaver_set(textAssets[parameters.language].inIntervall.getReady, 5);
     
                 color = yellow;
                 light_color = light_yellow;
                 mid_color = mid_yellow;
                 update_soundSlider();
     
-                $(".session_state").text(textAssets[parameters["language"]]["inIntervall"]["getReady"].toUpperCase());
-                $(".screensaver_text").text(textAssets[parameters["language"]]["inIntervall"]["getReady"]);
+                $(".session_state").text(textAssets[parameters.language].inIntervall.getReady.toUpperCase());
+                $(".screensaver_text").text(textAssets[parameters.language].inIntervall.getReady);
     
                 $(".session_intervall_btn_container > *").css("background-color", mid_yellow);
     
@@ -113,11 +113,11 @@ function intervall(data, from_wo = false){
                 update_soundSlider();
 
                 if(intExType == "Pause"){
-                    $(".session_state").text(textAssets[parameters["language"]]["updatePage"]["break"].toUpperCase());
-                    $(".screensaver_text").text(textAssets[parameters["language"]]["updatePage"]["break"]);
+                    $(".session_state").text(textAssets[parameters.language].updatePage.break.toUpperCase());
+                    $(".screensaver_text").text(textAssets[parameters.language].updatePage.break);
                 }else{
-                    $(".session_state").text(textAssets[parameters["language"]]["inIntervall"]["rest"].toUpperCase());
-                    $(".screensaver_text").text(textAssets[parameters["language"]]["inIntervall"]["rest"]);
+                    $(".session_state").text(textAssets[parameters.language].inIntervall.rest.toUpperCase());
+                    $(".screensaver_text").text(textAssets[parameters.language].inIntervall.rest);
                 };
     
                 $(".session_intervall_btn_container > *").css("background-color", mid_red);
@@ -159,8 +159,8 @@ function intervall(data, from_wo = false){
                 $(".session_intervall_btn_container").css("display", "none");
                 $(".blurBG").css("display", "none");
     
-                $(".session_state").text(textAssets[parameters["language"]]["inIntervall"]["end"].toUpperCase());
-                $(".screensaver_text").text(textAssets[parameters["language"]]["inIntervall"]["end"]);
+                $(".session_state").text(textAssets[parameters.language].inIntervall.end.toUpperCase());
+                $(".screensaver_text").text(textAssets[parameters.language].inIntervall.end);
     
                 $(".session_remaining_cycle").text("");
                 $(".session_intervall_timer").text("");
@@ -180,13 +180,13 @@ function intervall(data, from_wo = false){
     };
 
     function historyTargetUpdate(){
-        let pauseCorr = data.slice(0, currentExoIndex).filter(exo => exo['type'] == "Pause").length;
+        let pauseCorr = data.slice(0, currentExoIndex).filter(exo => exo.type == "Pause").length;
         let correctedIndex = currentExoIndex - pauseCorr;
 
         if(from_wo){
-            historyTarget = tempNewHistory["exoList"][getHistoryExoIndex(tempNewHistory, next_id)]["exoList"][correctedIndex]["setList"][iActualSet];
+            historyTarget = tempNewHistory.exoList[getHistoryExoIndex(tempNewHistory, next_id)].exoList[correctedIndex].setList[iActualSet];
         }else{
-            historyTarget = tempNewHistory["exoList"][correctedIndex]["setList"][iActualSet];
+            historyTarget = tempNewHistory.exoList[correctedIndex].setList[iActualSet];
         };
     };
 
@@ -202,15 +202,15 @@ function intervall(data, from_wo = false){
 
     let totalCycle = parseInt(getInvervallSessionCycleCount(data));
 
-    if(from_wo && recovery["varSav"]["iCurrent_cycle"] === false || !from_wo && !recovery){
+    if(from_wo && recovery.varSav.iCurrent_cycle === false || !from_wo && !recovery){
         iActualSet = 0;
         iCurrent_cycle = totalCycle;
         currentExoIndexSAV = 0;
     }else{
         hasReallyStarted = true;
-        iActualSet = recovery["varSav"]['iActualSet'];
-        iCurrent_cycle = recovery["varSav"]["iCurrent_cycle"];
-        currentExoIndexSAV = recovery["varSav"]['currentExoIndex'];
+        iActualSet = recovery.varSav.iActualSet;
+        iCurrent_cycle = recovery.varSav.iCurrent_cycle;
+        currentExoIndexSAV = recovery.varSav.currentExoIndex;
     };
 
     currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, true);
@@ -262,15 +262,15 @@ function intervall(data, from_wo = false){
         iCurrent_cycle--;
 
         if(!skipped){
-            tempStats["workedTime"] += iWork_time;
-            tempStats["repsDone"] += iWork_time/2.1;
+            tempStats.workedTime += iWork_time;
+            tempStats.repsDone += iWork_time/2.1;
         };
     
         if(intExType == "Int."){
             if(Ispent > smallestTime){
-                historyTarget["work"] = get_time_u(Ispent);
+                historyTarget.work = get_timeString(Ispent);
             }else{
-                historyTarget["work"] = "X";
+                historyTarget.work = "X";
             };
         };
     
@@ -287,7 +287,7 @@ function intervall(data, from_wo = false){
         if(iCurrent_cycle == 0){
             lockState = false;
             Ifinished = true;
-            historyTarget["rest"] = "X";
+            historyTarget.rest = "X";
     
             if(!from_wo){
                 udpate_recovery("intervall", data);
@@ -319,21 +319,21 @@ function intervall(data, from_wo = false){
             startRestIntervall();
         }else{
             iActualSet = 0;
-            intExType = data[currentExoIndex + 1]["type"];
+            intExType = data[currentExoIndex + 1].type;
     
             if(intExType == 'Pause'){
                 isBeeping = false;
-                iRest_time = time_unstring(data[currentExoIndex + 1]["rest"]);
+                iRest_time = time_unstring(data[currentExoIndex + 1].rest);
                 
                 session_state("Rest"); 
-                historyTarget["rest"] = "X";
+                historyTarget.rest = "X";
     
                 update_timer($(".session_intervall_timer"), iRest_time, 0);
                 update_timer($(".screensaver_Ltimer"), iRest_time, 0);
 
                 startRestIntervall();
             }else if(intExType == 'Int.'){
-                historyTarget["rest"] = "X";
+                historyTarget.rest = "X";
                 currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, true);
     
                 if(!from_wo && iCurrent_cycle != 0){
@@ -365,13 +365,13 @@ function intervall(data, from_wo = false){
             iActualSet++;
             
             if(Ispent > smallestTime){
-                historyTarget["rest"] = get_time_u(Ispent);
+                historyTarget.rest = get_timeString(Ispent);
             }else{
-                historyTarget["rest"] = "X";
+                historyTarget.rest = "X";
             };
         };
     
-        intExType = data[currentExoIndex]["type"];
+        intExType = data[currentExoIndex].type;
         currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, true);
     
         historyTargetUpdate();

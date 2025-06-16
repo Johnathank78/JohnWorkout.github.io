@@ -34,6 +34,24 @@ const dayofweek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frid
 const monthofyear = ["Jan","Feb","March","April","May","June","July","Aug","Sept","Oct","Nov","Dec"];
 const dayofweek_conventional = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+const abrTimeSymols = {
+    "year": "%",
+    "week": "£",
+    "day": "@",
+    "hour": "€",
+    "minute": "#",
+    "second": "&"
+};
+
+// const labelToSymbol = {
+//     y: "%",
+//     w: "£",
+//     d: "@",
+//     h: "€",
+//     m: "#",
+//     s: "&"
+// };
+
 const timeUnit = 1000;
 const repTime = 2.1;
 const wrmTime = 3.5 * 60;
@@ -75,30 +93,12 @@ const textAssets = {
                 "sunday": "D"
             },
             "abrTimeLabels": {
-                "year": {
-                    "symbol": "%",
-                    "label": "a"
-                },
-                "week": {
-                    "symbol": "$",
-                    "label": "w"
-                },
-                "day": {
-                    "symbol": "@",
-                    "label": "j"
-                },
-                "hour": {
-                    "symbol": "|",
-                    "label": "h"
-                },
-                "minute": {
-                    "symbol": "#",
-                    "label": "m"
-                },
-                "second": {
-                    "symbol": "&",
-                    "label": "s"
-                }
+                "year": "a",
+                "week": "w",
+                "day": "j",
+                "hour": "h",
+                "minute": "m",
+                "second": "s"
             },
             "rightInitial": "D",
             "leftInitial": "G",
@@ -447,30 +447,12 @@ const textAssets = {
                 "sunday": "S"
             },
             "abrTimeLabels": {
-                "year": {
-                    "symbol": "%",
-                    "label": "y"
-                },
-                "week": {
-                    "symbol": "$",
-                    "label": "w"
-                },
-                "day": {
-                    "symbol": "@",
-                    "label": "d"
-                },
-                "hour": {
-                    "symbol": "|",
-                    "label": "h"
-                },
-                "minute": {
-                    "symbol": "#",
-                    "label": "m"
-                },
-                "second": {
-                    "symbol": "&",
-                    "label": "s"
-                }
+                "year": "y",
+                "week": "w",
+                "day": "d",
+                "hour": "h",
+                "minute": "m",
+                "second": "s"
             },
             "rightInitial": "R",
             "leftInitial": "L",

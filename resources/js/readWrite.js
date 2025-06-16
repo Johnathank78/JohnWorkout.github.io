@@ -91,8 +91,8 @@ function restoreDoneSessions(data){
         if(history){
             let lastHistory = getLastHistoryDay(history);
 
-            if(isToday(lastHistory["date"])){
-                sessionDone['data'][session['id']] = true;
+            if(isToday(lastHistory.date)){
+                sessionDone.data[session.id] = true;
             };
         };
     });
@@ -108,9 +108,9 @@ $(document).ready(function(){
 
             current_page = "import";
 
-            if($(this).text() == textAssets[parameters["language"]]["preferences"]["export"]){
+            if($(this).text() == textAssets[parameters.language].preferences.export){
 
-                $(".selection_saveLoad_btn_submit").text(textAssets[parameters["language"]]["preferences"]["export"]);
+                $(".selection_saveLoad_btn_submit").text(textAssets[parameters.language].preferences.export);
                 $('.selection_saveLoad_emptyMsg').css('display', 'none');
 
                 $(".selection_saveLoad_btn_submit").css('display', 'flex');
@@ -123,9 +123,9 @@ $(document).ready(function(){
 
                 closePanel('parameters');
                 showBlurPage('selection_saveLoad_page');
-            }else if($(this).text() == textAssets[parameters["language"]]["preferences"]["import"]){
+            }else if($(this).text() == textAssets[parameters.language].preferences.import){
 
-                $(".selection_saveLoad_btn_submit").text(textAssets[parameters["language"]]["preferences"]["import"]);
+                $(".selection_saveLoad_btn_submit").text(textAssets[parameters.language].preferences.import);
 
                 $(".selection_saveLoad_page").children(":not(.selection_saveLoad_emptyMsg)").css('display', 'none');
                 $('.selection_saveLoad_emptyMsg').css('display', 'inline-block');
@@ -223,7 +223,7 @@ $(document).ready(function(){
         let temp = false;
         let schedule = false;
 
-        if($(this).text() == textAssets[parameters["language"]]["preferences"]["import"]){
+        if($(this).text() == textAssets[parameters.language].preferences.import){
             if(platform == "Mobile"){
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0){
                     temp = await readFromFile("Workout", 'parameters.txt');
@@ -231,9 +231,9 @@ $(document).ready(function(){
                     if(temp){
                         parameters = JSON.parse(temp);
     
-                        previousWeightUnit = parameters["weightUnit"];
+                        previousWeightUnit = parameters.weightUnit;
                         parametersMemory = JSON.stringify(parameters);
-                        changeLanguage(parameters['language'], true);
+                        changeLanguage(parameters.language, true);
     
                         parameters_set(parameters)
                         parameters_save(parameters);
@@ -256,7 +256,7 @@ $(document).ready(function(){
                         calendar_save(calendar_dict);
                         calendar_read(session_list)
     
-                        updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
+                        updateWeightUnits(session_list, previousWeightUnit, parameters.weightUnit);
                         session_save(session_list);
     
                         restoreDoneSessions(session_list);
@@ -292,9 +292,9 @@ $(document).ready(function(){
 
                         parameters = JSON.parse(temp);
 
-                        previousWeightUnit = parameters["weightUnit"];
+                        previousWeightUnit = parameters.weightUnit;
                         parametersMemory = JSON.stringify(parameters);
-                        changeLanguage(parameters['language'], true);
+                        changeLanguage(parameters.language, true);
 
                         parameters_set(parameters)
 
@@ -313,7 +313,7 @@ $(document).ready(function(){
 
                         session_pusher(session_list);
                         
-                        updateWeightUnits(session_list, previousWeightUnit, parameters["weightUnit"]);
+                        updateWeightUnits(session_list, previousWeightUnit, parameters.weightUnit);
                         session_save(session_list);
 
                         restoreDoneSessions(session_list);
@@ -339,12 +339,12 @@ $(document).ready(function(){
             };
 
             if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
-                bottomNotification("imported", textAssets[parameters["language"]]["bottomNotif"]["IOprefix"]);
+                bottomNotification("imported", textAssets[parameters.language].bottomNotif.IOprefix);
             };
-        }else if($(this).text() == textAssets[parameters["language"]]["preferences"]["export"]){
+        }else if($(this).text() == textAssets[parameters.language].preferences.export){
             if(platform == "Mobile"){
                 if(checked.filter($('#selection_saveLoad_sl')).length > 0){
-                    writeToFile([session_list, parameters["weightUnit"]], "Workout", "session_list.txt");
+                    writeToFile([session_list, parameters.weightUnit], "Workout", "session_list.txt");
                 };
                 if(checked.filter($('#selection_saveLoad_rl')).length > 0){
                     writeToFile(reminder_list, "Workout", "reminder_list.txt");
@@ -357,13 +357,13 @@ $(document).ready(function(){
                 };
                 
                 if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
-                    bottomNotification("exported", textAssets[parameters["language"]]["bottomNotif"]["IOprefix"]);
+                    bottomNotification("exported", textAssets[parameters.language].bottomNotif.IOprefix);
                 };
             }else if(platform == "Web"){
                 let files = [];
 
                 if(checked.filter($('#selection_saveLoad_sl')).length > 0){
-                    files.push(new File([JSON.stringify([session_list, parameters["weightUnit"]])], "session_list.txt", { type: "text/plain" }));
+                    files.push(new File([JSON.stringify([session_list, parameters.weightUnit])], "session_list.txt", { type: "text/plain" }));
                 };
                 if(checked.filter($('#selection_saveLoad_rl')).length > 0){
                     files.push(new File([JSON.stringify(reminder_list)], "reminder_list.txt", { type: "text/plain" }));
@@ -381,12 +381,12 @@ $(document).ready(function(){
                     if(downloadTest == "Failed"){
                         if(navigator.canShare({ files })){
                             await navigator.share({ files });
-                            bottomNotification("exported", textAssets[parameters["language"]]["bottomNotif"]["IOprefix"]);
+                            bottomNotification("exported", textAssets[parameters.language].bottomNotif.IOprefix);
                         } else {
                             bottomNotification("write");
                         };
                     }else{
-                        bottomNotification("exported", textAssets[parameters["language"]]["bottomNotif"]["IOprefix"]);
+                        bottomNotification("exported", textAssets[parameters.language].bottomNotif.IOprefix);
                     };
                 };
             };

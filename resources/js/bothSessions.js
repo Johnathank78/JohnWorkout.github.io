@@ -32,9 +32,9 @@ function keepAwakeToggle(state){
         };
     }else if(platform == "Mobile"){
         if(state){
-            if(parameters["keepAwake"]){KeepAwake.keepAwake()};
+            if(parameters.keepAwake){KeepAwake.keepAwake()};
         }else{
-            if(parameters["keepAwake"]){KeepAwake.allowSleep()};
+            if(parameters.keepAwake){KeepAwake.allowSleep()};
         };
     };    
 };
@@ -45,10 +45,10 @@ async function launchSession(index){
     current_session = session_list[index];
 
     if(platform == "Mobile"){
-        let shown = await isShown(current_session["id"], getScheduleScheme(current_session));
+        let shown = await isShown(current_session.id, getScheduleScheme(current_session));
 
         if(shown){
-            let id = getNotifFirstIdChar(current_session) + current_session["id"] + shown.slice(-1);
+            let id = getNotifFirstIdChar(current_session) + current_session.id + shown.slice(-1);
             await undisplayAndCancelNotification(id);
         };
     };
@@ -65,17 +65,17 @@ async function launchSession(index){
 
     $(".session_header_secondRow").append($(".selection_info_page"));
 
-    if(current_session["type"] == "I"){
+    if(current_session.type == "I"){
         ongoing = "intervall";
         current_history = getSessionHistory(current_session);
 
         if(recovery){
-            tempStats["timeSpent"] = recovery["tempStats"]["timeSpent"];
-            tempStats["workedTime"] = recovery["tempStats"]["workedTime"];
-            tempStats["weightLifted"] = recovery["tempStats"]["weightLifted"];
-            tempStats["repsDone"] = recovery["tempStats"]["repsDone"];
+            tempStats.timeSpent = recovery.tempStats.timeSpent;
+            tempStats.workedTime = recovery.tempStats.workedTime;
+            tempStats.weightLifted = recovery.tempStats.weightLifted;
+            tempStats.repsDone = recovery.tempStats.repsDone;
 
-            tempNewHistory = recovery["tempHistory"];
+            tempNewHistory = recovery.tempHistory;
             stats_set(tempStats);
         }else{
             tempStats = generateStatsObj({"timeSpent": 0, "workedTime": 0, "weightLifted": 0, "repsDone": 0});
@@ -94,13 +94,13 @@ async function launchSession(index){
 
         TPtimer = setInterval(() => {
             if(!isIdle){
-                tempStats["timeSpent"]++;
-                $(".selection_info_TimeSpent").text(get_time_u(timeFormat(tempStats["timeSpent"])));
+                tempStats.timeSpent++;
+                $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFormat(tempStats.timeSpent))));
             };
         }, timeUnit);
 
-        intervall(current_session["exoList"]);
-    }else if(current_session["type"] == "W"){
+        intervall(current_session.exoList);
+    }else if(current_session.type == "W"){
         ongoing = "workout";
         
         $('.session_exercise_Lrest_btn').data("canLongClick", false);
@@ -120,12 +120,12 @@ async function launchSession(index){
 
         if(recovery){
 
-            tempStats["timeSpent"] = recovery["tempStats"]["timeSpent"];
-            tempStats["workedTime"] = recovery["tempStats"]["workedTime"];
-            tempStats["weightLifted"] = recovery["tempStats"]["weightLifted"];
-            tempStats["repsDone"] = recovery["tempStats"]["repsDone"];
+            tempStats.timeSpent = recovery.tempStats.timeSpent;
+            tempStats.workedTime = recovery.tempStats.workedTime;
+            tempStats.weightLifted = recovery.tempStats.weightLifted;
+            tempStats.repsDone = recovery.tempStats.repsDone;
 
-            tempNewHistory = recovery["tempHistory"];            
+            tempNewHistory = recovery.tempHistory;            
             stats_set(tempStats);
         }else{
             tempStats = generateStatsObj({"timeSpent": 0, "workedTime": 0, "weightLifted": 0, "repsDone": 0});
@@ -138,7 +138,7 @@ async function launchSession(index){
             });
         };
 
-        workout(current_session["exoList"]);
+        workout(current_session.exoList);
     };
 
     if(muted){
@@ -149,7 +149,7 @@ async function launchSession(index){
 
     update_soundSlider();
 
-    if(parameters["keepAwake"]){keepAwakeToggle(true)};
+    if(parameters.keepAwake){keepAwakeToggle(true)};
 
     $(".selection_infoStart").css("display", "none");
     $(".selection_info_item").eq(4).css("display", "none");
@@ -186,33 +186,33 @@ async function quit_session(failed=false){
         await undisplayAndCancelNotification(1235);
     };
 
-    if(parameters["keepAwake"]){keepAwakeToggle(false)};
+    if(parameters.keepAwake){keepAwakeToggle(false)};
 
-    if(!((current_session["type"] == "W" && (tempStats["timeSpent"] <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session["type"] == "I" && tempStats["timeSpent"] <= 60)){
+    if(!((current_session.type == "W" && (tempStats.timeSpent <= 0 || isHistoryDayEmpty(tempNewHistory))) || current_session.type == "I" && tempStats.timeSpent <= 60)){
 
         fillSessionEnd(tempNewHistory, current_history, failed);
 
-        if(current_history["state"] == true){
-            tempNewHistory["duration"] = tempStats["timeSpent"];
-            current_history["historyList"].push(tempNewHistory);
+        if(current_history.state == true){
+            tempNewHistory.duration = tempStats.timeSpent;
+            current_history.historyList.push(tempNewHistory);
         };
         
-        current_history["historyCount"] += 1;
+        current_history.historyCount += 1;
         session_save(session_list);
 
-        stats["timeSpent"] += tempStats["timeSpent"];
-        stats["workedTime"] += tempStats["workedTime"];
-        stats["weightLifted"] += tempStats["weightLifted"];
-        stats["repsDone"] += tempStats["repsDone"];
+        stats.timeSpent += tempStats.timeSpent;
+        stats.workedTime += tempStats.workedTime;
+        stats.weightLifted += tempStats.weightLifted;
+        stats.repsDone += tempStats.repsDone;
         stats_save(stats);
 
-        sessionDone["data"][current_session["id"]] = true;
+        sessionDone.data[current_session.id] = true;
         sessionDone_save(sessionDone);
 
         // Notification related;
 
         if(isScheduled(current_session)){
-            let id = await getTodayPendingId(current_session["id"]);
+            let id = await getTodayPendingId(current_session.id);
 
             if(platform == "Mobile"){
                 await undisplayAndCancelNotification(id);
@@ -305,7 +305,7 @@ function manageSessionEndTabs(){
 };
 
 function getSessionEndData(presentHistory, history, type){
-    let number = history["historyCount"] + 1;
+    let number = history.historyCount + 1;
     let outNumber = "";
     
     let time = 0;
@@ -314,13 +314,13 @@ function getSessionEndData(presentHistory, history, type){
     let weight = 0;
     let double = false;
 
-    if(parameters["language"] == "french"){
+    if(parameters.language == "french"){
         if(number == 1){
             outNumber = "1er";
         }else{
             outNumber = number.toString() + "ème";
         };
-    }else if(parameters["language"] == "english"){
+    }else if(parameters.language == "english"){
         if(number == 1){
             outNumber = "1st";
         }else if(number == 2){
@@ -332,19 +332,19 @@ function getSessionEndData(presentHistory, history, type){
         };
     };
 
-    if(number == 1 || history["historyList"].length == 0){return [outNumber, false, false, isHistoryDayComplete(tempNewHistory, type)]};
+    if(number == 1 || history.historyList.length == 0){return [outNumber, false, false, isHistoryDayComplete(tempNewHistory, type)]};
 
-    let pastHistory = history["historyList"].getLast();
+    let pastHistory = history.historyList.getLast();
     let isEqual = areSessionEquallyCompleted(presentHistory, pastHistory, type);
 
-    if(pastHistory["duration"] === 0){
-        if(tempStats["timeSpent"] === 0){
+    if(pastHistory.duration === 0){
+        if(tempStats.timeSpent === 0){
             performanceGrowth = 0;
         }else{
             performanceGrowth = 100;
         };
     }else{
-        performanceGrowth = Math.round(((pastHistory["duration"] - tempStats["timeSpent"]) / pastHistory["duration"]) * 100);
+        performanceGrowth = Math.round(((pastHistory.duration - tempStats.timeSpent) / pastHistory.duration) * 100);
     };
 
     time = Math.max(Math.min(performanceGrowth, Infinity), -100)
@@ -352,18 +352,18 @@ function getSessionEndData(presentHistory, history, type){
 
     if(type == "I"){return [outNumber, time, false, isEqual]};
 
-    for(const exo of pastHistory["exoList"]){
-        if(exo['type'] == "Bi." || exo['type'] == "Uni."){
-            double = exo["name"].includes("Ts.") || exo["name"].includes("Alt.");
+    for(const exo of pastHistory.exoList){
+        if(exo.type == "Bi." || exo.type == "Uni."){
+            double = exo.name.includes("Ts.") || exo.name.includes("Alt.");
             if(double){
-                weight += convertToUnit(2 * exo["setList"].reduce((sum, set) => sum + (set["reps"] * set['weight']), 0), parameters["weightUnit"], "kg");
+                weight += convertToUnit(2 * exo.setList.reduce((sum, set) => sum + (set.reps * set.weight), 0), parameters.weightUnit, "kg");
             }else{
-                weight += convertToUnit(exo["setList"].reduce((sum, set) => sum + (set["reps"] * set['weight']), 0), parameters["weightUnit"], "kg");
+                weight += convertToUnit(exo.setList.reduce((sum, set) => sum + (set.reps * set.weight), 0), parameters.weightUnit, "kg");
             };
         };
     };
 
-    weight = weight == 0 ? false : Math.round(((tempStats["weightLifted"] - weight) / weight) * 100);
+    weight = weight == 0 ? false : Math.round(((tempStats.weightLifted - weight) / weight) * 100);
 
     return [outNumber, time, weight, isEqual];
 };
@@ -373,24 +373,24 @@ function fillSessionEnd(presentHistory, history, failed){
     function changeElemNode(data){
         let out = false;
 
-        let name = data[1]["name"];
-        let type = data[1]["type"]
+        let name = data[1].name;
+        let type = data[1].type
         
-        let sets = data[1]["sets"];
-        let reps = data[1]["reps"];
-        let weight = data[1]["weight"];
+        let sets = data[1].sets;
+        let reps = data[1].reps;
+        let weight = data[1].weight;
 
-        let oldSets = data[1]["oldSets"];
-        let oldReps = data[1]["oldReps"];
-        let oldWeight = data[1]["oldWeight"];
+        let oldSets = data[1].oldSets;
+        let oldReps = data[1].oldReps;
+        let oldWeight = data[1].oldWeight;
 
-        let cycle = data[1]["cycle"];
-        let work = data[1]["work"];
-        let rest = data[1]["rest"];
+        let cycle = data[1].cycle;
+        let work = data[1].work;
+        let rest = data[1].rest;
         
-        let oldCycle = data[1]["oldCycle"];
-        let oldWork = data[1]["oldWork"];
-        let oldRest = data[1]["oldRest"];
+        let oldCycle = data[1].oldCycle;
+        let oldWork = data[1].oldWork;
+        let oldRest = data[1].oldRest;
         
         let elem = $('<div class="selection_sessionFinished_suggested_optGroup"><span class="selection_sessionFinished_suggested_optGroupTitle"></span></div>');
         let optElem = $('<div class="selection_sessionFinished_suggested_optItem"><input type="checkbox" class="selection_sessionFinished_suggested_optCheck"><span class="selection_sessionFinished_suggested_optText"></span></div>');
@@ -403,19 +403,19 @@ function fillSessionEnd(presentHistory, history, failed){
             if(sets !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["sets", sets]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['placeHolders']['sets'] +" : "+ oldSets + " -> " + sets);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters.language].updatePage.placeHolders.sets +" : "+ oldSets + " -> " + sets);
             };
 
             if(reps !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["reps", reps]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['placeHolders']['reps'] +" : "+ oldReps + " -> " + reps);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters.language].updatePage.placeHolders.reps +" : "+ oldReps + " -> " + reps);
             };
             
             if(weight !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["weight", weight]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['placeHolders']['weight'] +" : "+ oldWeight + parameters["weightUnit"] + " -> " + weight + parameters["weightUnit"]);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters.language].updatePage.placeHolders.weight +" : "+ oldWeight + parameters.weightUnit + " -> " + weight + parameters.weightUnit);
             };
         }else if(type == "Int."){
             out = $(elem).clone();
@@ -425,19 +425,19 @@ function fillSessionEnd(presentHistory, history, failed){
             if(cycle !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["cycle", cycle]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['cycle'] +" : "+ oldCycle + " -> " + cycle);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters.language].updatePage.cycle +" : "+ oldCycle + " -> " + cycle);
             };
 
             if(work !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["work", work]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['work'] +" : "+ oldWork + " -> " + work);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters.language].updatePage.work +" : "+ display_timeString(oldWork) + " -> " + display_timeString(work));
             };
             
             if(rest !== undefined){
                 $(out).append($(optElem).clone());
                 $(out).find(".selection_sessionFinished_suggested_optText").last().data("data", ["rest", rest]);
-                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters["language"]]['updatePage']['rest'] +" : "+ oldRest + " -> " + rest);
+                $(out).find(".selection_sessionFinished_suggested_optText").last().text(textAssets[parameters.language].updatePage.rest +" : "+ display_timeString(oldRest) + " -> " + display_timeString(rest));
             };
         };
 
@@ -461,15 +461,15 @@ function fillSessionEnd(presentHistory, history, failed){
         $('.selection_sessionFinished').css('paddingBottom', '30px');
         $('.selection_sessionFinished_navigator').css('display', 'none');
 
-        let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["subText"]["failed"]).length;
+        let assetCount = Object.keys(textAssets[parameters.language].sessionEnd.subText.failed).length;
         let randomFailedSub = Math.floor(Math.random() * (assetCount)).toString();
 
-        $(failedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["failed"]);
-        $(failedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["failed"][randomFailedSub]);
+        $(failedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.failed);
+        $(failedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters.language].sessionEnd.subText.failed[randomFailedSub]);
     }else{
-        let [number, time, weight, isEqual] = getSessionEndData(presentHistory, history, current_session["type"]);
+        let [number, time, weight, isEqual] = getSessionEndData(presentHistory, history, current_session.type);
         let intNum = parseInt(number.match(/\d+/)[0], 10);
-        let changes = generateSuggestedChanges(tempNewHistory, current_session["type"]);
+        let changes = generateSuggestedChanges(tempNewHistory, current_session.type);
         let changesFilled = Object.keys(changes).length > 0;
 
         if(!isEqual && intNum != 1){
@@ -493,81 +493,81 @@ function fillSessionEnd(presentHistory, history, failed){
         let randomWeightMain = 0;
 
         // First Tile
-        $(finishedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["congrats"]);
+        $(finishedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.congrats);
 
-        $(finishedTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(current_session["name"]);
+        $(finishedTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(current_session.name);
 
-        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["YC"]);
+        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters.language].sessionEnd.subText.congrats.YC);
         $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(2).text(number);
-        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["FT"]);
-        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(3).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["congrats"]["T"]);
+        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters.language].sessionEnd.subText.congrats.FT);
+        $(finishedTile).find('.selection_sessionFinished_subTextPart').eq(3).text(textAssets[parameters.language].sessionEnd.subText.congrats.T);
 
         // CompletedTile 
 
-        let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["completed"]).length;
+        let assetCount = Object.keys(textAssets[parameters.language].sessionEnd.mainText.completed).length;
         let randomCompleted = Math.floor(Math.random() * (assetCount)).toString();
 
-        $(completedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["completed"][randomCompleted]);
-        $(completedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["completed"]);
+        $(completedTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.completed[randomCompleted]);
+        $(completedTile).find('.selection_sessionFinished_subText').text(textAssets[parameters.language].sessionEnd.subText.completed);
 
         // Second Tile
         if(time > 0){
-            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["good"]).length
+            let assetCount = Object.keys(textAssets[parameters.language].sessionEnd.mainText.chrono.good).length
 
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["good"][randomTimeMain]);
+            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.chrono.good[randomTimeMain]);
 
-            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]["YHB"]);
-            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["faster"]);
-            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters.language].sessionEnd.subText.chrono.YHB);
+            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters.language].sessionEnd.interestWord.chrono.faster);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters.language].sessionEnd.common.TTLT);
         }else if(time < 0){
-            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
+            let assetCount = Object.keys(textAssets[parameters.language].sessionEnd.mainText.chrono.bad).length
             
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"][randomTimeMain]);
+            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.chrono.bad[randomTimeMain]);
 
-            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]["YHB"]);
-            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["slower"]);
-            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters.language].sessionEnd.subText.chrono.YHB);
+            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(time).toString() + textAssets[parameters.language].sessionEnd.interestWord.chrono.slower);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters.language].sessionEnd.common.TTLT);
         }else{
-            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"]).length
+            let assetCount = Object.keys(textAssets[parameters.language].sessionEnd.mainText.chrono.even).length
             
             randomTimeMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"][randomTimeMain]);
+            $(chronoTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.chrono.even[randomTimeMain]);
 
-            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["chrono"]['YT']);
-            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["chrono"]["even"]);
-            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['ATLT']);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters.language].sessionEnd.subText.chrono.YT);
+            $(chronoTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters.language].sessionEnd.interestWord.chrono.even);
+            $(chronoTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters.language].sessionEnd.common.ATLT);
         };
 
         // Third Tile
         if(weight > 0){
-            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["good"]).length
+            let assetCount = Object.keys(textAssets[parameters.language].sessionEnd.mainText.weight.good).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["good"][randomWeightMain]);
+            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.weight.good[randomWeightMain]);
 
-            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["more"]);
-            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters.language].sessionEnd.subText.weight.YHL);
+            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters.language].sessionEnd.interestWord.weight.more);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters.language].sessionEnd.common.TTLT);
         }else if(weight < 0){
-            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["bad"]).length
+            let assetCount = Object.keys(textAssets[parameters.language].sessionEnd.mainText.chrono.bad).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["bad"][randomWeightMain]);
+            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.weight.bad[randomWeightMain]);
 
-            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["less"]);
-            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['TTLT']);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters.language].sessionEnd.subText.weight.YHL);
+            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(Math.abs(weight).toString() + textAssets[parameters.language].sessionEnd.interestWord.weight.less);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters.language].sessionEnd.common.TTLT);
         }else{
-            let assetCount = Object.keys(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["chrono"]["even"]).length
+            let assetCount = Object.keys(textAssets[parameters.language].sessionEnd.mainText.chrono.even).length
 
             randomWeightMain = Math.floor(Math.random() * (assetCount)).toString()
-            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters["language"]]["sessionEnd"]["mainText"]["weight"]["even"][randomWeightMain]);
+            $(liftTile).find('.selection_sessionFinished_mainText').text(textAssets[parameters.language].sessionEnd.mainText.weight.even[randomWeightMain]);
 
-            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["subText"]["weight"]["YHL"]);
-            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters["language"]]["sessionEnd"]["interestWord"]["weight"]["even"]);
-            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters["language"]]["sessionEnd"]['common']['ATLT']);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(0).text(textAssets[parameters.language].sessionEnd.subText.weight.YHL);
+            $(liftTile).find('.selection_sessionFinished_subTextInterest').eq(0).text(textAssets[parameters.language].sessionEnd.interestWord.weight.even);
+            $(liftTile).find('.selection_sessionFinished_subTextPart').eq(1).text(textAssets[parameters.language].sessionEnd.common.ATLT);
         };
 
         // Forth Tile
@@ -590,10 +590,10 @@ function generateSuggestedChanges(history, type){
     let suggestedData = {};
 
     if(type == "W"){
-        history["exoList"].forEach(exo => {
-            let id = exo["id"].replace(/_(1|2)/g, "");
+        history.exoList.forEach(exo => {
+            let id = exo.id.replace(/_(1|2)/g, "");
     
-            let type = exo["type"];
+            let type = exo.type;
             let name = false;
     
             let setList = false;
@@ -601,24 +601,24 @@ function generateSuggestedChanges(history, type){
     
             if(type == "Bi." || type == "Uni."){
                 if(type == "Uni."){
-                    name = exo["name"].slice(0, -4);
+                    name = exo.name.slice(0, -4);
                     setList = mergeHistoryExo(history, id);
-                    completedSets = Math.floor(setList.filter(set => set["reps"] != 0).length / 2);
+                    completedSets = Math.floor(setList.filter(set => set.reps != 0).length / 2);
                 }else if(type == "Bi."){
-                    name = exo["name"]
-                    completedSets = exo["setList"].filter(set => set["reps"] != 0).length;
+                    name = exo.name
+                    completedSets = exo.setList.filter(set => set.reps != 0).length;
                 };
         
                 if(completedSets == 0){return};
     
-                let correctedSetList = exo["setList"].filter(set => set["reps"] != 0);
+                let correctedSetList = exo.setList.filter(set => set.reps != 0);
     
-                let expectedSets = exo["expectedStats"]["setNb"];
-                let expectedReps = exo["expectedStats"]["reps"];
-                let expectedWeight = exo["expectedStats"]["weight"];
+                let expectedSets = exo.expectedStats.setNb;
+                let expectedReps = exo.expectedStats.reps;
+                let expectedWeight = exo.expectedStats.weight;
     
-                let repsMean = Math.ceil(correctedSetList.map(set => set["reps"]).reduce((acc, val) => acc + val, 0) / completedSets); 
-                let weightMean = correctedSetList.map(set => set["weight"]).reduce((acc, val) => acc + val, 0) / completedSets;
+                let repsMean = Math.ceil(correctedSetList.map(set => set.reps).reduce((acc, val) => acc + val, 0) / completedSets); 
+                let weightMean = correctedSetList.map(set => set.weight).reduce((acc, val) => acc + val, 0) / completedSets;
                 let weightMeanRounded = roundToNearestHalf(weightMean);
     
                 if(repsMean != expectedReps || weightMean != expectedWeight || completedSets != expectedSets){
@@ -629,38 +629,38 @@ function generateSuggestedChanges(history, type){
                     };
                     
                     if(completedSets != expectedSets){
-                        suggestedData[id]['sets'] = completedSets;
-                        suggestedData[id]['oldSets'] = expectedSets;
+                        suggestedData[id].sets = completedSets;
+                        suggestedData[id].oldSets = expectedSets;
                     };
         
                     if(repsMean != expectedReps){
-                        suggestedData[id]['reps'] = repsMean;
-                        suggestedData[id]['oldReps'] = expectedReps;
+                        suggestedData[id].reps = repsMean;
+                        suggestedData[id].oldReps = expectedReps;
                     };
                     
                     if(weightMean != expectedWeight){
-                        suggestedData[id]['weight'] = weightMeanRounded;
-                        suggestedData[id]['oldWeight'] = expectedWeight;
+                        suggestedData[id].weight = weightMeanRounded;
+                        suggestedData[id].oldWeight = expectedWeight;
                     };
                 };
             }else if(type == "Int."){
-                exo['exoList'].forEach(subExo => {
-                    let subName = subExo['name'];
+                exo.exoList.forEach(subExo => {
+                    let subName = subExo.name;
     
-                    let subID = id+"_"+subExo["id"];
-                    let correctedSetList = subExo["setList"].filter(set => set["work"] != "X");
+                    let subID = id+"_"+subExo.id;
+                    let correctedSetList = subExo.setList.filter(set => set.work != "X");
                     
-                    let expectedCycle = parseInt(subExo["expectedStats"]["cycle"]);
-                    let expectedWork = time_unstring(subExo["expectedStats"]["work"]);
-                    let expectedRest = time_unstring(subExo["expectedStats"]["rest"]);;
+                    let expectedCycle = parseInt(subExo.expectedStats.cycle);
+                    let expectedWork = time_unstring(subExo.expectedStats.work);
+                    let expectedRest = time_unstring(subExo.expectedStats.rest);;
                     
                     let completedCycle = correctedSetList.length;
                     if(completedCycle == 0){return};
     
-                    let workMean = Math.ceil(correctedSetList.map(set => time_unstring(set["work"])).reduce((acc, val) => acc + val, 0) / completedCycle);
+                    let workMean = Math.ceil(correctedSetList.map(set => time_unstring(set.work)).reduce((acc, val) => acc + val, 0) / completedCycle);
     
                     let restDenominator = completedCycle == 1 ? 1 : completedCycle - 1;
-                    let restMean = Math.ceil(correctedSetList.filter(set => set["rest"] != "X").map(set => time_unstring(set["rest"])).reduce((acc, val) => acc + val, 0) / (restDenominator));
+                    let restMean = Math.ceil(correctedSetList.filter(set => set.rest != "X").map(set => time_unstring(set.rest)).reduce((acc, val) => acc + val, 0) / (restDenominator));
                     
                     if(workMean != expectedWork && workMean != 0 || restMean != expectedRest && restMean != 0 || completedCycle != expectedCycle){
                         
@@ -670,41 +670,41 @@ function generateSuggestedChanges(history, type){
                         };
                         
                         if(completedCycle != expectedCycle){
-                            suggestedData[subID]['cycle'] = completedCycle;
-                            suggestedData[subID]['oldCycle'] = expectedCycle;
+                            suggestedData[subID].cycle = completedCycle;
+                            suggestedData[subID].oldCycle = expectedCycle;
                         };
             
                         if(workMean != expectedWork && workMean != 0){
-                            suggestedData[subID]['work'] = get_time_u(workMean);
-                            suggestedData[subID]['oldWork'] = get_time_u(expectedWork);
+                            suggestedData[subID].work = get_timeString(workMean);
+                            suggestedData[subID].oldWork = get_timeString(expectedWork);
                         };
                         
                         if(restMean != expectedRest && restMean != 0){
-                            suggestedData[subID]['rest'] = get_time_u(restMean);
-                            suggestedData[subID]['oldRest'] = get_time_u(expectedRest);
+                            suggestedData[subID].rest = get_timeString(restMean);
+                            suggestedData[subID].oldRest = get_timeString(expectedRest);
                         };
                     };
                 });
             };
         });
     }else if(type == "I"){
-        history["exoList"].forEach(exo => {
-            let id = exo["id"];
-            let name = exo["name"];
+        history.exoList.forEach(exo => {
+            let id = exo.id;
+            let name = exo.name;
 
-            let correctedSetList = exo["setList"].filter(set => set["work"] != "X");
+            let correctedSetList = exo.setList.filter(set => set.work != "X");
             
-            let expectedCycle = parseInt(exo["expectedStats"]["cycle"]);
-            let expectedWork = time_unstring(exo["expectedStats"]["work"]);
-            let expectedRest = time_unstring(exo["expectedStats"]["rest"]);;
+            let expectedCycle = parseInt(exo.expectedStats.cycle);
+            let expectedWork = time_unstring(exo.expectedStats.work);
+            let expectedRest = time_unstring(exo.expectedStats.rest);;
             
             let completedCycle = correctedSetList.length;
             if(completedCycle == 0){return};
 
-            let workMean = Math.ceil(correctedSetList.map(set => time_unstring(set["work"])).reduce((acc, val) => acc + val, 0) / completedCycle);
+            let workMean = Math.ceil(correctedSetList.map(set => time_unstring(set.work)).reduce((acc, val) => acc + val, 0) / completedCycle);
 
             let restDenominator = completedCycle == 1 ? 1 : completedCycle - 1;
-            let restMean = Math.ceil(correctedSetList.filter(set => set["rest"] != "X").map(set => time_unstring(set["rest"])).reduce((acc, val) => acc + val, 0) / (restDenominator));
+            let restMean = Math.ceil(correctedSetList.filter(set => set.rest != "X").map(set => time_unstring(set.rest)).reduce((acc, val) => acc + val, 0) / (restDenominator));
 
             if(workMean != expectedWork && workMean != 0 || restMean != expectedRest && restMean != 0 || completedCycle != expectedCycle){
                 
@@ -714,18 +714,18 @@ function generateSuggestedChanges(history, type){
                 };
                 
                 if(completedCycle != expectedCycle){
-                    suggestedData[id]['cycle'] = completedCycle;
-                    suggestedData[id]['oldCycle'] = expectedCycle;
+                    suggestedData[id].cycle = completedCycle;
+                    suggestedData[id].oldCycle = expectedCycle;
                 };
     
                 if(workMean != expectedWork && workMean != 0){
-                    suggestedData[id]['work'] = get_time_u(workMean);
-                    suggestedData[id]['oldWork'] = get_time_u(expectedWork);
+                    suggestedData[id].work = get_timeString(workMean);
+                    suggestedData[id].oldWork = get_timeString(expectedWork);
                 };
                 
                 if(restMean != expectedRest && restMean != 0){
-                    suggestedData[id]['rest'] = get_time_u(restMean);
-                    suggestedData[id]['oldRest'] = get_time_u(expectedRest);
+                    suggestedData[id].rest = get_timeString(restMean);
+                    suggestedData[id].oldRest = get_timeString(expectedRest);
                 };
             };
         });
@@ -740,31 +740,31 @@ function generateIntervallHistoryExoList(session){
     let expectedStats = false;
     let setList = false;
 
-    session['exoList'].forEach(exo => {
-        if(exo["type"] == "Int."){
+    session.exoList.forEach(exo => {
+        if(exo.type == "Int."){
             expectedStats = generateHistoryExceptedStatsObj({
-                "type": exo['type'],
-                "cycle": exo["cycle"],
-                "work": exo["work"],
-                "rest": exo["rest"]
+                "type": exo.type,
+                "cycle": exo.cycle,
+                "work": exo.work,
+                "rest": exo.rest
             });
     
-            setList = Array.from({ length: exo["cycle"] }, (_, index) => {
-                return generateHistorySetObj({"type": exo["type"], "work": "X", "rest": "X"});
+            setList = Array.from({ length: exo.cycle }, (_, index) => {
+                return generateHistorySetObj({"type": exo.type, "work": "X", "rest": "X"});
             })
     
             out.push(generateHistoryExoObj({
-                "type": exo['type'],
-                "name": exo['name'],
+                "type": exo.type,
+                "name": exo.name,
                 "expectedStats": expectedStats,
                 "setList": setList,
                 "note": "",
-                "id": exo["id"]
+                "id": exo.id
             }));
         };
         
-        // else if(exo["type"] == "Pause"){
-        //     out.push({"type": exo['type']});
+        // else if(exo.type == "Pause"){
+        //     out.push({"type": exo.type});
         // };
         
     });
@@ -777,7 +777,7 @@ function generateIntervallHistoryExoList(session){
 function recovery_init(mode){
     if(mode == "workout"){
         recovery = {
-            "id": current_session['id'],
+            "id": current_session.id,
             "varSav": {
                 "extype": false,
                 "next_id": false,
@@ -808,7 +808,7 @@ function recovery_init(mode){
         };
     }else if(mode == "intervall"){
         recovery = {
-            "id": current_session['id'],
+            "id": current_session.id,
             "varSav": {
                 "hasIntervallStarted": false,
                 "intervallData": false,
@@ -829,43 +829,43 @@ function recovery_init(mode){
 };
 
 function udpate_recovery(mode, data=false){
-    tempNewHistory["duration"] = tempStats["timeSpent"];
+    tempNewHistory.duration = tempStats.timeSpent;
     
     if(mode == "workout"){
 
-        recovery["varSav"]["extype"] = extype;
-        recovery["varSav"]["next_id"] = next_id;
-        recovery["varSav"]["next_name"] = next_name;
-        recovery["varSav"]["next_rest"] = next_rest;
-        recovery["varSav"]["LrestTime"] = LrestTime;
-        recovery["varSav"]["RrestTime"] = RrestTime;
-        recovery["varSav"]["next_specs"] = next_specs;
-        recovery["varSav"]["actual_setL"] = actual_setL;
-        recovery["varSav"]["actual_setR"] = actual_setR;
-        recovery["varSav"]["actual_setNb"] = actual_setNb;
-        recovery["varSav"]["beforeExercise"] = beforeExercise;
+        recovery.varSav.extype = extype;
+        recovery.varSav.next_id = next_id;
+        recovery.varSav.next_name = next_name;
+        recovery.varSav.next_rest = next_rest;
+        recovery.varSav.LrestTime = LrestTime;
+        recovery.varSav.RrestTime = RrestTime;
+        recovery.varSav.next_specs = next_specs;
+        recovery.varSav.actual_setL = actual_setL;
+        recovery.varSav.actual_setR = actual_setR;
+        recovery.varSav.actual_setNb = actual_setNb;
+        recovery.varSav.beforeExercise = beforeExercise;
 
         if(data){
-            recovery["varSav"]["intervallData"] = data;
-            recovery["varSav"]["iCurrent_cycle"] = iCurrent_cycle;
-            recovery["varSav"]["iActualSet"] = iActualSet;
-            recovery["varSav"]["currentExoIndex"] = currentExoIndex;
+            recovery.varSav.intervallData = data;
+            recovery.varSav.iCurrent_cycle = iCurrent_cycle;
+            recovery.varSav.iActualSet = iActualSet;
+            recovery.varSav.currentExoIndex = currentExoIndex;
         };
         
-        recovery["html"] = $(".session_next_exercises_container").html();
-        recovery["tempHistory"] = tempNewHistory;
-        recovery["tempStats"] = tempStats;
+        recovery.html = $(".session_next_exercises_container").html();
+        recovery.tempHistory = tempNewHistory;
+        recovery.tempStats = tempStats;
 
-        recovery["undoMemory"] = undoMemory;
+        recovery.undoMemory = undoMemory;
     }else if(mode == "intervall"){
-        recovery["varSav"]["intervallData"] = data;
-        recovery["varSav"]["iCurrent_cycle"] = iCurrent_cycle;
-        recovery["varSav"]["iActualSet"] = iActualSet;
-        recovery["varSav"]["currentExoIndex"] = currentExoIndex;
-        recovery["varSav"]["Ifinished"] = Ifinished;
+        recovery.varSav.intervallData = data;
+        recovery.varSav.iCurrent_cycle = iCurrent_cycle;
+        recovery.varSav.iActualSet = iActualSet;
+        recovery.varSav.currentExoIndex = currentExoIndex;
+        recovery.varSav.Ifinished = Ifinished;
 
-        recovery["tempHistory"] = tempNewHistory;
-        recovery["tempStats"] = tempStats;
+        recovery.tempHistory = tempNewHistory;
+        recovery.tempStats = tempStats;
     };
 
     recovery_save(recovery);
@@ -1030,7 +1030,7 @@ function screensaver_toggle(on){
         isSaving = true;
 
         if(!(Ltimer || Rtimer || sIntervall)){
-            $(".screensaver_text").text(textAssets[parameters["language"]]["screenSaver"]["saver"]);
+            $(".screensaver_text").text(textAssets[parameters.language].screenSaver.saver);
             $(".screensaver_Ltimer, .screensaver_Rtimer, .screensaver_Xtimer").text("");
         };
 
@@ -1090,7 +1090,7 @@ $(document).ready(function(){
 
     $('.session_exit_y').on('longClicked', function(e){
         closePanel('session_exit');
-        quit_session(current_session["type"] == 'I' && Ifinished === false || current_session["type"] == 'W' && finished === false);
+        quit_session(current_session.type == 'I' && Ifinished === false || current_session.type == 'W' && finished === false);
     });
 
     // SCREENSAVER;
@@ -1111,9 +1111,9 @@ $(document).ready(function(){
 
     $(document).on('longClicked', '.lockTouch', function(e){
         if(lockState){
-            $(this).text(textAssets[parameters["language"]]['screenSaver']['lock']);
+            $(this).text(textAssets[parameters.language].screenSaver.lock);
         }else{
-            $(this).text(textAssets[parameters["language"]]['screenSaver']['unlock']);
+            $(this).text(textAssets[parameters.language].screenSaver.unlock);
         };
 
         lockState = !lockState;
@@ -1214,14 +1214,14 @@ $(document).ready(function(){
         $('.blurBG').css('display', 'none');
         beepPlayer = constructPlayer(beepPath, 1000);
         beep2x3Player = constructPlayer(beep2x3Path, 1000);
-        launchSession(getSessionIndexByID(recovery["id"]));
+        launchSession(getSessionIndexByID(recovery.id));
     });
 
 
     // SUGGESTED
 
     $('.selection_sessionFinished_suggestedBtn').on('click', function(){
-        if(current_session["type"] == "W"){
+        if(current_session.type == "W"){
             $('.selection_sessionFinished_suggested_optGroup').each((_, item) => {
                 let id = $(item).data('id')
     
@@ -1238,30 +1238,30 @@ $(document).ready(function(){
                     if(!subID){
                         if($(line).parent().find(".selection_sessionFinished_suggested_optCheck").is(':checked')){
                             if(type == "sets"){
-                                current_session["exoList"][exoID]["setNb"] = val;
+                                current_session.exoList[exoID].setNb = val;
                             }else if(type == "reps"){
-                                current_session["exoList"][exoID]["reps"] = val;
+                                current_session.exoList[exoID].reps = val;
                             }else if(type == "weight"){
-                                current_session["exoList"][exoID]["weight"] = val;
+                                current_session.exoList[exoID].weight = val;
                             };
                         };
                     }else{
-                        let subExoID = getExoIndexById(current_session["exoList"][exoID], subID);
+                        let subExoID = getExoIndexById(current_session.exoList[exoID], subID);
 
                         if($(line).parent().find(".selection_sessionFinished_suggested_optCheck").is(':checked')){
                             if(type == "cycle"){
-                                current_session["exoList"][exoID]["exoList"][subExoID]["cycle"] = val;
+                                current_session.exoList[exoID].exoList[subExoID].cycle = val;
                             }else if(type == "work"){
-                                current_session["exoList"][exoID]["exoList"][subExoID]["work"] = val;
+                                current_session.exoList[exoID].exoList[subExoID].work = val;
                             }else if(type == "rest"){
-                                current_session["exoList"][exoID]["exoList"][subExoID]["rest"] = val;
+                                current_session.exoList[exoID].exoList[subExoID].rest = val;
                             };
                         };
                     };
     
                 });
             });
-        }else if(current_session["type"] == "I"){
+        }else if(current_session.type == "I"){
             $('.selection_sessionFinished_suggested_optGroup').each((_, item) => {
                 let id = $(item).data('id')
     
@@ -1274,11 +1274,11 @@ $(document).ready(function(){
     
                     if($(line).parent().find(".selection_sessionFinished_suggested_optCheck").is(':checked')){
                         if(type == "cycle"){
-                            current_session["exoList"][exoID]["cycle"] = val;
+                            current_session.exoList[exoID].cycle = val;
                         }else if(type == "work"){
-                            current_session["exoList"][exoID]["work"] = val;
+                            current_session.exoList[exoID].work = val;
                         }else if(type == "rest"){
-                            current_session["exoList"][exoID]["rest"] = val;
+                            current_session.exoList[exoID].rest = val;
                         };
                     };
 
@@ -1286,7 +1286,7 @@ $(document).ready(function(){
             });
         };
 
-        bottomNotification("updated", current_session["name"]);
+        bottomNotification("updated", current_session.name);
         session_save(session_list);
 
         refresh_session_tile();

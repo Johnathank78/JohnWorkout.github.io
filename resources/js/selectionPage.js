@@ -19,7 +19,7 @@ function trackItem(item, reminderOrSession, archive = false){
     let item_List = false;
 
     if(reminderOrSession == "reminder"){
-        item_List = reminder_list.filter(reminder => reminder['isArchived'] === archive);
+        item_List = reminder_list.filter(reminder => reminder.isArchived === archive);
         node_list = $(".selection_reminder_tile");
 
         update_current_node = $(item).closest(".selection_reminder_tile");
@@ -28,7 +28,7 @@ function trackItem(item, reminderOrSession, archive = false){
         update_current_item = item_List[update_current_index];
 
     }else if(reminderOrSession == "session"){
-        item_List = session_list.filter(session => session['isArchived'] === archive);
+        item_List = session_list.filter(session => session.isArchived === archive);
         node_list = $(".selection_session_tile");
 
         update_current_node = $(item).closest(".selection_session_tile");
@@ -44,10 +44,10 @@ function manageJumpContainer(data){
         $(".jump_toggle").css("background-color", green);
         $(".jump_toggle").children().css("marginLeft", "18px");
 
-        $(".update_schedule_select_jumpEvery").eq(0).val(data['jumpType']);
-        $(".update_schedule_input").eq(3).val(data['jumpVal']);
+        $(".update_schedule_select_jumpEvery").eq(0).val(data.jumpType);
+        $(".update_schedule_input").eq(3).val(data.jumpVal);
 
-        $(".update_schedule_input").eq(4).val(data['everyVal']);
+        $(".update_schedule_input").eq(4).val(data.everyVal);
 
         $('.update_schedule_tline_sblock').staticSpawn("flex", 40, 300);
     }else{
@@ -57,7 +57,7 @@ function manageJumpContainer(data){
 
         $(".update_schedule_select_jumpEvery").eq(0).val("Day");
         $(".update_schedule_input").eq(3).val("");
-        $(".update_schedule_select_jumpEvery").eq(1).text(textAssets[parameters["language"]]["updatePage"]["times"]);
+        $(".update_schedule_select_jumpEvery").eq(1).text(textAssets[parameters.language].updatePage.times);
         $(".update_schedule_input").eq(4).val("");  
 
         $('.update_schedule_tline_sblock').staticDespawn(-14, 300);
@@ -169,13 +169,13 @@ $(document).ready(function(){
         let order = {"7 Days": 1, "1 Month": 2, "3 Month": 3, "6 Month": 4, "1 Year": 5, "For ever": 6};
         let set = new Set();
 
-        if(order[parameters["deleteAfter"]] > order[$(this).val()]){
+        if(order[parameters.deleteAfter] > order[$(this).val()]){
             session_list.forEach(session => {
-                if(session['history']['historyList'].length != 0){
-                    let historyList = getSessionHistory(session)["historyList"]
+                if(session.history.historyList.length != 0){
+                    let historyList = getSessionHistory(session).historyList;
                     historyList.forEach(historyDay => {
-                        if(historyDay["date"] < subtractTime($(this).val()).getTime()){
-                            set.add(historyDay["date"]);
+                        if(historyDay.date < subtractTime($(this).val()).getTime()){
+                            set.add(historyDay.date);
                         };
                     }); 
                 };
@@ -199,7 +199,7 @@ $(document).ready(function(){
 
     $('.selection_deleteHistoryConfirm_btn').on('click', function(){
         if($(this).is('.selection_deleteHistoryConfirm_btn_n')){
-            $('.selection_parameters_deleteafter').val(parameters["deleteAfter"]);
+            $('.selection_parameters_deleteafter').val(parameters.deleteAfter);
         };
 
         closePanel('deleteHistoryConfirm');
@@ -292,60 +292,60 @@ $(document).ready(function(){
         reminderOrSession = $(item).hasClass("selection_session_tile") ? "session" : "reminder";
 
         trackItem(item, reminderOrSession);
-        $('.update_colorChooser').css('backgroundColor', update_current_item['color']);
+        $('.update_colorChooser').css('backgroundColor', update_current_item.color);
 
         if(reminderOrSession == "session"){
-            $(".update_data_name").val(update_current_item["name"]);
+            $(".update_data_name").val(update_current_item.name);
             
-            if(update_current_item["type"] == "I"){
+            if(update_current_item.type == "I"){
                 update_pageFormat("editIN");
                 
                 selected_mode = "I";
                 $(".update_intervallList_container").html("");
     
-                update_current_item['exoList'].forEach(exo => {
-                    if(exo["type"] == "Int."){
+                update_current_item.exoList.forEach(exo => {
+                    if(exo.type == "Int."){
                         $(".update_intervallList_container").append(Iintervall_tile(exo));
-                        if(exo['hint']){showHint(".update_intervallList_container")};
+                        if(exo.hint){showHint(".update_intervallList_container")};
     
-                        manageRestInputVisibility($(".update_intervallList_container").children().last(), update_current_item["type"]);
-                    }else if(exo["type"] == "Pause"){
+                        manageRestInputVisibility($(".update_intervallList_container").children().last(), update_current_item.type);
+                    }else if(exo.type == "Pause"){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
                 });
     
                 $(".update_intervallList_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
-            }else if(update_current_item["type"] == "W"){
+            }else if(update_current_item.type == "W"){
                 update_pageFormat("editWO");
     
                 selected_mode = "W";
                 $(".update_workoutList_container").html("");
                 
-                update_current_item["exoList"].forEach(exo => {
-                    if(exo["type"] == "Pause"){
+                update_current_item.exoList.forEach(exo => {
+                    if(exo.type == "Pause"){
                         $(".update_workoutList_container").append(pause_tile(exo));
-                    }else if(exo["type"] == "Int."){
+                    }else if(exo.type == "Int."){
                         $(".update_workoutList_container").append(exercise_tile(exo));
     
                         if(isIntervallLinked(exo)){
-                            $(".update_workoutList_container").children().last().attr('exo-data', JSON.stringify({"type": exo["type"], "linkId": exo["linkId"]}));
+                            $(".update_workoutList_container").children().last().attr('exo-data', JSON.stringify({"type": exo.type, "linkId": exo.linkId}));
                         }else{
-                            $(".update_workoutList_container").children().last().attr('exo-data', JSON.stringify({"type": exo["type"], "name": exo["name"], "exoList": exo["exoList"]}));
+                            $(".update_workoutList_container").children().last().attr('exo-data', JSON.stringify({"type": exo.type, "name": exo.name, "exoList": exo.exoList}));
                         };
     
-                        if(exo['hint']){showHint(".update_workoutList_container")};
-                    }else if(exo["type"] == "Wrm."){
+                        if(exo.hint){showHint(".update_workoutList_container")};
+                    }else if(exo.type == "Wrm."){
                         $(".update_workoutList_container").append(exercise_tile(exo));
-                        if(exo['hint']){showHint(".update_workoutList_container")};
+                        if(exo.hint){showHint(".update_workoutList_container")};
                         
                         $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                     }else{
                         $(".update_workoutList_container").append(exercise_tile(exo));
-                        manageRestInputVisibility($(".update_workoutList_container").children().last(), update_current_item["type"]);
-                        if(exo['hint']){showHint(".update_workoutList_container")};
+                        manageRestInputVisibility($(".update_workoutList_container").children().last(), update_current_item.type);
+                        if(exo.hint){showHint(".update_workoutList_container")};
                     };
     
-                    if(update_current_item["exoList"].length> 1){
+                    if(update_current_item.exoList.length> 1){
                         $(".update_workout_item_cross").css("opacity", "1");
                     };
                 })
@@ -355,8 +355,8 @@ $(document).ready(function(){
         }else if(reminderOrSession == "reminder"){
             update_pageFormat("editRM");
     
-            $(".update_data_name").val(update_current_item["name"]);
-            $(".udpate_reminder_body_txtarea").val(update_current_item["body"]).change();
+            $(".update_data_name").val(update_current_item.name);
+            $(".udpate_reminder_body_txtarea").val(update_current_item.body).change();
         };
     
         $(".update_workoutList_container").scrollTop(0);
@@ -374,17 +374,17 @@ $(document).ready(function(){
 
         if(reminderOrSession == "session"){
 
-            if(update_current_item["type"] == "I"){
+            if(update_current_item.type == "I"){
                 update_pageFormat("deleteIN");
 
                 selected_mode = "I";
-                $(".update_data_name").val(update_current_item["name"]);
+                $(".update_data_name").val(update_current_item.name);
                 $(".update_intervallList_container").html("");
                 
-                update_current_item['exoList'].forEach(exo => {
-                    if(exo["type"] == "Int."){
+                update_current_item.exoList.forEach(exo => {
+                    if(exo.type == "Int."){
                         $(".update_intervallList_container").append(Iintervall_tile(exo));
-                    }else if(exo["type"] == "Pause"){
+                    }else if(exo.type == "Pause"){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
                 });
@@ -394,32 +394,32 @@ $(document).ready(function(){
                 $(".update_workout_item, .update_exercise_pause_item").css("pointer-events", "none");
                 $('.update_workout_item_cross_container, .update_workout_item_grab_container').css("display", "none");
 
-            }else if(update_current_item["type"] == "W"){
+            }else if(update_current_item.type == "W"){
                 update_pageFormat("deleteWO");
 
                 selected_mode = "W";
 
-                $(".update_data_name").val(update_current_item["name"]);
+                $(".update_data_name").val(update_current_item.name);
 
                 $(".update_workoutList_container").html("");
 
-                update_current_item["exoList"].forEach(exo => {
-                    if(exo["type"] == "Pause"){
+                update_current_item.exoList.forEach(exo => {
+                    if(exo.type == "Pause"){
                         $(".update_workoutList_container").append(pause_tile(exo));
-                    }else if(exo["type"] == "Int."){
+                    }else if(exo.type == "Int."){
                         $(".update_workoutList_container").append(exercise_tile(exo));
     
                         if(isIntervallLinked(exo)){ // IS LINKED
-                            $(".update_workoutList_container").children().last().data('data', exo["idLink"]);
+                            $(".update_workoutList_container").children().last().data('data', exo.idLink);
                         }else{ // IS CREATED
-                            $(".update_workoutList_container").children().last().data('data', exo["id"]);
+                            $(".update_workoutList_container").children().last().data('data', exo.id);
                         };
-                    }else if(exo["type"] == "Wrm."){
+                    }else if(exo.type == "Wrm."){
                         $(".update_workoutList_container").append(exercise_tile(exo));
                         $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                     }else{
                         $(".update_workoutList_container").append(exercise_tile(exo));
-                        manageRestInputVisibility($(".update_workoutList_container").children().last(), update_current_item["type"]);
+                        manageRestInputVisibility($(".update_workoutList_container").children().last(), update_current_item.type);
                     };
                 })
 
@@ -433,8 +433,8 @@ $(document).ready(function(){
         }else if(reminderOrSession == "reminder"){
             update_pageFormat("deleteRM");
 
-            $(".update_data_name").val(update_current_item["name"]);
-            $(".udpate_reminder_body_txtarea").val(update_current_item["body"]).change();
+            $(".update_data_name").val(update_current_item.name);
+            $(".udpate_reminder_body_txtarea").val(update_current_item.body).change();
         };
 
         $(".update_workoutList_container").scrollTop(0);
@@ -499,37 +499,37 @@ $(document).ready(function(){
         let item = $(e.target).closest(".selection_session_tile, .selection_reminder_tile");
         trackItem(item, "session");
         
-        $(".update_data_name").val(update_current_item["name"]);
+        $(".update_data_name").val(update_current_item.name);
         $(".update_history_container_day, .update_history_loadMore_btn").remove();
 
         update_pageFormat("history");
         current_history = getSessionHistory(update_current_item);
 
-        $(".update_history_count").text(current_history["historyCount"]);
+        $(".update_history_count").text(current_history.historyCount);
         $(".update_history_count").css('display', 'flex');
 
         $('.history_toggle').css('display', 'flex')
 
         // toggle;
-        $(".history_toggle").attr("state", current_history["state"]);
+        $(".history_toggle").attr("state", current_history.state);
 
-        if(current_history["state"] === true || current_history["state"] == "true"){
+        if(current_history.state === true || current_history.state == "true"){
             $(".history_toggle").css("background-color", green);
             $(".history_toggle").children().css("marginLeft", "18px");
-        }else if(current_history["state"] === false || current_history["state"] == "false"){
+        }else if(current_history.state === false || current_history.state == "false"){
             $(".history_toggle").css("background-color", "#4C5368");
             $(".history_toggle").children().css("marginLeft", "unset");
 
-            $('.update_history_container').append('<div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters["language"]]["updatePage"]["disabledHistory"]+'</span></div>');
+            $('.update_history_container').append('<div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters.language].updatePage.disabledHistory+'</span></div>');
             return;
         };
 
         //-------;
 
-        if(current_history['historyList'].length == 0){
-            $('.update_history_container').append('<div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters["language"]]["updatePage"]["emptyHistory"]+'</span></div>');
+        if(current_history.historyList.length == 0){
+            $('.update_history_container').append('<div class="update_history_container_day noselect"><span class="update_history_container_day_noHistory">'+textAssets[parameters.language].updatePage.emptyHistory+'</span></div>');
         }else{
-            historyScrollState = loadHistorydayz(current_history, current_history["historyList"].length);
+            historyScrollState = loadHistorydayz(current_history, current_history.historyList.length);
         };
 
         $(".update_history_container").scrollTop(0);
@@ -551,13 +551,13 @@ $(document).ready(function(){
         if(cannotClick && reminderOrSession == "reminder"){return}else{canNowClick('allowed')};
 
         trackItem(item, reminderOrSession);
-        $('.update_colorChooser').css('backgroundColor', update_current_item['color']);
+        $('.update_colorChooser').css('backgroundColor', update_current_item.color);
 
         let inp_list = $(".update_schedule_input");
         let notif = isScheduled(update_current_item);
 
         if(notif){
-            let page = getPageOfDate(notif["dateList"].map(timestamp => zeroAM(timestamp, "timestamp"))[0]);
+            let page = getPageOfDate(notif.dateList.map(timestamp => zeroAM(timestamp, "timestamp"))[0]);
             generateBaseCalendar(page);
             
             let currentData = currentTimeSelection(notif);
@@ -565,16 +565,16 @@ $(document).ready(function(){
 
             $('.update_schedule_select_every option[value="'+getScheduleScheme(update_current_item)+'"]').prop('selected', true);
 
-            $(inp_list[0]).val(notif["scheduleData"]["hours"]);
-            $(inp_list[1]).val(notif["scheduleData"]["minutes"]);
-            $(inp_list[2]).val(notif["scheduleData"]["count"]);
+            $(inp_list[0]).val(notif.scheduleData.hours);
+            $(inp_list[1]).val(notif.scheduleData.minutes);
+            $(inp_list[2]).val(notif.scheduleData.count);
 
             $('.update_schedule_datePicker').css('justify-content', "flex-start");
-            manageJumpContainer(notif["jumpData"]);
+            manageJumpContainer(notif.jumpData);
 
-            updateSelectScheduleLabels(notif["scheduleData"]["count"], $('.update_schedule_input_count'));
-            updateSelectScheduleLabels(notif["jumpData"]['jumpVal'], $('.update_schedule_jump_count'));
-            updateSelectScheduleLabels(notif["jumpData"]['everyVal'], $('.update_schedule_every_count'));
+            updateSelectScheduleLabels(notif.scheduleData.count, $('.update_schedule_input_count'));
+            updateSelectScheduleLabels(notif.jumpData.jumpVal, $('.update_schedule_jump_count'));
+            updateSelectScheduleLabels(notif.jumpData.everyVal, $('.update_schedule_every_count'));
         }else{
             $(".update_schedule_select_day").attr("multiple", false);
             
@@ -582,7 +582,7 @@ $(document).ready(function(){
             datePicker.initSelection([]);
 
             $('.update_schedule_datePicker').css('justify-content', "center");
-            $('.update_schedule_datePicker').text(textAssets[parameters["language"]]["updatePage"]["pickDate"]);
+            $('.update_schedule_datePicker').text(textAssets[parameters.language].updatePage.pickDate);
 
             $(inp_list[0]).val("");
             $(inp_list[1]).val("");
@@ -593,7 +593,7 @@ $(document).ready(function(){
             manageJumpContainer(false);
         };
 
-        $('.update_data_name').val(update_current_item["name"]);
+        $('.update_data_name').val(update_current_item.name);
     });
 
     // TOGGLE;
@@ -611,13 +611,13 @@ $(document).ready(function(){
                 $(this).attr("state", "false");
 
                 if($(this).hasClass(".selection_parameters_keepawake")){
-                    parameters["keepAwake"] = false;
+                    parameters.keepAwake = false;
                     parameters_save(parameters);
                 }else if($(this).hasClass(".selection_parameters_autosaver")){
-                    parameters["autoSaver"] = false;
+                    parameters.autoSaver = false;
                     parameters_save(parameters);
                 }else if($(this).hasClass("history_toggle")){
-                    current_history["state"] = false;
+                    current_history.state = false;
                 }else if($(this).hasClass("jump_toggle")){
                     $('.update_schedule_tline_sblock').animateDespawn(-14, 300);
                 };
@@ -633,13 +633,13 @@ $(document).ready(function(){
                 $(this).attr("state", "true");
 
                 if($(this).hasClass(".selection_parameters_keepawake")){
-                    parameters["keepAwake"] = true;
+                    parameters.keepAwake = true;
                     parameters_save(parameters);
                 }else if($(this).hasClass(".selection_parameters_autosaver")){
-                    parameters["autoSaver"] = true;
+                    parameters.autoSaver = true;
                     parameters_save(parameters);
                 }else if($(this).hasClass("history_toggle")){
-                    current_history["state"] = true;
+                    current_history.state = true;
                 }else if($(this).hasClass("jump_toggle")){
                     $('.update_schedule_tline_sblock').animateSpawn("flex", 40, -14, 300);
                 };

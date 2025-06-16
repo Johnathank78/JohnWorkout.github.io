@@ -302,46 +302,46 @@ function get_session_time(session, uniFix=false){
     let computedTime = 0;
     let effectiveTime = false;
 
-    if(session["type"] == "I"){
+    if(session.type == "I"){
         computedTime = 5;
 
-        session["exoList"].forEach(exo => {
-            if(exo["type"] == "Int."){
-                computedTime += exo["cycle"] * (time_unstring(exo["work"]) + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
-            }else if(exo["type"] == "Pause"){
-                computedTime += time_unstring(exo["rest"]);
+        session.exoList.forEach(exo => {
+            if(exo.type == "Int."){
+                computedTime += exo.cycle * (time_unstring(exo.work) + time_unstring(exo.rest)) - time_unstring(exo.rest);
+            }else if(exo.type == "Pause"){
+                computedTime += time_unstring(exo.rest);
             };
         });
 
         return computedTime;
-    }else if(session["type"] == "W"){
-        session["exoList"].forEach((exo, i) => {
-            if(exo["type"] == "Int."){
+    }else if(session.type == "W"){
+        session.exoList.forEach((exo, i) => {
+            if(exo.type == "Int."){
                 if(isIntervallLinked(exo)){ // IS LINKED
-                    computedTime += get_session_time(session_list[getSessionIndexByID(exo["linkId"])]);
+                    computedTime += get_session_time(session_list[getSessionIndexByID(exo.linkId)]);
                 }else{ // IS CREATED
-                    exo["exoList"].forEach(subExo => {
-                        if(subExo["type"] == "Int."){
-                            computedTime += subExo["cycle"] * (time_unstring(subExo["work"]) + time_unstring(subExo["rest"])) - time_unstring(subExo["rest"]);
-                        }else if(subExo["type"] == "Pause"){
-                            computedTime += time_unstring(subExo["rest"]);
+                    exo.exoList.forEach(subExo => {
+                        if(subExo.type == "Int."){
+                            computedTime += subExo.cycle * (time_unstring(subExo.work) + time_unstring(subExo.rest)) - time_unstring(subExo.rest);
+                        }else if(subExo.type == "Pause"){
+                            computedTime += time_unstring(subExo.rest);
                         };
                     });
                 };
-            }else if(exo["type"] == "Bi."){
-                if(exo["name"].includes("Alt.")){
-                    computedTime += exo["setNb"] * (exo["reps"]*2*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
+            }else if(exo.type == "Bi."){
+                if(exo.name.includes("Alt.")){
+                    computedTime += exo.setNb * (exo.reps*2*repTime + time_unstring(exo.rest)) - time_unstring(exo.rest);
                 }else{
-                    computedTime += exo["setNb"] * (exo["reps"]*repTime + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
+                    computedTime += exo.setNb * (exo.reps*repTime + time_unstring(exo.rest)) - time_unstring(exo.rest);
                 };
-            }else if(exo["type"] == "Uni."){
-                let repsDuration = exo["reps"] * repTime;
-                let setsDone = uniFix ? Math.floor(exo["setNb"]/2) : exo["setNb"];
+            }else if(exo.type == "Uni."){
+                let repsDuration = exo.reps * repTime;
+                let setsDone = uniFix ? Math.floor(exo.setNb/2) : exo.setNb;
                 
-                computedTime += setsDone * (2*repsDuration + time_unstring(exo["rest"])) - time_unstring(exo["rest"]);
-            }else if(exo["type"] == "Pause"){
-                if(i != session["exoList"].length - 1) computedTime += time_unstring(exo["rest"]);
-            }else if(exo['type'] == "Wrm."){
+                computedTime += setsDone * (2*repsDuration + time_unstring(exo.rest)) - time_unstring(exo.rest);
+            }else if(exo.type == "Pause"){
+                if(i != session.exoList.length - 1) computedTime += time_unstring(exo.rest);
+            }else if(exo.type == "Wrm."){
                 computedTime += wrmTime;
             };
 
@@ -351,7 +351,7 @@ function get_session_time(session, uniFix=false){
         computedTime = computedTime * 1.05;
     };
 
-    if(!uniFix && session["type"] == "W"){
+    if(!uniFix && session.type == "W"){
         effectiveTime = get_effective_sessionTime(session, computedTime);
         if(effectiveTime !== null && effectiveTime > 0) return effectiveTime;
     };
@@ -386,26 +386,26 @@ function get_effective_sessionTime(sessionObj, computedTime, X = 6, tolerance = 
 };
 
 function isIntervallLinked(data){
-    return data["linkId"];
+    return data.linkId;
 };
 
 function get_session_exoCount(session){
     let nb_exo = 0;
 
-    session["exoList"].forEach(exo => {
-        if(session["type"] == "I"){
-            if(exo["type"] == "Int."){
+    session.exoList.forEach(exo => {
+        if(session.type == "I"){
+            if(exo.type == "Int."){
                 nb_exo += 1;
             };
-        }else if(session["type"] == "W"){
-            if(exo["type"] == "Int."){
+        }else if(session.type == "W"){
+            if(exo.type == "Int."){
                 if(isIntervallLinked(exo)){
-                    let linkIndex = getSessionIndexByID(exo["linkId"]);
-                    nb_exo += session_list[linkIndex]["exoList"].filter(exo => exo["type"] == "Int.").length;
+                    let linkIndex = getSessionIndexByID(exo.linkId);
+                    nb_exo += session_list[linkIndex].exoList.filter(exo => exo.type == "Int.").length;
                 }else{
-                    nb_exo += exo["exoList"].filter(exo => exo['type'] == "Int.").length;
+                    nb_exo += exo.exoList.filter(exo => exo.type == "Int.").length;
                 };
-            }else if(exo["type"] != "Pause" && exo["type"] != "Wrm."){
+            }else if(exo.type != "Pause" && exo.type != "Wrm."){
                 nb_exo += 1;
             };
         };
@@ -431,29 +431,29 @@ function get_session_stats(session){
     let roundedWeight = false;
     let exoList = false;
 
-    session["exoList"].forEach(exo => {
-        type = exo["type"];
+    session.exoList.forEach(exo => {
+        type = exo.type;
         
         if(type == "Pause"){return};
         if(type == "Int."){
 
             if(isIntervallLinked(exo)){
-                exoList = session_list[getSessionIndexByID(exo["linkId"])]["exoList"];
+                exoList = session_list[getSessionIndexByID(exo.linkId)].exoList;
             }else{
-                exoList = exo["exoList"];
+                exoList = exo.exoList;
             };
 
             exoList.forEach(subExo => {
-                if(subExo["type"] == "Int."){
-                    repsDone += parseInt(subExo["cycle"]) * (time_unstring(subExo["work"]) / repTime);
-                    workedTime += parseInt(subExo["cycle"]) * time_unstring(subExo["work"])
+                if(subExo.type == "Int."){
+                    repsDone += parseInt(subExo.cycle) * (time_unstring(subExo.work) / repTime);
+                    workedTime += parseInt(subExo.cycle) * time_unstring(subExo.work)
                 };
             });
         }else if(type == "Bi."){
-            roundedWeight = unitRound(exo["weight"]);
-            reps = parseInt(exo["setNb"]) * parseInt(exo["reps"]);
+            roundedWeight = unitRound(exo.weight);
+            reps = parseInt(exo.setNb) * parseInt(exo.reps);
 
-            if(exo["name"].includes("Alt.")){
+            if(exo.name.includes("Alt.")){
                 repsDone += 2 * reps;
                 workedTime += reps * repTime;
                 weightLifted += 2 * reps * roundedWeight;
@@ -463,8 +463,8 @@ function get_session_stats(session){
                 weightLifted += reps * roundedWeight;
             };
         }else if(type == "Uni."){
-            roundedWeight = unitRound(exo["weight"]);
-            reps = parseInt(exo["setNb"]) * parseInt(exo["reps"]);
+            roundedWeight = unitRound(exo.weight);
+            reps = parseInt(exo.setNb) * parseInt(exo.reps);
 
             repsDone += reps;
             workedTime += reps * repTime;
@@ -482,9 +482,9 @@ function get_session_stats(session){
 
 function getSmallesRest(){
     if(LrestTime - Lspent > RrestTime - Rspent){
-        return textAssets[parameters["language"]]["misc"]["rightInitial"];
+        return textAssets[parameters.language].misc.rightInitial;
     }else{
-        return textAssets[parameters["language"]]["misc"]["leftInitial"];
+        return textAssets[parameters.language].misc.leftInitial;
     };
 };
 
@@ -507,40 +507,40 @@ function nbSessionScheduled(vsDate){
 
         if(notif){
             if(scheduleType == "Day"){
-                firstDate = zeroAM(notif["dateList"][0], "date");
+                firstDate = zeroAM(notif.dateList[0], "date");
 
                 nb = getIterationNumber(
                     vsDate,
                     firstDate,
-                    notif["scheduleData"]["count"],
-                    notif["scheduleData"]["scheme"],
-                    notif['jumpData']["jumpVal"],
-                    notif['jumpData']["jumpType"],
-                    notif['jumpData']["everyVal"],
-                    notif["occurence"],
+                    notif.scheduleData.count,
+                    notif.scheduleData.scheme,
+                    notif.jumpData.jumpVal,
+                    notif.jumpData.jumpType,
+                    notif.jumpData.everyVal,
+                    notif.occurence,
                     1,
                     false,
-                    session["id"]
+                    session.id
                 );
 
                 if(nb > 0) count += nb;
             }else if(scheduleType == "Week"){
                 // Jump offsetting the day indexs, may need a (deep) rework
-                iterationData = {"maxI": notif["dateList"].length, "i": getClosestWeekIteration(vsDate, notif["dateList"])};
-                firstDate = zeroAM(notif["dateList"][iterationData['i']], "date");
+                iterationData = {"maxI": notif.dateList.length, "i": getClosestWeekIteration(vsDate, notif.dateList)};
+                firstDate = zeroAM(notif.dateList[iterationData.i], "date");
 
                 nb = getIterationNumber(
                     vsDate,
                     firstDate,
-                    notif["scheduleData"]["count"],
-                    notif["scheduleData"]["scheme"],
-                    notif['jumpData']["jumpVal"],
-                    notif['jumpData']["jumpType"],
-                    notif['jumpData']["everyVal"],
-                    notif["occurence"],
+                    notif.scheduleData.count,
+                    notif.scheduleData.scheme,
+                    notif.jumpData.jumpVal,
+                    notif.jumpData.jumpType,
+                    notif.jumpData.everyVal,
+                    notif.occurence,
                     1,
                     iterationData,
-                    session["id"]
+                    session.id
                 );
 
                 if(nb > 0) count += nb;
@@ -554,19 +554,19 @@ function nbSessionScheduled(vsDate){
 // History
 
 function getSessionHistory(session){
-    return session["history"];
+    return session.history;
 };
 
 function isHistoryDayEmpty(historyDay){
     let count = 0;
 
-    historyDay['exoList'].forEach(exo => {
-        if(exo["type"] == "Int."){
-            exo['exoList'].forEach(subExo => {
-                count += subExo["setList"].length;
+    historyDay.exoList.forEach(exo => {
+        if(exo.type == "Int."){
+            exo.exoList.forEach(subExo => {
+                count += subExo.setList.length;
             });
         }else{
-            count += exo["setList"].length;
+            count += exo.setList.length;
         };
     });
 
@@ -575,21 +575,21 @@ function isHistoryDayEmpty(historyDay){
 
 function isHistoryDayComplete(historyDay, type){
     if(type == "W"){
-        for(const exo of historyDay["exoList"]){
-            if(exo["type"] == "Int."){
-                for (const subExo of exo["exoList"]) {
-                    if(subExo["expectedStats"]["cycle"] != subExo["setList"].filter(set => set["work"] != "X").length){
+        for(const exo of historyDay.exoList){
+            if(exo.type == "Int."){
+                for (const subExo of exo.exoList) {
+                    if(subExo.expectedStats.cycle != subExo.setList.filter(set => set.work != "X").length){
                         return false;
                     };
                 };
-            }else if(["Bi.", "Uni."].includes(exo["type"]) && exo["expectedStats"]["setNb"] != exo["setList"].length){
+            }else if(["Bi.", "Uni."].includes(exo.type) && exo.expectedStats.setNb != exo.setList.length){
                 return false;
             };
         };
     }else if(type == "I"){
-        for(const exo of historyDay["exoList"]){
-            if(exo["type"] == "Int."){
-                if(exo["expectedStats"]["cycle"] != exo["setList"].filter(set => set["work"] != "X").length){
+        for(const exo of historyDay.exoList){
+            if(exo.type == "Int."){
+                if(exo.expectedStats.cycle != exo.setList.filter(set => set.work != "X").length){
                     return false;
                 };
             };
@@ -600,16 +600,16 @@ function isHistoryDayComplete(historyDay, type){
 };
 
 function getLastHistoryDay(history){
-    if(history["historyList"].length == 0){
+    if(history.historyList.length == 0){
         return [];
     }else{
-        return history["historyList"][history["historyList"].length - 1];;
+        return history.historyList[history.historyList.length - 1];;
     };
 };
 
 function getHistoryExoIndex(history, id){
-    for(let i=0;i<history["exoList"].length;i++){
-        if(history["exoList"][i]["id"] == id){
+    for(let i=0;i<history.exoList.length;i++){
+        if(history.exoList[i].id == id){
             return i;
         };
     };
@@ -647,11 +647,11 @@ function smallestAvailableExoId(mode){
 };
 
 function getExoIndexById(session, id){
-    for(let index = 0; index < session["exoList"].length; index++){
-        const item = session["exoList"][index];
+    for(let index = 0; index < session.exoList.length; index++){
+        const item = session.exoList[index];
         const realID = id.replace(/_(1|2)/g, "");
 
-        if(item['id'] == realID){
+        if(item.id == realID){
             return parseInt(index);
         };
     };
@@ -662,9 +662,9 @@ function getExoIndexById(session, id){
 function mergeHistoryExo(history, id){
     let out = [];
 
-    history["exoList"].forEach(exo => {
-        if(exo["id"].replace(/_(1|2)/g, "") == id){ 
-            out.push(exo['setList']);
+    history.exoList.forEach(exo => {
+        if(exo.id.replace(/_(1|2)/g, "") == id){ 
+            out.push(exo.setList);
         };
     });
     
@@ -673,10 +673,10 @@ function mergeHistoryExo(history, id){
 
 function areSessionEquallyCompleted(currentHistory, pastHistory, type){
     function findHistoryExoByID(history, id){
-        for(let index = 0; index < history["exoList"].length; index++){
-            const exo = history["exoList"][index];
+        for(let index = 0; index < history.exoList.length; index++){
+            const exo = history.exoList[index];
             
-            if(exo["id"] == id){
+            if(exo.id == id){
                 return exo;
             };
         };
@@ -689,17 +689,17 @@ function areSessionEquallyCompleted(currentHistory, pastHistory, type){
     let setList; let pastSetList;
 
     if(type == "W"){
-        currentHistory["exoList"].forEach(exo => {
-            if(exo["type"] == "Int."){
-                pastExo = findHistoryExoByID(pastHistory, exo["id"]);
+        currentHistory.exoList.forEach(exo => {
+            if(exo.type == "Int."){
+                pastExo = findHistoryExoByID(pastHistory, exo.id);
                 
                 if(pastExo){
-                    exo["exoList"].forEach(subExo => {
-                        pastSubExo = findHistoryExoByID(pastExo, subExo["id"]);
+                    exo.exoList.forEach(subExo => {
+                        pastSubExo = findHistoryExoByID(pastExo, subExo.id);
                         
                         if(pastSubExo){
-                            setList = subExo["setList"].filter(set => set["work"] != "X");
-                            pastSetList = pastSubExo["setList"].filter(set => set["work"] != "X");
+                            setList = subExo.setList.filter(set => set.work != "X");
+                            pastSetList = pastSubExo.setList.filter(set => set.work != "X");
         
                             if(setList.length < pastSetList.length){
                                 areEqual = false;
@@ -708,11 +708,11 @@ function areSessionEquallyCompleted(currentHistory, pastHistory, type){
                     });
                 };
             }else{
-                pastExo = findHistoryExoByID(pastHistory, exo["id"]);
+                pastExo = findHistoryExoByID(pastHistory, exo.id);
                 
                 if(pastExo){
-                    setList = exo["setList"].filter(set => set["reps"] != 0);
-                    pastSetList = pastExo["setList"].filter(set => set["reps"] != 0);
+                    setList = exo.setList.filter(set => set.reps != 0);
+                    pastSetList = pastExo.setList.filter(set => set.reps != 0);
             
                     if(setList.length < pastSetList.length){
                         areEqual = false;
@@ -721,12 +721,12 @@ function areSessionEquallyCompleted(currentHistory, pastHistory, type){
             };
         });
     }else if(type == "I"){
-        currentHistory["exoList"].forEach(exo => {
-            pastExo = findHistoryExoByID(pastHistory, exo["id"]);
+        currentHistory.exoList.forEach(exo => {
+            pastExo = findHistoryExoByID(pastHistory, exo.id);
     
             if(pastExo){
-                setList = exo["setList"].filter(set => set["work"] != "X");
-                pastSetList = pastExo["setList"].filter(set => set["work"] != "X");
+                setList = exo.setList.filter(set => set.work != "X");
+                pastSetList = pastExo.setList.filter(set => set.work != "X");
                 
                 if(setList.length < pastSetList.length){
                     areEqual = false;
@@ -795,8 +795,8 @@ function get_time(ref){
     };
 };
 
-function get_time_u(ref, getList=false){
-    if(isNaI(ref) && !isNaI(ref.substring(ref.length - 1, ref.length))){ref += "s"};
+function get_timeString(ref, getList=false){
+    if(isNaI(ref) && !isNaI(ref.substring(ref.length - 1, ref.length))){ref += abrTimeSymols.second};
     ref = time_unstring(ref);
 
     if(ref === false){return false};
@@ -824,14 +824,25 @@ function get_time_u(ref, getList=false){
         ];
     } else {
         return (
-            (years != 0 ? years + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["year"]['label'] : "") +
-            (weeks != 0 ? weeks + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["week"]['label'] : "") +
-            (days != 0 ? days + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["day"]['label'] : "") +
-            (hours != 0 ? hours + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["hour"]['label'] : "") +
-            (minutes != 0 ? minutes + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["minute"]['label'] : "") +
-            ((secondes != 0 || ref < 60) ? secondes + textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["second"]['label'] : "")
+            (years != 0 ? years + abrTimeSymols.year : "") +
+            (weeks != 0 ? weeks + abrTimeSymols.week : "") +
+            (days != 0 ? days + abrTimeSymols.day : "") +
+            (hours != 0 ? hours + abrTimeSymols.hour : "") +
+            (minutes != 0 ? minutes + abrTimeSymols.minute : "") +
+            ((secondes != 0 || ref < 60) ? secondes + abrTimeSymols.second : "")
         );
     }
+};
+
+function display_timeString(timeString, lang=false){
+    lang = lang ? lang : parameters.language;
+
+    return timeString.replace(abrTimeSymols.year, textAssets[lang].misc.abrTimeLabels.year)
+    .replace(abrTimeSymols.week, textAssets[lang].misc.abrTimeLabels.week)
+    .replace(abrTimeSymols.day, textAssets[lang].misc.abrTimeLabels.day)
+    .replace(abrTimeSymols.hour, textAssets[lang].misc.abrTimeLabels.hour)
+    .replace(abrTimeSymols.minute, textAssets[lang].misc.abrTimeLabels.minute)
+    .replace(abrTimeSymols.second, textAssets[lang].misc.abrTimeLabels.second)
 };
 
 function time_unstring(strr, getList=false){
@@ -845,14 +856,14 @@ function time_unstring(strr, getList=false){
         return parseInt(strr);
     };
 
-    const allSymbols = Object.values(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]).map(item => item.label).join("");
+    const allSymbols = Object.values(abrTimeSymols).join("");
 
-    let reY = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["year"]['label']}`, "g");
-    let reW = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["week"]['label']}`, "g");
-    let reD = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["day"]['label']}`, "g");
-    let reH = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["hour"]['label']}`, "g");
-    let reM = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["minute"]['label']}`, "g");
-    let reS = new RegExp(`\\d{1,}${textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["second"]['label']}`, "g");
+    let reY = new RegExp(`\\d{1,}${abrTimeSymols.year}`, "g");
+    let reW = new RegExp(`\\d{1,}${abrTimeSymols.week}`, "g");
+    let reD = new RegExp(`\\d{1,}${abrTimeSymols.day}`, "g");
+    let reH = new RegExp(`\\d{1,}${abrTimeSymols.hour}`, "g");
+    let reM = new RegExp(`\\d{1,}${abrTimeSymols.minute}`, "g");
+    let reS = new RegExp(`\\d{1,}${abrTimeSymols.second}`, "g");
     let reAuth = new RegExp("^" + allSymbols + "0123456789", "g");
 
     let y = strr.match(reY);
@@ -867,22 +878,22 @@ function time_unstring(strr, getList=false){
     }else if(strr.match(reAuth) !== null){
         return false;
     }else if(
-        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["year"]['label']) && y === null) ||
-        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["week"]['label']) && w === null) ||
-        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["day"]['label']) && d === null) ||
-        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["hour"]['label']) && h === null) ||
-        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["minute"]['label']) && m === null) ||
-        (strr.match(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["second"]['label']) && s === null)
+        (strr.match(abrTimeSymols.year) && y === null) &&
+        (strr.match(abrTimeSymols.week) && w === null) &&
+        (strr.match(abrTimeSymols.day) && d === null) &&
+        (strr.match(abrTimeSymols.hour) && h === null) &&
+        (strr.match(abrTimeSymols.minute) && m === null) &&
+        (strr.match(abrTimeSymols.second) && s === null)
     ){
         return false;
     };
 
-    y = (y !== null) ? parseInt(y[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["year"]['label'])[0]) : 0;
-    w = (w !== null) ? parseInt(w[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["week"]['label'])[0]) : 0;
-    d = (d !== null) ? parseInt(d[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["day"]['label'])[0]) : 0;
-    h = (h !== null) ? parseInt(h[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["hour"]['label'])[0]) : 0;
-    m = (m !== null) ? parseInt(m[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["minute"]['label'])[0]) : 0;
-    s = (s !== null) ? parseInt(s[0].split(textAssets[parameters["language"]]["misc"]["abrTimeLabels"]["second"]['label'])[0]) : 0;
+    y = (y !== null) ? parseInt(y[0].split(abrTimeSymols.year)[0]) : 0;
+    w = (w !== null) ? parseInt(w[0].split(abrTimeSymols.week)[0]) : 0;
+    d = (d !== null) ? parseInt(d[0].split(abrTimeSymols.day)[0]) : 0;
+    h = (h !== null) ? parseInt(h[0].split(abrTimeSymols.hour)[0]) : 0;
+    m = (m !== null) ? parseInt(m[0].split(abrTimeSymols.minute)[0]) : 0;
+    s = (s !== null) ? parseInt(s[0].split(abrTimeSymols.second)[0]) : 0;
 
     if(getList){return [y, w, d, h, m, s]}else{return y*31449600+w*604800+d*86400+h*3600+m*60+s};
 };
@@ -926,9 +937,9 @@ function formatDate(timestamp) {
         day = '0' + day;
     };
 
-    if(parameters["language"] == "french"){
+    if(parameters.language == "french"){
         return [day, month, year].join('/');
-    }else if(parameters["language"] == "english"){
+    }else if(parameters.language == "english"){
         return [year, month, day].join('/');
     };
 };
@@ -939,7 +950,7 @@ function parseDate(dateString) {
 
     let year, month, day;
 
-    if (parameters["language"] == 'french') {
+    if (parameters.language == 'french') {
         day = parseInt(parts[0]);
         month = parseInt(parts[1]);
         year = parseInt(parts[2]);
@@ -989,13 +1000,13 @@ async function deleteRelatedSwap(from){
     for (let i = sessionSwapped.length - 1; i >= 0; i--) {
         const item = sessionSwapped[i];
 
-        if(item["from"] === from){
-            if(isToday(item['time']) && !sessionDone["data"][item["idTo"]]){
-                sessionToBeDone["data"][item["idFrom"]] = true;
-                uniq_scheduler(item['idFrom'], "session");
+        if(item.from === from){
+            if(isToday(item.time) && !sessionDone.data[item.idTo]){
+                sessionToBeDone.data[item.idFrom] = true;
+                uniq_scheduler(item.idFrom, "session");
             };
             
-            if(platform == "Mobile"){await undisplayAndCancelNotification("9" + item['swapID'] + idTo + "1")};
+            if(platform == "Mobile"){await undisplayAndCancelNotification("9" + item.swapID + idTo + "1")};
 
             sessionSwapped.splice(i, 1);
         };
@@ -1010,15 +1021,15 @@ function closestNextDate(D, notif, offset = 0) {
     const today = getToday('date')
     const studyDate = new Date(D);
 
-    const X = notif["scheduleData"]["count"];
-    const Y = notif["scheduleData"]["scheme"];
-    const Z = notif["jumpData"]["jumpVal"];
-    const U = notif["jumpData"]["jumpType"];
-    const T = notif["jumpData"]["everyVal"];
-    const O = notif["occurence"];
+    const X = notif.scheduleData.count;
+    const Y = notif.scheduleData.scheme;
+    const Z = notif.jumpData.jumpVal;
+    const U = notif.jumpData.jumpType;
+    const T = notif.jumpData.everyVal;
+    const O = notif.occurence;
 
-    const hours = notif["scheduleData"]["hours"];
-    const minutes = notif["scheduleData"]["minutes"];
+    const hours = notif.scheduleData.hours;
+    const minutes = notif.scheduleData.minutes;
 
     // Start searching from max(D, now) so we look for future occurrences
     let testDate = new Date(Math.max(studyDate.getTime(), today.getTime()));
@@ -1067,11 +1078,11 @@ function smallestAvailableId(data, idKey){
 };
 
 function isScheduled(item){
-    return item["notif"];
+    return item.notif;
 };
 
 function noSessionSchedule(archive = false){
-    let filteredSessionList = session_list.filter(session => session['isArchived'] === archive);
+    let filteredSessionList = session_list.filter(session => session.isArchived === archive);
 
     for (let i = 0; i < filteredSessionList.length; i++) {
         if(isScheduled(filteredSessionList[i])){
@@ -1083,7 +1094,7 @@ function noSessionSchedule(archive = false){
 };
 
 function getContractedType(type){
-    let base = textAssets[parameters["language"]]["updatePage"]["exerciseTypes"];
+    let base = textAssets[parameters.language].updatePage.exerciseTypes;
     let keys  = Object.keys(base);
 
     for (let x = 0; x < keys.length; x++) {
@@ -1095,7 +1106,7 @@ function getContractedType(type){
 
 function getSessionIndexByID(id){
     for(let i=0; i<session_list.length; i++){
-        if(session_list[i]["id"] == id){
+        if(session_list[i].id == id){
             return i;
         };
     };
@@ -1105,7 +1116,7 @@ function getSessionIndexByID(id){
 
 function getReminderIndexByID(id){
     for(let i=0; i<reminder_list.length; i++){
-        if(reminder_list[i]['id'] == id){
+        if(reminder_list[i].id == id){
             return i;
         };
     };
@@ -1118,15 +1129,15 @@ function getNotifFirstIdChar(session){
     let todaysDate = getToday("timestamp");
 
     if(notif && getScheduleScheme(session) == "Week"){
-        for(let i=0; i<notif["dateList"].length; i++){
-            if(todaysDate == zeroAM(notif["dateList"][i], "timestamp")){
+        for(let i=0; i<notif.dateList.length; i++){
+            if(todaysDate == zeroAM(notif.dateList[i], "timestamp")){
                 return "2"+(i+1).toString();
             };
         };
 
         return "9";
     }else if(notif && getScheduleScheme(session) == "Day"){
-        if(todaysDate == zeroAM(notif["dateList"][0], "timestamp")){
+        if(todaysDate == zeroAM(notif.dateList[0], "timestamp")){
             return "1";
         }else{
             return "9"
@@ -1140,7 +1151,7 @@ function getScheduleScheme(session){
     let scheduleData = isScheduled(session);
 
     if(scheduleData){
-        return scheduleData["scheduleData"]["scheme"];
+        return scheduleData.scheduleData.scheme;
     }else{
         return false;
     };
@@ -1301,17 +1312,17 @@ function unitRound(val){
 
 function updateWeightUnits(data, from, to){
     data.forEach(session => {
-        if(session["type"] == "W"){
-            session['exoList'].forEach(exo => {
-                if(exo["type"] == "Uni." || exo["type"] == "Bi."){
-                    exo["weight"] = convertToUnit(exo["weight"], from, to);
+        if(session.type == "W"){
+            session.exoList.forEach(exo => {
+                if(exo.type == "Uni." || exo.type == "Bi."){
+                    exo.weight = convertToUnit(exo.weight, from, to);
                 };
             });
         };
     });
 
     session_save(data);
-    previousWeightUnit = parameters["weightUnit"];
+    previousWeightUnit = parameters.weightUnit;
 };
 
 function weightUnitgroup(val, unit) {
@@ -1348,156 +1359,156 @@ function roundToNearestHalf(num) {
 
 function changeLanguage(lang, first=false){
     // Time Selector;
-    $(".timeSelectorSubmit").text(textAssets[lang]["misc"]['submit']);
+    $(".timeSelectorSubmit").text(textAssets[lang].misc.submit);
 
     // Calendar;
 
-    $(".calendarPickerSubmit").text(textAssets[lang]["misc"]['submit']);
-    $(".selection_page_calendar_header_D").eq(0).text(textAssets[lang]["misc"]["dayInitials"]["monday"]);
-    $(".selection_page_calendar_header_D").eq(1).text(textAssets[lang]["misc"]["dayInitials"]["tuesday"]);
-    $(".selection_page_calendar_header_D").eq(2).text(textAssets[lang]["misc"]["dayInitials"]["wednesday"]);
-    $(".selection_page_calendar_header_D").eq(3).text(textAssets[lang]["misc"]["dayInitials"]["thursday"]);
-    $(".selection_page_calendar_header_D").eq(4).text(textAssets[lang]["misc"]["dayInitials"]["friday"]);
-    $(".selection_page_calendar_header_D").eq(5).text(textAssets[lang]["misc"]["dayInitials"]["saturday"]);
-    $(".selection_page_calendar_header_D").eq(6).text(textAssets[lang]["misc"]["dayInitials"]["sunday"]);
+    $(".calendarPickerSubmit").text(textAssets[lang].misc.submit);
+    $(".selection_page_calendar_header_D").eq(0).text(textAssets[lang].misc.dayInitials.monday);
+    $(".selection_page_calendar_header_D").eq(1).text(textAssets[lang].misc.dayInitials.tuesday);
+    $(".selection_page_calendar_header_D").eq(2).text(textAssets[lang].misc.dayInitials.wednesday);
+    $(".selection_page_calendar_header_D").eq(3).text(textAssets[lang].misc.dayInitials.thursday);
+    $(".selection_page_calendar_header_D").eq(4).text(textAssets[lang].misc.dayInitials.friday);
+    $(".selection_page_calendar_header_D").eq(5).text(textAssets[lang].misc.dayInitials.saturday);
+    $(".selection_page_calendar_header_D").eq(6).text(textAssets[lang].misc.dayInitials.sunday);
 
-    $(".calendarGo").eq(0).text(textAssets[lang]["calendar"]["backWard"]);
-    $(".calendarGo").eq(1).text(textAssets[lang]["calendar"]["forWard"]);
-    $(".selection_page_calendar_plusOne").text(textAssets[lang]["calendar"]["shiftByOne"]);
+    $(".calendarGo").eq(0).text(textAssets[lang].calendar.backWard);
+    $(".calendarGo").eq(1).text(textAssets[lang].calendar.forWard);
+    $(".selection_page_calendar_plusOne").text(textAssets[lang].calendar.shiftByOne);
 
-    $(".selection_page_calendar_header_M").eq(0).text(textAssets[lang]["misc"]["abrMonthLabels"][getKeyByValue(textAssets[previousLanguage]["misc"]["abrMonthLabels"], $($(".selection_page_calendar_header_M")[0]).text())]);
-    $(".selection_page_calendar_header_M").eq(1).text(textAssets[lang]["misc"]["abrMonthLabels"][getKeyByValue(textAssets[previousLanguage]["misc"]["abrMonthLabels"], $($(".selection_page_calendar_header_M")[1]).text())]);
+    $(".selection_page_calendar_header_M").eq(0).text(textAssets[lang].misc.abrMonthLabels[getKeyByValue(textAssets[previousLanguage].misc.abrMonthLabels, $($(".selection_page_calendar_header_M")[0]).text())]);
+    $(".selection_page_calendar_header_M").eq(1).text(textAssets[lang].misc.abrMonthLabels[getKeyByValue(textAssets[previousLanguage].misc.abrMonthLabels, $($(".selection_page_calendar_header_M")[1]).text())]);
 
-    $(".selection_page_calendar_noSession").text(textAssets[lang]["calendar"]["emptyMessage"]);
-    $(".selection_dayPreview_noSession").text(textAssets[lang]["calendar"]["emptyMessage"]);
+    $(".selection_page_calendar_noSession").text(textAssets[lang].calendar.emptyMessage);
+    $(".selection_dayPreview_noSession").text(textAssets[lang].calendar.emptyMessage);
 
     // Stats;
 
-    $(".selection_info_item_title").eq(0).text(textAssets[lang]["stats"]["timeSpent"]);
-    $(".selection_info_item_title").eq(1).text(textAssets[lang]["stats"]["workedTime"]);
-    $(".selection_info_item_title").eq(2).text(textAssets[lang]["stats"]["weightLifted"]);
-    $(".selection_info_item_title").eq(3).text(textAssets[lang]["stats"]["repsDone"]);
-    $(".selection_info_item_title").eq(4).text(textAssets[lang]["stats"]["sessionMissed"]);
-    $(".selection_infoStart_title").text(textAssets[lang]["stats"]["since"]);
+    $(".selection_info_item_title").eq(0).text(textAssets[lang].stats.timeSpent);
+    $(".selection_info_item_title").eq(1).text(textAssets[lang].stats.workedTime);
+    $(".selection_info_item_title").eq(2).text(textAssets[lang].stats.weightLifted);
+    $(".selection_info_item_title").eq(3).text(textAssets[lang].stats.repsDone);
+    $(".selection_info_item_title").eq(4).text(textAssets[lang].stats.sessionMissed);
+    $(".selection_infoStart_title").text(textAssets[lang].stats.since);
 
-    $(".selection_infoStart_value").text(formatDate(stats["since"]));
+    $(".selection_infoStart_value").text(formatDate(stats.since));
 
     $(".selection_info_TimeSpent").text($(".selection_info_TimeSpent").text()
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["year"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["year"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["week"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["week"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["day"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["day"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["hour"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["hour"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["minute"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["minute"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["second"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["second"]['label'])
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.year, textAssets[lang].misc.abrTimeLabels.year)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.week, textAssets[lang].misc.abrTimeLabels.week)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.day, textAssets[lang].misc.abrTimeLabels.day)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.hour, textAssets[lang].misc.abrTimeLabels.hour)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.minute, textAssets[lang].misc.abrTimeLabels.minute)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.second, textAssets[lang].misc.abrTimeLabels.second)
     );
     
     $(".selection_info_WorkedTime").text($(".selection_info_WorkedTime").text()
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["year"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["year"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["week"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["week"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["day"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["day"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["hour"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["hour"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["minute"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["minute"]['label'])
-        .replace(textAssets[previousLanguage]["misc"]["abrTimeLabels"]["second"]['label'], textAssets[lang]["misc"]["abrTimeLabels"]["second"]['label'])
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.year, textAssets[lang].misc.abrTimeLabels.year)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.week, textAssets[lang].misc.abrTimeLabels.week)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.day, textAssets[lang].misc.abrTimeLabels.day)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.hour, textAssets[lang].misc.abrTimeLabels.hour)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.minute, textAssets[lang].misc.abrTimeLabels.minute)
+        .replace(textAssets[previousLanguage].misc.abrTimeLabels.second, textAssets[lang].misc.abrTimeLabels.second)
     );
 
     // Preferences;
 
-    $(".selection_parameters_title").text(textAssets[lang]["preferences"]["preferences"]);
-    $(".selection_parameters_archive_btn").text(textAssets[lang]["preferences"]["archve"]);
-    $(".selection_parameters_text").eq(0).text(textAssets[lang]["preferences"]["language"]);
-    $(".selection_parameters_text").eq(1).text(textAssets[lang]["preferences"]["weightUnit"]);
-    $(".selection_parameters_text").eq(2).text(textAssets[lang]["preferences"]["notifBefore"]);
-    $(".selection_parameters_text").eq(3).text(textAssets[lang]["preferences"]["keepHistory"]);
-    $(".selection_parameters_text").eq(4).text(textAssets[lang]["preferences"]["keepAwake"]);
-    $(".selection_parameters_text").eq(5).text(textAssets[lang]["preferences"]["autoSaver"]);
+    $(".selection_parameters_title").text(textAssets[lang].preferences.preferences);
+    $(".selection_parameters_archive_btn").text(textAssets[lang].preferences.archve);
+    $(".selection_parameters_text").eq(0).text(textAssets[lang].preferences.language);
+    $(".selection_parameters_text").eq(1).text(textAssets[lang].preferences.weightUnit);
+    $(".selection_parameters_text").eq(2).text(textAssets[lang].preferences.notifBefore);
+    $(".selection_parameters_text").eq(3).text(textAssets[lang].preferences.keepHistory);
+    $(".selection_parameters_text").eq(4).text(textAssets[lang].preferences.keepAwake);
+    $(".selection_parameters_text").eq(5).text(textAssets[lang].preferences.autoSaver);
 
     let prefList = ["kg", "lbs", "forEver", "sDays", "oMonth", "tMonth", "sMonth", "oYear"];
     $(".selection_parameters_opt").each(function(index){
         if(index >= 4){
-            $(this).text(textAssets[lang]["preferences"][prefList[index - 2]]);
+            $(this).text(textAssets[lang].preferences[prefList[index - 2]]);
         };
     });
 
     // Import - Export;
 
-    $(".selection_saveLoad_headerText").text(textAssets[lang]["preferences"]["impExpMenu"]["selectElements"]);
-    $(".selection_saveLoad_itemText").eq(0).text(textAssets[lang]["preferences"]["impExpMenu"]["sessionList"]);
-    $(".selection_saveLoad_itemText").eq(1).text(textAssets[lang]["preferences"]["impExpMenu"]["reminderList"]);
-    $(".selection_saveLoad_itemText").eq(2).text(textAssets[lang]["preferences"]["impExpMenu"]["preferences"]);
-    $(".selection_saveLoad_itemText").eq(3).text(textAssets[lang]["preferences"]["impExpMenu"]["stats"]);
+    $(".selection_saveLoad_headerText").text(textAssets[lang].preferences.impExpMenu.selectElements);
+    $(".selection_saveLoad_itemText").eq(0).text(textAssets[lang].preferences.impExpMenu.sessionList);
+    $(".selection_saveLoad_itemText").eq(1).text(textAssets[lang].preferences.impExpMenu.reminderList);
+    $(".selection_saveLoad_itemText").eq(2).text(textAssets[lang].preferences.impExpMenu.preferences);
+    $(".selection_saveLoad_itemText").eq(3).text(textAssets[lang].preferences.impExpMenu.stats);
 
-    $($(".selection_parameters_saveLoad_btn ")[0]).text(textAssets[lang]["preferences"]["export"]);
-    $($(".selection_parameters_saveLoad_btn ")[1]).text(textAssets[lang]["preferences"]["import"]);
+    $($(".selection_parameters_saveLoad_btn ")[0]).text(textAssets[lang].preferences.export);
+    $($(".selection_parameters_saveLoad_btn ")[1]).text(textAssets[lang].preferences.import);
 
-    $(".selection_saveLoad_emptyMsg").text(textAssets[lang]["preferences"]["impExpMenu"]["emptyMessage"]);
+    $(".selection_saveLoad_emptyMsg").text(textAssets[lang].preferences.impExpMenu.emptyMessage);
 
     // Tiles;
 
-    $(".selection_session_tile_extra_schedule").text(textAssets[lang]["sessionItem"]["schedule"]);
-    $(".selection_session_tile_extra_history").text(textAssets[lang]["sessionItem"]["history"]);
+    $(".selection_session_tile_extra_schedule").text(textAssets[lang].sessionItem.schedule);
+    $(".selection_session_tile_extra_history").text(textAssets[lang].sessionItem.history);
 
     $(".selection_session_work:contains(':')").each(function(){
-        $(this).text($(this).text().replace(textAssets[previousLanguage]["updatePage"]["work"][0], textAssets[lang]["updatePage"]["work"][0]));
+        $(this).text($(this).text().replace(textAssets[previousLanguage].updatePage.work[0], textAssets[lang].updatePage.work[0]));
     });
 
-    $('.selection_empty_msg').text(textAssets[lang]["sessionItem"]["addASession"]);
+    $('.selection_empty_msg').text(textAssets[lang].sessionItem.addASession);
 
     // Add;
 
-    $(".selection_add_option_session").text(textAssets[lang]["updatePage"]["itemTypeChoices"]["session"]);
-    $(".selection_add_option_reminder").text(textAssets[lang]["updatePage"]["itemTypeChoices"]["reminder"]);
+    $(".selection_add_option_session").text(textAssets[lang].updatePage.itemTypeChoices.session);
+    $(".selection_add_option_reminder").text(textAssets[lang].updatePage.itemTypeChoices.reminder);
     
-    $(".linkNcreateSeparator").text(textAssets[lang]["updatePage"]["or"].toUpperCase());
-    $(".update_linkWith").text(textAssets[lang]["updatePage"]["linkWith"]);
+    $(".linkNcreateSeparator").text(textAssets[lang].updatePage.or.toUpperCase());
+    $(".update_linkWith").text(textAssets[lang].updatePage.linkWith);
 
-    $(".update_name_info").text(textAssets[lang]["updatePage"]["name"]);
-    $(".update_data_tile_info").eq(0).text(textAssets[lang]["updatePage"]["cycle"]);
-    $(".update_data_tile_info").eq(1).text(textAssets[lang]["updatePage"]["work"]);
-    $(".update_data_tile_info").eq(2).text(textAssets[lang]["updatePage"]["rest"]);
+    $(".update_name_info").text(textAssets[lang].updatePage.name);
+    $(".update_data_tile_info").eq(0).text(textAssets[lang].updatePage.cycle);
+    $(".update_data_tile_info").eq(1).text(textAssets[lang].updatePage.work);
+    $(".update_data_tile_info").eq(2).text(textAssets[lang].updatePage.rest);
 
-    $(".update_reminder_body_title").text(textAssets[lang]["updatePage"]["reminderBody"]);
-    $(".udpate_reminder_body_txtarea").attr("placeholder", textAssets[lang]["updatePage"]["placeHolders"]["body"]);
+    $(".update_reminder_body_title").text(textAssets[lang].updatePage.reminderBody);
+    $(".udpate_reminder_body_txtarea").attr("placeholder", textAssets[lang].updatePage.placeHolders.body);
 
     if(!first){updateExerciseHTML(previousLanguage, lang)};
 
     // Schedule;
 
-    $(".update_schedule_opt").eq(0).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
-    $(".update_schedule_opt").eq(1).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
+    $(".update_schedule_opt").eq(0).text(textAssets[lang].updatePage.temporalityChoices.day);
+    $(".update_schedule_opt").eq(1).text(textAssets[lang].updatePage.temporalityChoices.week);
 
-    $(".update_schedule_opt").eq(2).text(textAssets[lang]["updatePage"]["temporalityChoices"]["day"]);
-    $(".update_schedule_opt").eq(3).text(textAssets[lang]["updatePage"]["temporalityChoices"]["week"]);
+    $(".update_schedule_opt").eq(2).text(textAssets[lang].updatePage.temporalityChoices.day);
+    $(".update_schedule_opt").eq(3).text(textAssets[lang].updatePage.temporalityChoices.week);
 
-    $(".update_schedule_span").eq(0).text(textAssets[lang]["updatePage"]["on"]);
-    $(".update_schedule_span").eq(1).text(textAssets[lang]["updatePage"]["at"]);
-    $(".update_schedule_span").eq(3).text(textAssets[lang]["updatePage"]["every"]);
+    $(".update_schedule_span").eq(0).text(textAssets[lang].updatePage.on);
+    $(".update_schedule_span").eq(1).text(textAssets[lang].updatePage.at);
+    $(".update_schedule_span").eq(3).text(textAssets[lang].updatePage.every);
 
-    $(".update_schedule_jumpText").text(textAssets[lang]["updatePage"]["jump"]);
-    $(".update_schedule_jumpEveryText").text(textAssets[lang]["updatePage"]["times"]);
-    $(".update_schedule_everyText").text(textAssets[lang]["updatePage"]["every"]);
+    $(".update_schedule_jumpText").text(textAssets[lang].updatePage.jump);
+    $(".update_schedule_jumpEveryText").text(textAssets[lang].updatePage.times);
+    $(".update_schedule_everyText").text(textAssets[lang].updatePage.every);
 
-    $('.update_colorPicker_span').text(textAssets[lang]["updatePage"]["pickColor"])
+    $('.update_colorPicker_span').text(textAssets[lang].updatePage.pickColor)
 
     // Session;
 
-    $(".screensaver_Ltimer_prefix").text(textAssets[lang]["misc"]["leftInitial"] + " |");
-    $(".screensaver_Rtimer_prefix").text(textAssets[lang]["misc"]["rightInitial"] + " |");
+    $(".screensaver_Ltimer_prefix").text(textAssets[lang].misc.leftInitial + " |");
+    $(".screensaver_Rtimer_prefix").text(textAssets[lang].misc.rightInitial + " |");
 
-    $(".lockTouch").text(textAssets[lang]['screenSaver']['lock'])
+    $(".lockTouch").text(textAssets[lang].screenSaver.lock)
 
-    $(".session_exist_text").text(textAssets[lang]["inSession"]["exitQuestion"]);
-    $(".session_exist_subtext").text(textAssets[lang]["inSession"]["exitDetails"]);
+    $(".session_exist_text").text(textAssets[lang].inSession.exitQuestion);
+    $(".session_exist_subtext").text(textAssets[lang].inSession.exitDetails);
 
-    $(".session_exit_btn").eq(0).text(textAssets[lang]["inSession"]["quit"]);
-    $(".session_exit_btn").eq(1).text(textAssets[lang]["inSession"]["cancel"]);
+    $(".session_exit_btn").eq(0).text(textAssets[lang].inSession.quit);
+    $(".session_exit_btn").eq(1).text(textAssets[lang].inSession.cancel);
 
-    $(".session_btnLabelL").text(textAssets[lang]["misc"]["left"]);
-    $(".session_btnLabelR").text(textAssets[lang]["misc"]["right"]);
+    $(".session_btnLabelL").text(textAssets[lang].misc.left);
+    $(".session_btnLabelR").text(textAssets[lang].misc.right);
 
-    $('.session_pastData_title').eq(0).text(textAssets[lang]["inSession"]["pastData"]);
+    $('.session_pastData_title').eq(0).text(textAssets[lang].inSession.pastData);
 
-    $('.session_pastData_sideTitle').eq(0).text(textAssets[lang]["misc"]["left"]);
-    $('.session_pastData_sideTitle').eq(1).text(textAssets[lang]["misc"]["right"]);
+    $('.session_pastData_sideTitle').eq(0).text(textAssets[lang].misc.left);
+    $('.session_pastData_sideTitle').eq(1).text(textAssets[lang].misc.right);
 
     if(lang == "french"){
         $('.session_pastData_sideTitle').css('width', '68px');
@@ -1507,31 +1518,31 @@ function changeLanguage(lang, first=false){
 
     // Recovery;
 
-    $('.selection_recovery_headerText').text(textAssets[lang]["recovery"]["recovery"]);
-    $('.selection_recovery_subText2').text(textAssets[lang]["recovery"]["subText2"]);
-    $('.selection_recovery_subText3').text(textAssets[lang]["recovery"]["subText3"]);
+    $('.selection_recovery_headerText').text(textAssets[lang].recovery.recovery);
+    $('.selection_recovery_subText2').text(textAssets[lang].recovery.subText2);
+    $('.selection_recovery_subText3').text(textAssets[lang].recovery.subText3);
     
-    $('.selection_recovery_btn').eq(0).text(textAssets[lang]["recovery"]["no"]);
-    $('.selection_recovery_btn').eq(1).text(textAssets[lang]["recovery"]["yes"]);
+    $('.selection_recovery_btn').eq(0).text(textAssets[lang].recovery.no);
+    $('.selection_recovery_btn').eq(1).text(textAssets[lang].recovery.yes);
 
     // DeleteHistoryConfirm
 
-    $('.selection_deleteHistoryConfirm_headerText').text(textAssets[lang]["deleteHistoryConfirm"]["confirm"]);
-    $('.selection_deleteHistoryConfirm_subText1').text(textAssets[lang]["deleteHistoryConfirm"]["subText1"]);
-    $('.selection_deleteHistoryConfirm_subText2').text(textAssets[lang]["deleteHistoryConfirm"]["subText2"]);
-    $('.selection_deleteHistoryConfirm_subText4').text(textAssets[lang]["deleteHistoryConfirm"]["subText4"]);
-    $('.selection_deleteHistoryConfirm_subText5').text(textAssets[lang]["deleteHistoryConfirm"]["subText5"]);
+    $('.selection_deleteHistoryConfirm_headerText').text(textAssets[lang].deleteHistoryConfirm.confirm);
+    $('.selection_deleteHistoryConfirm_subText1').text(textAssets[lang].deleteHistoryConfirm.subText1);
+    $('.selection_deleteHistoryConfirm_subText2').text(textAssets[lang].deleteHistoryConfirm.subText2);
+    $('.selection_deleteHistoryConfirm_subText4').text(textAssets[lang].deleteHistoryConfirm.subText4);
+    $('.selection_deleteHistoryConfirm_subText5').text(textAssets[lang].deleteHistoryConfirm.subText5);
 
-    $('.selection_deleteHistoryConfirm_btn').eq(0).text(textAssets[lang]["recovery"]["yes"]);
-    $('.selection_deleteHistoryConfirm_btn').eq(1).text(textAssets[lang]["recovery"]["no"]);
+    $('.selection_deleteHistoryConfirm_btn').eq(0).text(textAssets[lang].recovery.yes);
+    $('.selection_deleteHistoryConfirm_btn').eq(1).text(textAssets[lang].recovery.no);
 
     // Remaining stats
 
-    $(".session_remaining_item_title").eq(0).text(textAssets[lang]["inSession"]["remaining"]["reTime"]); 
-    $(".session_remaining_item_title").eq(1).text(textAssets[lang]["inSession"]["remaining"]["reWoTime"]); 
-    $(".session_remaining_item_title").eq(2).text(textAssets[lang]["inSession"]["remaining"]["reSets"]); 
-    $(".session_remaining_item_title").eq(3).text(textAssets[lang]["inSession"]["remaining"]["reReps"]); 
-    $(".session_remaining_item_title").eq(4).text(textAssets[lang]["inSession"]["remaining"]["reWeight"]); 
+    $(".session_remaining_item_title").eq(0).text(textAssets[lang].inSession.remaining.reTime); 
+    $(".session_remaining_item_title").eq(1).text(textAssets[lang].inSession.remaining.reWoTime); 
+    $(".session_remaining_item_title").eq(2).text(textAssets[lang].inSession.remaining.reSets); 
+    $(".session_remaining_item_title").eq(3).text(textAssets[lang].inSession.remaining.reReps); 
+    $(".session_remaining_item_title").eq(4).text(textAssets[lang].inSession.remaining.reWeight); 
 
     previousLanguage = lang;
 };
@@ -1541,18 +1552,18 @@ function updateExerciseHTML(prev, next){
     if(exercisesHTML !== undefined){
         htmlString = $(exercisesHTML).html();
 
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["name"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["name"] + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["sets"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["sets"] + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["reps"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["reps"] + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["rest"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["rest"] + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["cycle"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["cycle"] + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["work"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["work"] + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["rest"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["rest"] + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev]["updatePage"]["placeHolders"]["hint"] + '"', 'placeholder="' + textAssets[next]["updatePage"]["placeHolders"]["hint"] + '"');
-        htmlString = htmlString.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Bi."], textAssets[next]["updatePage"]["exerciseTypes"]["Bi."]);
-        htmlString = htmlString.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Uni."], textAssets[next]["updatePage"]["exerciseTypes"]["Uni."]);
-        htmlString = htmlString.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Int."], textAssets[next]["updatePage"]["exerciseTypes"]["Int."]);
-        htmlString = htmlString.customReplaceAll(textAssets[prev]["updatePage"]["exerciseTypes"]["Wrm."], textAssets[next]["updatePage"]["exerciseTypes"]["Wrm."]);
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.name + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.name + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.sets + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.sets + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.reps + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.reps + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.rest + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.rest + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.cycle + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.cycle + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.work + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.work + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.rest + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.rest + '"');
+        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.hint + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.hint + '"');
+        htmlString = htmlString.customReplaceAll(textAssets[prev].updatePage.exerciseTypes["Bi."], textAssets[next].updatePage.exerciseTypes["Bi."]);
+        htmlString = htmlString.customReplaceAll(textAssets[prev].updatePage.exerciseTypes["Uni."], textAssets[next].updatePage.exerciseTypes["Uni."]);
+        htmlString = htmlString.customReplaceAll(textAssets[prev].updatePage.exerciseTypes["Int."], textAssets[next].updatePage.exerciseTypes["Int."]);
+        htmlString = htmlString.customReplaceAll(textAssets[prev].updatePage.exerciseTypes["Wrm."], textAssets[next].updatePage.exerciseTypes["Wrm."]);
     
         exercisesHTML = $(htmlString);
     };

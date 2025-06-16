@@ -16,7 +16,7 @@ function summonTimeSelector(target){
     cannotClick = "timeSelector";
 
     isEditing = false
-    let timeValue = time_unstring($(target).val(), true);
+    let timeValue = time_unstring($(target).storeVal(), true);
 
     $('.timeSelectorHours').find('.timeSelectorInput').val(timeValue[3]);
     $('.timeSelectorMinutes').find('.timeSelectorInput').val(timeValue[4]);
@@ -25,7 +25,6 @@ function summonTimeSelector(target){
     updateTimeSelectorVal($('.timeSelectorHours').find('.timeSelectorInput'), 0);
     updateTimeSelectorVal($('.timeSelectorMinutes').find('.timeSelectorInput'), 0);
     updateTimeSelectorVal($('.timeSelectorSeconds').find('.timeSelectorInput'), 0);
-
 
     $(".timeSelectorSubmit").data("target", target);
     showBlurPage('timeSelectorBody');
@@ -71,17 +70,17 @@ function timeSelectorUpdateTarget(classs){
     if(classs.includes("Linput")){
         LinputShown = false;
 
-        let val = time_unstring(get_time_u($(".Linput").val()));
+        let val = time_unstring(get_timeString($(".Linput").storeVal()));
         if(val >= 3600){val = false};
 
         LrestTime = val === false ? LrestTime : val;
 
-        let nbSetLeft = extype == "Uni" ? $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters["language"]]["misc"]["leftInitial"]+"')").length : $(".session_next_exercise_name:contains('"+next_name+"')").length;
+        let nbSetLeft = extype == "Uni" ? $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters.language].misc.leftInitial+"')").length : $(".session_next_exercise_name:contains('"+next_name+"')").length;
 
         if(LrestTime == 0 || nbSetLeft == 0){
-            $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
+            $(".Lrest").text(textAssets[parameters.language].inSession.next);
         }else{
-            $(".Lrest").text(textAssets[parameters["language"]]["inSession"]["rest"]);
+            $(".Lrest").text(textAssets[parameters.language].inSession.rest);
         };
 
         $(".Linput").css('display', "none");
@@ -89,21 +88,21 @@ function timeSelectorUpdateTarget(classs){
 
         udpate_recovery("workout");
     }else if(classs.includes("Rinput")){
-        $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
+        $(".Rrest").text(textAssets[parameters.language].inSession.next);
 
         RinputShown = false;
 
-        let val = time_unstring(get_time_u($(".Rinput").val()));
+        let val = time_unstring(get_timeString($(".Rinput").storeVal()));
         if(val >= 3600){val = false};
 
         RrestTime = val === false ? RrestTime : val;
 
-        let nbSetLeft = extype == "Uni" ? $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters["language"]]["misc"]["rightInitial"]+"')").length : $(".session_next_exercise_name:contains('"+next_name+"')").length;
+        let nbSetLeft = extype == "Uni" ? $(".session_next_exercise_name:contains('"+next_name+" - "+textAssets[parameters.language].misc.rightInitial+"')").length : $(".session_next_exercise_name:contains('"+next_name+"')").length;
 
         if(RrestTime == 0 || nbSetLeft == 0){
-            $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["next"]);
+            $(".Rrest").text(textAssets[parameters.language].inSession.next);
         }else{
-            $(".Rrest").text(textAssets[parameters["language"]]["inSession"]["rest"]);
+            $(".Rrest").text(textAssets[parameters.language].inSession.rest);
         };
 
         $(".Rinput").css('display', "none");
@@ -126,7 +125,8 @@ $(document).ready(function(){
 
     $(document).on('click', '.timeSelectorSubmit', function(e){
         isEditing = false;
-        
+
+        let target = $(".timeSelectorSubmit").data("target")
         let hours = parseInt($('.timeSelectorHours').find(".timeSelectorInput").val());
         let minutes = parseInt($('.timeSelectorMinutes').find(".timeSelectorInput").val());
         let seconds = parseInt($('.timeSelectorSeconds').find(".timeSelectorInput").val());
@@ -135,8 +135,10 @@ $(document).ready(function(){
         minutes = minutes <= 59 ? minutes : 59;
         seconds = seconds <= 59 ? seconds : 59;
 
-        let timeString = get_time_u(hours * 3600 + minutes * 60 + seconds);
-        $($(".timeSelectorSubmit").data("target")).val(timeString);
+        let timeString = get_timeString(hours * 3600 + minutes * 60 + seconds);
+
+        $(target).storeVal(timeString);
+        $(target).val(display_timeString(timeString));
 
         closePanel('timeSelector');
         canNowClick("allowed");

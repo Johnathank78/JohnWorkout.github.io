@@ -79,6 +79,8 @@ $(document).ready(async function(){
 
         session_save(session_list);
         reminder_save(reminder_list);
+        parameters_save(parameters);
+        stats_save(stats);
 
         deleteHistory();
     
@@ -120,14 +122,14 @@ $(document).ready(async function(){
         // session_list[3].notif.dateList[0] -= 1000 * 60 * 60 * 24 * 3; // +2 days for testing purposes
         // session_list[3].notif.occurence -= 1
 
-        // sessionToBeDone["data"]["12"] = true;
-        // sessionDone["data"]["12"] = false;
+        // sessionToBeDone.data["12"] = true;
+        // sessionDone.data["12"] = false;
         
         // let count = nbSessionScheduled(getToday("date", -1));
 
         // console.log(count)
-        // Object.keys(sessionToBeDone["data"]).forEach(function(key){
-        //     if(sessionToBeDone["data"][key] && sessionDone["data"][key]){
+        // Object.keys(sessionToBeDone.data).forEach(function(key){
+        //     if(sessionToBeDone.data[key] && sessionDone.data[key]){
         //         count -= 1;
         //     };
         // });

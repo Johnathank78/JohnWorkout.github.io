@@ -7,16 +7,16 @@ function emptySessionScheme(){
     };
 
     session_list.forEach(session => {
-        out["data"][session["id"]] = false
+        out.data[session.id] = false
     });
 
     return out
 };
 
 function cleanSessionScheme(drop){
-    delete sessionDone["data"][drop];
-    delete hasBeenShifted["data"][drop];
-    delete sessionToBeDone["data"][drop];
+    delete sessionDone.data[drop];
+    delete hasBeenShifted.data[drop];
+    delete sessionToBeDone.data[drop];
 };
 
 function sessionSchemeVarsReset(){
@@ -34,9 +34,9 @@ function sessionSchemeVarsReset(){
 };
 
 function enlargeSessionScheme(id){
-    sessionDone["data"][id] = false;
-    hasBeenShifted["data"][id] = false;
-    sessionToBeDone["data"][id] = false;
+    sessionDone.data[id] = false;
+    hasBeenShifted.data[id] = false;
+    sessionToBeDone.data[id] = false;
 };
 
 //STATS & PARAMS
@@ -288,10 +288,9 @@ function stats_read(set=false){
         stats_save(data);
     }else{
         data = JSON.parse(data);
-        data = JSONiseStats(data);
 
-        if(getToday('date').getFullYear() != data['missedSessions']['year'] || getToday('timestamp') == 1749938400000){
-            data['missedSessions']['val'] = 0;
+        if(getToday('date').getFullYear() != data.missedSessions.year || getToday('timestamp') == 1750024800000){
+            data.missedSessions.val = 0;
         };
     };
 
@@ -307,14 +306,14 @@ function stats_save(data){
 };
 
 function stats_set(data){
-    $(".selection_info_TimeSpent").text(get_time_u(timeFormat(data["timeSpent"])));
-    $(".selection_info_WorkedTime").text(get_time_u(timeFormat(parseInt(data["workedTime"]))));
-    $(".selection_info_WeightLifted").text(weightUnitgroup(data["weightLifted"], parameters['weightUnit']));
-    $(".selection_info_RepsDone").text(parseInt(data["repsDone"]));
-    $(".selection_infoStart_value").text(formatDate(data["since"]));
+    $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFormat(data.timeSpent))));
+    $(".selection_info_WorkedTime").text(display_timeString(get_timeString(timeFormat(parseInt(data.workedTime)))));
+    $(".selection_info_WeightLifted").text(weightUnitgroup(data.weightLifted, parameters.weightUnit));
+    $(".selection_info_RepsDone").text(parseInt(data.repsDone));
+    $(".selection_infoStart_value").text(formatDate(data.since));
     
-    if(data["missedSessions"]){
-        $(".selection_info_Missed").text(data["missedSessions"]["val"]);
+    if(data.missedSessions){
+        $(".selection_info_Missed").text(data.missedSessions.val);
     };
 };
 
@@ -352,12 +351,12 @@ function parameters_read(first=true){
         data = JSON.parse(data);
     };
 
-    data = JSONiseParameters(data);
+    // data.notifBefore = data.notifBefore.replace(/[ywdhms]/g, c => labelToSymbol[c]);
     parameters_set(data);
 
-    previousWeightUnit = data["weightUnit"];
+    previousWeightUnit = data.weightUnit;
     parametersMemory = JSON.stringify(data);
-    changeLanguage(data['language'], first);
+    changeLanguage(data.language, first);
     
     return data;
 };
@@ -373,7 +372,8 @@ function parameters_set(data){
             $(target).val(data[targetName]);
             $('.selection_parameters_select option[value="'+data[targetName]+'"]').prop('selected', true);
         }else if($(target).is("input")){
-            $(target).val(data[targetName]);
+            $(target).val(display_timeString(data[targetName], data.language));
+            $(target).storeVal(data[targetName]);
         }else if($(target).is('.parameters_toggle')){
             $(target).attr("state", data[targetName]);
         };
@@ -727,40 +727,81 @@ function session_read(set=false){
         return [];
     }else{
         data = JSON.parse(data);
+        
         calendar_dict = calendar_read(data[0]);
         previousWeightUnit = data[1];
 
-        data[0] = JSONiseList(data[0]);
-        
-        if(previousWeightUnit != parameters['weightUnit']){
-            updateWeightUnits(data[0], previousWeightUnit, parameters['weightUnit']);
+        if(previousWeightUnit != parameters.weightUnit){
+            updateWeightUnits(data[0], previousWeightUnit, parameters.weightUnit);
         };
 
-        // FIX
+        // data[0].forEach(session => {
+        //     session.exoList.forEach(exo => {
+        //         if(session.type == "W" && exo.type != "Wrm."){
+        //             if(exo.type == "Int." && !isIntervallLinked(exo)){
+        //                 exo.exoList.forEach(subExo => {
+        //                     subExo.rest = subExo.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                     subExo.work = subExo.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                 });
+        //             }else if(!(exo.type == "Int." && isIntervallLinked(exo))){
+        //                 exo.rest = exo.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //             };
+        //         }else if(session.type == "I"){
+        //             if(exo.type == "Int."){
+        //                 exo.rest = exo.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                 exo.work = exo.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //             }else{
+        //                 exo.rest = exo.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //             };
+        //         };                
+        //     });
 
-        data[0].forEach(session => {
-            if(isNaI(session['id'])) session['id'] = smallestAvailableId(data[0], "id");
-            if(session.hasOwnProperty("isArchived") === false) session['isArchived'] = false;
+        //     if(session.type == "W"){
+        //         session.history.historyList.forEach(history => {
+        //             history.exoList.forEach(exo => {
+        //                 if(exo.type == "Int."){
+        //                     exo.exoList.forEach(subExo => {
+        //                         subExo.expectedStats.work = subExo.expectedStats.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                         subExo.expectedStats.rest = subExo.expectedStats.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
 
-            if(session['history']['state'] == 'true'){
-                session['history']['state'] = true;
-            }else if(session['history']['state'] == 'false'){
-                session['history']['state'] = false;
-            };
-        });
+        //                         subExo.setList.forEach(set => {
+        //                             set.work = set.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                             set.rest = set.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                         });
+        //                     });
+        //                 };
+        //             });
+        //         });
+        //     }else if(session.type == "I"){
+        //         session.history.historyList.forEach(history => {
+        //             history.exoList.forEach(exo => {
+        //                 if(exo.type == "Int."){
+        //                     exo.expectedStats.work = exo.expectedStats.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                     exo.expectedStats.rest = exo.expectedStats.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+
+        //                     exo.setList.forEach(set => {
+        //                         set.work = set.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                         set.rest = set.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
+        //                     });
+        //                 };
+        //             });
+        //         });
+        //     };
+
+        // }); 
 
         return data[0];
     };
 };
 
 function session_save(data){
-    saveItem("sessions_list", JSON.stringify([data, parameters['weightUnit']]));
+    saveItem("sessions_list", JSON.stringify([data, parameters.weightUnit]));
     return;
 };
 
 function session_pusher(session_list, archive = false, global = false){
-    let filteredSessionList = session_list.filter(session => session['isArchived'] === archive);
-    let filteredReminderList = reminder_list.filter(reminder => reminder['isArchived'] === archive);
+    let filteredSessionList = session_list.filter(session => session.isArchived === archive);
+    let filteredReminderList = reminder_list.filter(reminder => reminder.isArchived === archive);
 
     $(".selection_session_container").children().remove();
 
@@ -788,16 +829,15 @@ function reminder_read(set=false){
 
     if(set) data = set;
 
-    if (data === null || data == ""){
+    if(data === null || data == ""){
         return [];
     }else{
         data = JSON.parse(data);
-        data = JSONiseList(data);
 
-        data.forEach(reminder => {
-            if(isNaI(reminder['id'])) reminder['id'] = smallestAvailableId(data, "id");
-            if(reminder.hasOwnProperty("isArchived") === false) reminder['isArchived'] = false;
-        });
+        // data.forEach(reminder => {
+        //     if(isNaI(reminder.id)) reminder.id = smallestAvailableId(data, "id");
+        //     if(reminder.hasOwnProperty("isArchived") === false) reminder.isArchived = false;
+        // });
 
         return data;
     };
@@ -811,8 +851,8 @@ function reminder_save(data){
 function reminder_pusher(reminder_list, archive = false, global = false){
     $(".selection_empty_msg").css("display", "none");
 
-    let filteredSessionList = session_list.filter(session => session['isArchived'] === archive);
-    let filteredReminderList = reminder_list.filter(reminder => reminder['isArchived'] === archive);
+    let filteredSessionList = session_list.filter(session => session.isArchived === archive);
+    let filteredReminderList = reminder_list.filter(reminder => reminder.isArchived === archive);
 
     $(".selection_reminder_container").children().remove();
 
@@ -854,21 +894,21 @@ function calendar_read(data){
 
     data.forEach(session => {
         if(isScheduled(session)){
-            let temp = $('<span class="selection_page_calendar_Scheduled_item noselect">'+session["name"]+'</span>');
+            let temp = $('<span class="selection_page_calendar_Scheduled_item noselect">'+session.name+'</span>');
 
-            $(temp).data("state", dict[session["id"]]);
-            $(temp).data("id", session["id"]);
+            $(temp).data("state", dict[session.id]);
+            $(temp).data("id", session.id);
 
-            if(dict[session["id"]]){
-                $(temp).css('backgroundColor', session['color']);
+            if(dict[session.id]){
+                $(temp).css('backgroundColor', session.color);
             }else{
                 $(temp).css('backgroundColor', '#4C5368');
             };
 
             $(".selection_page_calendar_second").append(temp);
         }else{
-            if(dict[session["id"]] !== undefined){
-                delete dict[session["id"]];
+            if(dict[session.id] !== undefined){
+                delete dict[session.id];
             };
         };
     });
@@ -893,7 +933,7 @@ function calendar_reset(data){
 
     data.forEach(session => {
         if(isScheduled(session)){
-            dict[session["id"]] = true;
+            dict[session.id] = true;
         };
     });
     
@@ -962,17 +1002,17 @@ function recovery_read(){
     }else{
 
         data = JSON.parse(data);
-        let sessionIndex = getSessionIndexByID(data["id"])
+        let sessionIndex = getSessionIndexByID(data.id)
 
-        if(session_list[sessionIndex]["type"] == "I"){
-            if(data["varSav"]['Ifinished']){
+        if(session_list[sessionIndex].type == "I"){
+            if(data.varSav.Ifinished){
                 ongoing = "intervall";
                 
                 current_session = session_list[sessionIndex];
                 current_history = getSessionHistory(current_session);
 
-                tempStats = data['tempStats'];
-                tempNewHistory = data["tempHistory"];
+                tempStats = data.tempStats;
+                tempNewHistory = data.tempHistory;
 
                 quit_session();
                 return data;
@@ -980,7 +1020,7 @@ function recovery_read(){
         };
 
         showBlurPage("selection_recovery_page");
-        $(".selection_recovery_subText1").text(session_list[getSessionIndexByID(data["id"])]["name"]);
+        $(".selection_recovery_subText1").text(session_list[getSessionIndexByID(data.id)].name);
 
         return data;
     };
@@ -1004,7 +1044,7 @@ function sessionDone_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(new Date(data["creationDate"])) != formatDate(getToday("date"))){
+    if(formatDate(new Date(data.creationDate)) != formatDate(getToday("date"))){
         data = emptySessionScheme();
         localStorage.setItem("session_done", JSON.stringify(data));
     };
@@ -1030,7 +1070,7 @@ function hasBeenShifted_read(){
 
     data = JSON.parse(data);
 
-    if(formatDate(new Date(data["creationDate"])) != formatDate(getToday("date"))){
+    if(formatDate(new Date(data.creationDate)) != formatDate(getToday("date"))){
         data = emptySessionScheme();
         localStorage.setItem("hasBeenShifted", JSON.stringify(data));
     };
@@ -1054,7 +1094,7 @@ function sessionSwapped_read(){
     };
 
     data = JSON.parse(data);
-    data = data.filter(swap => swap['time'] >= now);
+    data = data.filter(swap => swap.time >= now);
 
     return data;
 };
@@ -1069,41 +1109,41 @@ function fillSessionToBeDone(){
     let data = emptySessionScheme();
     
     session_list.forEach((session) => {
-        let notif = session['notif'];
+        let notif = session.notif;
         
         if(notif){
-            let jumpData = notif['jumpData'];
+            let jumpData = notif.jumpData;
             
             let dateToTest = getToday("date");
             let scheduleDate = false;
             
             if(getScheduleScheme(session) == "Day"){
-                scheduleDate = zeroAM(notif["dateList"][0], "date");
+                scheduleDate = zeroAM(notif.dateList[0], "date");
             }else{
-                let i = getClosestWeekIteration(getToday("timestamp"), notif['dateList']);
-                scheduleDate = zeroAM(notif["dateList"][i], "date");
+                let i = getClosestWeekIteration(getToday("timestamp"), notif.dateList);
+                scheduleDate = zeroAM(notif.dateList[i], "date");
             };
 
             if(isEventScheduled(
                 dateToTest,
                 scheduleDate,
-                notif["scheduleData"]["count"], 
-                notif["scheduleData"]["scheme"], 
-                jumpData['jumpVal'], 
-                jumpData['jumpType'], 
-                jumpData['everyVal'], 
-                notif["occurence"], 
-                session['id']
+                notif.scheduleData.count, 
+                notif.scheduleData.scheme, 
+                jumpData.jumpVal, 
+                jumpData.jumpType, 
+                jumpData.everyVal, 
+                notif.occurence, 
+                session.id
             )){
-                data['data'][session['id']] = true;
+                data.data[session.id] = true;
             };
         };
     });
 
     sessionSwapped.forEach((swap) => {
         if(swap.time == getToday("timestamp")){
-            data['data'][swap.from] = false;
-            data['data'][swap.to] = true;
+            data.data[swap.from] = false;
+            data.data[swap.to] = true;
         };
     });
 
@@ -1122,21 +1162,21 @@ function sessionToBeDone_read(){
 
     sessionToBeDone = JSON.parse(sessionToBeDone);
 
-    if(formatDate(new Date(sessionToBeDone["creationDate"])) != formatDate(getToday("date"))){
+    if(formatDate(new Date(sessionToBeDone.creationDate)) != formatDate(getToday("date"))){
         let sessionDone = localStorage.getItem("session_done");
         let count = nbSessionScheduled(getToday("date", -1));
 
         if(!(sessionDone === null || sessionDone == "")){
             sessionDone = JSON.parse(sessionDone);
 
-            Object.keys(sessionToBeDone["data"]).forEach(function(key){
-                if(sessionToBeDone["data"][key] && sessionDone["data"][key]){
+            Object.keys(sessionToBeDone.data).forEach(function(key){
+                if(sessionToBeDone.data[key] && sessionDone.data[key]){
                     count -= 1;
                 };
             });
         };
 
-        stats["missedSessions"]["val"] += count;
+        stats.missedSessions.val += count;
         stats_save(stats);
 
         // --------------------

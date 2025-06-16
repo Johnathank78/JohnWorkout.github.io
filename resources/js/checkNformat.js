@@ -468,49 +468,4 @@ $(document).ready(function(){
             return;
         }
     });
-    
-    $(document).on("keydown", ".timeString", function (e) {
-        let allowedNumbers = "0123456789";
-        let allowedLetters = "ywdhms";
-        let allowedKeys = ["Backspace", "ArrowLeft", "ArrowRight", "Delete", "Tab"];
-
-        let unitOrder = ["y", "w", "d", "h", "m", "s"]; // Order from largest to smallest
-        let currentValue = $(this).val();
-        let lastChar = currentValue.slice(-1);
-        let existingLetters = currentValue.match(/[ywdhms]/g) || [];
-        let lastUsedUnit = existingLetters.length ? existingLetters[existingLetters.length - 1] : null;
-
-        // Prevent any input after "s"
-        if (existingLetters.includes("s") && !allowedKeys.includes(e.key)) {
-            e.preventDefault();
-            return;
-        }
-
-        // Allow numbers and control keys
-        if (allowedNumbers.includes(e.key) || allowedKeys.includes(e.key)) {
-            return;
-        }
-
-        // Prevent duplicate time units
-        if (existingLetters.includes(e.key)) {
-            e.preventDefault();
-            return;
-        }
-
-        // Prevent consecutive letters (must have a number before a letter)
-        if (allowedLetters.includes(e.key) && allowedLetters.includes(lastChar)) {
-            e.preventDefault();
-            return;
-        }
-
-        // Enforce correct order based on last used unit
-        if (allowedLetters.includes(e.key)) {
-            if (lastUsedUnit && unitOrder.indexOf(e.key) <= unitOrder.indexOf(lastUsedUnit)) {
-                e.preventDefault();
-                return;
-            }
-        } else {
-            e.preventDefault();
-        }
-    });
 });//readyEnd

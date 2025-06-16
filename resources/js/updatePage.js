@@ -34,33 +34,33 @@ function restoreSwipedElement(){
 function updateSelectScheduleLabels(nb, item){
     if($(item).is(".update_schedule_jump_count")){
         if(nb == 1){
-            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(0).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['day']);
-            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(1).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['week']);
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(0).text(textAssets[parameters.language].updatePage.temporalityChoices.day);
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(1).text(textAssets[parameters.language].updatePage.temporalityChoices.week);
             
-            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters["language"]]["updatePage"]["times"]);
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters.language].updatePage.times);
             }else{
-            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(0).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['day'] + "s");
-            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(1).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['week'] + "s");
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(0).text(textAssets[parameters.language].updatePage.temporalityChoices.day + "s");
+            $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(1).text(textAssets[parameters.language].updatePage.temporalityChoices.week + "s");
             
-            if(parameters['language'] == "english"){
-                $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters["language"]]["updatePage"]["times"] + "s");
-            }else if(parameters['language'] == "french"){
-                $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters["language"]]["updatePage"]["times"]);
+            if(parameters.language == "english"){
+                $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters.language].updatePage.times + "s");
+            }else if(parameters.language == "french"){
+                $('.update_schedule_select_jumpEvery').find(".update_schedule_opt").eq(2).text(textAssets[parameters.language].updatePage.times);
             };
         };
-    }else if($(item).is(".update_schedule_every_count") && parameters['language']){
-        if(nb == 1 || parameters['language'] == "french"){
-            $('.update_schedule_jumpEveryText').text(textAssets[parameters["language"]]["updatePage"]["times"]);
+    }else if($(item).is(".update_schedule_every_count") && parameters.language){
+        if(nb == 1 || parameters.language == "french"){
+            $('.update_schedule_jumpEveryText').text(textAssets[parameters.language].updatePage.times);
         }else{
-            $('.update_schedule_jumpEveryText').text(textAssets[parameters["language"]]["updatePage"]["times"]+ "s");
+            $('.update_schedule_jumpEveryText').text(textAssets[parameters.language].updatePage.times+ "s");
         };
     }else if($(item).is(".update_schedule_input_count")){
         if(nb == 1){
-            $('.update_schedule_select_every').find(".update_schedule_opt").eq(0).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['day']);
-            $('.update_schedule_select_every').find(".update_schedule_opt").eq(1).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['week']);
+            $('.update_schedule_select_every').find(".update_schedule_opt").eq(0).text(textAssets[parameters.language].updatePage.temporalityChoices.day);
+            $('.update_schedule_select_every').find(".update_schedule_opt").eq(1).text(textAssets[parameters.language].updatePage.temporalityChoices.week);
         }else{
-            $('.update_schedule_select_every').find(".update_schedule_opt").eq(0).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['day'] + "s");
-            $('.update_schedule_select_every').find(".update_schedule_opt").eq(1).text(textAssets[parameters["language"]]["updatePage"]["temporalityChoices"]['week'] + "s");
+            $('.update_schedule_select_every').find(".update_schedule_opt").eq(0).text(textAssets[parameters.language].updatePage.temporalityChoices.day + "s");
+            $('.update_schedule_select_every').find(".update_schedule_opt").eq(1).text(textAssets[parameters.language].updatePage.temporalityChoices.week + "s");
         };
     };
 };
@@ -97,30 +97,30 @@ function leave_update(){
 };
 
 function deleteHistory(){
-    if(parameters["deleteAfter"] === "For ever"){return};
+    if(parameters.deleteAfter === "For ever"){return};
 
-    const deleteAfterDate = subtractTime(parameters["deleteAfter"]).getTime();
+    const deleteAfterDate = subtractTime(parameters.deleteAfter).getTime();
 
     session_list.forEach(session => {
         let filteredHistoryList = [];
         let currentHistory = getSessionHistory(session);
 
-        if(currentHistory['historyList'].length > 0){
-            currentHistory['historyList'].forEach(history => {
-                let timeStamp = history["date"];
+        if(currentHistory.historyList.length > 0){
+            currentHistory.historyList.forEach(history => {
+                let timeStamp = history.date;
     
                 if(timeStamp > deleteAfterDate){
                     filteredHistoryList.push(history);
                 };
             });
     
-            session["history"]["historyList"] = filteredHistoryList;
+            session.history.historyList = filteredHistoryList;
         };
     });
 };
 
 function leaveIntervallEdit(){
-    $(".update_name_info").text(textAssets[parameters["language"]]["updatePage"]["name"]);
+    $(".update_name_info").text(textAssets[parameters.language].updatePage.name);
     $(".update_data_name").val(creationNameSAV);
 
     update_pageReset();
@@ -239,23 +239,23 @@ $(document).ready(function(){
     });
 
     $(document).on("change", ".update_workout_data_type", function(){
-        if($(this).val() == textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Bi."]){
+        if($(this).val() == textAssets[parameters.language].updatePage.exerciseTypes["Bi."]){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_data_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_intervall_data_container").css("display", "none");
-        }else if($(this).val() == textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Uni."]){
+        }else if($(this).val() == textAssets[parameters.language].updatePage.exerciseTypes["Uni."]){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_data_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_intervall_data_container").css("display", "none");
-        }else if($(this).val() == textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Int."]){
+        }else if($(this).val() == textAssets[parameters.language].updatePage.exerciseTypes["Int."]){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "none");
-        }else if($(this).val() == textAssets[parameters["language"]]["updatePage"]["exerciseTypes"]["Wrm."]){
+        }else if($(this).val() == textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "none");
@@ -266,7 +266,7 @@ $(document).ready(function(){
     });
 
     $(document).on("click", '.update_workout_intervallEdit_container', function(){
-        $(".update_name_info").text(textAssets[parameters["language"]]["updatePage"]["create"]);
+        $(".update_name_info").text(textAssets[parameters.language].updatePage.create);
         
         previousPage = current_page;
         current_page = "intervallEdit";
@@ -282,12 +282,12 @@ $(document).ready(function(){
         $('.update_intervallLink').children().remove();
         $('.update_intervallList_container').html("");
         
-        if(session_list.filter(session => session["type"] == "I").length > 0){
+        if(session_list.filter(session => session.type == "I").length > 0){
             $('.update_intervallLink').prop('disabled', false);
 
             session_list.forEach(session => {
-                if(session["type"] == 'I'){
-                    $('.update_intervallLink').append($(optString.replace('[idVAL]', session["id"]).replace('[sessionVAL]', session["name"])))
+                if(session.type == 'I'){
+                    $('.update_intervallLink').append($(optString.replace('[idVAL]', session.id).replace('[sessionVAL]', session.name)))
                 };
             });
         }else{
@@ -311,8 +311,8 @@ $(document).ready(function(){
                     opacity: 1
                 });
 
-                $('.update_linkBtn').data('data', {"linkId": elementData["linkId"]});
-                $('.update_intervallLink option[value="'+elementData["linkId"]+'"]').prop('selected', true);
+                $('.update_linkBtn').data('data', {"linkId": elementData.linkId});
+                $('.update_intervallLink option[value="'+elementData.linkId+'"]').prop('selected', true);
 
                 $(".update_data_name").val("");
                 $('.update_intervallList_container').append(Iintervall_tile());
@@ -326,15 +326,15 @@ $(document).ready(function(){
                 };
 
                 $(".update_intervallList_container").html("");
-                $(".update_data_name").val(elementData["name"]);
+                $(".update_data_name").val(elementData.name);
 
-                elementData["exoList"].forEach(exo => {
-                    if(exo["type"] == "Int."){
+                elementData.exoList.forEach(exo => {
+                    if(exo.type == "Int."){
                         $(".update_intervallList_container").append(Iintervall_tile(exo));
-                        if(exo['hint']){showHint(".update_intervallList_container")};
+                        if(exo.hint){showHint(".update_intervallList_container")};
     
                         manageRestInputVisibility($(".update_intervallList_container").children().last().find('.update_workout_intervall_data_cycle'));
-                    }else if(exo["type"] == "Pause"){
+                    }else if(exo.type == "Pause"){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
                 });
@@ -358,7 +358,7 @@ $(document).ready(function(){
 
     $(document).on('change', '.update_intervallLink', function(){
         if($(".update_linkBtn").data("data")){
-            if($(this).val() == $(".update_linkBtn").data("data")['linkId']){
+            if($(this).val() == $(".update_linkBtn").data("data").linkId){
                 $('.update_linkBtn').css({
                     backgroundColor: green,
                     opacity: 1
@@ -378,16 +378,16 @@ $(document).ready(function(){
     });
 
     $(".update_linkBtn").on("click", async function(){
-        if(session_list.filter(session => session['type'] == "I").length == 0){return};
+        if(session_list.filter(session => session.type == "I").length == 0){return};
 
         let session = session_list[getSessionIndexByID($('.update_intervallLink').val())];
         let data = generateSessionObj({
             "type": "Int.",
-            "linkId": session["id"]
+            "linkId": session.id
         });
 
         $(currentIntervallItem).attr('exo-data', JSON.stringify(data));
-        $(currentIntervallItem).find('.update_workout_intervallName').text(session["name"]);
+        $(currentIntervallItem).find('.update_workout_intervallName').text(session.name);
 
         leaveIntervallEdit();
     });
@@ -398,14 +398,14 @@ $(document).ready(function(){
             update_pageReset();
 
             current_page = "selection";
-            update_current_item['notif'] = false;
+            update_current_item.notif = false;
 
             if(reminderOrSession == "session"){
-                delete calendar_dict[update_current_item["name"]];
+                delete calendar_dict[update_current_item.name];
 
-                sessionToBeDone["data"][update_current_item["id"]] = false;
-                hasBeenShifted["data"][update_current_item["id"]] = false;
-                deleteRelatedSwap(update_current_item["id"]);
+                sessionToBeDone.data[update_current_item.id] = false;
+                hasBeenShifted.data[update_current_item.id] = false;
+                deleteRelatedSwap(update_current_item.id);
 
                 session_save(session_list);
                 calendar_save(calendar_dict);
@@ -426,11 +426,11 @@ $(document).ready(function(){
 
             if(platform == "Mobile"){await removeAllNotifsFromSession(update_current_item)};
 
-            bottomNotification("unscheduled", update_current_item["name"]);
+            bottomNotification("unscheduled", update_current_item.name);
             manageHomeContainerStyle();
         }else{
             $(".update_error_container").css("display", "block");
-            $(".update_error_msg").text(textAssets[parameters["language"]]["error"]["schedule"]["notScheduled"]);
+            $(".update_error_msg").text(textAssets[parameters.language].error.schedule.notScheduled);
         };
 
     });
@@ -530,56 +530,52 @@ $(document).ready(function(){
         let sets = $(this).closest(".update_history_container_exercise").find('.update_history_container_set');
         setInd = $(sets).index($(this).closest(".update_history_container_set"));
 
-        let setData = current_history["historyList"][current_history["historyList"].length - 1 - dayInd]["exoList"][exoInd]["setList"][setInd];
-        let exoName = current_history["historyList"][current_history["historyList"].length - 1 - dayInd]["exoList"][exoInd]["name"];
+        let setData = current_history.historyList[current_history.historyList.length - 1 - dayInd].exoList[exoInd].setList[setInd];
+        let exoName = current_history.historyList[current_history.historyList.length - 1 - dayInd].exoList[exoInd].name;
 
-        let reps = exoName.includes("Alt.") ? 2*parseInt(setData["reps"]) : parseInt(setData["reps"]);
-        let weight = parseFloat(setData["weight"]);
+        let reps = exoName.includes("Alt.") ? 2*parseInt(setData.reps) : parseInt(setData.reps);
+        let weight = parseFloat(setData.weight);
 
 
         if(isNaI($(this).val())){
             if($(this).hasClass("update_history_container_reps")){
-                $(this).val(setData["reps"]);
+                $(this).val(setData.reps);
             }else if($(this).hasClass("update_history_container_weight")){
-                $(this).val(setData["weight"]);
+                $(this).val(setData.weight);
             };
 
             return;
         };
 
-        stats["repsDone"] -= reps;
-        stats["weightLifted"] -= exoName.includes("Ts.") ? 2*reps*weight : reps*weight;
-        stats["workedTime"] -= reps*2.1;
+        stats.repsDone -= reps;
+        stats.weightLifted -= exoName.includes("Ts.") ? 2*reps*weight : reps*weight;
+        stats.workedTime -= reps*2.1;
 
         if($(this).hasClass("update_history_container_reps")){
-            setData["reps"] = parseInt($(this).val());
+            setData.reps = parseInt($(this).val());
         }else if($(this).hasClass("update_history_container_weight")){
-            setData["weight"] = parseFloat($(this).val());
+            setData.weight = parseFloat($(this).val());
         };
 
-        reps = exoName.includes("Alt.") ? 2*parseInt(setData["reps"]) : parseInt(setData["reps"]);
-        weight = parseFloat(setData["weight"]);
+        reps = exoName.includes("Alt.") ? 2*parseInt(setData.reps) : parseInt(setData.reps);
+        weight = parseFloat(setData.weight);
 
-        stats["repsDone"] += reps;
-        stats["weightLifted"] += exoName.includes("Ts.") ? 2*reps*weight : reps*weight;
-        stats["workedTime"] += reps*2.1;
+        stats.repsDone += reps;
+        stats.weightLifted += exoName.includes("Ts.") ? 2*reps*weight : reps*weight;
+        stats.workedTime += reps*2.1;
     });
     
     // UPDATE
 
     $(document).on("click", ".update_btn", async function(e){
         if(current_page == "edit"){
-
-            let beforeUpdateHash = "";
-            let afterUpdateHash = "";
+            let beforeUpdateHash = SHA256(JSON.stringify(update_current_item));
 
             let new_name = $(".update_data_name").val().format();
             let color = $('.update_colorChooser').css('backgroundColor');
 
             if(reminderOrSession == "session"){
-                beforeUpdateHash = SHA256(JSON.stringify(update_current_item));
-
-                if(update_current_item['type'] == "I"){
+                if(update_current_item.type == "I"){
                     let ex_name = false;
                     let cycle = false;
                     let work = false;
@@ -590,34 +586,34 @@ $(document).ready(function(){
                     let error = iserror_int(new_name, true);
 
                     if(!error){
-                        update_current_item["name"] = new_name;
-                        update_current_item["exoList"] = new Array();
+                        update_current_item.name = new_name;
+                        update_current_item.exoList = new Array();
                         exercises = $(".update_intervallList_container").children();
 
-                        exercises.each((id, exo) => {
+                        exercises.each((_, exo) => {
                             type = getContractedType($(exo).find(".update_workout_data_type").val());
 
                             if(type == "Int."){
                                 ex_name = $(exo).find(".update_workout_data_name").val().format();
                                 cycle = $(exo).find(".update_workout_intervall_data_cycle").val();
-                                work = $(exo).find(".update_workout_intervall_data_work").val();
-                                rest = $(exo).find(".update_workout_intervall_data_rest").val();
+                                work = $(exo).find(".update_workout_intervall_data_work").storeVal();
+                                rest = $(exo).find(".update_workout_intervall_data_rest").storeVal();
                                 hint = $(exo).find(".udpate_workout_hint_txtarea").val();
 
                                 if(hint == ""){hint = false};
                                 
-                                update_current_item["exoList"].push(generateExoObj({
+                                update_current_item.exoList.push(generateExoObj({
                                     "type": type,
                                     "name": ex_name,
-                                    "cycle": parseInt(cycle), 
+                                    "cycle": parseInt(cycle),
                                     "work": work,
                                     "rest": rest,
                                     "hint": hint,
                                     "id": $(exo).attr("id")
                                 }))
                             }else if(type == "Pause"){
-                                rest = $(exo).find(".update_workout_data_pausetime").val();
-                                update_current_item["exoList"].push(generateExoObj({
+                                rest = $(exo).find(".update_workout_data_pausetime").storeVal();
+                                update_current_item.exoList.push(generateExoObj({
                                     "type": type, 
                                     "rest": rest,
                                     "id": $(exo).attr("id")
@@ -626,13 +622,13 @@ $(document).ready(function(){
                         });
 
                         if(isScheduled(update_current_item)){
-                            let id = await getPendingId(update_current_item["id"]);
+                            let id = await getPendingId(update_current_item.id);
 
                             uniq_scheduler(id, "session");
                             calendar_read(session_list);
                         };
 
-                        update_current_item["color"] = color;
+                        update_current_item.color = color;
                         $(update_current_node).html($(session_tile(update_current_item)).html());
 
                         refresh_session_tile();
@@ -648,7 +644,7 @@ $(document).ready(function(){
                     }else{
                         return;
                     };
-                }else if(update_current_item['type']  == "W"){
+                }else if(update_current_item.type == "W"){
                     let error = iserror_exo(new_name, true);
                     let exercises = false;
                     let ex_name = false;
@@ -663,13 +659,12 @@ $(document).ready(function(){
                     if(!error){
                         $(".selection_empty_msg").css("display", "none");
 
-                        let nameSav = update_current_item["name"];
-                        update_current_item["name"] = new_name;
-                        update_current_item["exoList"] = new Array();
+                        update_current_item.name = new_name;
+                        update_current_item.exoList = new Array();
                         
                         exercises = $(".update_workoutList_container").children();
                         
-                        exercises.each((id, exo) => {
+                        exercises.each((_, exo) => {
                             type = getContractedType($(exo).find(".update_workout_data_type").val());
 
                             if(type == "Int."){
@@ -678,21 +673,21 @@ $(document).ready(function(){
 
                                 if(hint == ""){hint = false};
 
-                                data['hint'] = hint;
-                                data['id'] = $(exo).attr('id');
+                                data.hint = hint;
+                                data.id = $(exo).attr('id');
 
-                                update_current_item["exoList"].push(data);
+                                update_current_item.exoList.push(data);
                             }else if(type == "Bi." || type == "Uni."){
                                 ex_name = $(exo).find(".update_workout_data_name").val().format();
                                 sets = $(exo).find(".update_workout_data_sets").val();
                                 reps = $(exo).find(".update_workout_data_reps").val();
                                 weight = $(exo).find(".update_workout_data_weight").val();
-                                rest = $(exo).find(".update_workout_data_resttime").val();
+                                rest = $(exo).find(".update_workout_data_resttime").storeVal();
                                 hint = $(exo).find(".udpate_workout_hint_txtarea").val();
 
                                 if(hint == ""){hint = false};
 
-                                update_current_item["exoList"].push(generateExoObj({
+                                update_current_item.exoList.push(generateExoObj({
                                     "type": type,
                                     "name": ex_name,
                                     "setNb": parseInt(sets), 
@@ -708,16 +703,16 @@ $(document).ready(function(){
 
                                 if(hint == ""){hint = false};
 
-                                update_current_item["exoList"].push(generateExoObj({
+                                update_current_item.exoList.push(generateExoObj({
                                     "type": type,
                                     "name": ex_name,
                                     "hint": hint,
                                     "id": $(exo).attr("id")
                                 }));
                             }else if(type == "Pause"){
-                                rest = $(exo).find(".update_workout_data_pausetime").val();
+                                rest = $(exo).find(".update_workout_data_pausetime").storeVal();
 
-                                update_current_item["exoList"].push(generateExoObj({
+                                update_current_item.exoList.push(generateExoObj({
                                     "type": type,
                                     "rest": rest,
                                     "id": $(exo).attr("id")
@@ -726,13 +721,13 @@ $(document).ready(function(){
                         });
 
                         if(isScheduled(update_current_item)){
-                            let id = await getPendingId(update_current_item['id']);
+                            let id = await getPendingId(update_current_item.id);
 
                             uniq_scheduler(id, "session");
                             calendar_read(session_list);
                         };
 
-                        update_current_item["color"] = color;
+                        update_current_item.color = color;
 
                         $(update_current_node).html($(session_tile(update_current_item)).html());
                         session_save(session_list);
@@ -740,21 +735,17 @@ $(document).ready(function(){
                         return;
                     };
                 };
-
-                afterUpdateHash = SHA256(JSON.stringify(update_current_item));
             }else if(reminderOrSession == "reminder"){
-                beforeUpdateHash = SHA256(JSON.stringify(update_current_item));
-
                 let new_body = $(".udpate_reminder_body_txtarea").val();
                 let error = iserrorReminder(new_name, new_body);
 
                 if(!error){
-                    update_current_item["name"] = new_name;
-                    update_current_item["body"] = new_body;
-                    update_current_item["color"] = color;
+                    update_current_item.name = new_name;
+                    update_current_item.body = new_body;
+                    update_current_item.color = color;
 
                     if(isScheduled(update_current_item)){
-                        let id = await getPendingId(update_current_item["id"]);
+                        let id = await getPendingId(update_current_item.id);
                         uniq_scheduler(id, "reminder");
                     };
 
@@ -763,13 +754,11 @@ $(document).ready(function(){
                 }else{
                     return;
                 };
-
-                afterUpdateHash = SHA256(JSON.stringify(update_current_item));
             };
 
             update_pageReset();
 
-            if(beforeUpdateHash != afterUpdateHash){bottomNotification("updated", new_name)};
+            if(beforeUpdateHash != SHA256(JSON.stringify(update_current_item))) bottomNotification("updated", new_name);
             current_page = "selection";
 
         }else if(current_page == "add"){
@@ -809,19 +798,19 @@ $(document).ready(function(){
 
                         exercises = $(".update_intervallList_container").children();
 
-                        exercises.each((id, exo) => {
+                        exercises.each((_, exo) => {
                             type = getContractedType($(exo).find(".update_workout_data_type").val());
 
                             if(type == "Int."){
                                 ex_name = $(exo).find(".update_workout_data_name").val().format();
                                 cycle = $(exo).find(".update_workout_intervall_data_cycle").val();
-                                work = $(exo).find(".update_workout_intervall_data_work").val();
-                                rest = $(exo).find(".update_workout_intervall_data_rest").val();
+                                work = $(exo).find(".update_workout_intervall_data_work").storeVal();
+                                rest = $(exo).find(".update_workout_intervall_data_rest").storeVal();
                                 hint = $(exo).find(".udpate_workout_hint_txtarea").val();
 
                                 if(hint == ""){hint = false};
                                 
-                                new_session["exoList"].push(generateExoObj({
+                                new_session.exoList.push(generateExoObj({
                                     "type": type,
                                     "name": ex_name,
                                     "cycle": parseInt(cycle), 
@@ -831,8 +820,8 @@ $(document).ready(function(){
                                     "id": $(exo).attr("id")
                                 }))
                             }else if(type == "Pause"){
-                                rest = $(exo).find(".update_workout_data_pausetime").val();
-                                new_session["exoList"].push(generateExoObj({
+                                rest = $(exo).find(".update_workout_data_pausetime").storeVal();
+                                new_session.exoList.push(generateExoObj({
                                     "type": type, 
                                     "rest": rest,
                                     "id": $(exo).attr("id")
@@ -883,11 +872,11 @@ $(document).ready(function(){
                             "notif": false,
                             "color": color,
                             "id": newID
-                        });;
+                        });
 
                         exercises = $(".update_workoutList_container").children();
 
-                        exercises.each((id, exo) => {
+                        exercises.each((_, exo) => {
                             type = getContractedType($(exo).find(".update_workout_data_type").val());
 
                             if(type == "Int."){
@@ -896,21 +885,21 @@ $(document).ready(function(){
 
                                 if(hint == ""){hint = false};
 
-                                data['hint'] = hint;
-                                data['id'] = $(exo).attr('id');
+                                data.hint = hint;
+                                data.id = $(exo).attr('id');
 
-                                new_session["exoList"].push(data);
+                                new_session.exoList.push(data);
                             }else if(type == "Bi." || type == "Uni."){
                                 ex_name = $(exo).find(".update_workout_data_name").val().format();
                                 sets = $(exo).find(".update_workout_data_sets").val();
                                 reps = $(exo).find(".update_workout_data_reps").val();
                                 weight = $(exo).find(".update_workout_data_weight").val();
-                                rest = $(exo).find(".update_workout_data_resttime").val();
+                                rest = $(exo).find(".update_workout_data_resttime").storeVal();
                                 hint = $(exo).find(".udpate_workout_hint_txtarea").val();
 
                                 if(hint == ""){hint = false};
 
-                                new_session["exoList"].push(generateExoObj({
+                                new_session.exoList.push(generateExoObj({
                                     "type": type,
                                     "name": ex_name,
                                     "setNb": parseInt(sets), 
@@ -926,16 +915,16 @@ $(document).ready(function(){
 
                                 if(hint == ""){hint = false};
 
-                                new_session["exoList"].push(generateExoObj({
+                                new_session.exoList.push(generateExoObj({
                                     "type": type,
                                     "name": ex_name,
                                     "hint": hint,
                                     "id": $(exo).attr("id")
                                 }));
                             }else if(type == "Pause"){
-                                rest = $(exo).find(".update_workout_data_pausetime").val();
+                                rest = $(exo).find(".update_workout_data_pausetime").storeVal();
 
-                                new_session["exoList"].push(generateExoObj({
+                                new_session.exoList.push(generateExoObj({
                                     "type": type,
                                     "rest": rest,
                                     "id": $(exo).attr("id")
@@ -995,22 +984,22 @@ $(document).ready(function(){
             let id = false;
 
             if(reminderOrSession == "session"){
-                title = update_current_item["name"];
-                id = update_current_item["id"];
+                title = update_current_item.name;
+                id = update_current_item.id;
 
                 if(platform == "Mobile"){
                     await removeAllNotifsFromSession(update_current_item);
                 };
                 
-                if(update_current_item["type"] == "I"){
+                if(update_current_item.type == "I"){
                     let toDelete = [];
 
                     session_list.forEach((session, index) => {
-                        if(session["type"] == "W"){
-                            session["exoList"].forEach((exo, exoInd) => {
-                                if(isIntervallLinked(exo) && exo["linkId"] == id){
+                        if(session.type == "W"){
+                            session.exoList.forEach((exo, exoInd) => {
+                                if(isIntervallLinked(exo) && exo.linkId == id){
                                     toDelete.push([index, exoInd]);
-                                    if(exoInd > 0 && session["exoList"][exoInd - 1]["type"] == "Pause"){
+                                    if(exoInd > 0 && session.exoList[exoInd - 1].type == "Pause"){
                                         toDelete.push([index, exoInd - 1]);
                                     };
                                 };
@@ -1019,13 +1008,13 @@ $(document).ready(function(){
                     });
 
                     toDelete.forEach((data) => {
-                        session_list[data[0]]["exoList"] = session_list[data[0]]["exoList"].delete(data[1]);
+                        session_list[data[0]].exoList = session_list[data[0]].exoList.delete(data[1]);
                     });
 
                     refresh_session_tile();
                 };
 
-                delete calendar_dict[update_current_item["name"]];
+                delete calendar_dict[update_current_item.name];
 
                 $(update_current_node).remove();
                 session_list = session_list.delete(update_current_index);
@@ -1042,7 +1031,7 @@ $(document).ready(function(){
                 updateCalendar(session_list, updateCalendarPage);
 
             }else if(reminderOrSession == "reminder"){
-                title = update_current_item["name"];
+                title = update_current_item.name;
 
                 if(platform == "Mobile"){
                     await removeAllNotifsFromSession(update_current_item);
@@ -1063,8 +1052,7 @@ $(document).ready(function(){
             };
 
         }else if(current_page == "schedule"){
-            let toHashString = isScheduled(update_current_item);
-            let beforeUpdateHash = SHA256(JSON.stringify(toHashString));
+            let beforeUpdateHash = SHA256(JSON.stringify(update_current_item.notif));
             
             let inp_list = $(".update_schedule_input");
             let scheme = $(".update_schedule_select_every").val();
@@ -1094,16 +1082,16 @@ $(document).ready(function(){
                 
                 let title = $('.update_data_name').val() + " | " + hours+":"+minutes;
                 let totaltime = false; let body = false;
-                let occurence = isScheduled(update_current_item) ? update_current_item["notif"]["occurence"] : 1;
+                let occurence = isScheduled(update_current_item) ? update_current_item.notif.occurence : 1;
 
                 if(reminderOrSession == "session"){
                     totaltime = get_time(get_session_time(update_current_item));
-                    body = textAssets[parameters["language"]]["notification"]["duration"] + " : " + totaltime;
+                    body = textAssets[parameters.language].notification.duration + " : " + totaltime;
                 }else if(reminderOrSession == "reminder"){
-                    body = update_current_item["body"];
+                    body = update_current_item.body;
                 };
 
-                let toSubstract = time_unstring(parameters['notifBefore']) * 1000;
+                let toSubstract = time_unstring(parameters.notifBefore) * 1000;
 
                 let id = 0;
                 let firston = 0;
@@ -1115,7 +1103,7 @@ $(document).ready(function(){
 
                 if(scheme == "Day"){
                     let date = new Date(Math.min(...dateList));
-                    id = "1" + update_current_item['id'] + "1";
+                    id = "1" + update_current_item.id + "1";
 
                     date = setHoursMinutes(date, hours, minutes);
                     firston = date.getTime() - toSubstract;
@@ -1154,7 +1142,7 @@ $(document).ready(function(){
 
                 }else if(scheme == "Week"){
                     let selectedTS = [];
-                    let idy = update_current_item['id'];
+                    let idy = update_current_item.id;
 
                     dateList.forEach(async(date, i) => {
                         id = "2" + (i+1).toString() + idy + "1";
@@ -1200,11 +1188,11 @@ $(document).ready(function(){
                     });
                 };
 
-                update_current_item['notif'] = notifJson;
+                update_current_item.notif = notifJson;
 
                 if(reminderOrSession == "session"){
-                    calendar_dict[update_current_item["id"]] = true;
-                    sessionToBeDone["data"][update_current_item["id"]] = dateList.includes(getToday('timestamp'));
+                    calendar_dict[update_current_item.id] = true;
+                    sessionToBeDone.data[update_current_item.id] = dateList.includes(getToday('timestamp'));
 
                     session_save(session_list);
                     sessionToBeDone_save(sessionToBeDone);
@@ -1221,15 +1209,14 @@ $(document).ready(function(){
 
                 if(platform == "Mobile"){console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()))};
 
-                if(reminderOrSession == "session"){hasBeenShifted["data"][update_current_item["id"]] = false};
+                if(reminderOrSession == "session"){hasBeenShifted.data[update_current_item.id] = false};
             }else{
                 return;
             };
 
             update_pageReset();
-            
-            let afterUpdateHash = SHA256(JSON.stringify(update_current_item['notif']));
-            if(beforeUpdateHash != afterUpdateHash){bottomNotification("scheduled", update_current_item["name"])};
+
+            if(beforeUpdateHash != SHA256(JSON.stringify(update_current_item.notif))){bottomNotification("scheduled", update_current_item.name)};
 
             current_page = "selection";
         }else if(current_page == "intervallEdit"){
@@ -1252,19 +1239,19 @@ $(document).ready(function(){
 
                 let exercises = $('.update_intervallList_container').children();
 
-                exercises.each((id, exo) => {
+                exercises.each((_, exo) => {
                     type = getContractedType($(exo).find(".update_workout_data_type").val());
 
                     if(type == "Int."){
                         ex_name = $(exo).find(".update_workout_data_name").val().format();
                         cycle = $(exo).find(".update_workout_intervall_data_cycle").val();
-                        work = $(exo).find(".update_workout_intervall_data_work").val();
-                        rest = $(exo).find(".update_workout_intervall_data_rest").val();
+                        work = $(exo).find(".update_workout_intervall_data_work").storeVal();
+                        rest = $(exo).find(".update_workout_intervall_data_rest").storeVal();
                         hint = $(exo).find(".udpate_workout_hint_txtarea").val();
 
                         if(hint == ""){hint = false};
 
-                        data["exoList"].push(generateExoObj({
+                        data.exoList.push(generateExoObj({
                             "type": type,
                             "name": ex_name,
                             "cycle": parseInt(cycle),
@@ -1274,8 +1261,8 @@ $(document).ready(function(){
                             "id": $(exo).attr("id")
                         }));
                     }else if(type == "Pause"){
-                        rest = $(exo).find(".update_workout_data_pausetime").val();
-                        data["exoList"].push(generateExoObj({
+                        rest = $(exo).find(".update_workout_data_pausetime").storeVal();
+                        data.exoList.push(generateExoObj({
                             "type": type,
                             "rest": rest
                         }));
@@ -1365,10 +1352,10 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.update_delete_archiverContainer', async function(e){
-        let title = update_current_item["name"];
+        let title = update_current_item.name;
 
-        update_current_item['isArchived'] = true;
-        update_current_item['notif'] = false;
+        update_current_item.isArchived = true;
+        update_current_item.notif = false;
 
         $(update_current_node).remove();
 
@@ -1398,9 +1385,9 @@ $(document).ready(function(){
 
         trackItem(item, reminderOrSession, archive = true);
 
-        let title = update_current_item["name"];
+        let title = update_current_item.name;
 
-        update_current_item['isArchived'] = false;
+        update_current_item.isArchived = false;
         $(update_current_node).remove();
 
         if(reminderOrSession == "session"){
