@@ -208,7 +208,7 @@ function isNaI(input) {
         return true;
     }
     return !/^-?\d+$/.test(input);
-}
+};
 
 function isDict(variable) {
     return (
@@ -216,7 +216,11 @@ function isDict(variable) {
         variable !== null &&
         !Array.isArray(variable)
     );
-}
+};
+
+function isDictEmpty(obj) {
+  return Object.keys(obj).length === 0;
+};
 
 function smoothScroll(item, speed, offset){
     function getFirstScrollableParent(element) {
@@ -1310,7 +1314,7 @@ function unitRound(val){
     return parseFloat(val.toString().match(re)[0]);
 };
 
-function updateWeightUnits(data, from, to){
+function updateSessionUnits(data, from, to){
     data.forEach(session => {
         if(session.type == "W"){
             session.exoList.forEach(exo => {
@@ -1322,10 +1326,17 @@ function updateWeightUnits(data, from, to){
     });
 
     session_save(data);
-    previousWeightUnit = parameters.weightUnit;
 };
 
-function weightUnitgroup(val, unit) {
+function updateTrackerUnits(data, from, to){
+    for (const key of Object.keys(data)) {
+        data[key] = convertToUnit(data[key], from, to);
+    };
+
+    weightData_save(data)
+};
+
+function weightUnitgroup(val, unit){
     // Convert to kg for consistency in calculations
     val = convertToUnit(val, "kg", unit);
 
@@ -1351,7 +1362,7 @@ function weightUnitgroup(val, unit) {
     }
 };
 
-function roundToNearestHalf(num) {
+function roundToNearestHalf(num){
     return Math.round(num * 2) / 2;
 };
 
@@ -1431,14 +1442,17 @@ function changeLanguage(lang, first=false){
 
     // Import - Export;
 
-    $(".selection_saveLoad_headerText").text(textAssets[lang].preferences.impExpMenu.selectElements);
-    $(".selection_saveLoad_itemText").eq(0).text(textAssets[lang].preferences.impExpMenu.sessionList);
-    $(".selection_saveLoad_itemText").eq(1).text(textAssets[lang].preferences.impExpMenu.reminderList);
-    $(".selection_saveLoad_itemText").eq(2).text(textAssets[lang].preferences.impExpMenu.preferences);
-    $(".selection_saveLoad_itemText").eq(3).text(textAssets[lang].preferences.impExpMenu.stats);
+    // adapt weight to lbs, rework lbs implementation ?
 
-    $($(".selection_parameters_saveLoad_btn ")[0]).text(textAssets[lang].preferences.export);
-    $($(".selection_parameters_saveLoad_btn ")[1]).text(textAssets[lang].preferences.import);
+    $(".selection_saveLoad_headerText").text(textAssets[lang].preferences.impExpMenu.selectElements);
+    $("#selection_saveLoad_sl").parent().find('.selection_saveLoad_itemText').text(textAssets[lang].preferences.impExpMenu.sessionList);
+    $("#selection_saveLoad_rl").parent().find('.selection_saveLoad_itemText').text(textAssets[lang].preferences.impExpMenu.reminderList);
+    $("#selection_saveLoad_pa").parent().find('.selection_saveLoad_itemText').text(textAssets[lang].preferences.impExpMenu.preferences);
+    $("#selection_saveLoad_st").parent().find('.selection_saveLoad_itemText').text(textAssets[lang].preferences.impExpMenu.stats);
+    $("#selection_saveLoad_we").parent().find('.selection_saveLoad_itemText').text(textAssets[lang].preferences.impExpMenu.weightList);
+
+    $(".selection_parameters_saveLoad_btn").eq(0).text(textAssets[lang].preferences.export);
+    $(".selection_parameters_saveLoad_btn").eq(1).text(textAssets[lang].preferences.import);
 
     $(".selection_saveLoad_emptyMsg").text(textAssets[lang].preferences.impExpMenu.emptyMessage);
 

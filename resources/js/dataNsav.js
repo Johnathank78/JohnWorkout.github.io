@@ -351,8 +351,10 @@ function parameters_read(first=true){
         data = JSON.parse(data);
     };
 
-    // data.notifBefore = data.notifBefore.replace(/[ywdhms]/g, c => labelToSymbol[c]);
     parameters_set(data);
+
+    $(".weightTracker_unit").text(data.weightUnit);
+    $('.weightTracker_input').attr('placeholder', data.weightUnit == "lbs" ? '176.00' : "80.00");
 
     previousWeightUnit = data.weightUnit;
     parametersMemory = JSON.stringify(data);
@@ -732,7 +734,7 @@ function session_read(set=false){
         previousWeightUnit = data[1];
 
         if(previousWeightUnit != parameters.weightUnit){
-            updateWeightUnits(data[0], previousWeightUnit, parameters.weightUnit);
+            updateSessionUnits(data[0], previousWeightUnit, parameters.weightUnit);
         };
 
         // data[0].forEach(session => {
@@ -993,6 +995,35 @@ function audio_set(val){
     };
 };
 
+
+function weightData_read(set=false){
+    let data = localStorage.getItem("weightData");
+    if(set) data = set;
+
+    if(data === null || data == ""){
+        showWeightTracker({});
+        return {};
+    }else{
+        data = JSON.parse(data);
+
+        const todayTS = getToday('timestamp');
+        const lastTS  = zeroAM(Object.keys(data).slice(-1)[0], "timestamp");
+        const daysElapsed = daysBetweenTimestamps(todayTS, lastTS);
+
+        if(!isDictEmpty(data) && daysElapsed > 7){
+            showWeightTracker(data);
+        }else if(isDictEmpty(data)){
+            showWeightTracker(data);
+        };
+
+        return data;
+    };
+};
+
+function weightData_save(data){
+    saveItem("weightData", JSON.stringify(data));
+    return;
+};
 
 function recovery_read(){
     let data = localStorage.getItem("recovery");

@@ -85,6 +85,7 @@
     </script>
     <script src="./resources/js/jquery.js"></script>
     <script src="./resources/js/FlexReorder.js"></script>
+    <script src="./resources/js/graph.js"></script>
     
 
     <script src="./resources/js/method.js"></script>
@@ -97,13 +98,14 @@
     <script src="./resources/js/readWrite.js"></script>
 
     <script src="./resources/js/init.js"></script>
-
+    
     <script src="./resources/js/graphicUpdate.js"></script>
     <script src="./resources/js/checkNformat.js"></script>
     <script src="./resources/js/keys.js"></script>
     <script src="./resources/js/click.js"></script>
     <script src="./resources/js/phone.js"></script>
-
+    
+    <script src="./resources/js/weightTracker.js"></script>
     <script src="./resources/js/schedule.js"></script>
 
     <script src="./resources/js/selectionPage.js"></script>
@@ -122,6 +124,7 @@
 
 <body>
     <div class="app">
+
         <div class="imgSet">
             <img src="./resources/imgs/archive.svg" alt="" id="archiveIMG">
             <img src="./resources/imgs/bin.svg" alt="" id="binIMG">
@@ -192,6 +195,30 @@
                     <span class="timeSelectorSubmit">Submit</span>
                 </div>
                 
+            </div>
+            <div class="weightTracker">
+                <div class="weightTracker_upperPart noselect">
+                    <div class="weightTrackerFirstRow">
+                        <span class="weightTracker_headerText">Weight Tracker</span>
+                        <div class="weightTrackerFirstRow_right">
+                            <div class="weightTracker_growthRate_container">
+                                <div class="weightTracker_growthRate_indicator"></div>
+                                <span class="weightTracker_growthRate">14%</span>
+                            </div>
+                            <span class="weightTracker_currentWeight">83.50</span>
+                        </div>
+                    </div>
+                    <div id="weightTrackerCanva"></div>
+                    <span class="weightTracker_noData">No measure yet</span>
+                </div>
+                <div class="weightTracker_lowerPart">
+                    <span class="weightTracker_question">How much do you weight ?</span>
+                    <div class="weightTracker_inputContainer">
+                        <input type="text" inputmode="decimal" class="weightTracker_input strictlyFloatable" placeholder="80.00">
+                        <span class="weightTracker_unit">kg</span>
+                    </div>
+                    <span class="weightTracker_submitButton">Submit</span>
+                </div>
             </div>
 
             <!-- SELECTION -->
@@ -393,6 +420,7 @@
                 <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_rl" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Reminder List</span></div>
                 <div class="selection_saveLoad_item"><input type="checkbox" name="parameters" id="selection_saveLoad_pa" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Parameters</span></div>
                 <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_st" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Stats</span></div>
+                <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_we" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Weights</span></div>
                 <span class="selection_saveLoad_emptyMsg">Nothing saved</span>
                 <span class="selection_saveLoad_btn_submit">Export</span>
             </div>

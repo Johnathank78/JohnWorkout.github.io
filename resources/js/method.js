@@ -29,6 +29,15 @@ String.prototype.customReplaceAll = function (searchValue, replaceValue) {
     return this.replace(regex, replaceValue);
 };
 
+Number.prototype.betterToFixed = function(digits) {
+    if (typeof digits !== 'number') return '';
+
+    const factor = Math.pow(10, digits);
+    const rounded = Math.round(this * factor) / factor;
+
+    return String(rounded);
+};
+
 Array.prototype.delete = function(ind){
     var output = new Array();
 

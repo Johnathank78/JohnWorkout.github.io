@@ -25,7 +25,7 @@ function bottomNotification(from, target="", queued=false){
         return;
     };
 
-    $('.bottomNotification_Icon').css("transform", "unset");
+    $('.bottomNotification_Icon').css({ "transform": "unset" });
 
     if(["scheduled", "created", "imported", "exported", "parameters", "archived", "unarchived"].includes(from)){
         $('.bottomNotification_Icon').css('filter', greenFilter);
@@ -50,12 +50,12 @@ function bottomNotification(from, target="", queued=false){
         }else if(from == "unarchived"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.unarchived);
         };
-    }else if(["unscheduled", "deleted", "write", "read"].includes(from)){
+    }else if(["unscheduled", "deleted", "write", "read", "weight", "alreadyWeight"].includes(from)){
         $('.bottomNotification_Icon').css('filter', redFilter);
         $(".bottomNotification_msg").css('color', redText);
         $('.bottomNotification').css("backgroundColor", redBG);
 
-        if(["write", "read"].includes(from)){
+        if(["write", "read", "weight", "alreadyWeight"].includes(from)){
             $(".bottomNotification_Icon").attr('src', addIMG);
             $('.bottomNotification_Icon').css("transform", "rotate(45deg)");
         }else{
@@ -72,6 +72,10 @@ function bottomNotification(from, target="", queued=false){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.write);
         }else if(from == "read"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.read);
+        }else if(from == "weight"){
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.weight);
+        }else if(from == "alreadyWeight"){
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.alreadyWeight);
         };
     }else if(from == "updated"){
         $('.bottomNotification_Icon').css('filter', blueFilter);

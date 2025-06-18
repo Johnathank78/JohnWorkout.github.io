@@ -103,13 +103,11 @@ function restoreDoneSessions(data){
 $(document).ready(function(){
     $(document).on("click", ".selection_parameters_saveLoad_btn", async function(){
         if(parametersChecknUpdate()){
-
             $(".selection_saveLoad_checkbox").prop("checked", false);
 
             current_page = "import";
 
             if($(this).text() == textAssets[parameters.language].preferences.export){
-
                 $(".selection_saveLoad_btn_submit").text(textAssets[parameters.language].preferences.export);
                 $('.selection_saveLoad_emptyMsg').css('display', 'none');
 
@@ -120,6 +118,7 @@ $(document).ready(function(){
 
                 $('#selection_saveLoad_sl').parent().css('display', session_list.length == 0 ? 'none' : 'flex');
                 $('#selection_saveLoad_rl').parent().css('display', reminder_list.length == 0 ? 'none' : 'flex');
+                $('#selection_saveLoad_we').parent().css('display', isDictEmpty(weightData) ? 'none' : 'flex');
                 $('#selection_saveLoad_st').parent().css('display', Object.entries(stats).every(([k, v]) => k === 'since' 
                                                                         || k === 'missedSessions' 
                                                                         || v === 0) 
@@ -160,11 +159,20 @@ $(document).ready(function(){
                         $('.selection_saveLoad_emptyMsg').css('display', 'none');
 
                     };
+
                     if(await fileExists("Workout", "stats.txt")){
                         $(".selection_saveLoad_btn_submit").css('display', 'flex');
                         $(".selection_saveLoad_headerText").css('display', 'inline-block');
 
                         $('#selection_saveLoad_st').parent().css('display', 'flex');
+                        $('.selection_saveLoad_emptyMsg').css('display', 'none');
+                    };
+
+                    if(await fileExists("Workout", "weights.txt")){
+                        $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                        $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                        $('#selection_saveLoad_we').parent().css('display', 'flex');
                         $('.selection_saveLoad_emptyMsg').css('display', 'none');
                     };
 
@@ -195,6 +203,7 @@ $(document).ready(function(){
                             $('#selection_saveLoad_sl').parent().css('display', 'flex');
                             $('.selection_saveLoad_emptyMsg').css('display', 'none');
                         };
+
                         if(localFiles[i].name == "reminder_list.txt"){
                             $(".selection_saveLoad_btn_submit").css('display', 'flex');
                             $(".selection_saveLoad_headerText").css('display', 'inline-block');
@@ -202,6 +211,7 @@ $(document).ready(function(){
                             $('#selection_saveLoad_rl').parent().css('display', 'flex');
                             $('.selection_saveLoad_emptyMsg').css('display', 'none');
                         };
+
                         if(localFiles[i].name == "parameters.txt"){
                             $(".selection_saveLoad_btn_submit").css('display', 'flex');
                             $(".selection_saveLoad_headerText").css('display', 'inline-block');
@@ -209,11 +219,20 @@ $(document).ready(function(){
                             $('#selection_saveLoad_pa').parent().css('display', 'flex');
                             $('.selection_saveLoad_emptyMsg').css('display', 'none');
                         };
+
                         if(localFiles[i].name == "stats.txt"){
                             $(".selection_saveLoad_btn_submit").css('display', 'flex');
                             $(".selection_saveLoad_headerText").css('display', 'inline-block');
 
                             $('#selection_saveLoad_st').parent().css('display', 'flex');
+                            $('.selection_saveLoad_emptyMsg').css('display', 'none');
+                        };
+
+                        if(localFiles[i].name == "weights.txt"){
+                            $(".selection_saveLoad_btn_submit").css('display', 'flex');
+                            $(".selection_saveLoad_headerText").css('display', 'inline-block');
+
+                            $('#selection_saveLoad_we').parent().css('display', 'flex');
                             $('.selection_saveLoad_emptyMsg').css('display', 'none');
                         };
                     };
@@ -243,7 +262,6 @@ $(document).ready(function(){
                         parameters_save(parameters);
                         schedule = true;
                     };
-
                 };
                 if(checked.filter($('#selection_saveLoad_sl')).length > 0){
                     temp = await readFromFile("Workout", 'session_list.txt');
@@ -260,7 +278,8 @@ $(document).ready(function(){
                         calendar_save(calendar_dict);
                         calendar_read(session_list)
     
-                        updateWeightUnits(session_list, previousWeightUnit, parameters.weightUnit);
+                        updateSessionUnits(session_list, previousWeightUnit, parameters.weightUnit);
+                        previousWeightUnit = parameters.weightUnit;
                         session_save(session_list);
     
                         restoreDoneSessions(session_list);
@@ -279,14 +298,17 @@ $(document).ready(function(){
                         reminder_save(reminder_list);
                         schedule = true;
                     };
-
                 };
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
                     temp = await readFromFile("Workout", 'stats.txt');
 
-                    if(temp){
-                        stats = stats_read(temp);
-                    };
+                    if(temp) stats = stats_read(temp);
+                };
+                if(checked.filter($('#selection_saveLoad_we')).length > 0){
+                    temp = await readFromFile("Workout", 'weights.txt');
+
+                    if(temp) weightData = weightData_read(temp);
+                    weightData_save(weightData);
                 };
 
                 if(schedule){scheduler()};
@@ -318,11 +340,13 @@ $(document).ready(function(){
 
                         session_pusher(session_list);
                         
-                        updateWeightUnits(session_list, previousWeightUnit, parameters.weightUnit);
+                        updateSessionUnits(session_list, previousWeightUnit, parameters.weightUnit);
+                        previousWeightUnit = parameters.weightUnit;
                         session_save(session_list);
 
                         restoreDoneSessions(session_list);
-                        
+                        sessionToBeDone = fillSessionToBeDone();
+
                         schedule = true;
                     };
                     if(checked.filter($('#selection_saveLoad_rl')).length > 0 && localFiles[i].name == "reminder_list.txt"){
@@ -338,12 +362,17 @@ $(document).ready(function(){
                         temp = await localFiles[i].text();
                         stats = stats_read(temp);
                     };
+                    if(checked.filter($('#selection_saveLoad_we')).length > 0 && localFiles[i].name == "weights.txt"){
+                        temp = await localFiles[i].text();
+                        weightData = weightData_read(temp);
+                        weightData_save(weightData);
+                    };
 
                     if(schedule){scheduler()};
                 };
             };
 
-            if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
+            if(checked.filter($('#selection_saveLoad_we')).length > 0 || checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
                 bottomNotification("imported", textAssets[parameters.language].bottomNotif.IOprefix);
             };
         }else if($(this).text() == textAssets[parameters.language].preferences.export){
@@ -360,8 +389,11 @@ $(document).ready(function(){
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
                     writeToFile(stats, "Workout", "stats.txt");
                 };
+                if(checked.filter($('#selection_saveLoad_we')).length > 0){
+                    writeToFile(weightData, "Workout", "weights.txt");
+                };
                 
-                if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
+                if(checked.filter($('#selection_saveLoad_we')).length > 0 || checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
                     bottomNotification("exported", textAssets[parameters.language].bottomNotif.IOprefix);
                 };
             }else if(platform == "Web"){
@@ -379,15 +411,18 @@ $(document).ready(function(){
                 if(checked.filter($('#selection_saveLoad_st')).length > 0){
                     files.push(new File([JSON.stringify(stats)], "stats.txt", { type: "text/plain" }));
                 };
+                if(checked.filter($('#selection_saveLoad_we')).length > 0){
+                    files.push(new File([JSON.stringify(weightData)], "weights.txt", { type: "text/plain" }));
+                };
                 
-                if(checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
+                if(checked.filter($('#selection_saveLoad_we')).length > 0 || checked.filter($('#selection_saveLoad_pa')).length > 0 || checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0 || checked.filter($('#selection_saveLoad_st')).length > 0){
                     const downloadTest = await downloadFilesToFolder(files);
                     
                     if(downloadTest == "Failed"){
                         if(navigator.canShare({ files })){
                             await navigator.share({ files });
                             bottomNotification("exported", textAssets[parameters.language].bottomNotif.IOprefix);
-                        } else {
+                        }else{
                             bottomNotification("write");
                         };
                     }else{

@@ -14,6 +14,7 @@ var tempStats = false;
 
 var session_list = false;
 var reminder_list = false;
+var weightData = false;
 var calendar_dict = false;
 var sessionDoneSAV = false;
 var sessionDone = false;
@@ -73,6 +74,8 @@ $(document).ready(async function(){
         sessionToBeDone = sessionToBeDone_read();
         sessionDone = sessionDone_read();
 
+        weightData = weightData_read();
+
         await rescheduler();
 
         global_pusher(session_list, reminder_list);
@@ -85,7 +88,7 @@ $(document).ready(async function(){
         deleteHistory();
     
         recovery = recovery_read();
-    
+
         if(platform == "Web"){
             window.oncontextmenu = function(e) {
                 e.preventDefault();
@@ -137,6 +140,37 @@ $(document).ready(async function(){
         // console.log(count)
 
     // -------------------
-    
-    //$('.main_title').text([window.screen.width, window.screen.height, window.devicePixelRatio, window.matchMedia("(orientation: portrait)").matches ? "portrait" : 'landscape'].join(','))
+
+    // const dates = Array.from({length: 20}, (_, i) => {
+    //     const d = new Date('2024-01-01');
+    //     d.setDate(d.getDate() + i * 7);
+    //     return d;
+    // });
+
+    // const weights = [
+    //     80.0, 80.4, 80.9, 81.5,
+    //     82.1, 82.8, 83.4, 84.0,
+    //     84.5, 85.0,              // sommet
+    //     84.6, 84.0, 83.3, 82.5,
+    //     81.7, 80.8, 80.0, 79.0,
+    //     78.5, 78.0  
+    // ];
+
+    // graph({
+    //     target: $('.graphTest'),
+    //     curveData: {
+    //         X: dates,
+    //         Y: weights,
+    //         color: '#1799d3' 
+    //     },
+    //     lineWidth: 3,
+    //     dotSize: 3,
+    //     showGrid: true,
+    //     showAxes: true,
+    //     showDots: true,
+    //     showDataTag: true,
+    //     dataTagPrecision: 2,
+    //     dataTagSpacing: 50,
+    //     pxPerPoint: 30
+    // });
 });//readyEnd

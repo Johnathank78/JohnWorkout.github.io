@@ -391,10 +391,15 @@ function parametersChecknUpdate(){
         parameters_save(parameters);
 
         if(parameters.weightUnit != previousWeightUnit){
+            $(".weightTracker_unit").text(parameters.weightUnit);
+            $('.weightTracker_input').attr('placeholder', parameters.weightUnit == "lbs" ? '176.00' : "80.00");
             exercisesHTML = exercisesHTML.replaceAll(previousWeightUnit, parameters.weightUnit);
 
             stats_set(stats);
-            updateWeightUnits(session_list, previousWeightUnit, parameters.weightUnit);
+            
+            updateSessionUnits(session_list, previousWeightUnit, parameters.weightUnit);
+            updateTrackerUnits(weightData, previousWeightUnit, parameters.weightUnit);
+            previousWeightUnit = parameters.weightUnit;
         };
 
         if(parameters.language != previousLanguage){

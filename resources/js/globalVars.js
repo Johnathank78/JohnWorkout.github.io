@@ -137,6 +137,7 @@ const textAssets = {
                 "reminderList": "Rappels",
                 "preferences": "Paramètres",
                 "stats": "Statistiques",
+                "weightList": "Pesées",
                 "emptyMessage": "Aucun élément sauvegardé"
             }
         },
@@ -316,7 +317,9 @@ const textAssets = {
             "exchanged": "Séance échangé avec succès",
             "fixSound": "Son réparé avec succès",
             "archived": "archivée avec succès",
-            "unarchived": "déarchivée avec succès"
+            "unarchived": "déarchivée avec succès",
+            "weight": "Masse trop éloigné de la mesure précédente",
+            "alreadyWeight": "Masse déjà renseigné aujourd'hui",
         },
         "sessionEnd": {
             "mainText": {
@@ -491,6 +494,7 @@ const textAssets = {
                 "reminderList": "Reminders",
                 "preferences": "Preferences",
                 "stats": "Statistics",
+                "weightList": "Weights",
                 "emptyMessage": "Nothing saved"
             }
         },
@@ -670,7 +674,9 @@ const textAssets = {
             "exchanged": "Session successfully exchanged",
             "fixSound": "Sound successfully fixed",
             "archived": "archived successfully",
-            "unarchived": "unarchived successfully"
+            "unarchived": "unarchived successfully",
+            "weight": "Weight too far from last measure",
+            "alreadyWeight": "Today's weight already registered"
         },
         "sessionEnd": {
             "mainText": {

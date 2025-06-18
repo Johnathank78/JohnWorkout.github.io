@@ -166,6 +166,11 @@ function closePanel(src, notAnimated=false){
             $('.selection_add_btn, .selection_info, .selection_parameters').css('display', 'flex');
             
             break;
+        case "weightTracker":
+            $('.blurBG').css('display', 'none');
+            isTrackerShown = false;
+
+            break;
         default:
             console.warn(`Unknown src: ${src}`);
             break;
@@ -294,6 +299,13 @@ function unfocusDivs(e){
 
     if(notTargeted(e.target, '.session_pastData_container, .session_specsPastData') && pastDataShown){
         closePanel('pastData');
+        canNowClick();
+    };
+
+    if(notTargeted(e.target, '.weightTracker') && isTrackerShown){
+        closePanel('weightTracker');
+        $('.weightTracker_input').val('');
+        
         canNowClick();
     };
 };
