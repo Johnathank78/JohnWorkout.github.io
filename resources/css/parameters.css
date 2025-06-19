@@ -112,6 +112,22 @@
     display: none;
 }
 
+.weightTracker_spawner{
+    position: absolute;
+
+    top: 20px;
+    right: 20px;
+
+    width: 25px;
+    height: 25px;
+
+    background-color: white;
+    opacity: .4;
+
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 .selection_parameters_title{
     font-size: 24px;
     font-weight: 500;

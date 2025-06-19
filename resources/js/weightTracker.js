@@ -81,10 +81,14 @@ $(document).ready(async function(){
         const todayTS = getToday('timestamp');
 
         if (!hasHistory) {
-            $('.weightTracker_input').val("");
+            if(val > 499){
+                bottomNotification("weightTooBig");
+                return;
+            };
 
             weightData[todayTS.toString()] = val;
 
+            bottomNotification("weightProcessed");
             weightData_save(weightData);
             showWeightTracker(weightData);
 
@@ -102,14 +106,20 @@ $(document).ready(async function(){
             bottomNotification("alreadyWeight");
             return;
         }else if(val > maxAllowed || val < minAllowed){
-            bottomNotification("weight")
+            bottomNotification("weightTooFar");
             return;
         }else{
             $('.weightTracker_input').val("");
             weightData[todayTS.toString()] = val;
             weightData_save(weightData);
 
+            bottomNotification("weightProcessed");
             showWeightTracker(weightData);
+            return;
         };
+    });
+
+    $(document).on('click', '.weightTracker_spawner', function(e){
+        showWeightTracker(weightData);
     });
 });//readyEnd

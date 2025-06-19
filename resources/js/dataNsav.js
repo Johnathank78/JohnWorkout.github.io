@@ -1010,7 +1010,7 @@ function weightData_read(set=false){
         const lastTS  = zeroAM(Object.keys(data).slice(-1)[0], "timestamp");
         const daysElapsed = daysBetweenTimestamps(todayTS, lastTS);
 
-        if(!isDictEmpty(data) && daysElapsed > 7){
+        if(!isDictEmpty(data) && daysElapsed > 6){
             showWeightTracker(data);
         }else if(isDictEmpty(data)){
             showWeightTracker(data);

@@ -1558,6 +1558,13 @@ function changeLanguage(lang, first=false){
     $(".session_remaining_item_title").eq(3).text(textAssets[lang].inSession.remaining.reReps); 
     $(".session_remaining_item_title").eq(4).text(textAssets[lang].inSession.remaining.reWeight); 
 
+    // WeightTracker
+
+    $('.weightTracker_headerText').text(textAssets[lang].weightTracker.title);
+    $(".weightTracker_noData").text(textAssets[lang].weightTracker.noMeasure);
+    $(".weightTracker_question").text(textAssets[lang].weightTracker.howMuch);
+    $(".weightTracker_submitButton").text(textAssets[lang].misc.submit);
+
     previousLanguage = lang;
 };
 

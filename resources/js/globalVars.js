@@ -137,7 +137,7 @@ const textAssets = {
                 "reminderList": "Rappels",
                 "preferences": "Paramètres",
                 "stats": "Statistiques",
-                "weightList": "Pesées",
+                "weightList": "Pesés",
                 "emptyMessage": "Aucun élément sauvegardé"
             }
         },
@@ -318,8 +318,10 @@ const textAssets = {
             "fixSound": "Son réparé avec succès",
             "archived": "archivée avec succès",
             "unarchived": "déarchivée avec succès",
-            "weight": "Masse trop éloigné de la mesure précédente",
+            "weightTooFar": "Masse trop éloigné de la mesure précédente",
             "alreadyWeight": "Masse déjà renseigné aujourd'hui",
+            "weightTooBig": "Tu ne peux pas être aussi lourd",
+            "weightProcessed": "Pesé enregistrée avec succès"
         },
         "sessionEnd": {
             "mainText": {
@@ -413,7 +415,12 @@ const textAssets = {
                 "TTLT": ' que la fois dernière',
                 "ATLT": ' que la fois dernière'
             }
-        }
+        },
+        "weightTracker": {
+            "title": "Pesés",
+            "noMeasure": "Pas encore d'observation",
+            "howMuch": "Combien pèses-tu ?"
+        },
     },
     "english": {
         "misc": {
@@ -676,7 +683,9 @@ const textAssets = {
             "archived": "archived successfully",
             "unarchived": "unarchived successfully",
             "weight": "Weight too far from last measure",
-            "alreadyWeight": "Today's weight already registered"
+            "alreadyWeight": "Today's weight already registered",
+            "weightTooBig": "You cannot be that heavy",
+            "weightProcessed": "Weight successfully registered"
         },
         "sessionEnd": {
             "mainText": {
@@ -769,7 +778,12 @@ const textAssets = {
                 "TTLT": ' than the last time',
                 "ATLT": ' as the last time'
             }
-        }
+        },
+        "weightTracker": {
+            "title": "Weight Tracker",
+            "noMeasure": "No measure yet",
+            "howMuch": "How much do you weight ?"
+        },
     }
 };
 

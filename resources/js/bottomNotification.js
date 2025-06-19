@@ -27,7 +27,7 @@ function bottomNotification(from, target="", queued=false){
 
     $('.bottomNotification_Icon').css({ "transform": "unset" });
 
-    if(["scheduled", "created", "imported", "exported", "parameters", "archived", "unarchived"].includes(from)){
+    if(["scheduled", "created", "imported", "exported", "parameters", "archived", "unarchived", "weightProcessed"].includes(from)){
         $('.bottomNotification_Icon').css('filter', greenFilter);
         $(".bottomNotification_msg").css('color', greenText);
         $('.bottomNotification').css("backgroundColor", greenBG);
@@ -49,13 +49,15 @@ function bottomNotification(from, target="", queued=false){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.archived);
         }else if(from == "unarchived"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.unarchived);
+        }else if(from == "weightProcessed"){
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.weightProcessed);
         };
-    }else if(["unscheduled", "deleted", "write", "read", "weight", "alreadyWeight"].includes(from)){
+    }else if(["unscheduled", "deleted", "write", "read", "weightTooFar", "alreadyWeight", "weightTooBig"].includes(from)){
         $('.bottomNotification_Icon').css('filter', redFilter);
         $(".bottomNotification_msg").css('color', redText);
         $('.bottomNotification').css("backgroundColor", redBG);
 
-        if(["write", "read", "weight", "alreadyWeight"].includes(from)){
+        if(["write", "read", "weight", "alreadyWeight", "weightTooBig"].includes(from)){
             $(".bottomNotification_Icon").attr('src', addIMG);
             $('.bottomNotification_Icon').css("transform", "rotate(45deg)");
         }else{
@@ -73,9 +75,11 @@ function bottomNotification(from, target="", queued=false){
         }else if(from == "read"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.read);
         }else if(from == "weight"){
-            $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.weight);
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.weightTooFar);
         }else if(from == "alreadyWeight"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.alreadyWeight);
+        }else if(from == "weightTooBig"){
+            $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.weightTooBig);
         };
     }else if(from == "updated"){
         $('.bottomNotification_Icon').css('filter', blueFilter);

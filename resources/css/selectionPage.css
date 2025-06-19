@@ -1367,6 +1367,7 @@
     height: 40dvh;
     max-height: 342px;
 
+    transform: translateY(-10%);
     border-radius: 12px;
 }
 
@@ -1394,13 +1395,18 @@
 .weightTracker_noData{
     position: absolute;
 
+    width: 95%;              /* or any percentage depending on the container */
+    text-align: center;
+    word-break: break-word;  /* ensure long words break */
+    white-space: normal;
+
     left: 50%;
     top: 60%;
 
     transform: translate(-50%, -50%);
     
     color: rgba(255,255,255,0.15);
-    font-size: 35px;
+    font-size: 33px;
     font-weight: 500;
 }
 
@@ -1512,6 +1518,8 @@
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
+
+    font-weight: 700;
 
     opacity: .6;
 }
