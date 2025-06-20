@@ -96,13 +96,13 @@ $(document).ready(async function(){
         };
 
         const lastVal = Object.values(weightData).slice(-1)[0];
-        const lastTS  = zeroAM(Object.keys(weightData).slice(-1)[0], 'timestamp');
+        const lastTS  = zeroAM(parseInt(Object.keys(weightData).slice(-1)[0]), 'timestamp');
 
-        const daysElapsed = daysBetweenTimestamps(todayTS, lastTS);
+        const daysElapsed = daysBetweenTimestamps(lastTS, todayTS);
         const maxAllowed = lastVal + daysElapsed * MAX_KG_PER_DAY;
         const minAllowed = lastVal - daysElapsed * MAX_KG_PER_DAY;
 
-        if(zeroAM(lastTS) == zeroAM(todayTS)){
+        if(lastTS == todayTS){
             bottomNotification("alreadyWeight");
             return;
         }else if(val > maxAllowed || val < minAllowed){

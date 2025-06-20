@@ -57,7 +57,7 @@ function bottomNotification(from, target="", queued=false){
         $(".bottomNotification_msg").css('color', redText);
         $('.bottomNotification').css("backgroundColor", redBG);
 
-        if(["write", "read", "weight", "alreadyWeight", "weightTooBig"].includes(from)){
+        if(["write", "read", "weightTooFar", "alreadyWeight", "weightTooBig"].includes(from)){
             $(".bottomNotification_Icon").attr('src', addIMG);
             $('.bottomNotification_Icon').css("transform", "rotate(45deg)");
         }else{
@@ -74,7 +74,7 @@ function bottomNotification(from, target="", queued=false){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.write);
         }else if(from == "read"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.read);
-        }else if(from == "weight"){
+        }else if(from == "weightTooFar"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.weightTooFar);
         }else if(from == "alreadyWeight"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.alreadyWeight);
