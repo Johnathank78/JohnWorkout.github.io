@@ -339,7 +339,7 @@ function parameters_read(first=true){
         data = generateParametersObj({
             "language": "english",
             "weightUnit": "kg",
-            "notifBefore": "0s",
+            "notifBefore": "0&",
             "deleteAfter": "1 Year",
             "autoSaver": false,
             "keepAwake": false

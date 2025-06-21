@@ -21,6 +21,8 @@ function goBack(platform){
             closePanel('addContainer');
         }else if(timeInputShown){
             closePanel('timeSelector');
+        }else if(isTrackerShown){
+            closePanel('weightTracker');
         }else if(rotation_state){
             closePanel('parameters');
         }else if(statOpened){
@@ -65,6 +67,8 @@ function goBack(platform){
         closePanel('import');
     }else if(current_page == "schedule" && isDatePicking){
         closePanel("datePicker");
+    }else if(current_page == "history" && historyGraphShow){
+        closePanel('historyGraph');
     }else if(timeInputShown){
         closePanel('timeSelector');
     }else if(colorPickerShown){

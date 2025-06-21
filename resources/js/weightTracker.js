@@ -46,26 +46,38 @@ function showWeightTracker(weightData){
                 $('.weightTracker_growthRate').css('color', red);
             }else{
                 $('.weightTracker_growthRate_indicator').css({ 'background': "gray" });
+                $('.weightTracker_growthRate_indicator').removeClass('is-down');
                 $('.weightTracker_growthRate').css('color', "gray");
             };
         };
         
         graph({
             target: $('#weightTrackerCanva'),
+            
             curveData: {
                 X: extractedWeight.X,
                 Y: extractedWeight.Y,
                 color: '#1799d3' 
             },
             lineWidth: 4,
+
             showGrid: true,
-            showYaxe: true,
-            yLabelPad: 10,
+            showXaxe: true,
+            absoluteXaxis: true,
+            showDots: true,
+            
             showDataTag: true,
+            hideLastDataTag: true,
             dataTagSize: 10,
             dataTagPrecision: 2,
-            dataTagSpacing: 100,
-            nbPoints: 10
+            dataTagSpacing: 120,
+            
+            scrollable: true,
+            pxPerWidth: 7,
+            nbPoints: 21,
+
+            showYaxe: true,
+            yLabelPad: 10,
         });
     };
 
@@ -78,11 +90,17 @@ $(document).ready(async function(){
         const MAX_KG_PER_DAY = 2;     
 
         const val = parseFloat($('.weightTracker_input').val());
+        
+        if(isNaN(val)) return;
+
         const todayTS = getToday('timestamp');
 
         if (!hasHistory) {
             if(val > 499){
                 bottomNotification("weightTooBig");
+                return;
+            }else if(val < 20){
+                bottomNotification("weightTooLow");
                 return;
             };
 

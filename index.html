@@ -150,6 +150,7 @@
             <img src="./resources/imgs/backArrow.png" alt="" id="backArrowIMG">
             <img src="./resources/imgs/link.png" alt="" id="linkIMG">
             <img src="./resources/imgs/stopSign.png" alt="" id="stopIMG">
+            <img src="./resources/imgs/scale.png" alt="" id="scaleIMG">
         </div>
 
         <div id="IOSbackerUI"><img src="./resources/imgs/arrow.png" id="backerUIbackArrow"></div>
@@ -196,6 +197,7 @@
                 </div>
                 
             </div>
+
             <div class="weightTracker">
                 <div class="weightTracker_upperPart noselect">
                     <div class="weightTrackerFirstRow">
@@ -218,6 +220,31 @@
                         <span class="weightTracker_unit noselect">kg</span>
                     </div>
                     <span class="weightTracker_submitButton noselect">Submit</span>
+                </div>
+            </div>
+
+            <div class="historyGraph">
+                <div class="historyGraph_upperPart noselect">
+                    <div class="historyGraphFirstRow">
+                        <span class="historyGraph_headerText">Data Graph</span>
+                        <div class="historyGraphFirstRow_right">
+                            <div class="historyGraph_growthRate_container">
+                                <div class="historyGraph_growthRate_indicator"></div>
+                                <span class="historyGraph_growthRate">14%</span>
+                            </div>
+                            <span class="historyGraph_currentWeight">12</span>
+                        </div>
+                    </div>
+                    <div id="historyGraphCanva"></div>
+                    <span class="historyGraph_noData">No data yet</span>
+                </div>
+                <div class="historyGraph_lowerPart">
+                    <select name="" id="" class="historyGraph_exoSelect">
+                    </select>
+                    <select name="" id="" class="historyGraph_modeSelect">
+                        <option value="weight" selected>Weight</option>
+                        <option value="reps">Reps</option>
+                    </select>
                 </div>
             </div>
 
@@ -735,7 +762,7 @@
 
                         <div class="selection_parameters_page">
                             <span class="selection_parameters_title noselect">Preferences</span>
-                            <div class="weightTracker_spawner"></div>
+                            <div class="weightTracker_spawner"><img src="./resources/imgs/scale.png" alt="" class="weightTracker_spawnerIcon"></div>
                             
                             <div class="selection_parameters_item noselect">
                                 <span class="selection_parameters_text">Language</span>
@@ -849,6 +876,7 @@
                         <div class="update_delete_archiverContainer">
                             <img src="./resources/imgs/archive.svg" alt="" class="update_delete_archiver">
                         </div>
+                        <div class="historyGraph_spawner"><img src="./resources/imgs/stats.svg" alt="" class="historyGraph_spawnerIcon"></div>
                         <div class="toggle history_toggle noselect" state="false" moveState="true"><div class="toggle_dot"></div></div>
                     </div>
                 </div>

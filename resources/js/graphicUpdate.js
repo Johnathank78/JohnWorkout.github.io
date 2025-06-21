@@ -97,8 +97,9 @@ function update_pageReset(){
     $('.history_toggle').css('display', "none");
     $(".update_history_count, .update_delete_archiverContainer").css('display', 'none');
 
-    $('.update_tile_link').css('display', 'none')
-    $('.linkNcreateSeparator').css('display', 'none')
+    $('.update_tile_link').css('display', 'none');
+    $('.linkNcreateSeparator').css('display', 'none');
+    $('.historyGraph_spawner').css('display', 'none');
 };
 
 function update_pageFormat(from){
@@ -218,6 +219,7 @@ function update_pageFormat(from){
         $(".update_btn").text(textAssets[parameters.language].updatePage.schedule);
     }else if(from == "history"){
         $('.history_toggle').css('display', "flex");
+        $('.historyGraph_spawner').css('display', 'flex');
         $(".update_name_tile").css("pointer-events", "none");
 
         $(".update_btn_container").css("display", "none");

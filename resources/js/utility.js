@@ -1565,6 +1565,11 @@ function changeLanguage(lang, first=false){
     $(".weightTracker_question").text(textAssets[lang].weightTracker.howMuch);
     $(".weightTracker_submitButton").text(textAssets[lang].misc.submit);
 
+    // HistoryGraph
+
+    $('.historyGraph_headerText').text(textAssets[lang].historyGraph.title);
+    $(".historyGraph_noData").text(textAssets[lang].historyGraph.noMeasure);
+
     previousLanguage = lang;
 };
 

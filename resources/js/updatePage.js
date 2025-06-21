@@ -19,6 +19,7 @@ var exoInd = 0;
 var setInd = 0;
 
 var isDatePicking = false;
+var historyGraphShow = false;
 
 function restoreSwipedElement(){
     if(currentlySwipedElement){
@@ -127,6 +128,142 @@ function leaveIntervallEdit(){
     update_pageFormat(previousPage == "edit" ? "editWO" : "addWO");
 
     current_page = previousPage;
+};
+
+function exctractGraphData(historys, id, name, mode){
+    let X = [];
+    let Y = [];
+
+    let exoId = false;
+    let exoName = false;
+
+    let setList = false;
+    let completedSets = false;
+
+    historys.historyList.forEach(history => {
+        history.exoList.forEach(exo => {
+            if(exo.type == "Bi." || exo.type == "Uni."){
+                if(exo.type == "Uni."){
+                    exoName = exo.name.slice(0, -4);
+                    exoId = exo.id.slice(0, -2);
+
+                    setList = mergeHistoryExo(history, exoId);
+                    completedSets = Math.floor(setList.filter(set => set.reps != 0).length / 2);
+                }else if(exo.type == "Bi."){
+                    exoId = exo.id
+                    exoName = exo.name
+                    completedSets = exo.setList.filter(set => set.reps != 0).length;
+                };
+
+                if(exoId == id && exoName == name){
+                    let correctedSetList = exo.setList.filter(set => set.reps != 0);
+                    if(correctedSetList.length == 0) return;
+
+                    let repsMean = Math.ceil(correctedSetList.map(set => set.reps).reduce((acc, val) => acc + val, 0) / completedSets);
+                    let weightMean = correctedSetList.map(set => set.weight).reduce((acc, val) => acc + val, 0) / completedSets;
+
+                    if(mode == "weight"){
+                        Y.push(weightMean);
+                    }else if(mode == "reps"){
+                        Y.push(repsMean);
+                    };
+
+                    X.push(new Date(history.date));
+                };
+            };
+        });
+    });
+    
+    return { X, Y };
+};
+
+function plotHistoryGraph(history, firstID, firstName, mode){
+    let extractedGraphData = exctractGraphData(history, firstID, firstName, mode);
+    $('#historyGraphCanva').children().remove();
+
+    if(extractedGraphData.Y.length > 0){
+        $('.historyGraphFirstRow_right').css('display', 'flex');
+        $('.historyGraph_noData').css('display', 'none');
+
+        let lastIndex = extractedGraphData.X.length - 1;
+
+        $('.historyGraph_currentWeight').text(parseFloat(extractedGraphData.Y[lastIndex]).toFixed(1));
+
+        if(extractedGraphData.X.length == 1){
+            $('.historyGraph_growthRate_container').css('display', 'none');
+        }else{
+            $('.historyGraph_growthRate_container').css('display', 'flex');
+            
+            let growth = Math.min(((extractedGraphData.Y[lastIndex] - extractedGraphData.Y[lastIndex - 1]) / extractedGraphData.Y[lastIndex - 1]) * 100, 100) || 0;
+            let percentage = (growth).toFixed(1);
+            
+            $('.historyGraph_growthRate').text(Math.abs(percentage) + '%');
+    
+            if(growth > 0){
+                $('.historyGraph_growthRate_indicator').css({ 'background': green });
+                $('.historyGraph_growthRate_indicator').removeClass('is-down');
+                $('.historyGraph_growthRate').css('color', green);
+            }else if(growth < 0){
+                $('.historyGraph_growthRate_indicator').css({ 'background': red });
+                $('.historyGraph_growthRate_indicator').addClass('is-down');
+                $('.historyGraph_growthRate').css('color', red);
+            }else{
+                $('.historyGraph_growthRate_indicator').css({ 'background': "gray" });
+                $('.historyGraph_growthRate_indicator').removeClass('is-down');
+                $('.historyGraph_growthRate').css('color', "gray");
+            };
+        };
+    
+        graph({
+            target: $('#historyGraphCanva'),
+            
+            curveData: {
+                X: extractedGraphData.X,
+                Y: extractedGraphData.Y,
+                color: '#1799d3'
+            },
+            lineWidth: 4,
+    
+            showGrid: true,
+            showXaxe: true,
+            absoluteXaxis : true,
+            showDots: true,
+            
+            showDataTag: true,
+            hideLastDataTag: true,
+            dataTagSize: 10,
+            dataTagPrecision: 2,
+            dataTagSpacing: 75,
+            
+            scrollable: true,
+            pxPerWidth: 7,
+            nbPoints: 30,
+
+            showYaxe: true,
+            yLabelPad: 10,
+        });
+    }else{
+        $('.historyGraph_noData').css('display', 'block');
+        $('.historyGraphFirstRow_right').css('display', 'none');
+    };
+};
+
+function showHistoryGraph(session){
+    historyGraphShow = true;
+    $('.historyGraph_exoSelect').children().remove();
+
+    let optExoString = '<option value="[idVAL]">[exoVAL]</option>';
+    let filteredExoList = session.exoList.filter(exo => exo.type != "Pause" && exo.type != "Wrm.");
+
+    let firstID = filteredExoList[0].id;
+    let firstName = filteredExoList[0].name;
+
+    filteredExoList.forEach(exo => {
+        $('.historyGraph_exoSelect').append($(optExoString.replace('[idVAL]', exo.id).replace('[exoVAL]', exo.name)))
+    });
+
+    plotHistoryGraph(current_history, firstID, firstName, "weight");
+    showBlurPage('historyGraph');
 };
 
 $(document).ready(function(){
@@ -1407,5 +1544,27 @@ $(document).ready(function(){
 
     $(document).on('change', '.update_schedule_input', function(){
         updateSelectScheduleLabels($(this).val(), this);
+    });
+
+    // DATA GRAPH
+
+    $(document).on('click', '.historyGraph_spawner', function(e){
+        showHistoryGraph(update_current_item);
+    });
+
+    $(document).on('change', '.historyGraph_exoSelect', function(e){
+        let firstID = $('.historyGraph_exoSelect').val();
+        let firstName = $('.historyGraph_exoSelect option[value="'+firstID+'"]').text();
+        let mode = $('.historyGraph_modeSelect').val();
+
+        plotHistoryGraph(current_history, firstID, firstName, mode);
+    });
+
+    $(document).on('change', '.historyGraph_modeSelect', function(e){
+        let firstID = $('.historyGraph_exoSelect').val();
+        let firstName = $('.historyGraph_exoSelect option[value="'+firstID+'"]').text();
+        let mode = $('.historyGraph_modeSelect').val();
+
+        plotHistoryGraph(current_history, firstID, firstName, mode);
     });
 });//readyEnd

@@ -321,6 +321,7 @@ const textAssets = {
             "weightTooFar": "Masse trop éloigné de la mesure précédente",
             "alreadyWeight": "Masse déjà renseigné aujourd'hui",
             "weightTooBig": "Tu ne peux pas être aussi lourd",
+            "weightTooLow": "Tu ne peux pas être aussi léger",
             "weightProcessed": "Pesé enregistrée avec succès"
         },
         "sessionEnd": {
@@ -421,6 +422,10 @@ const textAssets = {
             "noMeasure": "Pas encore d'observation",
             "howMuch": "Combien pèses-tu ?"
         },
+        "historyGraph": {
+            "title": "Historique",
+            "noMeasure": "Pas encore de donnée",
+        }
     },
     "english": {
         "misc": {
@@ -685,6 +690,7 @@ const textAssets = {
             "weight": "Weight too far from last measure",
             "alreadyWeight": "Today's weight already registered",
             "weightTooBig": "You cannot be that heavy",
+            "weightTooLow": "You cannot be that light",
             "weightProcessed": "Weight successfully registered"
         },
         "sessionEnd": {
@@ -784,6 +790,10 @@ const textAssets = {
             "noMeasure": "No measure yet",
             "howMuch": "How much do you weight ?"
         },
+        "historyGraph": {
+            "title": "History Graph",
+            "noMeasure": "No data yet",
+        }
     }
 };
 
@@ -818,6 +828,7 @@ $(document).ready(function(){
     linkIMG = $('#linkIMG').attr('src');
     stopIMG = $('#stopIMG').attr('src');
     archiveIMG = $('#archiveIMG').attr('src');
+    scaleIMG = $('#scaleIMG').attr('src');
 
     $("img").attr("draggable", false);
     

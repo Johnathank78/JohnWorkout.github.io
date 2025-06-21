@@ -171,6 +171,11 @@ function closePanel(src, notAnimated=false){
             isTrackerShown = false;
 
             break;
+        case "historyGraph":
+            $('.blurBG').css('display', 'none');
+            historyGraphShow = false;
+
+            break;
         default:
             console.warn(`Unknown src: ${src}`);
             break;
@@ -213,7 +218,7 @@ function unfocusDivs(e){
         canNowClick();
     };
 
-    if(notTargeted(e.target, ".selection_parameters, .selection_parameters_page") && rotation_state && !timeInputShown && !deleteHistoryConfirmShown){
+    if(notTargeted(e.target, ".selection_parameters, .selection_parameters_page") && rotation_state && !timeInputShown && !deleteHistoryConfirmShown && !isTrackerShown){
         closePanel("parameters");
         canNowClick();
     };
@@ -306,6 +311,11 @@ function unfocusDivs(e){
         closePanel('weightTracker');
         $('.weightTracker_input').val('');
         
+        canNowClick();
+    };
+
+    if(notTargeted(e.target, '.historyGraph') && historyGraphShow){
+        closePanel('historyGraph');
         canNowClick();
     };
 };

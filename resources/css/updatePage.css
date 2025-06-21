@@ -235,6 +235,35 @@
     display: none;
 }
 
+.historyGraph_spawner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    width: 25px;
+    height: 25px;
+
+    padding: 5px;
+
+    background-color: #34394C;
+
+    border-radius: 6px;
+    cursor: pointer;
+
+    display: none;
+}
+
+.historyGraph_spawnerIcon{
+    flex-grow: 0;
+    flex-shrink: 0;
+
+    width: 22px;
+    height: 22px;
+}
+
 .update_delete_archiverContainer{
     flex-grow: 0;
     flex-shrink: 0;
