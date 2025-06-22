@@ -60,24 +60,25 @@ function showWeightTracker(weightData){
                 color: '#1799d3' 
             },
             lineWidth: 4,
+    
+            showYaxe: true,
+            showXaxe: true,
+            absoluteXaxis : true,
 
             showGrid: true,
-            showXaxe: true,
-            absoluteXaxis: true,
             showDots: true,
-            
             showDataTag: true,
+            
             hideLastDataTag: true,
             dataTagSize: 10,
             dataTagPrecision: 2,
-            dataTagSpacing: 120,
+            dataTagSpacing: 75,
             
             scrollable: true,
             pxPerWidth: 7,
-            nbPoints: 21,
+            nbPoints: 30,
 
-            showYaxe: true,
-            yLabelPad: 10,
+            paddings: {l: 10, t: 15, b: 0}
         });
     };
 

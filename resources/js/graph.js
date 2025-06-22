@@ -1,42 +1,33 @@
-/* graph.js – version 11.3  (2025-06-22)
+/* graph.js – version 11.4  (2025-06-22)
  * -----------------------------------------------------------------------
- * Responsive, collision-free line-chart — jQuery + Canvas
+ * Responsive, collision‑free line‑chart — jQuery + Canvas
  * -----------------------------------------------------------------------
- *  NEW IN v11.3
+ *  NEW IN v11.4
  *  ------------
- *  • Fixed performance issues with sticky Y-axis
- *  • Y-axis now uses true CSS sticky positioning
- *  • Eliminated scroll event redraws for better performance
- *  • No more visual glitches during horizontal scroll
- * 
- *  NEW IN v11.2
- *  ------------
- *  • Fixed sticky Y-axis for scrollable charts
- *  • Y-axis labels now stay visible during horizontal scroll
- *  • Nothing draws to the left of Y-axis line
- * 
- *  NEW IN v11.1
- *  ------------
- *  • `absoluteXaxis` (bool) :
- *        false (défaut) → échelle X proportionnelle au temps (dates).
- *        true           → espacement horizontal égal point-par-point,
- *                         quelle que soit la distance réelle entre dates.
+ *  • **Removed** `BORDER_GAP`, `xLabelPad`, and `yLabelPad` (margins now cover edge spacing)
+ *  • Y‑axis label offset now controlled by `TICK_GAP_Y`
+ *  • X‑axis label offset now controlled by `TICK_GAP_X`
+ *  • Data‑tag bounding now uses chart margins instead of the old border gap
+ *  • Simplified margin calculation logic
+ *
+ *  PREVIOUS CHANGES … see earlier changelog entries
  * ----------------------------------------------------------------------*/
 
 (function ($) {
   "use strict";
 
-  /* ======= CONSTANTES RÉGLABLES ==================================== */
-  const TICK_GAP_Y  = 12;
-  const TICK_GAP_X  = 8;
-  const BORDER_GAP  = 6;
-  const SINGLE_H    = 0.60; /* bloc 60 % hauteur */
-  const SINGLE_Y_FR = 0.80; /* 80 % bloc pour Y */
-  const SINGLE_X_FR = 0.20; /* 20 % bloc pour X */
+  /* ======= CONFIGURABLE CONSTANTS ================================= */
+  const TICK_GAP_Y  = 8; // distance tick ↔︎ Y‑label
+  const TICK_GAP_X  = 8;  // distance tick ↔︎ X‑label
+
+  /* -- single‑value fallback sizes (1‑point mode) ------------------ */
+  const SINGLE_H    = 0.60; /* block 60 % height */
+  const SINGLE_Y_FR = 0.80; /* 80 % block for Y */
+  const SINGLE_X_FR = 0.20; /* 20 % block for X */
   /* ================================================================= */
 
   function graph(optsIn) {
-    /* ---------- options par défaut -------------------------------- */
+    /* ---------- default options ----------------------------------- */
     const opts = $.extend({
       target            : null,
       curveData         : { X: [], Y: [], color: "#00bfff" },
@@ -52,18 +43,24 @@
       dataTagPrecision  : 2,
       dataTagSize       : 12,
       dataTagSpacing    : 30,
-      yLabelPad         : 0,
-      xLabelPad         : 0,
-      pxPerWidth        : null,    // max points dans une largeur visible
-      scrollable        : false,   // activer le scroll horiz.
+      pxPerWidth        : null,   // max points in one visible width
+      scrollable        : false,  // enable horizontal scroll
       absoluteXaxis     : false,
       nbPoints          : null,
-      hideLastDataTag   : false
+      hideLastDataTag   : false,
+      paddings : { 
+        t: undefined, 
+        b: undefined, 
+        l: undefined, 
+        r: undefined, 
+        v: undefined, 
+        h: undefined
+      }
     }, optsIn);
 
     if (optsIn && optsIn.showAxes) opts.showXaxe = opts.showYaxe = true;
 
-    /* ---------- cible DOM ----------------------------------------- */
+    /* ---------- DOM target --------------------------------------- */
     if (!opts.target || !opts.target.length)
       throw new Error("graph(): target missing");
     const $el = opts.target.eq(0);
@@ -71,7 +68,7 @@
     const prev = $el.data("graph-instance");
     if (prev) prev.destroy();
 
-    /* ---------- container setup ----------------------------------- */
+    /* ---------- container setup ---------------------------------- */
     const chartContainer = document.createElement("div");
     Object.assign(chartContainer.style, {
       position: "relative",
@@ -91,15 +88,15 @@
       overflowY: "hidden"
     });
 
-    /* ---------- canvas setup -------------------------------------- */
+    /* ---------- canvas setup ------------------------------------- */
     const canvas = document.createElement("canvas");
     Object.assign(canvas.style, { width: "100%", height: "100%", display: "block" });
     const ctx = canvas.getContext("2d");
     const dpr = window.devicePixelRatio || 1;
 
-    // Y-axis canvas with true sticky positioning
+    // Y‑axis canvas with true sticky positioning
     const yAxisCanvas = document.createElement("canvas");
-    Object.assign(yAxisCanvas.style, { 
+    Object.assign(yAxisCanvas.style, {
       position: "absolute",
       left: "0",
       top: "0",
@@ -117,7 +114,7 @@
     $el.empty().append(chartContainer);
     if ($el.css("position") === "static") $el.css("position", "relative");
 
-    /* ---------- utilitaires --------------------------------------- */
+    /* ---------- utilities ---------------------------------------- */
     const rgba = (hex, a) => {
       hex = hex.replace("#", "");
       if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
@@ -130,28 +127,40 @@
       return (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p;
     };
 
-    /* ---------- rendu principal ----------------------------------- */
+    /* ---------- main render -------------------------------------- */
     function redraw() {
-      /* — dimensions visibles — */
+      /* — visible dimensions — */
       const rect = $el[0].getBoundingClientRect();
       const wVis = Math.round(rect.width);
       const hVis = Math.round(rect.height);
       if (!wVis || !hVis) return;
 
-      /* — données complètes — */
+      /* — full data — */
       const Xsrc = opts.curveData.X, Ysrc = opts.curveData.Y;
       if (!Array.isArray(Xsrc) || Xsrc.length !== Ysrc.length || !Xsrc.length) return;
 
       let X = Xsrc.slice(), Y = Ysrc.slice(), n = X.length;
 
-      /* découpe par nbPoints */
+      /* clip by nbPoints */
       if (opts.nbPoints && n > opts.nbPoints) {
         X = X.slice(n - opts.nbPoints);
         Y = Y.slice(n - opts.nbPoints);
         n = X.length;
       }
 
-      /* — calculate Y-axis width first — */
+      /* — compute additional paddings first — */
+      let extraPaddingLeft = 0;
+      let extraPaddingRight = 0;
+
+      if(opts.paddings.v){
+        extraPaddingLeft += opts.paddings.v;
+        extraPaddingRight += opts.paddings.v;
+      } else {
+        extraPaddingLeft += opts.paddings.l === undefined ? 0 : opts.paddings.l;
+        extraPaddingRight += opts.paddings.r === undefined ? 0 : opts.paddings.r;
+      }
+
+      /* — compute Y‑axis width including paddings — */
       const isDate = X[0] instanceof Date;
       const Ynum = Y.map(Number);
       const tickLen = 5, fontAxis = 12;
@@ -165,10 +174,11 @@
           ctx.measureText(Math.min(...Ynum).toFixed(dec)).width,
           ctx.measureText(Math.max(...Ynum).toFixed(dec)).width
         );
-        yAxisWidth = 2 + opts.yLabelPad + maxYw + TICK_GAP_Y + tickLen;
+        // width = extra padding + label width + tick gap + tick + base padding
+        yAxisWidth = extraPaddingLeft + 2 + TICK_GAP_Y + maxYw + tickLen;
       }
 
-      /* — gestion largeur / scroll — */
+      /* — width / scroll handling — */
       let wDraw = wVis;
       let isScrollable = false;
       if (opts.pxPerWidth && opts.pxPerWidth > 0) {
@@ -181,8 +191,8 @@
             scrollContainer.style.overflowX = "auto";
             scrollContainer.style.scrollbarWidth = "none";
             scrollContainer.style.msOverflowStyle = "none";
-            
-            scrollContainer.scrollLeft = wDraw; 
+
+            scrollContainer.scrollLeft = wDraw; // stick to latest
             isScrollable = true;
           } else {
             X = X.slice(n - maxVis);
@@ -198,22 +208,22 @@
         scrollContainer.style.overflowX = "hidden";
       }
 
-      /* — Setup Y-axis canvas (render once, position with CSS) — */
+      /* — Y‑axis sticky canvas ------------------------------------ */
       if (opts.showYaxe && isScrollable) {
         yAxisCanvas.style.width = yAxisWidth + "px";
         yAxisCanvas.style.display = "block";
-        
-        // Set up Y-axis canvas dimensions
+
+        // device‑pixel‑ratio aware size
         yAxisCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         if (yAxisCanvas.width !== yAxisWidth * dpr || yAxisCanvas.height !== hVis * dpr) {
-          yAxisCanvas.width = yAxisWidth * dpr;
+          yAxisCanvas.width  = yAxisWidth * dpr;
           yAxisCanvas.height = hVis * dpr;
           yAxisCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
         yAxisCtx.clearRect(0, 0, yAxisWidth, hVis);
         yAxisCtx.font = `${fontAxis}px sans-serif`;
-        
-        // Get background color from container
+
+        // match background color
         const bgColor = getComputedStyle($el[0]).backgroundColor || "#000";
         yAxisCtx.fillStyle = bgColor;
         yAxisCtx.fillRect(0, 0, yAxisWidth, hVis);
@@ -221,28 +231,26 @@
         yAxisCanvas.style.display = "none";
       }
 
-      /* — Hi-DPI main canvas — */
+      /* — Hi‑DPI main canvas ------------------------------------- */
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (canvas.width !== wDraw * dpr || canvas.height !== hVis * dpr) {
-        canvas.width = wDraw * dpr;
+        canvas.width  = wDraw * dpr;
         canvas.height = hVis * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
       ctx.clearRect(0, 0, wDraw, hVis);
       ctx.font = `${fontAxis}px sans-serif`;
 
-      /* ===== mode 1 seul point ==================================== */
+      /* ===== single‑point mode ================================== */
       if (n === 1) {
         const xText = isDate
-          ? (typeof window.formatDate === "function"
-              ? window.formatDate(X[0])
-              : X[0].toLocaleDateString())
+          ? (typeof window.formatDate === "function" ? window.formatDate(X[0]) : X[0].toLocaleDateString())
           : String(X[0]);
         const yText = String(Y[0]);
 
         const blkH = hVis * SINGLE_H;
-        const fY = Math.round(blkH * SINGLE_Y_FR);
-        const fX = Math.round(blkH * SINGLE_X_FR);
+        const fY   = Math.round(blkH * SINGLE_Y_FR);
+        const fX   = Math.round(blkH * SINGLE_X_FR);
 
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
@@ -260,116 +268,108 @@
       }
       /* ============================================================ */
 
-      /* — mise en nombres — */
+      /* — convert X values to numbers — */
       const Xnum = isDate ? X.map(d => d.getTime()) : X.map(Number);
 
+      /* — margins -------------------------------------------------- */
       const margins = {
-        left  : opts.showYaxe ? yAxisWidth : 20,
-        right : 20,
-        top   : opts.showDataTag ? opts.dataTagSize * 3 : 20,
-        bottom: opts.showXaxe ? opts.xLabelPad + tickLen + TICK_GAP_X + fontAxis : 20
+        l : opts.showYaxe ? yAxisWidth : (20 + extraPaddingLeft),
+        r : 20 + extraPaddingRight,
+        t : opts.showDataTag ? opts.dataTagSize * 3 : 20,
+        b : opts.showXaxe ? tickLen + TICK_GAP_X + fontAxis : 20
       };
 
-      const chartW = wDraw - margins.left - margins.right;
-      const chartH = hVis - margins.top - margins.bottom;
+      // Apply vertical/horizontal paddings
+      if(opts.paddings.h){
+        margins.t += opts.paddings.h;
+        margins.b += opts.paddings.h;
+      } else {
+        margins.t += opts.paddings.t === undefined ? 0 : opts.paddings.t;
+        margins.b += opts.paddings.b === undefined ? 0 : opts.paddings.b;
+      }
+
+      const chartW = wDraw - margins.l - margins.r;
+      const chartH = hVis  - margins.t  - margins.b;
       if (chartW <= 0 || chartH <= 0) return;
 
-      /* échelle Y (flat series → pad) */
+      /* — Y scale (flat series → pad) ----------------------------- */
       let yMin = Math.min(...Ynum), yMax = Math.max(...Ynum);
       if (yMin === yMax) { const pad = Math.max(Math.abs(yMin) * 0.1, 1); yMin -= pad; yMax += pad; }
-      const y2p = v => margins.top + (1 - (v - yMin) / (yMax - yMin || 1)) * chartH;
+      const y2p = v => margins.t + (1 - (v - yMin) / (yMax - yMin || 1)) * chartH;
 
-      /* échelle X : dépend de absoluteXaxis */
+      /* — X scale -------------------------------------------------- */
       const xMin = Xnum[0], xMax = Xnum[n - 1];
       const xPos = i => opts.absoluteXaxis
-        ? margins.left + (i / ((n - 1) || 1)) * chartW
-        : margins.left + ((Xnum[i] - xMin) / (xMax - xMin || 1)) * chartW;
+        ? margins.l + (i / ((n - 1) || 1)) * chartW
+        : margins.l + ((Xnum[i] - xMin) / (xMax - xMin || 1)) * chartW;
 
-      /* ===== GRILLE ================================================= */
+      /* ===== GRID ================================================= */
       if (opts.showGrid) {
         ctx.strokeStyle = "rgba(255,255,255,0.07)";
         ctx.lineWidth = 1;
         for (let i = 0; i <= 5; i++) {
-          const y = margins.top + (i / 5) * chartH + 0.5;
-          ctx.beginPath(); 
-          ctx.moveTo(margins.left, y); 
-          ctx.lineTo(wDraw - margins.right, y); 
-          ctx.stroke();
+          const y = margins.t + (i / 5) * chartH + 0.5;
+          ctx.beginPath(); ctx.moveTo(margins.l, y); ctx.lineTo(wDraw - margins.r, y); ctx.stroke();
         }
       }
 
-      /* ===== Y-AXIS ================================================ */
+      /* ===== Y‑AXIS ============================================== */
       const drawYAxis = (context, xOffset = 0) => {
         context.strokeStyle = "rgba(255,255,255,0.25)";
         context.lineWidth = 1;
-        
-        // Y-axis line
-        const axisX = xOffset + (isScrollable ? yAxisWidth - 1.1 : margins.left);
 
-        context.beginPath(); 
-        context.moveTo(axisX, margins.top); 
-        context.lineTo(axisX, hVis - margins.bottom); 
-        context.stroke();
+        // Y‑axis line - account for padding in sticky canvas
+        const axisX = xOffset + (isScrollable ? yAxisWidth - 1.1 : margins.l);
+        context.beginPath(); context.moveTo(axisX, margins.t); context.lineTo(axisX, hVis - margins.b); context.stroke();
 
-        // Y-axis ticks and labels
+        // ticks & labels
         const stepY = niceStep(yMax - yMin);
-        const dec = stepY >= 1 ? 0 : Math.min(4, Math.ceil(-Math.log10(stepY)));
+        const dec   = stepY >= 1 ? 0 : Math.min(4, Math.ceil(-Math.log10(stepY)));
         const yStepPx = Math.abs(y2p(yMin + stepY) - y2p(yMin));
-        const skip = Math.max(1, Math.round(30 / yStepPx));
+        const skip    = Math.max(1, Math.round(30 / yStepPx));
 
         context.fillStyle = "rgba(255,255,255,0.65)";
-        context.textAlign = "right"; 
-        context.textBaseline = "middle";
+        context.textAlign = "right"; context.textBaseline = "middle";
 
         let idx = 0;
         for (let v = Math.ceil(yMin / stepY) * stepY; v <= yMax + 1e-9; v += stepY, idx++) {
           if (idx % skip) continue;
           const yy = y2p(v);
-          
+
           context.strokeStyle = "rgba(255,255,255,0.25)";
-          context.lineWidth = 1;
-          context.beginPath(); 
-          context.moveTo(axisX, yy); 
-          context.lineTo(axisX - tickLen, yy); 
-          context.stroke();
-          
-          context.fillStyle = "rgba(255,255,255,0.65)";
-          context.fillText(v.toFixed(dec), axisX - tickLen - opts.yLabelPad, yy);
+          context.beginPath(); context.moveTo(axisX, yy); context.lineTo(axisX - tickLen, yy); context.stroke();
+
+          context.fillText(v.toFixed(dec), axisX - tickLen - TICK_GAP_Y, yy);
         }
       };
 
       if (opts.showYaxe) {
         if (isScrollable) {
-          // Draw Y-axis on separate sticky canvas
-          drawYAxis(yAxisCtx, 0);
+          drawYAxis(yAxisCtx, 0); // sticky canvas
         } else {
-          // Draw Y-axis on main canvas
-          drawYAxis(ctx, 0);
+          drawYAxis(ctx, 0);      // main canvas
         }
       }
 
-      /* ===== X-AXIS =============================================== */
+      /* ===== X‑AXIS ============================================= */
       ctx.strokeStyle = "rgba(255,255,255,0.25)";
       ctx.lineWidth = 1;
       if (opts.showXaxe) {
-        ctx.beginPath(); 
-        ctx.moveTo(margins.left, hVis - margins.bottom); 
-        ctx.lineTo(wDraw - margins.right, hVis - margins.bottom); 
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(margins.l, hVis - margins.b); ctx.lineTo(wDraw - margins.r, hVis - margins.b); ctx.stroke();
       }
 
-      /* ===== TICKS X & LABELS ====================================== */
+      /* ===== X ticks & labels =================================== */
       const labelled = new Set();
       if (opts.showXaxe) {
         ctx.fillStyle = "rgba(255,255,255,0.65)";
         ctx.textAlign = "center"; ctx.textBaseline = "top";
 
         let lastR = -Infinity;
-        const axisY = hVis - margins.bottom;
-        const lLim = margins.left, rLim = wDraw - margins.right;
+        const axisY = hVis - margins.b;
+        const lLim = margins.l, rLim = wDraw - margins.r;
 
         for (let i = 0; i < n; i++) {
-          const xp = xPos(i);
+          const xp  = xPos(i);
           const lbl = isDate
             ? (typeof window.formatDate === "function" ? window.formatDate(X[i]) : X[i].toLocaleDateString())
             : String(X[i]);
@@ -378,23 +378,23 @@
           let xLbl = xp, half = lblW / 2;
           if (xLbl - half < lLim) xLbl = lLim + half;
           else if (xLbl + half > rLim) xLbl = rLim - half;
-          if (xLbl - half < lastR + 15) continue;
+          if (xLbl - half < lastR + 15) continue; // avoid overlap
 
           ctx.beginPath(); ctx.moveTo(xp, axisY); ctx.lineTo(xp, axisY + tickLen); ctx.stroke();
-          ctx.fillText(lbl, xLbl, axisY + tickLen + TICK_GAP_X + opts.xLabelPad);
+          ctx.fillText(lbl, xLbl, axisY + tickLen + TICK_GAP_X);
 
           lastR = xLbl + half; labelled.add(i);
         }
       }
 
-      /* ===== POLYLINE ============================================== */
+      /* ===== POLYLINE =========================================== */
       ctx.lineWidth = opts.lineWidth; ctx.lineCap = "round"; ctx.lineJoin = "round";
       ctx.strokeStyle = opts.curveData.color;
       ctx.beginPath(); ctx.moveTo(xPos(0), y2p(Ynum[0]));
       for (let i = 1; i < n; i++) ctx.lineTo(xPos(i), y2p(Ynum[i]));
       ctx.stroke();
 
-      /* ===== GRADIENT FILL ========================================= */
+      /* ===== GRADIENT FILL ====================================== */
       const gStops = Array.isArray(opts.gradientStops) && opts.gradientStops.length
         ? opts.gradientStops
         : [{ pos: 0, alpha: 0.6 }, { pos: 0.4, alpha: 0.3 }, { pos: 0.85, alpha: 0 }];
@@ -403,26 +403,24 @@
       ctx.beginPath();
       ctx.moveTo(xPos(0), y2p(Ynum[0]));
       for (let i = 1; i < n; i++) ctx.lineTo(xPos(i), y2p(Ynum[i]));
-      ctx.lineTo(xPos(n - 1), hVis - margins.bottom);
-      ctx.lineTo(xPos(0), hVis - margins.bottom);
+      ctx.lineTo(xPos(n - 1), hVis - margins.b);
+      ctx.lineTo(xPos(0), hVis - margins.b);
       ctx.closePath();
 
-      const grad = ctx.createLinearGradient(0, margins.top, 0, hVis - margins.bottom);
+      const grad = ctx.createLinearGradient(0, margins.t, 0, hVis - margins.b);
       gStops.forEach(s => grad.addColorStop(Math.max(0, Math.min(1, s.pos)), rgba(opts.curveData.color, s.alpha)));
       ctx.fillStyle = grad; ctx.fill(); ctx.restore();
 
-      /* ===== DOTS ================================================== */
+      /* ===== DOTS =============================================== */
       if (opts.showDots) {
         const r = Math.max(1, opts.dotSize);
         ctx.fillStyle = opts.dotColor || opts.curveData.color;
-        for (let i = 1; i < n; i++) { 
-          ctx.beginPath(); 
-          ctx.arc(xPos(i), y2p(Ynum[i]), r, 0, Math.PI * 2); 
-          ctx.fill(); 
+        for (let i = 1; i < n; i++) {
+          ctx.beginPath(); ctx.arc(xPos(i), y2p(Ynum[i]), r, 0, Math.PI * 2); ctx.fill();
         }
       }
 
-      /* ===== DATA-TAGS ============================================ */
+      /* ===== DATA TAGS ========================================== */
       if (opts.showDataTag) {
         const fPx = opts.dataTagSize;
         ctx.font = `${fPx}px sans-serif`;
@@ -446,12 +444,13 @@
           const cx = xPos(i), cy = y2p(Ynum[i]);
           let tx = cx - boxW / 2, ty = cy - boxH - clearY;
 
-          // Ensure data tags don't go to the left of Y-axis
-          const lLim = margins.left + BORDER_GAP;
-          const rLim = wDraw - margins.right - BORDER_GAP - boxW;
-          const tLim = BORDER_GAP;
-          if (tx < lLim) tx = lLim; else if (tx > rLim) tx = rLim;
-          if (ty < tLim) ty = tLim;
+          // keep inside canvas area (allow tags above chart grid)
+          const lLim = margins.l;
+          const rLim = wDraw - margins.r - boxW;
+          const tLim = 0; // Allow tags to go to the very top of canvas
+          if (tx < lLim)       tx = lLim;
+          else if (tx > rLim)  tx = rLim;
+          if (ty < tLim)       ty = tLim;
 
           const cxDraw = tx + boxW / 2;
           if (placed.some(px => Math.abs(px - cxDraw) < minDX)) continue;
@@ -475,7 +474,7 @@
       }
     }
 
-    /* ---------- observe & API ------------------------------------- */
+    /* ---------- observe & API ----------------------------------- */
     const ro = new ResizeObserver(redraw);
     ro.observe($el[0]);
     $(window).on("resize", redraw);

@@ -224,12 +224,14 @@ function plotHistoryGraph(history, firstID, firstName, mode){
             },
             lineWidth: 4,
     
-            showGrid: true,
+            showYaxe: true,
             showXaxe: true,
             absoluteXaxis : true,
+
+            showGrid: true,
             showDots: true,
-            
             showDataTag: true,
+            
             hideLastDataTag: true,
             dataTagSize: 10,
             dataTagPrecision: 2,
@@ -239,8 +241,7 @@ function plotHistoryGraph(history, firstID, firstName, mode){
             pxPerWidth: 7,
             nbPoints: 30,
 
-            showYaxe: true,
-            yLabelPad: 10,
+            paddings: {l: 10, t: 15, b: 0}
         });
     }else{
         $('.historyGraph_noData').css('display', 'block');

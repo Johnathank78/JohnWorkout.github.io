@@ -1522,7 +1522,7 @@
     align-content: center;
 
     text-align: center;
-    background-color: #636b7d;
+    background-color: #4c5368;
     
     width: 100%;
     height: 40px;
@@ -1539,7 +1539,7 @@
 }
 
 .historyGraph_modeSelect{
-    background-color: #4c5368;
+    background-color: #474d62;
     height: 30px;
     font-size: 18px;
 }
