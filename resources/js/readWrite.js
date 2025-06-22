@@ -438,4 +438,46 @@ $(document).ready(function(){
     $(document).on("click", '.selection_saveLoad_itemText', function(){
         $(this).parent().find("input").click();
     });
+
+    // SELECTION
+
+    const $container = $('.selection_saveLoad_page');
+    let isCheckBoxDragging = false;
+    let initialCheckState = null;
+    
+    // Start tracking when touch begins on any checkbox
+    $container.on('touchstart', '.selection_saveLoad_item', function(e){
+        isCheckBoxDragging = true;
+        initialCheckState = $(this).find('.selection_saveLoad_checkbox').prop('checked');
+        // Toggle the checkbox that was initially touched
+        $(this).find('.selection_saveLoad_checkbox').prop('checked', !initialCheckState);
+        e.preventDefault();
+    });
+    
+    // Handle touch move over checkboxes
+    $container.on('touchmove', function(e){
+        if (!isCheckBoxDragging) return;
+        
+        e.preventDefault();
+        
+        // Get the touch position
+        const touch = e.originalEvent.touches[0];
+        const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        // Check if we're over a checkbox
+        const $checkboxContainer = $(elementBelow).closest('.selection_saveLoad_item');
+        const $checkbox = $checkboxContainer.find('.selection_saveLoad_checkbox');
+        
+        if ($checkbox.length) {
+            // Set checkbox to opposite of initial state
+            $checkbox.prop('checked', !initialCheckState);
+        }
+    });
+    
+    // Stop tracking when touch ends
+    $container.on('touchend touchcancel', function(){
+        isCheckBoxDragging = false;
+        initialCheckState = null;
+    });
+
 });//readyEnd
