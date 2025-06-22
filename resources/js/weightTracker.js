@@ -59,6 +59,7 @@ function showWeightTracker(weightData){
                 Y: extractedWeight.Y,
                 color: '#1799d3' 
             },
+             
             lineWidth: 4,
     
             showYaxe: true,
@@ -78,7 +79,7 @@ function showWeightTracker(weightData){
             pxPerWidth: 7,
             nbPoints: 30,
 
-            paddings: {l: 15, t: 10, b: 0}
+            paddings: {l: 10, v: 0}
         });
     };
 

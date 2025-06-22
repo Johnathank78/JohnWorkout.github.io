@@ -634,6 +634,7 @@
     align-content: center;
 
     text-align: center;
+    text-align-last: center;
     
     background-color: #484C66;
     width: 100%;
@@ -1364,7 +1365,7 @@
     width: 87vw;
     max-width: 446px;
 
-    height: 40dvh;
+    height: 45dvh;
 
     transform: translateY(-10%);
     border-radius: 12px;
@@ -1378,7 +1379,6 @@
     align-items: center;
 
     width: calc(100% - 40px);
-    height: calc(65% - 40px);
 
     background-color: #262837;
     border-radius: 12px 12px 0 0;
@@ -1390,7 +1390,7 @@
     position: relative;
     background-color: #262837;
     width: calc(100% + 40px);
-    height: 80%;
+    height: 185px;
 }
 
 .weightTracker_noData, .historyGraph_noData{
@@ -1521,6 +1521,7 @@
     align-content: center;
 
     text-align: center;
+    text-align-last: center;
     background-color: #4c5368;
     
     width: 100%;

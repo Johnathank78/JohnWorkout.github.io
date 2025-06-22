@@ -221,6 +221,7 @@ function plotHistoryGraph(history, firstID, firstName, mode){
                 Y: extractedGraphData.Y,
                 color: '#1799d3'
             },
+            
             lineWidth: 4,
     
             showYaxe: true,
