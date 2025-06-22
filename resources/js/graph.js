@@ -9,7 +9,6 @@
  *  • X‑axis label offset now controlled by `TICK_GAP_X`
  *  • Data‑tag bounding now uses chart margins instead of the old border gap
  *  • Simplified margin calculation logic
- *  • **FIXED** Canvas overflow on high-DPI mobile devices in PWA
  *
  *  PREVIOUS CHANGES … see earlier changelog entries
  * ----------------------------------------------------------------------*/
@@ -75,8 +74,7 @@
       position: "relative",
       width: "100%",
       height: "100%",
-      overflow: "hidden",
-      boxSizing: "border-box" // Ensure proper box model
+      overflow: "hidden"
     });
 
     const scrollContainer = document.createElement("div");
@@ -87,20 +85,12 @@
       width: "100%",
       height: "100%",
       overflowX: "hidden",
-      overflowY: "hidden",
-      boxSizing: "border-box" // Ensure proper box model
+      overflowY: "hidden"
     });
 
     /* ---------- canvas setup ------------------------------------- */
     const canvas = document.createElement("canvas");
-    Object.assign(canvas.style, { 
-      width: "100%", 
-      height: "100%", 
-      display: "block",
-      boxSizing: "border-box", // Ensure proper box model
-      maxWidth: "100%",        // Prevent overflow
-      maxHeight: "100%"        // Prevent overflow
-    });
+    Object.assign(canvas.style, { width: "100%", height: "100%", display: "block" });
     const ctx = canvas.getContext("2d");
     const dpr = window.devicePixelRatio || 1;
 
@@ -113,9 +103,7 @@
       height: "100%",
       pointerEvents: "none",
       zIndex: "10",
-      display: "none", // Initially hidden
-      boxSizing: "border-box", // Ensure proper box model
-      maxHeight: "100%"        // Prevent overflow
+      display: "none" // Initially hidden
     });
     const yAxisCtx = yAxisCanvas.getContext("2d");
 
@@ -141,13 +129,10 @@
 
     /* ---------- main render -------------------------------------- */
     function redraw() {
-      /* — visible dimensions with proper constraint handling — */
+      /* — visible dimensions — */
       const rect = $el[0].getBoundingClientRect();
-      // Ensure we respect the container's actual available space
-      const containerRect = chartContainer.getBoundingClientRect();
-      const wVis = Math.floor(Math.min(rect.width, containerRect.width));
-      const hVis = Math.floor(Math.min(rect.height, containerRect.height));
-      
+      const wVis = Math.round(rect.width);
+      const hVis = Math.round(rect.height);
       if (!wVis || !hVis) return;
 
       /* — full data — */
@@ -202,10 +187,7 @@
           if (opts.scrollable) {
             const pxPt = (wVis - yAxisWidth) / maxVis;
             wDraw = Math.round(pxPt * n) + yAxisWidth;
-            
-            // Ensure canvas CSS width is properly constrained
-            canvas.style.width = Math.max(wDraw, wVis) + "px";
-            canvas.style.maxWidth = "none"; // Allow horizontal scrolling
+            canvas.style.width = wDraw + "px";
             
             scrollContainer.style.overflowX = "auto";
             scrollContainer.style.scrollbarWidth = "none";
@@ -222,12 +204,10 @@
           }
         } else {
           canvas.style.width = "100%";
-          canvas.style.maxWidth = "100%"; // Restore constraint
           scrollContainer.style.overflowX = "hidden";
         }
       } else {
         canvas.style.width = "100%";
-        canvas.style.maxWidth = "100%"; // Restore constraint
         scrollContainer.style.overflowX = "hidden";
       }
 
@@ -236,47 +216,32 @@
         yAxisCanvas.style.width = yAxisWidth + "px";
         yAxisCanvas.style.display = "block";
 
-        // Constrained device‑pixel‑ratio aware size
-        const actualYAxisWidth = Math.min(yAxisWidth, wVis);
-        const actualHeight = Math.min(hVis, containerRect.height);
-        
+        // device‑pixel‑ratio aware size
         yAxisCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        if (yAxisCanvas.width !== actualYAxisWidth * dpr || yAxisCanvas.height !== actualHeight * dpr) {
-          yAxisCanvas.width  = actualYAxisWidth * dpr;
-          yAxisCanvas.height = actualHeight * dpr;
-          yAxisCanvas.style.width = actualYAxisWidth + "px";
-          yAxisCanvas.style.height = actualHeight + "px";
+        if (yAxisCanvas.width !== yAxisWidth * dpr || yAxisCanvas.height !== hVis * dpr) {
+          yAxisCanvas.width  = yAxisWidth * dpr;
+          yAxisCanvas.height = hVis * dpr;
           yAxisCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
-        yAxisCtx.clearRect(0, 0, actualYAxisWidth, actualHeight);
+        yAxisCtx.clearRect(0, 0, yAxisWidth, hVis);
         yAxisCtx.font = `${fontAxis}px sans-serif`;
 
         // match background color
         const bgColor = getComputedStyle($el[0]).backgroundColor || "#000";
         yAxisCtx.fillStyle = bgColor;
-        yAxisCtx.fillRect(0, 0, actualYAxisWidth, actualHeight);
+        yAxisCtx.fillRect(0, 0, yAxisWidth, hVis);
       } else {
         yAxisCanvas.style.display = "none";
       }
 
-      /* — Hi‑DPI main canvas with proper constraints --------------- */
-      const actualDrawWidth = isScrollable ? wDraw : Math.min(wDraw, wVis);
-      const actualDrawHeight = Math.min(hVis, containerRect.height);
-      
+      /* — Hi‑DPI main canvas ------------------------------------- */
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (canvas.width !== actualDrawWidth * dpr || canvas.height !== actualDrawHeight * dpr) {
-        canvas.width  = actualDrawWidth * dpr;
-        canvas.height = actualDrawHeight * dpr;
-        
-        // Ensure CSS dimensions match the constrained size
-        if (!isScrollable) {
-          canvas.style.width = actualDrawWidth + "px";
-        }
-        canvas.style.height = actualDrawHeight + "px";
-        
+      if (canvas.width !== wDraw * dpr || canvas.height !== hVis * dpr) {
+        canvas.width  = wDraw * dpr;
+        canvas.height = hVis * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
-      ctx.clearRect(0, 0, actualDrawWidth, actualDrawHeight);
+      ctx.clearRect(0, 0, wDraw, hVis);
       ctx.font = `${fontAxis}px sans-serif`;
 
       /* ===== single‑point mode ================================== */
@@ -286,7 +251,7 @@
           : String(X[0]);
         const yText = String(Y[0]);
 
-        const blkH = actualDrawHeight * SINGLE_H;
+        const blkH = hVis * SINGLE_H;
         const fY   = Math.round(blkH * SINGLE_Y_FR);
         const fX   = Math.round(blkH * SINGLE_X_FR);
 
@@ -295,12 +260,12 @@
 
         ctx.textBaseline = "bottom";
         ctx.font = `${fY}px sans-serif`;
-        ctx.fillText(yText, actualDrawWidth / 2, (actualDrawHeight - blkH) / 2 + fY);
+        ctx.fillText(yText, wDraw / 2, (hVis - blkH) / 2 + fY);
 
         ctx.globalAlpha = 0.6;
         ctx.textBaseline = "top";
         ctx.font = `${fX}px sans-serif`;
-        ctx.fillText(xText, actualDrawWidth / 2, (actualDrawHeight - blkH) / 2 + fY);
+        ctx.fillText(xText, wDraw / 2, (hVis - blkH) / 2 + fY);
         ctx.globalAlpha = 1;
         return;
       }
@@ -326,8 +291,8 @@
         margins.b += opts.paddings.b === undefined ? 0 : opts.paddings.b;
       }
 
-      const chartW = actualDrawWidth - margins.l - margins.r;
-      const chartH = actualDrawHeight - margins.t  - margins.b;
+      const chartW = wDraw - margins.l - margins.r;
+      const chartH = hVis  - margins.t  - margins.b;
       if (chartW <= 0 || chartH <= 0) return;
 
       /* — Y scale (flat series → pad) ----------------------------- */
@@ -347,7 +312,7 @@
         ctx.lineWidth = 1;
         for (let i = 0; i <= 5; i++) {
           const y = margins.t + (i / 5) * chartH + 0.5;
-          ctx.beginPath(); ctx.moveTo(margins.l, y); ctx.lineTo(actualDrawWidth - margins.r, y); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(margins.l, y); ctx.lineTo(wDraw - margins.r, y); ctx.stroke();
         }
       }
 
@@ -358,7 +323,7 @@
 
         // Y‑axis line - account for padding in sticky canvas
         const axisX = xOffset + (isScrollable ? yAxisWidth - 1.1 : margins.l);
-        context.beginPath(); context.moveTo(axisX, margins.t); context.lineTo(axisX, actualDrawHeight - margins.b); context.stroke();
+        context.beginPath(); context.moveTo(axisX, margins.t); context.lineTo(axisX, hVis - margins.b); context.stroke();
 
         // ticks & labels
         const stepY = niceStep(yMax - yMin);
@@ -393,7 +358,7 @@
       ctx.strokeStyle = "rgba(255,255,255,0.25)";
       ctx.lineWidth = 1;
       if (opts.showXaxe) {
-        ctx.beginPath(); ctx.moveTo(margins.l, actualDrawHeight - margins.b); ctx.lineTo(actualDrawWidth - margins.r, actualDrawHeight - margins.b); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(margins.l, hVis - margins.b); ctx.lineTo(wDraw - margins.r, hVis - margins.b); ctx.stroke();
       }
 
       /* ===== X ticks & labels =================================== */
@@ -403,8 +368,8 @@
         ctx.textAlign = "center"; ctx.textBaseline = "top";
 
         let lastR = -Infinity;
-        const axisY = actualDrawHeight - margins.b;
-        const lLim = margins.l, rLim = actualDrawWidth - margins.r;
+        const axisY = hVis - margins.b;
+        const lLim = margins.l, rLim = wDraw - margins.r;
 
         for (let i = 0; i < n; i++) {
           const xp  = xPos(i);
@@ -441,11 +406,11 @@
       ctx.beginPath();
       ctx.moveTo(xPos(0), y2p(Ynum[0]));
       for (let i = 1; i < n; i++) ctx.lineTo(xPos(i), y2p(Ynum[i]));
-      ctx.lineTo(xPos(n - 1), actualDrawHeight - margins.b);
-      ctx.lineTo(xPos(0), actualDrawHeight - margins.b);
+      ctx.lineTo(xPos(n - 1), hVis - margins.b);
+      ctx.lineTo(xPos(0), hVis - margins.b);
       ctx.closePath();
 
-      const grad = ctx.createLinearGradient(0, margins.t, 0, actualDrawHeight - margins.b);
+      const grad = ctx.createLinearGradient(0, margins.t, 0, hVis - margins.b);
       gStops.forEach(s => grad.addColorStop(Math.max(0, Math.min(1, s.pos)), rgba(opts.curveData.color, s.alpha)));
       ctx.fillStyle = grad; ctx.fill(); ctx.restore();
 
@@ -484,7 +449,7 @@
 
           // keep inside canvas area (allow tags above chart grid)
           const lLim = margins.l;
-          const rLim = actualDrawWidth - margins.r - boxW;
+          const rLim = wDraw - margins.r - boxW;
           const tLim = 0; // Allow tags to go to the very top of canvas
           if (tx < lLim)       tx = lLim;
           else if (tx > rLim)  tx = rLim;

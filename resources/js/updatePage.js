@@ -240,7 +240,7 @@ function plotHistoryGraph(history, firstID, firstName, mode){
             pxPerWidth: 7,
             nbPoints: 30,
 
-            paddings: {l: 10, t: 15, b: 0}
+            paddings: {l: 10, t: 10, b: 0}
         });
     }else{
         $('.historyGraph_noData').css('display', 'block');

@@ -1365,7 +1365,6 @@
     max-width: 446px;
 
     height: 40dvh;
-    max-height: 342px;
 
     transform: translateY(-10%);
     border-radius: 12px;
@@ -1539,7 +1538,7 @@
 }
 
 .historyGraph_modeSelect{
-    height: 28px;
+    height: 29px;
     font-size: 17px;
 }
 
