@@ -164,9 +164,11 @@ const textAssets = {
         "sessionItem": {
             "schedule": "Programmer",
             "history": "Historique",
+            "duplicate": "Dupliquer",
             "addASession": "Créer une séance",
             "archive": "Aucune archive",
             "unarchived": "Déarchiver",
+            "copy": "Copie"
         },
         "updatePage": {
             "linkWith": "Lier avec",
@@ -533,9 +535,11 @@ const textAssets = {
         "sessionItem": {
             "schedule": "Schedule",
             "history": "History",
+            "duplicate": "Duplicate",
             "addASession": "Create a session",
             "archive": "No archive yet",
             "unarchived": "Unarchive",
+            "copy": "Copy"
         },
         "updatePage": {
             "linkWith": "Link with",

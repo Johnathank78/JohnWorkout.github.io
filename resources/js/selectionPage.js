@@ -596,6 +596,41 @@ $(document).ready(function(){
         $('.update_data_name').val(update_current_item.name);
     });
 
+    $(document).on("click", '.selection_session_tile_extra_duplicate', function(e){
+        closePanel("xtraContainer");
+        canNowClick("allowed");
+        
+        let item = $(e.target).closest(".selection_session_tile, .selection_reminder_tile");
+        trackItem(item, "session");
+
+        setTimeout(() => {
+            $(this).parent().scrollTop(0);
+        }, 200);
+
+        let new_item = JSON.parse(JSON.stringify(update_current_item));
+        
+        new_item.id = smallestAvailableId([...session_list, ...reminder_list], "id")
+        new_item.name += " - " + textAssets[parameters.language].sessionItem.copy;
+        new_item.history = generateHistoryObj({ "state": true, "historyCount": 0, "historyList": [] });
+        new_item.notif = false;
+
+        const lastFalseIndex = session_list.findLastIndex(session => session.isArchived === false);
+        if(lastFalseIndex !== -1) {
+            session_list.splice(lastFalseIndex + 1, 0, new_item);
+            
+            $(".selection_session_container").append(session_tile(new_item));
+            $(".selection_session_container").children().last().css('opacity', "0");
+            
+            $(".selection_SR_container").animateFullScrollDown(500, () => {
+                setTimeout(() => {
+                    $(".selection_session_container").children().last().animate({ opacity: 1 }, 150)
+                }, 250);
+            });
+            
+            session_save(session_list);
+        };
+    });
+
     // TOGGLE;
 
     $(document).on("click", ".toggle", function(e){

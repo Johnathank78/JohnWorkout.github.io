@@ -68,6 +68,7 @@ function session_tile(session, archived = false){
                         <div class="selection_session_tile_extra">
                             <span class="selection_session_tile_extra_element selection_session_tile_extra_schedule" style=background-color:`+schedule_color+`;>`+textAssets[parameters.language].sessionItem.schedule+`</span>
                             <span class="selection_session_tile_extra_element selection_session_tile_extra_history">`+textAssets[parameters.language].sessionItem.history+`</span>
+                            <span class="selection_session_tile_extra_element selection_session_tile_extra_duplicate">`+textAssets[parameters.language].sessionItem.duplicate+`</span>
                         </div>
                     </div>
                 </div>`;
