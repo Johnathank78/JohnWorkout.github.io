@@ -1001,23 +1001,22 @@ function weightData_read(set=false){
     if(set) data = set;
 
     if(data === null || data == ""){
-        showWeightTracker({});
-        return {};
+        data = {};
     }else{
         data = JSON.parse(data);
-
-        const todayTS = getToday('timestamp');
-        const lastTS  = zeroAM(Object.keys(data).slice(-1)[0], "timestamp");
-        const daysElapsed = daysBetweenTimestamps(todayTS, lastTS);
-
-        if(!isDictEmpty(data) && daysElapsed > 6){
-            showWeightTracker(data);
-        }else if(isDictEmpty(data)){
-            showWeightTracker(data);
-        };
-
-        return data;
     };
+
+    const todayTS = getToday('timestamp');
+    const lastTS  = zeroAM(Object.keys(data).slice(-1)[0], "timestamp");
+    const daysElapsed = daysBetweenTimestamps(todayTS, lastTS);
+
+    if(!isDictEmpty(data) && daysElapsed > 6){
+        showWeightTracker(data);
+    }else if(isDictEmpty(data) && session_list.length != 0 && reminder_list.length != 0){
+        showWeightTracker(data);
+    };
+
+    return data;
 };
 
 function weightData_save(data){

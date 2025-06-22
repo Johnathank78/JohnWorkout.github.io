@@ -1469,13 +1469,14 @@ function changeLanguage(lang, first=false){
 
     // Add;
 
+    $(".update_name_tile").attr("placeholder", textAssets[lang].updatePage.name);
+
     $(".selection_add_option_session").text(textAssets[lang].updatePage.itemTypeChoices.session);
     $(".selection_add_option_reminder").text(textAssets[lang].updatePage.itemTypeChoices.reminder);
     
     $(".linkNcreateSeparator").text(textAssets[lang].updatePage.or.toUpperCase());
     $(".update_linkWith").text(textAssets[lang].updatePage.linkWith);
 
-    $(".update_name_info").text(textAssets[lang].updatePage.name);
     $(".update_data_tile_info").eq(0).text(textAssets[lang].updatePage.cycle);
     $(".update_data_tile_info").eq(1).text(textAssets[lang].updatePage.work);
     $(".update_data_tile_info").eq(2).text(textAssets[lang].updatePage.rest);

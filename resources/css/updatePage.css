@@ -141,13 +141,6 @@
     width: 100%;
 }
 
-.update_name_info{
-    font-size: 22px;
-    font-weight: 500; 
-
-    flex-shrink: 0;
-}
-
 .update_name_tile{
     
     flex-grow: 1;

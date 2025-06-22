@@ -121,7 +121,6 @@ function deleteHistory(){
 };
 
 function leaveIntervallEdit(){
-    $(".update_name_info").text(textAssets[parameters.language].updatePage.name);
     $(".update_data_name").val(creationNameSAV);
 
     update_pageReset();
