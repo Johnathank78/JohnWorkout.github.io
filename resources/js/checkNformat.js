@@ -173,7 +173,7 @@ function closePanel(src, notAnimated=false){
             break;
         case "historyGraph":
             $('.blurBG').css('display', 'none');
-            historyGraphShow = false;
+            historyGraphShown = false;
 
             break;
         default:
@@ -314,7 +314,7 @@ function unfocusDivs(e){
         canNowClick();
     };
 
-    if(notTargeted(e.target, '.historyGraph') && historyGraphShow){
+    if(notTargeted(e.target, '.historyGraph') && historyGraphShown){
         closePanel('historyGraph');
         canNowClick();
     };

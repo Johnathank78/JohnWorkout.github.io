@@ -43,15 +43,6 @@ const abrTimeSymols = {
     "second": "&"
 };
 
-// const labelToSymbol = {
-//     y: "%",
-//     w: "£",
-//     d: "@",
-//     h: "€",
-//     m: "#",
-//     s: "&"
-// };
-
 const timeUnit = 1000;
 const repTime = 2.1;
 const wrmTime = 3.5 * 60;

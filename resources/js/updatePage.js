@@ -19,7 +19,14 @@ var exoInd = 0;
 var setInd = 0;
 
 var isDatePicking = false;
-var historyGraphShow = false;
+var historyGraphShown = false;
+
+var focusId = false;
+var focusName = false;
+var focussSubId = false;
+var focusSubName = false;
+var focusMode = false;
+var focusModeSav = { w: 'weight', i: 'work' };
 
 function restoreSwipedElement(){
     if(currentlySwipedElement){
@@ -129,55 +136,111 @@ function leaveIntervallEdit(){
     current_page = previousPage;
 };
 
-function exctractGraphData(historys, id, name, mode){
+function exctractGraphData(session){
     let X = [];
     let Y = [];
 
     let exoId = false;
     let exoName = false;
 
+    let subExoId = false;
+    let subExoName = false;
+
     let setList = false;
-    let completedSets = false;
+    let completedSets = false;  
+    let type = false;
 
-    historys.historyList.forEach(history => {
-        history.exoList.forEach(exo => {
-            if(exo.type == "Bi." || exo.type == "Uni."){
-                if(exo.type == "Uni."){
-                    exoName = exo.name.slice(0, -4);
-                    exoId = exo.id.slice(0, -2);
-
-                    setList = mergeHistoryExo(history, exoId);
-                    completedSets = Math.floor(setList.filter(set => set.reps != 0).length / 2);
-                }else if(exo.type == "Bi."){
-                    exoId = exo.id
-                    exoName = exo.name
-                    completedSets = exo.setList.filter(set => set.reps != 0).length;
+    session.history.historyList.forEach(history => {
+        if(session.type == "W"){
+            history.exoList.forEach(exo => {
+                if(exo.type == "Bi." || exo.type == "Uni."){
+                    if(exo.type == "Uni."){
+                        exoName = exo.name.slice(0, -4);
+                        exoId = exo.id.slice(0, -2);
+    
+                        setList = mergeHistoryExo(history, exoId);
+                        completedSets = Math.floor(setList.filter(set => set.reps != 0).length / 2);
+                    }else if(exo.type == "Bi."){
+                        exoId = exo.id
+                        exoName = exo.name
+                        completedSets = exo.setList.filter(set => set.reps != 0).length;
+                    };
+    
+                    if(exoId == focusId && exoName == focusName){
+                        let correctedSetList = exo.setList.filter(set => set.reps != 0);
+                        if(correctedSetList.length == 0) return;
+    
+                        if(focusMode == "weight"){
+                            let weightMean = correctedSetList.map(set => set.weight).reduce((acc, val) => acc + val, 0) / completedSets;
+                            Y.push(weightMean);
+                        }else if(focusMode == "reps"){
+                            let repsMean = Math.ceil(correctedSetList.map(set => set.reps).reduce((acc, val) => acc + val, 0) / completedSets);
+                            Y.push(repsMean);
+                        };
+    
+                        X.push(new Date(history.date));
+                    };
+                }else if(exo.type == "Int."){
+                    exoId = exo.id;
+                    exoName = exo.name;
+    
+                    if(exoId == focusId && exoName == focusName){
+                        exo.exoList.forEach(subExo => {
+                            subExoId = subExo.id;
+                            subExoName = subExo.name;
+    
+                            if(subExoId == focussSubId && subExoName == focusSubName){
+                                let correctedSetList = subExo.setList.filter(set => set.work != "X");
+                                let completedCycle = correctedSetList.length;
+                                if(completedCycle == 0){return};
+                                
+                                if(focusMode == "work"){
+                                    let workMean = Math.ceil(correctedSetList.map(set => time_unstring(set.work)).reduce((acc, val) => acc + val, 0) / completedCycle);
+                                    Y.push(workMean);
+                                }else if(focusMode == "rest"){
+                                    let restDenominator = completedCycle == 1 ? 1 : completedCycle - 1;
+                                    let restMean = Math.ceil(correctedSetList.filter(set => set.rest != "X").map(set => time_unstring(set.rest)).reduce((acc, val) => acc + val, 0) / (restDenominator));
+                                    Y.push(restMean);
+                                };
+    
+                                X.push(new Date(history.date));
+                                type = exo.type;
+                            };
+                        });
+                    };
                 };
+            });
+        }else if(session.type == "I"){
+            history.exoList.forEach(exo => {
+                exoId = exo.id;
+                exoName = exo.name;
 
-                if(exoId == id && exoName == name){
-                    let correctedSetList = exo.setList.filter(set => set.reps != 0);
-                    if(correctedSetList.length == 0) return;
-
-                    let repsMean = Math.ceil(correctedSetList.map(set => set.reps).reduce((acc, val) => acc + val, 0) / completedSets);
-                    let weightMean = correctedSetList.map(set => set.weight).reduce((acc, val) => acc + val, 0) / completedSets;
-
-                    if(mode == "weight"){
-                        Y.push(weightMean);
-                    }else if(mode == "reps"){
-                        Y.push(repsMean);
+                if(exoId == focusId && exoName == focusName){
+                    let correctedSetList = exo.setList.filter(set => set.work != "X");
+                    let completedCycle = correctedSetList.length;
+                    if(completedCycle == 0){return};
+                    
+                    if(focusMode == "work"){
+                        let workMean = Math.ceil(correctedSetList.map(set => time_unstring(set.work)).reduce((acc, val) => acc + val, 0) / completedCycle);
+                        Y.push(workMean);
+                    }else if(focusMode == "rest"){
+                        let restDenominator = completedCycle == 1 ? 1 : completedCycle - 1;
+                        let restMean = Math.ceil(correctedSetList.filter(set => set.rest != "X").map(set => time_unstring(set.rest)).reduce((acc, val) => acc + val, 0) / (restDenominator));
+                        Y.push(restMean);
                     };
 
                     X.push(new Date(history.date));
+                    type = exo.type;
                 };
-            };
-        });
+            });
+        };
     });
     
-    return { X, Y };
+    return { X, Y, type };
 };
 
-function plotHistoryGraph(history, firstID, firstName, mode){
-    let extractedGraphData = exctractGraphData(history, firstID, firstName, mode);
+function plotHistoryGraph(session){
+    let extractedGraphData = exctractGraphData(session);
     $('#historyGraphCanva').children().remove();
 
     if(extractedGraphData.Y.length > 0){
@@ -185,9 +248,17 @@ function plotHistoryGraph(history, firstID, firstName, mode){
         $('.historyGraph_noData').css('display', 'none');
 
         let lastIndex = extractedGraphData.X.length - 1;
+        let lastValue = extractedGraphData.Y[lastIndex];
+        let type = extractedGraphData.type;
 
-        $('.historyGraph_currentWeight').text(parseFloat(extractedGraphData.Y[lastIndex]).toFixed(1));
+        if(type == "Int."){
+            lastValue = getNdisplay_timeString(lastValue);
+        }else{
+            lastValue = parseFloat(lastValue).toFixed(1)
+        };
 
+        $('.historyGraph_lastValue').text(lastValue);
+        
         if(extractedGraphData.X.length == 1){
             $('.historyGraph_growthRate_container').css('display', 'none');
         }else{
@@ -241,7 +312,9 @@ function plotHistoryGraph(history, firstID, firstName, mode){
             pxPerWidth: 7,
             nbPoints: 30,
 
-            paddings: {l: 10, t: 10, b: 0}
+            paddings: {l: 10, t: 10, b: 0},
+            getLabel: type == "Int." ? getNdisplay_timeString : false,
+            integerYaxisLabel: type == "Int."
         });
     }else{
         $('.historyGraph_noData').css('display', 'block');
@@ -249,21 +322,83 @@ function plotHistoryGraph(history, firstID, firstName, mode){
     };
 };
 
+function fillSubExoList(session, id){
+    let exo = session.exoList.filter(exo => exo.id == id)[0];
+    let optExoString = '<option value="[idVAL]">[exoVAL]</option>';
+
+    $('.historyGraph_subExoSelect').children().remove();
+    
+    if(exo.type == "Int."){
+        exo.exoList.forEach(subExo => {
+            $('.historyGraph_subExoSelect').append($(optExoString.replace('[idVAL]', subExo.id).replace('[exoVAL]', subExo.name)))
+        });
+
+        $('.historyGraph_subExoSelect').css('display', 'flex');
+        $('.historyGraph_modeSelectOpt').slice(0, 2).css('display', 'none');
+        $('.historyGraph_modeSelectOpt').slice(-2).css('display', 'flex');
+
+        focussSubId = exo.exoList[0].id;
+        focusSubName = exo.exoList[0].name;
+        
+        if(focusMode == "weight" || focusMode == "reps"){
+            focusModeSav.w = focusMode;
+            focusMode = focusModeSav.i;
+        }else{
+            focusModeSav.i = focusMode;
+        };
+
+        $('.historyGraph_modeSelect').val(focusMode);        
+    }else{
+        $('.historyGraph_subExoSelect').css('display', 'none');
+        
+        $('.historyGraph_modeSelectOpt').slice(0, 2).css('display', 'flex');
+        $('.historyGraph_modeSelectOpt').slice(-2).css('display', 'none');
+            
+        if(focusMode == "work" || focusMode == "rest"){
+            focusModeSav.i = focusMode;
+            focusMode = focusModeSav.w;
+
+        }else{
+            focusModeSav.w = focusMode;
+        };
+
+        $('.historyGraph_modeSelect').val(focusMode);        
+    };
+};
+
 function showHistoryGraph(session){
-    historyGraphShow = true;
+    historyGraphShown = true;
     $('.historyGraph_exoSelect').children().remove();
 
     let optExoString = '<option value="[idVAL]">[exoVAL]</option>';
     let filteredExoList = session.exoList.filter(exo => exo.type != "Pause" && exo.type != "Wrm.");
 
-    let firstID = filteredExoList[0].id;
-    let firstName = filteredExoList[0].name;
+    if(session.type == "W"){
+        focusId = filteredExoList[0].id;
+        focusName = filteredExoList[0].name;
+        
+        focusMode = filteredExoList[0].type == "Int." ? "work" : "weight";
+        filteredExoList.forEach(exo => {
+            $('.historyGraph_exoSelect').append($(optExoString.replace('[idVAL]', exo.id).replace('[exoVAL]', exo.name)))
+        });
 
-    filteredExoList.forEach(exo => {
-        $('.historyGraph_exoSelect').append($(optExoString.replace('[idVAL]', exo.id).replace('[exoVAL]', exo.name)))
-    });
+        fillSubExoList(session, focusId);
+    }else if(session.type == "I"){
+        focusId = filteredExoList[0].id;
+        focusName = filteredExoList[0].name;
 
-    plotHistoryGraph(current_history, firstID, firstName, "weight");
+        focusMode = "work";
+        filteredExoList.forEach(exo => {
+            $('.historyGraph_exoSelect').append($(optExoString.replace('[idVAL]', exo.id).replace('[exoVAL]', exo.name)))
+        });
+        
+        $('.historyGraph_modeSelectOpt').slice(0, 2).css('display', 'none');
+        $('.historyGraph_modeSelectOpt').slice(-2).css('display', 'flex');
+
+        $('.historyGraph_modeSelectOpt').eq(2).prop('selected', true);
+    };
+
+    plotHistoryGraph(session);
     showBlurPage('historyGraph');
 };
 
@@ -1554,18 +1689,23 @@ $(document).ready(function(){
     });
 
     $(document).on('change', '.historyGraph_exoSelect', function(e){
-        let firstID = $('.historyGraph_exoSelect').val();
-        let firstName = $('.historyGraph_exoSelect option[value="'+firstID+'"]').text();
-        let mode = $('.historyGraph_modeSelect').val();
+        focusId = $('.historyGraph_exoSelect').val();
+        focusName = $('.historyGraph_exoSelect option[value="'+focusId+'"]').text();
 
-        plotHistoryGraph(current_history, firstID, firstName, mode);
+        if(update_current_item.type == "W") fillSubExoList(update_current_item, focusId);
+        plotHistoryGraph(update_current_item);
+    });
+
+    $(document).on('change', '.historyGraph_subExoSelect', function(e){
+        focusSubId = $('.historyGraph_subExoSelect').val();
+        focusSubName = $('.historyGraph_subExoSelect option[value="'+focusSubId+'"]').text();
+
+        plotHistoryGraph(update_current_item);
     });
 
     $(document).on('change', '.historyGraph_modeSelect', function(e){
-        let firstID = $('.historyGraph_exoSelect').val();
-        let firstName = $('.historyGraph_exoSelect option[value="'+firstID+'"]').text();
-        let mode = $('.historyGraph_modeSelect').val();
+        focusMode = $('.historyGraph_modeSelect').val();
 
-        plotHistoryGraph(current_history, firstID, firstName, mode);
+        plotHistoryGraph(update_current_item);
     });
 });//readyEnd

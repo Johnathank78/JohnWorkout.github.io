@@ -492,10 +492,12 @@ function getSmallesRest(){
     };
 };
 
-function showBlurPage(className){
+function showBlurPage(className, intruder=false){
     $(".blurBG").children(':not(.'+className+')').css('display', 'none');
     $('.'+className+'').css("display", 'flex');
     $(".blurBG").css("display", "flex");
+
+    if(intruder) $('.intruder_versionNumber').css('display', 'inline-block');
 };
 
 function nbSessionScheduled(vsDate){
@@ -849,6 +851,10 @@ function display_timeString(timeString, lang=false){
     .replace(abrTimeSymols.second, textAssets[lang].misc.abrTimeLabels.second)
 };
 
+function getNdisplay_timeString(ref, lang=false){
+    return display_timeString(get_timeString(ref), lang)
+};
+
 function time_unstring(strr, getList=false){
     if(strr == ""){
         if(getList){
@@ -857,7 +863,7 @@ function time_unstring(strr, getList=false){
             return 0;
         };
     }else if(!isNaI(strr)){
-        return parseInt(strr);
+        return parseFloat(strr);
     };
 
     const allSymbols = Object.values(abrTimeSymols).join("");
@@ -1315,25 +1321,33 @@ function unitRound(val){
 };
 
 function updateSessionUnits(data, from, to){
-    data.forEach(session => {
+    return data.map(session => {
         if(session.type == "W"){
-            session.exoList.forEach(exo => {
-                if(exo.type == "Uni." || exo.type == "Bi."){
-                    exo.weight = convertToUnit(exo.weight, from, to);
-                };
-            });
-        };
-    });
+            return {
+                ...session,
+                exoList: session.exoList.map(exo => {
+                    if(exo.type == "Uni." || exo.type == "Bi."){
+                        return {
+                            ...exo,
+                            weight: convertToUnit(exo.weight, from, to)
+                        };
+                    }
+                    return exo;
+                })
+            };
+        }
 
-    session_save(data);
+        return session;
+    });
 };
 
 function updateTrackerUnits(data, from, to){
-    for (const key of Object.keys(data)) {
-        data[key] = convertToUnit(data[key], from, to);
-    };
+    const updatedData = Object.keys(data).reduce((acc, key) => {
+        acc[key] = convertToUnit(data[key], from, to);
+        return acc;
+    }, {});
 
-    weightData_save(data)
+    return updatedData;
 };
 
 function weightUnitgroup(val, unit){
@@ -1570,6 +1584,11 @@ function changeLanguage(lang, first=false){
 
     $('.historyGraph_headerText').text(textAssets[lang].historyGraph.title);
     $(".historyGraph_noData").text(textAssets[lang].historyGraph.noMeasure);
+
+    $(".historyGraph_modeSelectOpt").eq(0).text(textAssets[lang].updatePage.placeHolders.weight)
+    $(".historyGraph_modeSelectOpt").eq(1).text(textAssets[lang].updatePage.placeHolders.reps)
+    $(".historyGraph_modeSelectOpt").eq(2).text(textAssets[lang].updatePage.work)
+    $(".historyGraph_modeSelectOpt").eq(3).text(textAssets[lang].updatePage.rest)
 
     previousLanguage = lang;
 };

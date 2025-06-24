@@ -158,6 +158,8 @@
         <div class="blurBG">
             <!-- GLOBAL -->
 
+            <span class="intruder_versionNumber">v6.67</span>
+
             <div class="timeSelectorBody">
                 <div class="timeSelectorFirstRow">
                     <div class="timeSelectorOpt timeSelectorHours">
@@ -232,18 +234,20 @@
                                 <div class="historyGraph_growthRate_indicator"></div>
                                 <span class="historyGraph_growthRate">14%</span>
                             </div>
-                            <span class="historyGraph_currentWeight">12</span>
+                            <span class="historyGraph_lastValue">12</span>
                         </div>
                     </div>
                     <div id="historyGraphCanva"></div>
                     <span class="historyGraph_noData">No data yet</span>
                 </div>
                 <div class="historyGraph_lowerPart">
-                    <select name="" id="" class="historyGraph_exoSelect">
-                    </select>
+                    <select name="" id="" class="historyGraph_exoSelect"></select>
+                    <select name="" id="" class="historyGraph_subExoSelect"></select>
                     <select name="" id="" class="historyGraph_modeSelect">
-                        <option value="weight" selected>Weight</option>
-                        <option value="reps">Reps</option>
+                        <option class="historyGraph_modeSelectOpt" value="weight" selected>Weight</option>
+                        <option class="historyGraph_modeSelectOpt" value="reps">Reps</option>
+                        <option class="historyGraph_modeSelectOpt" value="work">Work</option>
+                        <option class="historyGraph_modeSelectOpt" value="rest">Rest</option>
                     </select>
                 </div>
             </div>
@@ -649,6 +653,8 @@
 
                     <div class="selection_header_secondRow">
                         <div class="selection_info_page noselect">
+                            <span class="versionNumber">v6.67</span>
+
                             <div class="selection_info_item">
                                 <div class="selection_info_itemWrapper">
                                     <span class="selection_info_item_title">Time spent</span>

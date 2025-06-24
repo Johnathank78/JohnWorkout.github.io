@@ -397,8 +397,9 @@ function parametersChecknUpdate(){
 
             stats_set(stats);
             
-            updateSessionUnits(session_list, previousWeightUnit, parameters.weightUnit);
-            updateTrackerUnits(weightData, previousWeightUnit, parameters.weightUnit);
+            session_list = updateSessionUnits(session_list, previousWeightUnit, parameters.weightUnit);
+            weightData = updateTrackerUnits(weightData, previousWeightUnit, parameters.weightUnit);
+            
             previousWeightUnit = parameters.weightUnit;
         };
 

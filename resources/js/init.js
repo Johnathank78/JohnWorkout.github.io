@@ -44,7 +44,7 @@ function isIntruder(){
     });
 
     $('.main_page').css('display', 'none');
-    showBlurPage('selection_sessionFinished');
+    showBlurPage('selection_sessionFinished', true);
 }
 
 $(document).ready(async function(){

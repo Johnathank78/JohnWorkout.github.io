@@ -362,7 +362,7 @@
 
         context.fillStyle = "rgba(255,255,255,0.65)";
         context.textAlign = "right"; context.textBaseline = "middle";
-        
+
         let idx = 0;
         for (let v = Math.ceil(yMin / stepY) * stepY; v <= yMax + 1e-9; v += stepY, idx++) {
           if (idx % skip) continue;
@@ -381,7 +381,7 @@
         if (isScrollable) {
           drawYAxis(yAxisCtx, 0); // sticky canvas
         } else {
-          drawYAxis(ctx, 0); // main canvas
+          drawYAxis(ctx, 0);      // main canvas
         }
       }
 

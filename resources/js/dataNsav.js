@@ -730,69 +730,13 @@ function session_read(set=false){
     }else{
         data = JSON.parse(data);
         
-        calendar_dict = calendar_read(data[0]);
-        previousWeightUnit = data[1];
-
-        if(previousWeightUnit != parameters.weightUnit){
-            updateSessionUnits(data[0], previousWeightUnit, parameters.weightUnit);
+        // FIX
+        if(data[1] == "kg" || data[1] == "lbs"){
+            data = data[0];
         };
-
-        // data[0].forEach(session => {
-        //     session.exoList.forEach(exo => {
-        //         if(session.type == "W" && exo.type != "Wrm."){
-        //             if(exo.type == "Int." && !isIntervallLinked(exo)){
-        //                 exo.exoList.forEach(subExo => {
-        //                     subExo.rest = subExo.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                     subExo.work = subExo.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                 });
-        //             }else if(!(exo.type == "Int." && isIntervallLinked(exo))){
-        //                 exo.rest = exo.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //             };
-        //         }else if(session.type == "I"){
-        //             if(exo.type == "Int."){
-        //                 exo.rest = exo.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                 exo.work = exo.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //             }else{
-        //                 exo.rest = exo.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //             };
-        //         };                
-        //     });
-
-        //     if(session.type == "W"){
-        //         session.history.historyList.forEach(history => {
-        //             history.exoList.forEach(exo => {
-        //                 if(exo.type == "Int."){
-        //                     exo.exoList.forEach(subExo => {
-        //                         subExo.expectedStats.work = subExo.expectedStats.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                         subExo.expectedStats.rest = subExo.expectedStats.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-
-        //                         subExo.setList.forEach(set => {
-        //                             set.work = set.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                             set.rest = set.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                         });
-        //                     });
-        //                 };
-        //             });
-        //         });
-        //     }else if(session.type == "I"){
-        //         session.history.historyList.forEach(history => {
-        //             history.exoList.forEach(exo => {
-        //                 if(exo.type == "Int."){
-        //                     exo.expectedStats.work = exo.expectedStats.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                     exo.expectedStats.rest = exo.expectedStats.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-
-        //                     exo.setList.forEach(set => {
-        //                         set.work = set.work.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                         set.rest = set.rest.replace(/[ywdhms]/g, c => labelToSymbol[c]);
-        //                     });
-        //                 };
-        //             });
-        //         });
-        //     };
-
-        // }); 
-
-        return data[0];
+        
+        calendar_dict = calendar_read(data);
+        return data;
     };
 };
 
@@ -835,12 +779,6 @@ function reminder_read(set=false){
         return [];
     }else{
         data = JSON.parse(data);
-
-        // data.forEach(reminder => {
-        //     if(isNaI(reminder.id)) reminder.id = smallestAvailableId(data, "id");
-        //     if(reminder.hasOwnProperty("isArchived") === false) reminder.isArchived = false;
-        // });
-
         return data;
     };
 };

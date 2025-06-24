@@ -99,6 +99,22 @@
     border-radius: 8px;
 }
 
+.versionNumber{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    
+    padding: 5px;
+    background-color: rgb(76, 83, 104);
+
+    flex-grow: 0;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    border-radius: 8px;
+}
+
 .selection_info_item_title{
     height: 100%;
 

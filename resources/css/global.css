@@ -66,6 +66,25 @@ span::-webkit-scrollbar{
     display: none;
 }
 
+.intruder_versionNumber{
+    position: absolute;
+
+    left: 50%;
+    bottom: 35px;
+    
+    transform: translateX(-50%);
+
+    padding: 5px;
+    background-color: rgb(76, 83, 104);
+
+    flex-grow: 0;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    border-radius: 8px;
+}
+
 /* .blurBG > div{
     filter: drop-shadow(0px 0px 18px rgba(0, 0, 0, 0.2));
 } */

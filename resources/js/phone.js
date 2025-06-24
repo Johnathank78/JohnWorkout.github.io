@@ -67,7 +67,7 @@ function goBack(platform){
         closePanel('import');
     }else if(current_page == "schedule" && isDatePicking){
         closePanel("datePicker");
-    }else if(current_page == "history" && historyGraphShow){
+    }else if(current_page == "history" && historyGraphShown){
         closePanel('historyGraph');
     }else if(timeInputShown){
         closePanel('timeSelector');
