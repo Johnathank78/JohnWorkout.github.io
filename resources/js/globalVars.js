@@ -1,16 +1,8 @@
-function isPwa(){
-   return ["fullscreen", "standalone", "minimal-ui"].some(
-       function(displayMode) {
-           return window.matchMedia('(display-mode: ' + displayMode + ')').matches;
-       }
-   );
-};
-
 const platform = "Web";
 const mobile = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "IOS" : "Android";
 
 const isWebMobile = /Mobi/.test(navigator.userAgent);
-const isStandalonePWA = isPwa();
+const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches;
 
 var addIMG = false; var binIMG = false; var editIMG = false; var grabIMG = false; var pauseIMG = false; var playIMG = false; var sound_fullIMG = false; 
 var sound_midIMG = false; var sound_lowIMG = false; var sound_offIMG = false; var timer2IMG = false; var tickIMG = false; var arrowIMG = false; 
