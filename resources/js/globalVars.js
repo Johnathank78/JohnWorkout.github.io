@@ -813,7 +813,9 @@ $(document).ready(function(){
     platform = "Web";
     mobile = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "IOS" : "Android";
     isWebMobile = /Mobi/.test(navigator.userAgent);
-    isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches;
+    isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches ||
+              window.navigator.standalone === true ||
+              document.referrer.startsWith('android-app://');
 
     addIMG = $("#addIMG").attr('src');
     binIMG = $("#binIMG").attr('src');
