@@ -231,8 +231,8 @@ $(document).ready(function(){
         $(".update_data_name").val(add_name_save);
         $('.update_colorChooser').css('backgroundColor', random_color);
 
-        $(".update_intervallList_container").html(intervallHTML);
-        $(".update_workoutList_container").html(exercisesHTML);
+        $(".update_intervall_container").html(intervallHTML);
+        $(".update_workout_container").html(exercisesHTML);
 
         $('.update_workout_item').css({
             opacity: 1,
@@ -243,7 +243,7 @@ $(document).ready(function(){
         $('.update_exercise_pause_item').css({
             opacity: 1,
             marginTop: 0,
-            height: 45
+            height: 50
         });
 
         $(".update_workoutList_container").scrollTop($(".update_workoutList_container").prop('scrollHeight'));

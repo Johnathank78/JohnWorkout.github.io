@@ -1559,10 +1559,6 @@
     display: none;
 }
 
-.historyGraph_modeSelectOpt:nth-last-child(-n+2){
-    display: none;
-}
-
 .weightTracker_unit{
     position: absolute;
     right: 10px;

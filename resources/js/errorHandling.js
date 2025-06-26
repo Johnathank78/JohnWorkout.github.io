@@ -84,7 +84,7 @@ function iserror_int(mname, isEdit){
     let type = false;
 
     for(let i=0;i<items.length;i++){
-        type = getContractedType($(items).eq(i).find(".update_workout_data_type").val());
+        type = $(items).eq(i).find(".update_workout_data_type").val();
 
         if(type == "Int."){
             name = $(items).eq(i).find(".update_workout_data_name").val();
@@ -164,7 +164,8 @@ function iserror_exo(mname, isEdit){
     let rest = false;
 
     for(let i=0;i<items.length;i++){
-        type = getContractedType($(items).eq(i).find(".update_workout_data_type").val());
+        type = $(items).eq(i).find(".update_workout_data_type").val();
+        
         if(type == "Bi." || type == "Uni."){
             name = $(items).eq(i).find(".update_workout_data_name").val();
             sets = $(items).eq(i).find(".update_workout_data_sets").val();

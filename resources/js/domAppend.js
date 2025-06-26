@@ -146,10 +146,10 @@ function Iintervall_tile(data = false){
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
                         <select name="type" class="update_workout_data_type update_workout_data" disabled>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`" selected>`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
+                            <option value="Wrm.">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
+                            <option value="Bi.">`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
+                            <option value="Uni.">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
+                            <option value="Int." selected>`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
                         </select>
                         <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.type+`</span>
                     </div>
@@ -201,10 +201,10 @@ function exercise_tile(data = false){
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
                         <select name="type" class="update_workout_data_type update_workout_data">
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`" selected>`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
+                            <option value="Wrm.">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
+                            <option value="Bi.">`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
+                            <option value="Uni.">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
+                            <option value="Int." selected>`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
                         </select>
                         <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.type+`</span>
                     </div>
@@ -265,10 +265,10 @@ function exercise_tile(data = false){
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
                         <select name="type" class="update_workout_data_type update_workout_data">
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
+                            <option value="Wrm.">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
+                            <option value="Bi.">`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
+                            <option value="Uni.">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
+                            <option value="Int.">`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
                         </select>
                         <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.type+`</span>
                     </div>
@@ -277,7 +277,7 @@ function exercise_tile(data = false){
                         <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.name+`</span>
                     </div>
                     <div class="update_workout_intervallEdit_container reorder__avoid noselect" style="display: none;">
-                        <span class="update_workout_intervallName">`+"Empty"+`</span>
+                        <span class="update_workout_intervallName">`+textAssets[parameters.language].updatePage.placeHolders.empty+`</span>
                         <img src="`+editIMG+`" alt="edit" class="update_workout_intervallIMG">
                     </div>
                 </div>
@@ -324,10 +324,10 @@ function exercise_tile(data = false){
             <div class="update_workout_item_first_line">
                 <div class="update_workout_data_type_container reorder__avoid">
                     <select name="type" class="update_workout_data_type update_workout_data">
-                        <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
-                        <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`" selected>`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
-                        <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
-                        <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
+                        <option value="Wrm.">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
+                        <option value="Bi." selected>`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
+                        <option value="Uni.">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
+                        <option value="Int.">`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
                     </select>
                     <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.type+`</span>
                 </div>
@@ -338,7 +338,7 @@ function exercise_tile(data = false){
                 </div>
 
                 <div class="update_workout_intervallEdit_container reorder__avoid noselect" style="display: none;">
-                    <span class="update_workout_intervallName">Empty</span>
+                    <span class="update_workout_intervallName">`+textAssets[parameters.language].updatePage.placeHolders.empty+`</span>
                     <img src="`+editIMG+`" alt="edit" class="update_workout_intervallIMG">
                 </div>
             </div>
@@ -480,7 +480,7 @@ function historyDay(i, history){
     let note_elem = $('<div class="update_history_container_exercise_note_container_wrapper"><div class="update_history_container_exercise_note_container"><span class="update_history_container_exercise_note"></span></div></div>');
     let exo_elem = $('<div class="update_history_container_exercise"><div class="update_history_container_exercise_header"><span class="update_history_container_exercise_name"></span><div class="update_history_container_exercise_sets_container"><span class="update_history_container_exercise_sets"></span><span class="update_history_container_Expectedsets"></span></div></div></div>');
     let set_elem = $('<div class="update_history_container_set"><div class="update_history_container_reps_container"><input class="update_history_container_reps strictlyNumeric resizingInp" type="text" inputmode="numeric" value=""><span class="update_history_container_Expectedreps"></span></div><span>x</span><div class="update_history_container_weight_container"><input class="update_history_container_weight strictlyFloatable resizingInp" type="text" inputmode="decimal" value=""><span class="update_history_container_Expectedweight"></span></div><span class="update_history_container_weightUnit"></span></div>');
-    let intSet_elem = $(`<div class="update_history_container_set" style="padding: unset;"><div class="update_history_container_work_container"><span class="udpate_history_workTitle">Work</span><div class="udpate_history_workData"><span class="update_history_container_work"></span><span class="update_history_container_Expectedwork"></span></div></div><div class="update_history_container_rest_container"><span class="udpate_history_restTitle">Rest</span><div class="udpate_history_restData"><span class="update_history_container_rest"></span><span class="update_history_container_Expectedrest"></span></div></div></div>`);
+    let intSet_elem = $(`<div class="update_history_container_set" style="padding: unset;"><div class="update_history_container_work_container"><span class="udpate_history_workTitle">`+textAssets[parameters.language].updatePage.work+`</span><div class="udpate_history_workData"><span class="update_history_container_work"></span><span class="update_history_container_Expectedwork"></span></div></div><div class="update_history_container_rest_container"><span class="udpate_history_restTitle">`+textAssets[parameters.language].updatePage.rest+`</span><div class="udpate_history_restData"><span class="update_history_container_rest"></span><span class="update_history_container_Expectedrest"></span></div></div></div>`);
     
     let date = 0; let time = 0; let day = 0; let exo = 0; let subExo =  0; 
     let expectedWeightUnit = 0; let expectedReps = 0; let expectedWeight = 0; let expectedSets = 0; 

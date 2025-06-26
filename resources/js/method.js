@@ -23,12 +23,6 @@ String.prototype.format = function(){
     return output;
 };
 
-String.prototype.customReplaceAll = function (searchValue, replaceValue) {
-    const escapedSearchValue = searchValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(escapedSearchValue, 'g');
-    return this.replace(regex, replaceValue);
-};
-
 Number.prototype.betterToFixed = function(digits) {
     if (typeof digits !== 'number') return '';
 

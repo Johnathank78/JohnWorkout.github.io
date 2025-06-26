@@ -84,8 +84,13 @@ function leave_update(){
         });
 
         if(reminderOrSession == "session"){
-            intervallHTML = $(".update_intervallList_container").html();
-            exercisesHTML = $(".update_workoutList_container").html();
+            intervallHTML = $(".update_intervallList_container").clone();
+            exercisesHTML = $(".update_workoutList_container").clone();
+            
+            $(intervallHTML).children().removeAttr('style');
+            $(exercisesHTML).children().removeAttr('style');
+
+            console.log($(exercisesHTML).children().prop("outerHTML"))
         }else{
             add_reminder_body_save = $(".udpate_reminder_body_txtarea").val();
         };
@@ -322,6 +327,54 @@ function plotHistoryGraph(session){
     };
 };
 
+function switchHistoryGraphScenario(showIntervals){
+    const $select = $('.historyGraph_modeSelect');
+
+    if (showIntervals) {
+        $('.historyGraph_subExoSelect').css('display', 'flex');
+        // Show interval options (work, rest), hide non-interval options (weight, reps)
+        $('.historyGraph_scenarioInt')
+            .prop('disabled', false)
+            .removeAttr('hidden');
+        
+        $('.historyGraph_scenarioNoInt')
+            .prop('disabled', true)
+            .attr('hidden', true);
+        
+        // Restore previous interval selection or default to 'work'
+        if(focusMode == "weight" || focusMode == "reps"){
+            focusModeSav.w = focusMode;
+            focusMode = focusModeSav.i;
+        }else{
+            focusModeSav.i = focusMode;
+        };
+
+    } else {
+        $('.historyGraph_subExoSelect').css('display', 'none');
+        // Show non-interval options (weight, reps), hide interval options (work, rest)
+        $('.historyGraph_scenarioNoInt')
+            .prop('disabled', false)
+            .removeAttr('hidden');
+        
+        $('.historyGraph_scenarioInt')
+            .prop('disabled', true)
+            .attr('hidden', true);
+        
+        // Restore previous non-interval selection or default to 'weight'
+        if(focusMode == "work" || focusMode == "rest"){
+            focusModeSav.i = focusMode;
+            focusMode = focusModeSav.w;
+
+        }else{
+            focusModeSav.w = focusMode;
+        };
+    };
+
+    // Update the select element to match focusMode
+    $select.val(focusMode);
+    $select.trigger('change');
+};
+
 function fillSubExoList(session, id){
     let exo = session.exoList.filter(exo => exo.id == id)[0];
     let optExoString = '<option value="[idVAL]">[exoVAL]</option>';
@@ -333,36 +386,12 @@ function fillSubExoList(session, id){
             $('.historyGraph_subExoSelect').append($(optExoString.replace('[idVAL]', subExo.id).replace('[exoVAL]', subExo.name)))
         });
 
-        $('.historyGraph_subExoSelect').css('display', 'flex');
-        $('.historyGraph_modeSelectOpt').slice(0, 2).css('display', 'none');
-        $('.historyGraph_modeSelectOpt').slice(-2).css('display', 'flex');
-
         focussSubId = exo.exoList[0].id;
-        focusSubName = exo.exoList[0].name;
-        
-        if(focusMode == "weight" || focusMode == "reps"){
-            focusModeSav.w = focusMode;
-            focusMode = focusModeSav.i;
-        }else{
-            focusModeSav.i = focusMode;
-        };
+        focusSubName = exo.exoList[0].name;       
 
-        $('.historyGraph_modeSelect').val(focusMode);        
+        switchHistoryGraphScenario(true);
     }else{
-        $('.historyGraph_subExoSelect').css('display', 'none');
-        
-        $('.historyGraph_modeSelectOpt').slice(0, 2).css('display', 'flex');
-        $('.historyGraph_modeSelectOpt').slice(-2).css('display', 'none');
-            
-        if(focusMode == "work" || focusMode == "rest"){
-            focusModeSav.i = focusMode;
-            focusMode = focusModeSav.w;
-
-        }else{
-            focusModeSav.w = focusMode;
-        };
-
-        $('.historyGraph_modeSelect').val(focusMode);        
+        switchHistoryGraphScenario(false);      
     };
 };
 
@@ -512,23 +541,23 @@ $(document).ready(function(){
     });
 
     $(document).on("change", ".update_workout_data_type", function(){
-        if($(this).val() == textAssets[parameters.language].updatePage.exerciseTypes["Bi."]){
+        if($(this).val() == "Bi."){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_data_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_intervall_data_container").css("display", "none");
-        }else if($(this).val() == textAssets[parameters.language].updatePage.exerciseTypes["Uni."]){
+        }else if($(this).val() == "Uni."){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_data_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").find(".update_workout_intervall_data_container").css("display", "none");
-        }else if($(this).val() == textAssets[parameters.language].updatePage.exerciseTypes["Int."]){
+        }else if($(this).val() == "Int."){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "none");
-        }else if($(this).val() == textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]){
+        }else if($(this).val() == "Wrm."){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
             $(this).closest(".update_workout_item").find(".update_workout_item_second_line").css("display", "none");
@@ -864,7 +893,7 @@ $(document).ready(function(){
                         exercises = $(".update_intervallList_container").children();
 
                         exercises.each((_, exo) => {
-                            type = getContractedType($(exo).find(".update_workout_data_type").val());
+                            type = $(exo).find(".update_workout_data_type").val();
 
                             if(type == "Int."){
                                 ex_name = $(exo).find(".update_workout_data_name").val().format();
@@ -938,7 +967,7 @@ $(document).ready(function(){
                         exercises = $(".update_workoutList_container").children();
                         
                         exercises.each((_, exo) => {
-                            type = getContractedType($(exo).find(".update_workout_data_type").val());
+                            type = $(exo).find(".update_workout_data_type").val();
 
                             if(type == "Int."){
                                 hint = $(exo).find(".udpate_workout_hint_txtarea").val();
@@ -1072,7 +1101,7 @@ $(document).ready(function(){
                         exercises = $(".update_intervallList_container").children();
 
                         exercises.each((_, exo) => {
-                            type = getContractedType($(exo).find(".update_workout_data_type").val());
+                            type = $(exo).find(".update_workout_data_type").val();
 
                             if(type == "Int."){
                                 ex_name = $(exo).find(".update_workout_data_name").val().format();
@@ -1150,7 +1179,7 @@ $(document).ready(function(){
                         exercises = $(".update_workoutList_container").children();
 
                         exercises.each((_, exo) => {
-                            type = getContractedType($(exo).find(".update_workout_data_type").val());
+                            type = $(exo).find(".update_workout_data_type").val();
 
                             if(type == "Int."){
                                 hint = $(exo).find(".udpate_workout_hint_txtarea").val();
@@ -1513,7 +1542,7 @@ $(document).ready(function(){
                 let exercises = $('.update_intervallList_container').children();
 
                 exercises.each((_, exo) => {
-                    type = getContractedType($(exo).find(".update_workout_data_type").val());
+                    type = $(exo).find(".update_workout_data_type").val();
 
                     if(type == "Int."){
                         ex_name = $(exo).find(".update_workout_data_name").val().format();

@@ -52,9 +52,13 @@ $(document).ready(async function(){
         isIntruder();
     }else{
         parameters = parameters_read();
-        exercisesHTML = exercise_tile();
-        intervallHTML = Iintervall_tile();
-    
+
+        exercisesHTML = $('<div class="update_workoutList_container"></div>');
+        intervallHTML = $('<div class="update_intervall_container"></div>');
+
+        $(exercisesHTML).append(exercise_tile());
+        $(intervallHTML).append(Iintervall_tile());
+
         [audio_lv, muted] = audio_read();
     
         stats = stats_read();

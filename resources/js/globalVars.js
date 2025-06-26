@@ -1,8 +1,8 @@
-const platform = "Web";
-const mobile = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "IOS" : "Android";
+var platform = false;
+var mobile = false;
 
-const isWebMobile = /Mobi/.test(navigator.userAgent);
-const isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches;
+var isWebMobile = false;
+var isStandalonePWA = false;
 
 var addIMG = false; var binIMG = false; var editIMG = false; var grabIMG = false; var pauseIMG = false; var playIMG = false; var sound_fullIMG = false; 
 var sound_midIMG = false; var sound_lowIMG = false; var sound_offIMG = false; var timer2IMG = false; var tickIMG = false; var arrowIMG = false; 
@@ -162,6 +162,8 @@ const textAssets = {
             "copy": "Copie"
         },
         "updatePage": {
+            "intervall": "Intervalle",
+            "workout": "Séances",
             "linkWith": "Lier avec",
             "name": "Nom",
             "reminderBody": "Corps du Rappel",
@@ -206,7 +208,8 @@ const textAssets = {
                 "body": "Coprs",
                 "hint": "Indication",
                 "type": 'Type',
-                "pause": "Pause"
+                "pause": "Pause",
+                "empty": "Vide"
             },
             "exerciseTypes": {
                 "Bi." : "Bilatéral",
@@ -533,6 +536,8 @@ const textAssets = {
             "copy": "Copy"
         },
         "updatePage": {
+            "intervall": "Interval",
+            "workout": "Workout",
             "linkWith": "Link with",
             "name": "Name",
             "reminderBody": "Reminder body",
@@ -577,7 +582,8 @@ const textAssets = {
                 "body": "Body",
                 "hint": "Hint",
                 "type": 'Type',
-                "pause": "Break"
+                "pause": "Break",
+                "empty": "Empty"
             },
             "exerciseTypes": {
                 "Bi." : "Bilateral",
@@ -804,6 +810,11 @@ var consoleShown = false;
 var konsole = false;
 
 $(document).ready(function(){
+    platform = "Web";
+    mobile = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "IOS" : "Android";
+    isWebMobile = /Mobi/.test(navigator.userAgent);
+    isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches;
+
     addIMG = $("#addIMG").attr('src');
     binIMG = $("#binIMG").attr('src');
     editIMG = $("#editIMG").attr('src');

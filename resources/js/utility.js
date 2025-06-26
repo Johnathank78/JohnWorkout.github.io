@@ -1103,17 +1103,6 @@ function noSessionSchedule(archive = false){
     return true;
 };
 
-function getContractedType(type){
-    let base = textAssets[parameters.language].updatePage.exerciseTypes;
-    let keys  = Object.keys(base);
-
-    for (let x = 0; x < keys.length; x++) {
-        if(base[keys[x]] == type){
-            return keys[x];
-        };
-    };
-};
-
 function getSessionIndexByID(id){
     for(let i=0; i<session_list.length; i++){
         if(session_list[i].id == id){
@@ -1456,8 +1445,6 @@ function changeLanguage(lang, first=false){
 
     // Import - Export;
 
-    // adapt weight to lbs, rework lbs implementation ?
-
     $(".selection_saveLoad_headerText").text(textAssets[lang].preferences.impExpMenu.selectElements);
     $("#selection_saveLoad_sl").parent().find('.selection_saveLoad_itemText').text(textAssets[lang].preferences.impExpMenu.sessionList);
     $("#selection_saveLoad_rl").parent().find('.selection_saveLoad_itemText').text(textAssets[lang].preferences.impExpMenu.reminderList);
@@ -1471,6 +1458,9 @@ function changeLanguage(lang, first=false){
     $(".selection_saveLoad_emptyMsg").text(textAssets[lang].preferences.impExpMenu.emptyMessage);
 
     // Tiles;
+
+    $('.update_mode_workout').text(textAssets[lang].updatePage.workout);
+    $('.update_mode_intervall').text(textAssets[lang].updatePage.intervall);
 
     $(".selection_session_tile_extra_schedule").text(textAssets[lang].sessionItem.schedule);
     $(".selection_session_tile_extra_history").text(textAssets[lang].sessionItem.history);
@@ -1596,22 +1586,24 @@ function changeLanguage(lang, first=false){
 function updateExerciseHTML(prev, next){
     let htmlString = false
     if(exercisesHTML !== undefined){
-        htmlString = $(exercisesHTML).html();
+        htmlString = $(exercisesHTML).prop('outerHTML');
 
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.name + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.name + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.sets + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.sets + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.reps + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.reps + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.rest + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.rest + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.cycle + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.cycle + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.work + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.work + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.rest + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.rest + '"');
-        htmlString = htmlString.customReplaceAll('placeholder="' + textAssets[prev].updatePage.placeHolders.hint + '"', 'placeholder="' + textAssets[next].updatePage.placeHolders.hint + '"');
-        htmlString = htmlString.customReplaceAll(textAssets[prev].updatePage.exerciseTypes["Bi."], textAssets[next].updatePage.exerciseTypes["Bi."]);
-        htmlString = htmlString.customReplaceAll(textAssets[prev].updatePage.exerciseTypes["Uni."], textAssets[next].updatePage.exerciseTypes["Uni."]);
-        htmlString = htmlString.customReplaceAll(textAssets[prev].updatePage.exerciseTypes["Int."], textAssets[next].updatePage.exerciseTypes["Int."]);
-        htmlString = htmlString.customReplaceAll(textAssets[prev].updatePage.exerciseTypes["Wrm."], textAssets[next].updatePage.exerciseTypes["Wrm."]);
-    
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.name, textAssets[next].updatePage.placeHolders.name);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.sets, textAssets[next].updatePage.placeHolders.sets);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.reps, textAssets[next].updatePage.placeHolders.reps);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.rest, textAssets[next].updatePage.placeHolders.rest);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.cycle, textAssets[next].updatePage.placeHolders.cycle);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.work, textAssets[next].updatePage.placeHolders.work);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.rest, textAssets[next].updatePage.placeHolders.rest);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.hint, textAssets[next].updatePage.placeHolders.hint);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.pause, textAssets[next].updatePage.placeHolders.pause);
+
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.exerciseTypes["Bi."], textAssets[next].updatePage.exerciseTypes["Bi."]);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.exerciseTypes["Uni."], textAssets[next].updatePage.exerciseTypes["Uni."]);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.exerciseTypes["Int."], textAssets[next].updatePage.exerciseTypes["Int."]);
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.exerciseTypes["Wrm."], textAssets[next].updatePage.exerciseTypes["Wrm."]);
+
+        htmlString = htmlString.replaceAll(textAssets[prev].updatePage.placeHolders.empty, textAssets[next].updatePage.placeHolders.empty);
         exercisesHTML = $(htmlString);
     };
 };
-
