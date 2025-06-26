@@ -1,7 +1,9 @@
 function isPwa(){
-    return ["fullscreen", "standalone", "minimal-ui"].some(
-        (displayMode) =&gt; window.matchMedia('(display-mode: ' + displayMode + ')').matches
-    );
+   return ["fullscreen", "standalone", "minimal-ui"].some(
+       function(displayMode) {
+           return window.matchMedia('(display-mode: ' + displayMode + ')').matches;
+       }
+   );
 };
 
 const platform = "Web";
