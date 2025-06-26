@@ -815,7 +815,9 @@ $(document).ready(function(){
     isWebMobile = /Mobi/.test(navigator.userAgent);
     isStandalonePWA = window.matchMedia('(display-mode: standalone)').matches ||
               window.navigator.standalone === true ||
-              document.referrer.startsWith('android-app://');
+              document.referrer === '';
+
+    $('.intruder_versionNumber').text(isWebMobile.toString() + " / " + isStandalonePWA.toString())
 
     addIMG = $("#addIMG").attr('src');
     binIMG = $("#binIMG").attr('src');
@@ -840,7 +842,7 @@ $(document).ready(function(){
 
     $("img").attr("draggable", false);
     
-    /*KONSOLEADD
+    
 
     konsole = new Konsole($(".konsole")[0]);
     window.onerror = function(message, error) {
@@ -858,6 +860,6 @@ $(document).ready(function(){
         consoleShown = !consoleShown;
     })
 
-    KONSOLEADD*/
+    
     
 });//readyEnd
