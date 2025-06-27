@@ -385,11 +385,11 @@ function session_read(set=false){
         data.forEach(session => {
             if(session.type == "W"){
                 session.exoList.forEach(exo => {
-                    if(exo.type == "Brk."){
+                    if(exo.type == "Pause"){
                         exo.type = "Brk.";
                     }else if(exo.type == "Int." && !isIntervallLinked(exo)){
                         exo.exoList.forEach(subExo => {
-                            if(subExo.type == "Brk."){
+                            if(subExo.type == "Pause"){
                                 subExo.type = "Brk.";
                             };
                         });
@@ -397,7 +397,7 @@ function session_read(set=false){
                 });
             }else if(session.type == "I"){
                 session.exoList.forEach(exo => {
-                    if(exo.type == "Brk."){
+                    if(exo.type == "Pause"){
                         exo.type = "Brk.";
                     };
                 });
