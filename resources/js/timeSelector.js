@@ -18,9 +18,9 @@ function summonTimeSelector(target){
     isEditing = false
     let timeValue = time_unstring($(target).storeVal(), true);
 
-    $('.timeSelectorHours').find('.timeSelectorInput').val(timeValue[3]);
-    $('.timeSelectorMinutes').find('.timeSelectorInput').val(timeValue[4]);
-    $('.timeSelectorSeconds').find('.timeSelectorInput').val(timeValue[5]);
+    $('.timeSelectorHours').find('.timeSelectorInput').val(timeValue.h);
+    $('.timeSelectorMinutes').find('.timeSelectorInput').val(timeValue.m);
+    $('.timeSelectorSeconds').find('.timeSelectorInput').val(timeValue.s);
 
     updateTimeSelectorVal($('.timeSelectorHours').find('.timeSelectorInput'), 0);
     updateTimeSelectorVal($('.timeSelectorMinutes').find('.timeSelectorInput'), 0);
@@ -60,8 +60,6 @@ function updateTimeSelectorVal(target, vec){
     }else{
         $(down).text(val-2);
     };
-
-
 };
 
 function timeSelectorUpdateTarget(classs){
@@ -70,7 +68,7 @@ function timeSelectorUpdateTarget(classs){
     if(classs.includes("Linput")){
         LinputShown = false;
 
-        let val = time_unstring(get_timeString($(".Linput").storeVal()));
+        let val = time_unstring($(".Linput").storeVal());
         if(val >= 3600){val = false};
 
         LrestTime = val === false ? LrestTime : val;
@@ -92,7 +90,7 @@ function timeSelectorUpdateTarget(classs){
 
         RinputShown = false;
 
-        let val = time_unstring(get_timeString($(".Rinput").storeVal()));
+        let val = time_unstring($(".Rinput").storeVal());
         if(val >= 3600){val = false};
 
         RrestTime = val === false ? RrestTime : val;

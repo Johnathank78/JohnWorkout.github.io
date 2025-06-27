@@ -495,7 +495,7 @@ function historyDay(i, history){
 
     day = history.historyList[i];
     date = formatDate(day.date);
-    time = display_timeString(get_timeString(timeFormat(parseInt(day.duration))));
+    time = display_timeString(get_timeString(timeFloor(parseInt(day.duration))));
 
     if(date == formatDate(Date.now())){
         out[0].push(fillElem("day", [textAssets[parameters.language].updatePage.today, time]));

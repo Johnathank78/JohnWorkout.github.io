@@ -285,7 +285,7 @@ async function resumeApp(){
 
     let elapsedTime = parseInt((new Date().getTime() - backgroundTimestamp) / 1000);
 
-    $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFormat(tempStats.timeSpent))));
+    $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFloor(tempStats.timeSpent))));
 
     if(currentSide.includes("L")){
         hasBeenUpdated = true;

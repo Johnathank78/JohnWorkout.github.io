@@ -288,7 +288,7 @@ function startWorkout(){
     TPtimer = setInterval(() => {
         if(!isIdle){
             tempStats.timeSpent++;
-            $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFormat(tempStats.timeSpent))));
+            $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFloor(tempStats.timeSpent))));
 
             recovery.tempStats.timeSpent = tempStats.timeSpent;
         };
@@ -500,7 +500,7 @@ function workout(exercises_list){
         TPtimer = setInterval(() => {
             if(!isIdle){
                 tempStats.timeSpent++;
-                $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFormat(tempStats.timeSpent))));
+                $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFloor(tempStats.timeSpent))));
 
                 recovery.tempStats.timeSpent = tempStats.timeSpent;
             }

@@ -294,8 +294,8 @@ function stats_save(data){
 };
 
 function stats_set(data){
-    $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFormat(data.timeSpent))));
-    $(".selection_info_WorkedTime").text(display_timeString(get_timeString(timeFormat(parseInt(data.workedTime)))));
+    $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFloor(data.timeSpent))));
+    $(".selection_info_WorkedTime").text(display_timeString(get_timeString(timeFloor(parseInt(data.workedTime)))));
     $(".selection_info_WeightLifted").text(weightUnitgroup(data.weightLifted, parameters.weightUnit));
     $(".selection_info_RepsDone").text(parseInt(data.repsDone));
     $(".selection_infoStart_value").text(formatDate(data.since));

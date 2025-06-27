@@ -363,7 +363,7 @@ function get_session_time(session, uniFix=false){
     return computedTime;
 };
 
-function get_effective_sessionTime(sessionObj, computedTime, X = 6, tolerance = 0.30) {
+function get_effective_sessionTime(sessionObj, computedTime, X = 5, tolerance = 0.6){
   if (!sessionObj?.history?.historyList) return null;
 
   const historyDays = sessionObj.history.historyList;
@@ -372,7 +372,7 @@ function get_effective_sessionTime(sessionObj, computedTime, X = 6, tolerance = 
   const complete = Array.isArray(historyDays)
   ? historyDays.filter(historyDay => isHistoryDayComplete(historyDay, "W"))
   : [];
-
+  
   if (complete.length <= X) return null; // pas assez de séances complètes
 
   // 2. Garder celles dont la durée observée est dans la tolérance
@@ -383,7 +383,7 @@ function get_effective_sessionTime(sessionObj, computedTime, X = 6, tolerance = 
     return delta <= tolerance;
   });
 
-  if (kept.length <= X) return null;
+  if (kept.length < X) return null;
   const sumObs = kept.reduce((sum, s) => sum + s.duration, 0);
 
   return Math.round(sumObs / kept.length);
@@ -773,39 +773,25 @@ function subtractTime(key){
 };
 
 function get_time(ref){
-
     let output = "";
+    let convert = get_timeString(timeFloor(ref), true)
 
     if(ref >= 3600){
-        let hours = Math.floor(ref/3600).toString();
-        let minutes = Math.floor(Math.floor(ref/60) - hours*60).toString();
-        let secondes = Math.floor(ref - minutes*60 - hours*3600).toString();
+        convert.m = convert.m.toString().length == 1 ? "0"+convert.m : convert.m;
+        convert.s = convert.s.toString().length == 1 ? "0"+convert.s : convert.s;
 
-        if(minutes.length == 1){
-            minutes = "0"+minutes;
-        };
-        if(secondes.length == 1){
-            secondes = "0"+secondes;
-        };
-        output = hours+":"+minutes+":"+secondes;
+        output = convert.h+":"+convert.m+":"+convert.s;
         return output;
     }else{
-        let minutes = Math.floor(ref/60).toString();
-        let secondes = Math.floor(ref - minutes*60).toString();
+        convert.s = convert.s.toString().length == 1 ? "0"+convert.s : convert.s;
 
-        if(secondes.length == 1){
-            secondes = "0"+secondes;
-        };
-        output = minutes+":"+secondes;
+        output = convert.m+":"+convert.s;
         return output;
     };
 };
 
 function get_timeString(ref, getList=false){
-    if(isNaI(ref) && !isNaI(ref.substring(ref.length - 1, ref.length))){ref += abrTimeSymols.second};
-    ref = time_unstring(ref);
-
-    if(ref === false){return false};
+    if(ref === false || isNaI(ref)){return false};
 
     let years = Math.floor(ref/31449600).toString();
     let weeks = Math.floor(Math.floor(ref/604800) - years*52).toString();
@@ -820,14 +806,14 @@ function get_timeString(ref, getList=false){
     secondes = (secondes.length == 1 && secondes != 0 && ref > 60) ? "0" + secondes : secondes;
 
     if (getList) {
-        return [
-            parseInt(years),
-            parseInt(weeks),
-            parseInt(days),
-            parseInt(hours),
-            parseInt(minutes),
-            parseInt(secondes)
-        ];
+        return {
+            y: parseInt(years),
+            w: parseInt(weeks),
+            d: parseInt(days),
+            h: parseInt(hours),
+            m: parseInt(minutes),
+            s: parseInt(secondes)
+        };
     } else {
         return (
             (years != 0 ? years + abrTimeSymols.year : "") +
@@ -905,11 +891,15 @@ function time_unstring(strr, getList=false){
     m = (m !== null) ? parseInt(m[0].split(abrTimeSymols.minute)[0]) : 0;
     s = (s !== null) ? parseInt(s[0].split(abrTimeSymols.second)[0]) : 0;
 
-    if(getList){return [y, w, d, h, m, s]}else{return y*31449600+w*604800+d*86400+h*3600+m*60+s};
+    if(getList){
+        return {y, w, d, h, m, s};
+    }else{
+        return y*31449600+w*604800+d*86400+h*3600+m*60+s
+    };
 };
 
-function timeFormat(ref){
-    return  ref >= 86400 ? (ref - ref%3600) : ref >= 3600 ? (ref - ref%60) : ref;
+function timeFloor(ref){
+    return  ref >= 86400 ? Math.floor(ref - ref%3600) : ref >= 3600 ? Math.floor(ref - ref%60) : Math.floor(ref);
 };
 
 // Date

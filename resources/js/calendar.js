@@ -1388,15 +1388,15 @@ $(document).ready(function(){
         $('.selection_dayPreview_focusTitle').text($(this).text());
         $('.selection_dayPreview_focusSubTitle').text("n°"+number);
 
-        $('.selection_dayPreview_focusTime_before').text((beforeList[3].toString().length > 1 ? beforeList[3] : "0" + beforeList[3]) 
+        $('.selection_dayPreview_focusTime_before').text((beforeList.h.toString().length > 1 ? beforeList.h : "0" + beforeList.h) 
             + textAssets[parameters.language].misc.abrTimeLabels.hour 
-            + (beforeList[4].toString().length > 1 ? beforeList[4] : "0" + beforeList[4]));
-        $('.selection_dayPreview_focusTime_after').text((afterList[3].toString().length > 1 ? afterList[3] : "0" + afterList[3]) 
+            + (beforeList.m.toString().length > 1 ? beforeList.m : "0" + beforeList.m));
+        $('.selection_dayPreview_focusTime_after').text((afterList.h.toString().length > 1 ? afterList.h : "0" + afterList.h) 
             + textAssets[parameters.language].misc.abrTimeLabels.hour 
-            + (afterList[4].toString().length > 1 ? afterList[4] : "0" + afterList[4]));
+            + (afterList.m.toString().length > 1 ? afterList.m : "0" + afterList.m));
 
         $('.selection_dayPreview_focusExchangeBtn').data("idFrom", $(this).data("id"));
-        $('.selection_dayPreview_focusExchangeBtn').data("hourMinutes", [beforeList[3], beforeList[4]]);
+        $('.selection_dayPreview_focusExchangeBtn').data("hourMinutes", [beforeList.h, beforeList.m]);
         $('.selection_dayPreview_focusExchangeBtn').data("elemId", $('.selection_dayPreview_item').index(this));
         $('.selection_dayPreview_focusExchangeBtn').data("dayInd", $('.selection_page_calendar_row_day').index(actualRowDay));
         

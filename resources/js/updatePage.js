@@ -327,52 +327,55 @@ function plotHistoryGraph(session){
     };
 };
 
-function switchHistoryGraphScenario(showIntervals){
+function switchHistoryGraphScenario(showIntervals) {
     const $select = $('.historyGraph_modeSelect');
+
+    // --- helpers ----------------------------------------------------------
+    const cacheKeyInt   = 'intervalOptions';
+    const cacheKeyNoInt = 'noIntervalOptions';
+
+    const stash = (key, $opts) => {
+        $select.data(key, ($select.data(key) || $()).add($opts.detach()));
+    };
+
+    const restore = (key) => {
+        const $cached = $select.data(key);
+        if ($cached && $cached.length) {
+            $select.append($cached);          // put back in the DOM
+            $select.data(key, $());           // reset cache
+        }
+    };
+    // ----------------------------------------------------------------------
 
     if (showIntervals) {
         $('.historyGraph_subExoSelect').css('display', 'flex');
-        // Show interval options (work, rest), hide non-interval options (weight, reps)
-        $('.historyGraph_scenarioInt')
-            .prop('disabled', false)
-            .removeAttr('hidden');
-        
-        $('.historyGraph_scenarioNoInt')
-            .prop('disabled', true)
-            .attr('hidden', true);
-        
-        // Restore previous interval selection or default to 'work'
-        if(focusMode == "weight" || focusMode == "reps"){
+
+        stash(cacheKeyNoInt, $select.find('.historyGraph_scenarioNoInt'));
+        restore(cacheKeyInt);
+
+        if (focusMode === 'weight' || focusMode === 'reps') {
             focusModeSav.w = focusMode;
-            focusMode = focusModeSav.i;
-        }else{
+            focusMode      = focusModeSav.i;
+        } else {
             focusModeSav.i = focusMode;
-        };
+        }
 
     } else {
         $('.historyGraph_subExoSelect').css('display', 'none');
-        // Show non-interval options (weight, reps), hide interval options (work, rest)
-        $('.historyGraph_scenarioNoInt')
-            .prop('disabled', false)
-            .removeAttr('hidden');
-        
-        $('.historyGraph_scenarioInt')
-            .prop('disabled', true)
-            .attr('hidden', true);
-        
-        // Restore previous non-interval selection or default to 'weight'
-        if(focusMode == "work" || focusMode == "rest"){
+
+        stash(cacheKeyInt, $select.find('.historyGraph_scenarioInt'));
+        restore(cacheKeyNoInt);
+
+        if (focusMode === 'work' || focusMode === 'rest') {
             focusModeSav.i = focusMode;
-            focusMode = focusModeSav.w;
-
-        }else{
+            focusMode      = focusModeSav.w;
+        } else {
             focusModeSav.w = focusMode;
-        };
-    };
+        }
+    }
 
-    // Update the select element to match focusMode
-    $select.val(focusMode);
-    $select.trigger('change');
+    // Synchronise the <select> and notify listeners
+    $select.val(focusMode).trigger('change');
 };
 
 function fillSubExoList(session, id){
@@ -583,11 +586,12 @@ $(document).ready(function(){
 
         $('.update_intervallLink').children().remove();
         $('.update_intervallList_container').html("");
-        
-        if(session_list.filter(session => session.type == "I").length > 0){
+
+        let iSessions = session_list.filter(session => session.type == "I");
+        if(iSessions.length > 0){
             $('.update_intervallLink').prop('disabled', false);
 
-            session_list.forEach(session => {
+            iSessions.forEach(session => {
                 if(session.type == 'I'){
                     $('.update_intervallLink').append($(optString.replace('[idVAL]', session.id).replace('[sessionVAL]', session.name)))
                 };
