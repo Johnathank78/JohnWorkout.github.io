@@ -54,7 +54,7 @@ $(document).ready(async function(){
         parameters = parameters_read();
 
         exercisesHTML = $('<div class="update_workoutList_container"></div>');
-        intervallHTML = $('<div class="update_intervall_container"></div>');
+        intervallHTML = $('<div class="update_intervallList_container"></div>');
 
         $(exercisesHTML).append(exercise_tile());
         $(intervallHTML).append(Iintervall_tile());

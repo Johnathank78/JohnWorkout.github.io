@@ -774,7 +774,7 @@ function subtractTime(key){
 
 function get_time(ref){
     let output = "";
-    let convert = get_timeString(timeFloor(ref), true)
+    let convert = get_timeString(parseInt(ref), true);
 
     if(ref >= 3600){
         convert.m = convert.m.toString().length == 1 ? "0"+convert.m : convert.m;

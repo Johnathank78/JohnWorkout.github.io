@@ -29,7 +29,7 @@ function reminder_tile(reminder, archived = false){
 };
 
 function session_tile(session, archived = false){
-    let time = get_session_time(session)
+    let time = get_session_time(session);
     let schedule_color = false;
 
     if(isScheduled(session)){schedule_color = "#1dbc60"}else{schedule_color = "#363949"};
