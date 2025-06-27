@@ -216,7 +216,7 @@ const textAssets = {
                 "Uni.": "Unilatéral",
                 "Int.": "Intervalle",
                 "Wrm.": "Echauffement",
-                "Pause": 'Pause'
+                "Brk.": 'Pause'
             }
         },
         "screenSaver": {

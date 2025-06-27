@@ -93,10 +93,10 @@ function iserror_int(mname, isEdit){
             rest = $(items).eq(i).find(".update_workout_intervall_data_rest").storeVal();
     
             interror = iserror(name, cycle, work, rest, isEdit);
-        }else if(type == "Pause"){
+        }else if(type == "Brk."){
             rest = time_unstring($(items).eq(i).find(".update_workout_data_pausetime").storeVal());
 
-            if(i>0 && $(items[i-1]).find(".update_workout_data_type").text() == "Pause"){
+            if(i>0 && $(items[i-1]).find(".update_workout_data_type").text() == "Brk."){
                 $(".update_error_container").css("display", "block");
                 $(".update_error_msg").text(textAssets[parameters.language].error.updatePage.consecutiveBreak);
                 return true;
@@ -207,10 +207,10 @@ function iserror_exo(mname, isEdit){
             $(".update_error_container").css("display", "block");
             $(".update_error_msg").text(textAssets[parameters.language].error.updatePage.fillAllEntries);
             return true;
-        }else if(type == "Pause"){
+        }else if(type == "Brk."){
             rest = time_unstring($(items).eq(i).find(".update_workout_data_pausetime").storeVal());
 
-            if(i > 0 && $(items).eq(i-1).find(".update_workout_data_type").text() == "Pause"){
+            if(i > 0 && $(items).eq(i-1).find(".update_workout_data_type").text() == "Brk."){
                 $(".update_error_container").css("display", "block");
                 $(".update_error_msg").text(textAssets[parameters.language].error.updatePage.consecutiveBreak);
                 return true;

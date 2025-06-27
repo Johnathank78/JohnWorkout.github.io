@@ -262,7 +262,7 @@ function getIterationNumber(C, D, X, Y, Z, U, T, O, F, { maxI, i }, ID = false) 
     }
 };
 
-function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
+function isEventScheduled(C, D, X, Y, Z, U, T, O) {
     // -------------------------------------
     // 1. Input parameters explanation
     // -------------------------------------
@@ -412,32 +412,34 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
     if (diffInDays >= 0) {
         // If diffInDays >= 0, just check if C is an event day.
         return checkEventDay(diffInDays);
-    } else {
-        // For negative offsets, we handle the specialized case for "before the first scheduled date."
+    }
+    
+    // else {
+    //     // For negative offsets, we handle the specialized case for "before the first scheduled date."
 
-        // 8.1. Check if C meets the pattern even though it's before D.
-        const occurrence = checkEventDay(diffInDays);
-        if (!occurrence) return false;
+    //     // 8.1. Check if C meets the pattern even though it's before D.
+    //     const occurrence = checkEventDay(diffInDays);
+    //     if (!occurrence) return false;
 
-        // 8.2. Ensure the spacing between C and D is exactly intervalDays
-        //      so that C is presumably the event immediately before D.
-        const dayDifference = Math.round(
-            (zeroAM(D, "date") - zeroAM(C, "date")) / millisecondsPerDay
-        );
-        const correctSpacing = (dayDifference === intervalDays);
+    //     // 8.2. Ensure the spacing between C and D is exactly intervalDays
+    //     //      so that C is presumably the event immediately before D.
+    //     const dayDifference = Math.round(
+    //         (zeroAM(D, "date") - zeroAM(C, "date")) / millisecondsPerDay
+    //     );
+    //     const correctSpacing = (dayDifference === intervalDays);
 
-        // 8.3. Additional checks:
-        //      - C_isToday ensures we only consider "today" if that's required
-        //      - isShifted references external "shift" logic
-        const C_isToday = (zeroAM(C, "timestamp") === getToday("timestamp"));
-        const isShifted = ID ? hasBeenShifted.data[ID] : true;
+    //     // 8.3. Additional checks:
+    //     //      - C_isToday ensures we only consider "today" if that's required
+    //     //      - isShifted references external "shift" logic
+    //     const C_isToday = (zeroAM(C, "timestamp") === getToday("timestamp"));
+    //     const isShifted = ID ? hasBeenShifted.data[ID] : true;
 
-        // 8.4. If all conditions align, keep the occurrence from checkEventDay.
-        if (correctSpacing && C_isToday && !isShifted) return occurrence;
+    //     // 8.4. If all conditions align, keep the occurrence from checkEventDay.
+    //     if (correctSpacing && C_isToday && !isShifted) return occurrence;
 
-        // Otherwise, it's not considered scheduled.
-        return false;
-    };
+    //     // Otherwise, it's not considered scheduled.
+    //     return false;
+    // };
 };
 
 function generateBaseCalendar(page){
@@ -538,8 +540,7 @@ function updateCalendar(data, page){
                         jumpData.jumpVal, 
                         jumpData.jumpType, 
                         jumpData.everyVal, 
-                        scheduleOccurence, 
-                        id
+                        scheduleOccurence
                     )){
                         nbdayz += 1; 
                         continue;
@@ -635,8 +636,7 @@ function updateCalendar(data, page){
                             jumpData.jumpVal, 
                             jumpData.jumpType, 
                             jumpData.everyVal, 
-                            scheduleOccurence, 
-                            id
+                            scheduleOccurence
                         )){
                             nbdayz += 1; 
                             continue;

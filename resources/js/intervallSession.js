@@ -112,7 +112,7 @@ function intervall(data, from_wo = false){
                 mid_color = mid_red;
                 update_soundSlider();
 
-                if(intExType == "Pause"){
+                if(intExType == "Brk."){
                     $(".session_state").text(textAssets[parameters.language].updatePage.break.toUpperCase());
                     $(".screensaver_text").text(textAssets[parameters.language].updatePage.break);
                 }else{
@@ -180,7 +180,7 @@ function intervall(data, from_wo = false){
     };
 
     function historyTargetUpdate(){
-        let pauseCorr = data.slice(0, currentExoIndex).filter(exo => exo.type == "Pause").length;
+        let pauseCorr = data.slice(0, currentExoIndex).filter(exo => exo.type == "Brk.").length;
         let correctedIndex = currentExoIndex - pauseCorr;
 
         if(from_wo){
@@ -321,7 +321,7 @@ function intervall(data, from_wo = false){
             iActualSet = 0;
             intExType = data[currentExoIndex + 1].type;
     
-            if(intExType == 'Pause'){
+            if(intExType == 'Brk.'){
                 isBeeping = false;
                 iRest_time = time_unstring(data[currentExoIndex + 1].rest);
                 

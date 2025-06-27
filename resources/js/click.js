@@ -67,18 +67,7 @@ function longClickDownHandler(e){
             };
 
         }else if($(this).data("counter") >= 100){
-            $(this).data("completed", true);
-
-            setTimeout(() => {
-
-                $(this).css("background", "unset");
-                $(this).css("backgroundColor", LC_color);
-
-                $(this).data("counter", 0);
-                $(this).data("completed", false);
-
-            }, 50);
-
+            // Trigger the longClicked event
             let event = new CustomEvent('longClicked', { bubbles: true });
             this.dispatchEvent(event);
 
@@ -88,8 +77,31 @@ function longClickDownHandler(e){
                 navigator.vibrate(300, 2);
             };
 
-            clearInterval($(this).data("onIntervall"));
-            $(this).data("onIntervall", false);
+            // Check if chaining is enabled
+            if($(this).data("chain")){
+                // Reset counter to 0 and continue
+                $(this).data("counter", 0);
+                
+                // Quick visual reset
+                $(this).css("background", "unset");
+                $(this).css("backgroundColor", LC_color);
+                
+                // Continue the interval - it will keep running
+            }else{
+                // Original behavior - complete and stop
+                $(this).data("completed", true);
+
+                setTimeout(() => {
+                    $(this).css("background", "unset");
+                    $(this).css("backgroundColor", LC_color);
+
+                    $(this).data("counter", 0);
+                    $(this).data("completed", false);
+                }, 50);
+
+                clearInterval($(this).data("onIntervall"));
+                $(this).data("onIntervall", false);
+            }
 
             return;
         }}, 10)
@@ -190,23 +202,7 @@ $(document).ready(function(){
         $(document).on("mousemove", ".longClickable", longClickMoveHandler);
     };
 
-    $(document).on("fantomClicked", ".rest_react", function(){
-        if(!isReactShowin){
-            isReactShowin = true;
-            $(this).animate({
-                opacity : .1,
-            }, 75, function(){
-                $(this).animate({
-                    opacity : 0,
-                }, 75, function(){
-                    isReactShowin = false
-                });
-            });
-        };
-    });
-
     $(".longClickable").each(function(){
-
         $(this).data("canLongClick", true);
 
         $(this).data("onIntervall", false);
@@ -247,6 +243,28 @@ $(document).ready(function(){
             $(this).data("alert", true);
         };
 
+        // Add chain parameter
+        if(this.getAttribute("chain") == "true"){
+            $(this).data("chain", true);
+        }else{
+            $(this).data("chain", false);
+        };
+
         $(this).data("counter", 0);
     });
-});//readyEnd
+
+    $(document).on("fantomClicked", ".rest_react", function(){
+        if(!isReactShowin){
+            isReactShowin = true;
+            $(this).animate({
+                opacity : .1,
+            }, 75, function(){
+                $(this).animate({
+                    opacity : 0,
+                }, 75, function(){
+                    isReactShowin = false
+                });
+            });
+        };
+    });
+});

@@ -262,7 +262,7 @@ async function pauseApp(){
 
                 if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
             }
-        }else if(extype == "Pause"){
+        }else if(extype == "Brk."){
             currentSide += "L";
             start = new Date(Date.now() + ((LrestTime - Lspent) * 1000));
             title = textAssets[parameters.language].notification.breakOver;
@@ -638,7 +638,7 @@ $(document).ready(function(){
                                     ]
                                 });
                             }
-                        }else if(extype == "Pause"){
+                        }else if(extype == "Brk."){
                             currentSide += "L"
                             start = new Date(Date.now() + ((LrestTime - Lspent) * 1000))
                             title = textAssets[parameters.language].notification.breakOver

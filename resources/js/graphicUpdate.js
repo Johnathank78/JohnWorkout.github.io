@@ -355,7 +355,7 @@ function behindExerciseContainer(shown){
         if(virtualHeight < Lrest_bottomBorder){$(".session_exercise_Lrest_btn").css("opacity", "0")};
         if(virtualHeight < Rrest_bottomBorder){$(".session_exercise_Rrest_btn").css("opacity", "0")};
     }else{
-        if(extype == "Pause" || extype == "Int."){
+        if(extype == "Brk." || extype == "Int."){
             $(".session_workout_extraTimer_container, .session_header, .selection_info, .session_workout_extraTimer_container, .session_current_exercise_specs, .session_specsPastData, .session_current_exercise_name").css("opacity", "1");
             if(!Ltimer){
                 $('.session_exercise_Lrest_btn').css('opacity', '1');

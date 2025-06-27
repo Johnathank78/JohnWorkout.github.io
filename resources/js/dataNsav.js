@@ -132,7 +132,7 @@ function generateExoObj({type, name, setNb, reps, weight, rest, cycle, work, hin
             "hint" : hint,
             "id" : id
         };
-    }else if(type == "Pause"){
+    }else if(type == "Brk."){
         return {
             "type" : type,
             "rest" : rest,
@@ -257,18 +257,6 @@ function saveItem(name, data){
     return;
 };
 
-function JSONiseStats(data){
-    if(isDict(data)){return data};
-
-    return generateStatsObj({
-        "timeSpent": parseInt(data[0]),
-        "workedTime": parseInt(data[1]),
-        "weightLifted": parseFloat(data[2]),
-        "repsDone": parseInt(data[3]),
-        "missedSessions": {"val": parseInt(data[5]), "year": getToday("date").getFullYear()},
-        "since": data[4],
-    });
-};
 
 function stats_read(set=false){
     let data = localStorage.getItem("stats");
@@ -317,19 +305,6 @@ function stats_set(data){
     };
 };
 
-
-function JSONiseParameters(data){
-    if(isDict(data)){return data};
-    
-    return generateParametersObj({
-        "language": data[0],
-        "weightUnit": data[1],
-        "notifBefore": data[2],
-        "deleteAfter": data[3],
-        "autoSaver": data[4] == true,
-        "keepAwake": data[5] == true
-    });
-};
 
 function parameters_read(first=true){
 
@@ -390,335 +365,6 @@ function parameters_save(data){
 };
 
 
-function JSONiseList(list){
-    if(list.length == 0){return []};
-    if(isDict(list[0])){return list};
-
-    //RESET VARS
-
-    Array.prototype.getId = function() {
-        return this[this.length - 1];
-    };
-
-    function isScheduled(item){
-        if(item[item.length - 2].constructor.name == "Array"){
-            if(item[item.length - 2][0] == "Notif"){
-                return item[item.length - 2];
-            }else{
-                return false;
-            };
-        }else{
-            return false;
-        };
-    };
-
-    function getSessionHistory(session){
-        if(session[0] == "W"){
-            return isScheduled(session) ? session[session.length - 3] : session[session.length - 2];
-        }else if(session[0] == "I"){
-            return isScheduled(session) ? session[session.length - 3] : session[session.length - 2];
-        }
-    };
-
-    function getHint(session, id){
-        for (let i = 0; i < session[2].length; i++) {
-            const elem = session[2][i];
-    
-            if(elem.getId() == id){
-                if(elem[0] == "Int."){
-                    if(isIntervallLinked(elem)){
-                        return elem[3];
-                    }else{
-                        return elem[2];
-                    };
-                }else if(elem.length == 8){
-                    return elem[6];
-                };
-            };
-        };
-    
-        return false;
-    };
-
-    function isIntervallLinked(data){
-        return !Array.isArray(data[2]);
-    };
-
-    if(platform == "Mobile"){
-        list.forEach(element => {
-            removeAllNotifsFromSession(element.getId())
-        });
-    };
-
-    let out = [];
-
-    for(let i = 0; i < list.length; i++){
-        let session = list[i];
-
-        if(session[0] != "R"){
-            let history = false;            
-            let currentHistory = getSessionHistory(session);
-            
-            if(currentHistory.length == 1){
-                history = generateHistoryObj({
-                    "state": currentHistory[0][1], 
-                    "historyCount": currentHistory[0][2],
-                    "historyList": []
-                });
-            }else{
-                let currentHistoryList = [];
-                
-                if(session[0] == "W"){
-                    currentHistory.forEach((thatHistory, id) => {
-                        if(id != 0){
-                            let date = thatHistory[0];
-                            let time = thatHistory[1];
-                            let exoList = [];
-                            
-                            thatHistory[2].forEach(exo => {
-                                let type = exo.length > 3 ? "Bi." : "Int.";
-                                let exoName = exo[0];
-                                let exoExptected = false;
-                                let setList = [];
-                                
-                                if(type == "Bi."){
-                                    exoExptected = generateHistoryExceptedStatsObj({
-                                        "type": type, 
-                                        "setNb": exo[1][0], 
-                                        "reps": exo[1][1], 
-                                        "weight": exo[1][2], 
-                                        "weightUnit": exo[1][3]
-                                    });
-    
-                                    exo[2].forEach(set => {
-                                        if(set.length > 0){
-                                            setList.push(generateHistorySetObj({
-                                                "type": type,
-                                                "reps": set[0],
-                                                "weight": set[1]
-                                            }));
-                                        };
-                                    });
-    
-                                    exoList.push(generateHistoryExoObj({
-                                        "type": type,
-                                        "name": exoName,
-                                        "expectedStats": exoExptected,
-                                        "setList": setList,
-                                        "note": false,
-                                        "id": false
-                                    }))
-                                }else{
-                                    let intExoList = []
-                                    
-                                    exo[1].forEach(subExo => {
-                                        let name = subExo[0];
-                                        let expectedStats = generateHistoryExceptedStatsObj({
-                                            "type": type, 
-                                            "cycle": subExo[1][0],
-                                            "work": subExo[1][1],
-                                            "rest": subExo[1][2],
-                                        });
-                                        
-                                        let setList = [];
-                                        subExo[2].forEach(set => {
-                                            if(set.length > 0){
-                                                setList.push(generateHistorySetObj({
-                                                    "type": type,
-                                                    "work": set[0],
-                                                    "rest": set[1]
-                                                }));
-                                            };
-                                        });
-    
-                                        intExoList.push(generateHistoryExoObj({
-                                            "type": type,
-                                            "name": name,
-                                            "expectedStats": expectedStats,
-                                            "setList": setList,
-                                            "note": false,
-                                            "id": false
-                                        }))
-    
-                                    });
-    
-                                    exoList.push(generateHistoryINTExoObj({
-                                        "type": "Int.",
-                                        "name": exo[0],
-                                        "exoList": intExoList,
-                                        "note": false,
-                                        "id": false
-                                    }));
-                                };
-                            });
-    
-                            currentHistoryList.push(generateHistoryElementObj({
-                                "date": date,
-                                "duration": time,
-                                "exoList": exoList
-                            }))
-    
-                        };
-                    });
-                }else if(session[0] == "I"){
-                    currentHistory.forEach((thatHistory, id) => {
-                        if(id != 0){
-                            let date = thatHistory[0];
-                            let time = thatHistory[1];
-                            let exoList = [];
-    
-                            thatHistory[2].forEach(exo => {
-                                let type = "Int.";
-                                let exoName = exo[0];
-                                
-                                let exoExptected = generateHistoryExceptedStatsObj({
-                                    "type": type, 
-                                    "cycle": exo[1][0], 
-                                    "work": exo[1][1], 
-                                    "rest": exo[1][2], 
-                                });
-                                
-                                let setList = [];
-    
-                                exo[2].forEach(set => {
-                                    if(set.length > 0){
-                                        setList.push(generateHistorySetObj({
-                                            "type": type,
-                                            "work": set[0],
-                                            "rest": set[1]
-                                        }));
-                                    };
-                                });
-    
-                                exoList.push(generateHistoryExoObj({
-                                    "type": type,
-                                    "name": exoName,
-                                    "expectedStats": exoExptected,
-                                    "setList": setList,
-                                    "note": false,
-                                    "id": false
-                                }))
-                            });
-    
-                            currentHistoryList.push(generateHistoryElementObj({
-                                "date": date,
-                                "duration": time,
-                                "exoList": exoList
-                            }))
-                        };
-                    });
-                };
-    
-                history = generateHistoryObj({
-                    "state": currentHistory[0][1] == "true", 
-                    "historyCount": currentHistory[0][2], 
-                    "historyList": currentHistoryList
-                });
-            };
-            
-            let exoList = [];
-    
-            if(session[0] == "W"){
-                session[2].forEach((exo, index) => {
-                    if(exo[0] == "Pause"){
-                        exoList.push(generateExoObj({"type": "Pause", "rest": exo[1], "id": (index+1).toString()}))
-                    }else if(exo[0] == "Uni." || exo[0] == "Bi."){
-                        exoList.push(generateExoObj({
-                            "type" : exo[0],
-                            "name" : exo[1],
-                            "setNb" : parseInt(exo[2]),
-                            "reps" : parseInt(exo[3]),
-                            "weight" : parseFloat(exo[4]),
-                            "rest" : exo[5],
-                            "hint" : getHint(session, exo.getId()),
-                            "id" : (index+1).toString()
-                        }));
-                    }else if(exo[0] == "Int."){
-                        if(isIntervallLinked(exo)){
-                            exoList.push(generateExoObj({
-                                'type': exo[0], 
-                                'hint': getHint(session, exo.getId()), 
-                                'linkId': exo[1],
-                                'id': (index+1).toString(), 
-                             }));
-                        }else{
-                            let subExoList = []
-
-                            exo[2].forEach((subExo, indexND) => {
-                                subExoList.push(generateExoObj({
-                                    "type" : subExo[0],
-                                    "name" : subExo[1],
-                                    "cycle" : subExo[2],
-                                    "work" : subExo[3],
-                                    "rest" : subExo[4],
-                                    "hint" : false,
-                                    "id" : (indexND+1).toString()
-                                }))
-                            });
-    
-                            let intExo = generateSessionObj({
-                                'type': exo[0], 
-                                'name': exo[1], 
-                                'exoList': subExoList, 
-                                'hint': false, 
-                                'id': (index+1).toString(), 
-                            })
-    
-                            exoList.push(intExo);
-                        };
-                    }else if(exo[0] == "Wrm."){
-                        exoList.push(generateExoObj({
-                            "type" : exo[0],
-                            "name" : exo[1],
-                            "hint" : getHint(session, exo.getId()),
-                            "id" : (index+1).toString()
-                        }));
-                    };
-                });
-            }else if(session[0] == "I"){
-                session[2].forEach((exo, index) => {
-                    if(exo[0] == "Pause"){
-                        exoList.push(generateExoObj({"type": "Pause", "rest": exo[1], "id": (index+1).toString()}))
-                    }else{
-                        exoList.push(generateExoObj({
-                            "type" : exo[0],
-                            "name" : exo[1],
-                            "cycle" : exo[2],
-                            "work" : exo[3],
-                            "rest" : exo[4],
-                            "hint" : false,
-                            "id" : (index+1).toString()
-                        }));
-                    };
-                });
-            };
-
-            let newSessionElement = generateSessionObj({
-                'type': session[0], 
-                'name': session[1], 
-                'exoList': exoList,
-                'history': history, 
-                'notif': false, 
-                'color': colorList[Math.floor(Math.random() * colorList.length)],
-                'id': session.getId()
-            });
-
-            out.push(newSessionElement);
-        }else{
-            out.push(generateReminderObj({
-                "type": session[0], 
-                "name": session[1], 
-                "body": session[2], 
-                "notif": false, 
-                "color": colorList[Math.floor(Math.random() * colorList.length)], 
-                "id": session[session.length - 1]
-            }));
-        };
-    };
-
-    return out;
-};
-
 function session_read(set=false){
     let data = localStorage.getItem("sessions_list");
 
@@ -731,9 +377,34 @@ function session_read(set=false){
         data = JSON.parse(data);
         
         // FIX
+
         if(data[1] == "kg" || data[1] == "lbs"){
             data = data[0];
         };
+
+        data.forEach(session => {
+            if(session.type == "W"){
+                session.exoList.forEach(exo => {
+                    if(exo.type == "Brk."){
+                        exo.type = "Brk.";
+                    }else if(exo.type == "Int." && !isIntervallLinked(exo)){
+                        exo.exoList.forEach(subExo => {
+                            if(subExo.type == "Brk."){
+                                subExo.type = "Brk.";
+                            };
+                        });
+                    };
+                });
+            }else if(session.type == "I"){
+                session.exoList.forEach(exo => {
+                    if(exo.type == "Brk."){
+                        exo.type = "Brk.";
+                    };
+                });
+            };
+        });
+
+        // ---
         
         calendar_dict = calendar_read(data);
         return data;
@@ -1100,8 +771,7 @@ function fillSessionToBeDone(){
                 jumpData.jumpVal, 
                 jumpData.jumpType, 
                 jumpData.everyVal, 
-                notif.occurence, 
-                session.id
+                notif.occurence
             )){
                 data.data[session.id] = true;
             };

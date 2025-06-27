@@ -309,7 +309,7 @@ $(document).ready(function(){
                         if(exo.hint){showHint(".update_intervallList_container")};
     
                         manageRestInputVisibility($(".update_intervallList_container").children().last(), update_current_item.type);
-                    }else if(exo.type == "Pause"){
+                    }else if(exo.type == "Brk."){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
                 });
@@ -322,7 +322,7 @@ $(document).ready(function(){
                 $(".update_workoutList_container").html("");
                 
                 update_current_item.exoList.forEach(exo => {
-                    if(exo.type == "Pause"){
+                    if(exo.type == "Brk."){
                         $(".update_workoutList_container").append(pause_tile(exo));
                     }else if(exo.type == "Int."){
                         $(".update_workoutList_container").append(exercise_tile(exo));
@@ -384,7 +384,7 @@ $(document).ready(function(){
                 update_current_item.exoList.forEach(exo => {
                     if(exo.type == "Int."){
                         $(".update_intervallList_container").append(Iintervall_tile(exo));
-                    }else if(exo.type == "Pause"){
+                    }else if(exo.type == "Brk."){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
                 });
@@ -404,7 +404,7 @@ $(document).ready(function(){
                 $(".update_workoutList_container").html("");
 
                 update_current_item.exoList.forEach(exo => {
-                    if(exo.type == "Pause"){
+                    if(exo.type == "Brk."){
                         $(".update_workoutList_container").append(pause_tile(exo));
                     }else if(exo.type == "Int."){
                         $(".update_workoutList_container").append(exercise_tile(exo));

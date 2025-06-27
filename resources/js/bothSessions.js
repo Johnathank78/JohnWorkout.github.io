@@ -763,7 +763,7 @@ function generateIntervallHistoryExoList(session){
             }));
         };
         
-        // else if(exo.type == "Pause"){
+        // else if(exo.type == "Brk."){
         //     out.push({"type": exo.type});
         // };
         

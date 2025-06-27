@@ -1242,6 +1242,14 @@
     width: calc(100% - 10px);
 }
 
+.update_workout_data_centerFix{
+    width: 100%;
+    line-height: 35px;
+    padding-left: unset;
+    text-align: center;
+    text-align-last: center;
+}
+
 .update_workout_data_pause{
     padding-left: unset;
     width: 100%;

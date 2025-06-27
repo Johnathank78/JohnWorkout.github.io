@@ -400,7 +400,7 @@ function showHistoryGraph(session){
     $('.historyGraph_exoSelect').children().remove();
 
     let optExoString = '<option value="[idVAL]">[exoVAL]</option>';
-    let filteredExoList = session.exoList.filter(exo => exo.type != "Pause" && exo.type != "Wrm.");
+    let filteredExoList = session.exoList.filter(exo => exo.type != "Brk." && exo.type != "Wrm.");
 
     if(session.type == "W"){
         focusId = filteredExoList[0].id;
@@ -636,7 +636,7 @@ $(document).ready(function(){
                         if(exo.hint){showHint(".update_intervallList_container")};
     
                         manageRestInputVisibility($(".update_intervallList_container").children().last().find('.update_workout_intervall_data_cycle'));
-                    }else if(exo.type == "Pause"){
+                    }else if(exo.type == "Brk."){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
                 });
@@ -913,7 +913,7 @@ $(document).ready(function(){
                                     "hint": hint,
                                     "id": $(exo).attr("id")
                                 }))
-                            }else if(type == "Pause"){
+                            }else if(type == "Brk."){
                                 rest = $(exo).find(".update_workout_data_pausetime").storeVal();
                                 update_current_item.exoList.push(generateExoObj({
                                     "type": type, 
@@ -1011,7 +1011,7 @@ $(document).ready(function(){
                                     "hint": hint,
                                     "id": $(exo).attr("id")
                                 }));
-                            }else if(type == "Pause"){
+                            }else if(type == "Brk."){
                                 rest = $(exo).find(".update_workout_data_pausetime").storeVal();
 
                                 update_current_item.exoList.push(generateExoObj({
@@ -1121,7 +1121,7 @@ $(document).ready(function(){
                                     "hint": hint,
                                     "id": $(exo).attr("id")
                                 }))
-                            }else if(type == "Pause"){
+                            }else if(type == "Brk."){
                                 rest = $(exo).find(".update_workout_data_pausetime").storeVal();
                                 new_session.exoList.push(generateExoObj({
                                     "type": type, 
@@ -1223,7 +1223,7 @@ $(document).ready(function(){
                                     "hint": hint,
                                     "id": $(exo).attr("id")
                                 }));
-                            }else if(type == "Pause"){
+                            }else if(type == "Brk."){
                                 rest = $(exo).find(".update_workout_data_pausetime").storeVal();
 
                                 new_session.exoList.push(generateExoObj({
@@ -1301,7 +1301,7 @@ $(document).ready(function(){
                             session.exoList.forEach((exo, exoInd) => {
                                 if(isIntervallLinked(exo) && exo.linkId == id){
                                     toDelete.push([index, exoInd]);
-                                    if(exoInd > 0 && session.exoList[exoInd - 1].type == "Pause"){
+                                    if(exoInd > 0 && session.exoList[exoInd - 1].type == "Brk."){
                                         toDelete.push([index, exoInd - 1]);
                                     };
                                 };
@@ -1562,7 +1562,7 @@ $(document).ready(function(){
                             "hint": hint,
                             "id": $(exo).attr("id")
                         }));
-                    }else if(type == "Pause"){
+                    }else if(type == "Brk."){
                         rest = $(exo).find(".update_workout_data_pausetime").storeVal();
                         data.exoList.push(generateExoObj({
                             "type": type,

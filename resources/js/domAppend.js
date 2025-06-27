@@ -99,10 +99,10 @@ function Iintervall_tile(data = false){
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
                         <select name="type" class="update_workout_data_type update_workout_data" disabled>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
-                            <option value="`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`" selected>`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
+                            <option value="Wrm.">`+textAssets[parameters.language].updatePage.exerciseTypes["Wrm."]+`</option>
+                            <option value="Bi.">`+textAssets[parameters.language].updatePage.exerciseTypes["Bi."]+`</option>
+                            <option value="Uni.">`+textAssets[parameters.language].updatePage.exerciseTypes["Uni."]+`</option>
+                            <option value="Int." selected>`+textAssets[parameters.language].updatePage.exerciseTypes["Int."]+`</option>
                         </select>
                         <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.type+`</span>
                     </div>
@@ -314,7 +314,7 @@ function exercise_tile(data = false){
             </div>
             `);
                 
-            $(element).find('select[name=type]').find('option[value='+textAssets[parameters.language].updatePage.exerciseTypes[data.type]+']').prop("selected", true)
+            $(element).find('select[name=type]').find('option[value="'+data.type+'"]').prop("selected", true)
             return element
         };
     }else{
@@ -385,7 +385,8 @@ function pause_tile(data = false){
         <div class="update_exercise_pause_item noselect reorder__child">
             <div class="update_workout_pause_item_line">
                 <div class="update_workout_data_type_container update_workout_data_pause">
-                    <input type="text" class="update_workout_data_type update_workout_data" value="`+textAssets[parameters.language].updatePage.exerciseTypes.Pause+`" disabled>
+                    <input type="text" class="update_workout_data_type" value="Brk." style="display: none">
+                    <span class="update_workout_data update_workout_data_centerFix">`+textAssets[parameters.language].updatePage.placeHolders.pause+`</span>
                     <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.type+`</span>
                 </div>
                 <div class="update_workout_data_container">
@@ -402,7 +403,8 @@ function pause_tile(data = false){
         <div class="update_exercise_pause_item noselect reorder__child">
             <div class="update_workout_pause_item_line">
                 <div class="update_workout_data_type_container update_workout_data_pause">
-                    <input type="text" class="update_workout_data_type update_workout_data" value="`+textAssets[parameters.language].updatePage.exerciseTypes.Pause+`" disabled>
+                    <input type="text" class="update_workout_data_type" value="Brk." style="display: none">
+                    <span class="update_workout_data update_workout_data_centerFix">`+textAssets[parameters.language].updatePage.placeHolders.pause+`</span>
                     <span class="update_workout_data_lablel">`+textAssets[parameters.language].updatePage.placeHolders.type+`</span>
                 </div>
                 <div class="update_workout_data_container">

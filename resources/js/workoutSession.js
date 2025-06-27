@@ -130,7 +130,7 @@ function updateSetPreviewStyle(extype, isPast=false){
         $('.session_setPreview_sideTitle').eq(1).text("Rest");
 
         $('.session_setPreview_side').eq(1).css('display', 'flex');
-    }else if(extype == "Pause" || !isPast){
+    }else if(extype == "Brk." || !isPast){
         $('.session_setPreview_side').eq(0).find('.session_setPreview_sideTitle').css('display', 'none');
         $('.session_setPreview_side').eq(0).find('.session_setPreview_sideData').css('border-radius', '8px');
         $('.session_setPreview_side').eq(1).css('display', 'none');
@@ -166,7 +166,7 @@ function sets_reorderUpdate(e, merge){
             target = $(childs).eq(i);
 
             merged = $(target).find('.session_next_exercise_type').filter(function(){
-                return $(this).text().includes("Pause") || $(this).text().includes("Wrm.");
+                return $(this).text().includes("Brk.") || $(this).text().includes("Wrm.");
             }).parent();
 
             if($(target).children().length > 1){
@@ -186,7 +186,7 @@ function sets_reorderUpdate(e, merge){
         let focusChild = $(e.detail.child);
         let focusedType = $(focusChild).find(".session_next_exercise_type").text();
 
-        if(focusedType == "Pause" || focusedType == "Wrm."){return};
+        if(focusedType == "Brk." || focusedType == "Wrm."){return};
         
         let toMerge; let next; let prev; let type;
         
@@ -194,7 +194,7 @@ function sets_reorderUpdate(e, merge){
             prev = $(focusChild).prev();
             type = $(prev).find(".session_next_exercise_type").text();
 
-            if(type == "Pause" || type == "Wrm."){
+            if(type == "Brk." || type == "Wrm."){
                 toMerge = $(prev).find(".session_next_exercise");
 
                 $(focusChild).prepend(toMerge);
@@ -204,7 +204,7 @@ function sets_reorderUpdate(e, merge){
             next = $(focusChild).next();
             type = $(next).find(".session_next_exercise_type").text();
 
-            if(type == "Pause" || type == "Wrm."){
+            if(type == "Brk." || type == "Wrm."){
                 toMerge = $(next).find(".session_next_exercise");
 
                 $(focusChild).append(toMerge);
@@ -221,7 +221,7 @@ function sets_reorderUpdate(e, merge){
 
         $(childs).each((i) => {
             target = $(childs).eq(i);
-            pause = $(target).find('.session_next_exercise_type:contains("Pause")').parent();
+            pause = $(target).find('.session_next_exercise_type:contains("Brk.")').parent();
 
             if($(target).children().length > 1){
                 pos = $(target).children().index(pause);
@@ -243,7 +243,7 @@ function sets_reorderUpdate(e, merge){
         if(e.detail.prctg <= 40){
             $(childs).each((i) => {
                 prev = $(childs).eq(i).prev();
-                if($(prev).find(".session_next_exercise_type").text() == "Pause"){
+                if($(prev).find(".session_next_exercise_type").text() == "Brk."){
                     pause = $(prev).find(".session_next_exercise");
                     $(childs).eq(i).prepend(pause);
                     $(prev).remove();
@@ -252,7 +252,7 @@ function sets_reorderUpdate(e, merge){
         }else if(e.detail.prctg >= 60){
             $(childs).each((i) => {
                 next = $(childs).eq(i).next();
-                if($(next).find(".session_next_exercise_type").text() == "Pause"){
+                if($(next).find(".session_next_exercise_type").text() == "Brk."){
                     pause = $(next).find(".session_next_exercise");
                     $(childs).eq(i).append(pause);
                     $(next).remove();
@@ -469,12 +469,12 @@ function workout(exercises_list){
                 $(bigExercise).append(exercise);
                 $(".session_next_exercises_container").append(bigExercise);
         
-            }else if(exo.type == "Pause"){
+            }else if(exo.type == "Brk."){
                 $(exercise).append(`
                     <div class="session_next_exercise_set">
                         <span class="session_next_exercise_name reorder__avoid">`+textAssets[parameters.language].updatePage.break+`</span>
                         <span class="session_next_exercise_rest">`+time_unstring(exo.rest)+`</span>
-                        <span class="session_next_exerciseType">Pause</span>
+                        <span class="session_next_exerciseType">Brk.</span>
                     </div>
                 `);
         
@@ -763,7 +763,7 @@ function workout(exercises_list){
                     };
                 };
             };
-        }else if(extype == "Pause"){
+        }else if(extype == "Brk."){
             dropSet_static($(".session_next_exercises_container").find(".session_next_exercise_set").first());
             next_exercise(true);
         };
@@ -805,7 +805,7 @@ async function next_exercise(first){
     extype = $(".session_next_exercise_type").first().text();
     next_id = $(".session_next_exercise_id").first().text().replace(/_(1|2)/g, "");
 
-    if(first && extype != "Pause"){
+    if(first && extype != "Brk."){
 
         updateRestBtnStyle('Reset')
         $(".session_workout_historyNotes_inp").val("").change();
@@ -834,10 +834,10 @@ async function next_exercise(first){
         $('.session_exercise_Rrest_btn').data("canLongClick", false);
         
         update_info(true);
-    }else if(!first || extype == "Pause"){
+    }else if(!first || extype == "Brk."){
         beforeExercise = false;
 
-        if(extype != "Pause"){
+        if(extype != "Brk."){
             $(".session_next_exercise_id").first().remove();
         }else{
             next_id = false;
@@ -846,7 +846,7 @@ async function next_exercise(first){
         $(".session_next_exercise_type").first().remove();
         if($(".session_next_exercise_type").length == 0){lastExo = true};
 
-        if(extype == "Pause" || extype == "Wrm."){
+        if(extype == "Brk." || extype == "Wrm."){
             sets_reorder.avoidIndexes = [];
         }else{
             sets_reorder.avoidIndexes = [0];
@@ -934,7 +934,7 @@ async function next_exercise(first){
 
             remaining_sets -= getInvervallSessionCycleCount(intervallData);
             $(".session_workout_remaining_sets").text(remaining_sets);
-        }else if(extype == "Pause"){
+        }else if(extype == "Brk."){
             $(".session_exercise_rest_btn_label").css('display', 'none');
             updateRestBtnStyle('Reset');
             
@@ -948,7 +948,7 @@ async function next_exercise(first){
             update_info(true);
         };
 
-        if(extype != "Pause") openHint();
+        if(extype != "Brk.") openHint();
         check_lastSet();
 
         if(hasReallyStarted && extype != "Int."){udpate_recovery("workout")};
@@ -967,7 +967,7 @@ function getIntervallSpecs(id){
         if(exo.type == "Int."){
             workRest.work += (exo.cycle * time_unstring(exo.work));
             workRest.rest += (exo.cycle - 1) * time_unstring(exo.rest);
-        }else if(exo.type == "Pause"){
+        }else if(exo.type == "Brk."){
             workRest.rest += time_unstring(exo.rest);
         };
     });
@@ -1023,7 +1023,7 @@ function update_info_vars(index = 0){
         }else{
             next_specs = "Work : " + display_timeString(get_timeString(intervallSpecs.work));
         };
-    }else if (extype == "Pause"){
+    }else if (extype == "Brk."){
         let adjacentExo = $('.session_next_exercise').eq(index + 1);
         actual_setNb = 0;
         
@@ -1052,7 +1052,7 @@ function update_info_vars(index = 0){
 };
 
 function update_specs(reps, weight){
-    if(extype == "Pause" || extype == "Int."){
+    if(extype == "Brk." || extype == "Int."){
         $('.session_current_exercise_specs_details_inp, .session_current_exercise_specs_details_inp, .session_current_exercise_specs_weight_unit').css("display", "none");
         $('.session_current_exercise_specs_pause').text(next_specs);
         $(".session_current_exercise_specs_before, .session_specsPastData").css("display", 'none');
@@ -1183,7 +1183,7 @@ function check_lastSet(){
         </div>
         `);
 
-        if(extype != "Pause"){
+        if(extype != "Brk."){
             $('.session_exercise_Rrest_btn').css("display", "none");
             $('.Lrest').text(textAssets[parameters.language].inSession.finished);
 
@@ -1282,7 +1282,7 @@ function timerLaunch(LR){
         if(parameters.autoSaver && LrestTime >= 5){screensaver_toggle(true)};
         screensaver_set(next_name, parseInt(LrestTime));
 
-        if(extype != "Pause"){remaining_sets -= 1};
+        if(extype != "Brk."){remaining_sets -= 1};
 
         if(LrestTime != 0){
             $(".session_workout_remaining_sets").text(remaining_sets);
@@ -1335,7 +1335,7 @@ function timerLaunch(LR){
 
         $('.session_exercise_Rrest_btn').data("canLongClick", false);
 
-        if(extype != "Pause"){remaining_sets -= 1};
+        if(extype != "Brk."){remaining_sets -= 1};
 
         if(parameters.autoSaver && RrestTime >= 5){screensaver_toggle(true)};
         screensaver_set(next_name, RrestTime, true);
@@ -1462,7 +1462,7 @@ async function timerDone(LR){
             }else{
                 next_exercise(true);
             };
-        }else if(extype == "Pause"){
+        }else if(extype == "Brk."){
             $('.Lrest').text(textAssets[parameters.language].inSession.finished);
             if(!noMore){next_exercise(true);};
         }else if(extype == "Wrm."){
@@ -1825,7 +1825,7 @@ $(document).ready(function(){
         }else if(extype == "Bi." || extype == "Uni."){
             //STATS UPDATE;
 
-            if(extype != "Pause" && extype != "Int."){
+            if(extype != "Brk." && extype != "Int."){
                 next_specs[0] = parseInt($(".session_current_exercise_specs_reps").val());
                 next_specs[1] = parseFloat($(".session_current_exercise_specs_weight").val());
 
@@ -1962,7 +1962,7 @@ $(document).ready(function(){
             if($(".session_next_bigExercise").length == 1){
                 quit_session();
             }else{
-                if($($('.session_next_exercise_type')[1]).text() == "Pause"){
+                if($($('.session_next_exercise_type')[1]).text() == "Brk."){
                     update_info_vars(2);
                     update_pastData(2);
 
@@ -2135,7 +2135,7 @@ $(document).ready(function(){
         isSetPreviewing = true;
         $(".session_setPreview_title").text(name);
 
-        if(extype == "Pause"){
+        if(extype == "Brk."){
             $(".session_setPreview_sideData").eq(0).text(get_time(rest));
         }else if(extype == "Int."){
             let intervallSpecs = getIntervallSpecs(id);
@@ -2188,7 +2188,7 @@ $(document).ready(function(){
     });
     
     $(document).on("hasBeenReordered", ".session_next_exercises_container", function(e){
-        if(extype == "Pause"){
+        if(extype == "Brk."){
             if($(".session_next_exercise_name").length != 1){
                 if($(".session_next_exercise_type").eq(0).text() == "Int."){
                     let temp = [$($(".session_next_exercise_cycle")[0]).text(), $($(".session_next_exercise_work")[0]).text(), $($(".session_next_exercise_rest")[1]).text()];
@@ -2331,7 +2331,7 @@ $(document).ready(function(){
                     "hint" : false,
                     "id" : false
                 }));
-            }else if(type == "Pause"){
+            }else if(type == "Brk."){
                 sessionPart.exoList.push(generateExoObj({
                     "type" : type,
                     "rest" : get_timeString($(exercise).find('.session_next_exercise_rest').first().text()),
