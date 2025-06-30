@@ -257,7 +257,7 @@ function exercise_tile(data = false){
             let sets = data.setNb ? data.setNb : 0;
             let reps = data.reps ? data.reps : 0;
             let weight = data.weight ? data.weight : 0;
-            let rest = data.rest ? data.rest : "0s";
+            let rest = data.rest ? data.rest : "0" + abrTimeSymols.second;
             
             let element = $(`
             <div class="update_workout_item noselect reorder__child" id="`+data.id+`">

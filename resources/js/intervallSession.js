@@ -425,9 +425,10 @@ function intervall(data, from_wo = false){
         Ispent = 0;
         intervall_state = 1;
         sWorkIntervall = setInterval(() => {
-            Ispent++;
-
+            
             if(!paused && !isIdle){
+                Ispent++;
+
                 if(iWork_time - Ispent <= 3 && iWork_time - Ispent > 0 && !isBeeping){
                     isBeeping = true;
 					playBeep(beepPlayer, iWork_time - Ispent);
@@ -454,9 +455,9 @@ function intervall(data, from_wo = false){
         Ispent = 0;
         intervall_state = 2;
         sRestIntervall = setInterval(() => {
-            Ispent++;
-
             if(!paused && !isIdle){
+                Ispent++;
+
                 if(iRest_time - Ispent <= 3 && iRest_time - Ispent > 0 && !isBeeping){
                     isBeeping = true;
 					playBeep(beepPlayer, iRest_time - Ispent);

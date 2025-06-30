@@ -190,8 +190,7 @@ async function pauseApp(){
             if(haveWebNotificationsBeenAccepted){showNotif({title: title, body: body})};
         }else if(intervall_state == 1){
             currentSide = "W";
-            start = new Date(Date.now() + ((restDat - Xspent) * 1000));
-            start = (iWork_time - Ispent) * 1000;
+            start = new Date(Date.now() + ((iWork_time - Ispent) * 1000));
             title = textAssets[parameters.language].notification.workOver;
             body = textAssets[parameters.language].inSession.end + ' : ' + getHourFormated(start) + "\n" + textAssets[parameters.language].updatePage.rest + " : " + display_timeString(get_timeString(iRest_time));
 

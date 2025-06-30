@@ -844,7 +844,7 @@ function getNdisplay_timeString(ref, lang=false){
 function time_unstring(strr, getList=false){
     if(strr == ""){
         if(getList){
-            return [0, 0, 0, 0, 0, 0];
+            return {y: 0, w: 0, d: 0, h: 0, m: 0, s: 0};
         }else{
             return 0;
         };

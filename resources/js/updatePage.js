@@ -639,7 +639,7 @@ $(document).ready(function(){
                         $(".update_intervallList_container").append(Iintervall_tile(exo));
                         if(exo.hint){showHint(".update_intervallList_container")};
     
-                        manageRestInputVisibility($(".update_intervallList_container").children().last().find('.update_workout_intervall_data_cycle'));
+                        manageRestInputVisibility($(".update_intervallList_container").children().last(), "I");
                     }else if(exo.type == "Brk."){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };

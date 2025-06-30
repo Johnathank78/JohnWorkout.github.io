@@ -1237,6 +1237,8 @@ function woIntervallLeave(){
     color = dark_blue;
     light_color = light_dark_blue;
     mid_color = mid_dark_blue;
+
+    recovery.varSav.iCurrent_cycle = false
     actual_setL = 1;
 
     $("html").css("background-color", color);

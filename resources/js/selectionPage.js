@@ -116,13 +116,15 @@ function manageRestInputVisibility(elem, mode){
         val = parseInt($(elem).find(setClass).val());
         
         if(val > 1 && !visibility){
-            if($(item).find(restClass).val() == "0s"){
+            if($(item).find(restClass).storeVal() == "0" + abrTimeSymols.second){
+                $(item).find(restClass).storeVal("");
                 $(item).find(restClass).val("");
             };
 
             $(item).css('display', 'block');
         }else if(val <= 1 && visibility){
             if($(item).find(restClass).val() == ""){
+                $(item).find(restClass).storeVal("0" + abrTimeSymols.second);
                 $(item).find(restClass).val("0s");
             };
     

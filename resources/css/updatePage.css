@@ -1009,12 +1009,14 @@
 
     gap: 8px;
 
-    width: calc(100%);
+    width: calc(100% - 30px);
     height: calc(100%);
 
     background-color: hsl(225, 16%, 40%);
     font-size: 18px;
     font-weight: 400;
+
+    padding: 0 15px;
 
     border-radius: 8px;
 
@@ -1201,6 +1203,8 @@
 }
 
 .update_workout_data_type_container{
+    flex-shrink: 1;
+    
     display: flex;
     position: relative;
 
@@ -1209,6 +1213,9 @@
 
     height: 100%;
     width: 36.5%;
+
+    min-width: 30%;
+
     padding-left: 0px;
 
     cursor: pointer;

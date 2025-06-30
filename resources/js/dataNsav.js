@@ -277,7 +277,7 @@ function stats_read(set=false){
     }else{
         data = JSON.parse(data);
 
-        if(getToday('date').getFullYear() != data.missedSessions.year || getToday('timestamp') == 1750024800000){
+        if(getToday('date').getFullYear() != data.missedSessions.year || getToday('timestamp') == 1751234400000){
             data.missedSessions.val = 0;
         };
     };
@@ -771,7 +771,8 @@ function fillSessionToBeDone(){
                 jumpData.jumpVal, 
                 jumpData.jumpType, 
                 jumpData.everyVal, 
-                notif.occurence
+                notif.occurence,
+                session.id
             )){
                 data.data[session.id] = true;
             };
