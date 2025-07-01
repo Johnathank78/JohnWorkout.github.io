@@ -84,10 +84,14 @@ $(document).ready(async function(){
 
         global_pusher(session_list, reminder_list);
 
+        // APPLY FIX
+
         session_save(session_list);
         reminder_save(reminder_list);
         parameters_save(parameters);
         stats_save(stats);
+
+        // ---------
 
         deleteHistory();
     

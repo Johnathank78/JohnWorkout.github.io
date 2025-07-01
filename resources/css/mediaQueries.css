@@ -249,7 +249,7 @@
         width: 95%;
     }
 
-    .session_remaining_cycle{
+    .session_remaining_cycle_container{
         left: 45px;
         bottom: unset;
         top: 50%;

@@ -236,7 +236,7 @@ async function quit_session(failed=false){
     skip = true; ncState = false;
     actual_setL = 0; actual_setR = 0; actual_setNb = 0;
 
-    stopXtimer();
+    if(current_session.type == "W" && restDat) stopXtimer();
 
     if(Lrest){clearInterval(Lrest); Lrest = false};
     if(Rrest){clearInterval(Rrest); Rrest = false};
@@ -1029,7 +1029,7 @@ function screensaver_toggle(on){
     if(on){
         isSaving = true;
 
-        if(!(Ltimer || Rtimer || sIntervall)){
+        if(!(Ltimer || Rtimer || isIntervallOngoing())){
             $(".screensaver_text").text(textAssets[parameters.language].screenSaver.saver);
             $(".screensaver_Ltimer, .screensaver_Rtimer, .screensaver_Xtimer").text("");
         };

@@ -312,7 +312,7 @@ function get_session_time(session, uniFix=false){
         session.exoList.forEach(exo => {
             if(exo.type == "Int."){
                 computedTime += exo.cycle * (time_unstring(exo.work) + time_unstring(exo.rest)) - time_unstring(exo.rest);
-            }else if(exo.type == "Pause"){
+            }else if(exo.type == "Brk."){
                 computedTime += time_unstring(exo.rest);
             };
         });
@@ -327,7 +327,7 @@ function get_session_time(session, uniFix=false){
                     exo.exoList.forEach(subExo => {
                         if(subExo.type == "Int."){
                             computedTime += subExo.cycle * (time_unstring(subExo.work) + time_unstring(subExo.rest)) - time_unstring(subExo.rest);
-                        }else if(subExo.type == "Pause"){
+                        }else if(subExo.type == "Brk."){
                             computedTime += time_unstring(subExo.rest);
                         };
                     });
@@ -343,7 +343,7 @@ function get_session_time(session, uniFix=false){
                 let setsDone = uniFix ? Math.floor(exo.setNb/2) : exo.setNb;
                 
                 computedTime += setsDone * (2*repsDuration + time_unstring(exo.rest)) - time_unstring(exo.rest);
-            }else if(exo.type == "Pause"){
+            }else if(exo.type == "Brk."){
                 if(i != session.exoList.length - 1) computedTime += time_unstring(exo.rest);
             }else if(exo.type == "Wrm."){
                 computedTime += wrmTime;
@@ -409,7 +409,7 @@ function get_session_exoCount(session){
                 }else{
                     nb_exo += exo.exoList.filter(exo => exo.type == "Int.").length;
                 };
-            }else if(exo.type != "Pause" && exo.type != "Wrm."){
+            }else if(exo.type != "Brk." && exo.type != "Wrm."){
                 nb_exo += 1;
             };
         };
@@ -438,7 +438,7 @@ function get_session_stats(session){
     session.exoList.forEach(exo => {
         type = exo.type;
         
-        if(type == "Pause"){return};
+        if(type == "Brk."){return};
         if(type == "Int."){
 
             if(isIntervallLinked(exo)){

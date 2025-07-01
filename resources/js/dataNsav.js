@@ -277,7 +277,7 @@ function stats_read(set=false){
     }else{
         data = JSON.parse(data);
 
-        if(getToday('date').getFullYear() != data.missedSessions.year || getToday('timestamp') == 1751234400000){
+        if(getToday('date').getFullYear() != data.missedSessions.year || getToday('timestamp') == 1751320800000){
             data.missedSessions.val = 0;
         };
     };
@@ -328,9 +328,6 @@ function parameters_read(first=true){
 
     parameters_set(data);
 
-    $(".weightTracker_unit").text(data.weightUnit);
-    $('.weightTracker_input').attr('placeholder', data.weightUnit == "lbs" ? '176.00' : "80.00");
-
     previousWeightUnit = data.weightUnit;
     parametersMemory = JSON.stringify(data);
     changeLanguage(data.language, first);
@@ -355,6 +352,9 @@ function parameters_set(data){
             $(target).attr("state", data[targetName]);
         };
     });
+
+    $(".weightTracker_unit").text(data.weightUnit);
+    $('.weightTracker_input').attr('placeholder', data.weightUnit == "lbs" ? '176.00' : "80.00");
 
     update_toggle();
 };
@@ -382,37 +382,13 @@ function session_read(set=false){
             data = data[0];
         };
 
-        data.forEach(session => {
-            if(session.type == "W"){
-                session.exoList.forEach(exo => {
-                    if(exo.type == "Pause"){
-                        exo.type = "Brk.";
-                    }else if(exo.type == "Int." && !isIntervallLinked(exo)){
-                        exo.exoList.forEach(subExo => {
-                            if(subExo.type == "Pause"){
-                                subExo.type = "Brk.";
-                            };
-                        });
-                    };
-                });
-            }else if(session.type == "I"){
-                session.exoList.forEach(exo => {
-                    if(exo.type == "Pause"){
-                        exo.type = "Brk.";
-                    };
-                });
-            };
-        });
-
-        // ---
-        
         calendar_dict = calendar_read(data);
         return data;
     };
 };
 
 function session_save(data){
-    saveItem("sessions_list", JSON.stringify([data, parameters.weightUnit]));
+    saveItem("sessions_list", JSON.stringify(data));
     return;
 };
 
@@ -792,9 +768,9 @@ function fillSessionToBeDone(){
 function sessionToBeDone_read(){
     let sessionToBeDone = localStorage.getItem("sessionToBeDone");
 
-    if (sessionToBeDone === null || sessionToBeDone == ""){
+    if(sessionToBeDone === null || sessionToBeDone == ""){
         sessionToBeDone = fillSessionToBeDone();
-        localStorage.setItem("sessionToBeDone", JSON.stringify(sessionToBeDone));
+        saveItem("sessionToBeDone", JSON.stringify(sessionToBeDone))
 
         return sessionToBeDone;
     };
@@ -803,20 +779,32 @@ function sessionToBeDone_read(){
 
     if(formatDate(new Date(sessionToBeDone.creationDate)) != formatDate(getToday("date"))){
         let sessionDone = localStorage.getItem("session_done");
-        let count = nbSessionScheduled(getToday("date", -1));
 
         if(!(sessionDone === null || sessionDone == "")){
             sessionDone = JSON.parse(sessionDone);
 
-            Object.keys(sessionToBeDone.data).forEach(function(key){
-                if(sessionToBeDone.data[key] && sessionDone.data[key]){
-                    count -= 1;
-                };
-            });
-        };
+            let count = 0;
+            let elapsedDays = daysBetweenTimestamps(sessionToBeDone.creationDate, getToday("timestamp"));
+            
+            if(elapsedDays == 1){
+                Object.keys(sessionToBeDone.data).forEach(function(key){
+                    if(sessionToBeDone.data[key] && !sessionDone.data[key]){
+                        count += 1;
+                    };
+                });
+            }else if(elapsedDays > 1){
+                count = nbSessionScheduled(getToday("date", -1));
 
-        stats.missedSessions.val += count;
-        stats_save(stats);
+                Object.keys(sessionToBeDone.data).forEach(function(key){
+                    if(sessionToBeDone.data[key] && sessionDone.data[key]){
+                        count -= 1;
+                    };
+                });
+            };
+    
+            stats.missedSessions.val += count;
+            stats_save(stats);
+        };
 
         // --------------------
 

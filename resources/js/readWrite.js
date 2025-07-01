@@ -326,7 +326,6 @@ $(document).ready(function(){
                         changeLanguage(parameters.language, true);
 
                         parameters_set(parameters)
-
                         parameters_save(parameters);
                         schedule = true;
                     };

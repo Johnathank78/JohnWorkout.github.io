@@ -7,6 +7,7 @@ var paused = false;
 
 var Ispent = 0; var iRest_time = 0; var iWork_time = 0; 
 var iCurrent_cycle = false; var iActualSet = false;
+var iActualSetNb = false;
 
 var Ifinished = false;
 var currentExoIndex = 0;
@@ -55,7 +56,20 @@ function getIntervallExoData(cycle, data, update = false){
     return false;
 };
 
+function isIntervallOngoing(){
+    return sIntervall || sWorkIntervall || sRestIntervall;
+};
+
 function intervall(data, from_wo = false){
+
+    function updateRemaining(prep){
+        if(prep){
+            $(".session_remaining_cycle").text((iCurrent_cycle).toString());
+        }else{
+            $(".session_remaining_subCycle").text((iActualSetNb - iActualSet).toString());
+            $(".session_remaining_cycle").text((iCurrent_cycle).toString());
+        };
+    };
     
     function session_state(state){
 
@@ -71,6 +85,8 @@ function intervall(data, from_wo = false){
     
                 $(".session_state").text(textAssets[parameters.language].inIntervall.getReady.toUpperCase());
                 $(".screensaver_text").text(textAssets[parameters.language].inIntervall.getReady);
+                
+                $(".session_remaining_subCycle").css("display", "none");
     
                 $(".session_intervall_btn_container > *").css("background-color", mid_yellow);
     
@@ -100,6 +116,10 @@ function intervall(data, from_wo = false){
                 if(!isSaving){$("html").css("background-color", color); $(".footer").css("background-color", mid_color)};
     
                 $(".session_state").css("color", light_green);
+                $(".session_remaining_subCycle").css({
+                    color: light_color,
+                    display: iActualSetNb > 1 ? "inline-block" : "none"
+                });
     
                 if(platform == "Mobile" && mobile != "IOS"){
                     if(!isSaving){StatusBar.setBackgroundColor({ color: green })};
@@ -114,10 +134,10 @@ function intervall(data, from_wo = false){
 
                 if(intExType == "Brk."){
                     $(".session_state").text(textAssets[parameters.language].updatePage.break.toUpperCase());
-                    $(".screensaver_text").text(textAssets[parameters.language].updatePage.break);
+                    $(".screensaver_text").text(textAssets[parameters.language].updatePage.break.toUpperCase());
                 }else{
                     $(".session_state").text(textAssets[parameters.language].inIntervall.rest.toUpperCase());
-                    $(".screensaver_text").text(textAssets[parameters.language].inIntervall.rest);
+                    $(".screensaver_text").text(textAssets[parameters.language].inIntervall.rest.toUpperCase());
                 };
     
                 $(".session_intervall_btn_container > *").css("background-color", mid_red);
@@ -126,7 +146,11 @@ function intervall(data, from_wo = false){
                 if(!isSaving){$("html").css("background-color", color); $(".footer").css("background-color", mid_color)};
     
                 $(".session_state").css("color", light_red);
-    
+                $(".session_remaining_subCycle").css({
+                    color: light_color,
+                    display: iActualSetNb > 1 ? "inline-block" : "none"
+                });
+
                 if(platform == "Mobile" && mobile != "IOS"){
                     if(!isSaving){StatusBar.setBackgroundColor({ color: red })};
                 };
@@ -144,6 +168,10 @@ function intervall(data, from_wo = false){
                 if(!isSaving){$("html").css("background-color", color); $(".footer").css("background-color", mid_color)};
     
                 $(".session_state").css("color", light_orange);
+                $(".session_remaining_subCycle").css({
+                    color: light_color,
+                    display: iActualSetNb > 1 ? "inline-block" : "none"
+                });
     
                 if(platform == "Mobile" && mobile != "IOS"){
                     if(!isSaving){StatusBar.setBackgroundColor({ color: orange })};
@@ -160,9 +188,11 @@ function intervall(data, from_wo = false){
                 $(".blurBG").css("display", "none");
     
                 $(".session_state").text(textAssets[parameters.language].inIntervall.end.toUpperCase());
-                $(".screensaver_text").text(textAssets[parameters.language].inIntervall.end);
+                $(".screensaver_text").text(textAssets[parameters.language].inIntervall.end.toUpperCase());
     
                 $(".session_remaining_cycle").text("");
+                $(".session_remaining_subCycle").text("");
+
                 $(".session_intervall_timer").text("");
     
                 $(".session_continue_btn").css("display", "block");
@@ -185,8 +215,10 @@ function intervall(data, from_wo = false){
 
         if(from_wo){
             historyTarget = tempNewHistory.exoList[getHistoryExoIndex(tempNewHistory, next_id)].exoList[correctedIndex].setList[iActualSet];
+            iActualSetNb = tempNewHistory.exoList[getHistoryExoIndex(tempNewHistory, next_id)].exoList[correctedIndex].setList.length
         }else{
             historyTarget = tempNewHistory.exoList[correctedIndex].setList[iActualSet];
+            iActualSetNb = tempNewHistory.exoList[correctedIndex].setList.length
         };
     };
 
@@ -223,7 +255,7 @@ function intervall(data, from_wo = false){
     exit_confirm("light");
 
     $('.lockTouch').css('display', 'flex');
-    $(".session_remaining_cycle").text((iCurrent_cycle).toString());
+    updateRemaining(true);
 
     // Bips
 
@@ -240,6 +272,7 @@ function intervall(data, from_wo = false){
         
         historyTargetUpdate();
         session_state("work");
+        updateRemaining();
 
         update_timer($(".session_intervall_timer"), iWork_time, Ispent);
         update_timer($(".screensaver_Ltimer"), iWork_time, Ispent);
@@ -324,7 +357,10 @@ function intervall(data, from_wo = false){
             if(intExType == 'Brk.'){
                 isBeeping = false;
                 iRest_time = time_unstring(data[currentExoIndex + 1].rest);
-                
+
+                $(".session_next_name").css("display", "inline-block");
+                $(".session_next_name").text("NEXT : " + data[currentExoIndex + 2].name.toUpperCase());
+
                 session_state("Rest"); 
                 historyTarget.rest = "X";
     
@@ -341,15 +377,16 @@ function intervall(data, from_wo = false){
                 }else if(from_wo && iCurrent_cycle != 0){
                     udpate_recovery("workout", data);
                 };
+
+                $(".session_next_name").css("display", "none");
     
                 historyTargetUpdate();
                 session_state("work");
     
                 update_timer($(".session_intervall_timer"), iWork_time, 0);
                 update_timer($(".screensaver_Ltimer"), iWork_time, 0);
-    
-                $(".session_remaining_cycle").text((iCurrent_cycle).toString());
-
+                
+                updateRemaining();
                 startWorkIntervall();
             };
         };
@@ -376,6 +413,8 @@ function intervall(data, from_wo = false){
     
         historyTargetUpdate();
         session_state("work");
+        
+        $(".session_next_name").css("display", "none");
     
         if(!from_wo && iCurrent_cycle != 0){
             udpate_recovery("intervall", data);
@@ -386,7 +425,7 @@ function intervall(data, from_wo = false){
         update_timer($(".session_intervall_timer"), iWork_time, 0);
         update_timer($(".screensaver_Ltimer"), iWork_time, 0);
         
-        $(".session_remaining_cycle").text((iCurrent_cycle).toString());
+        updateRemaining();
 
         startWorkIntervall();
     };
@@ -425,7 +464,6 @@ function intervall(data, from_wo = false){
         Ispent = 0;
         intervall_state = 1;
         sWorkIntervall = setInterval(() => {
-            
             if(!paused && !isIdle){
                 Ispent++;
 

@@ -438,12 +438,12 @@ $(document).ready(function(){
         });
     
         App.addListener('appStateChange', async (state) => {
-            if(state.isActive && ongoing && (hasStarted || sIntervall)){
+            if(state.isActive && ongoing && (hasStarted || isIntervallOngoing())){
                 await resumeApp();
                 isIdle = false;
 
                 if(wasLocked){keepAwakeToggle(true)};
-            }else if(!state.isActive && ongoing && (hasStarted || sIntervall)){
+            }else if(!state.isActive && ongoing && (hasStarted || isIntervallOngoing())){
                 const pauseProcess = await BackgroundTask.beforeExit(async () => {
     
                     isIdle = true;
@@ -665,12 +665,12 @@ $(document).ready(function(){
         });
     }else{
         document.addEventListener("visibilitychange", async () => {
-            if(document.visibilityState === 'hidden' && ongoing && (hasStarted || sIntervall)){
+            if(document.visibilityState === 'hidden' && ongoing && (hasStarted || isIntervallOngoing())){
                 isIdle = true;
                 beepPlayer.suspendAudioContext();
                 beep2x3Player.suspendAudioContext();
                 pauseApp();
-            }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || sIntervall)){
+            }else if(document.visibilityState === 'visible' && ongoing && (hasStarted || isIntervallOngoing())){
                 await resumeApp();
                 beepPlayer.resumeAudioContext();
                 beep2x3Player.resumeAudioContext();
