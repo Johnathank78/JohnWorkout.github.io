@@ -461,7 +461,7 @@
     flex-wrap: wrap;
     text-align: center;
 
-    width: 85%;
+    width: 90%;
 
     top:50%;
     left: 50%;
@@ -480,7 +480,7 @@
 
 .session_next_name{
     color: #f3a49b;
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 700;
 
     word-wrap: break-word;
