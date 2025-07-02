@@ -194,8 +194,8 @@ const magnifyBlocker = (() => {
     let holdTimer = null;
     let isSecondTap = false;
     
-    const DOUBLE_TAP_THRESHOLD = 300; // ms between taps
-    const HOLD_THRESHOLD = 100; // ms to trigger hold
+    const DOUBLE_TAP_THRESHOLD = 500; // ms between taps
+    const HOLD_THRESHOLD = 60; // ms to trigger hold
     
     return (event) => {
         // Skip if target is an editable element
@@ -219,7 +219,7 @@ const magnifyBlocker = (() => {
             holdTimer = setTimeout(() => {
                 // Hold threshold exceeded on second tap
                 event.preventDefault();
-                // console.log('Double-click + hold detected!');
+                console.log('Double-click + hold detected!');
             }, HOLD_THRESHOLD);
         } else {
             // First tap or taps too far apart

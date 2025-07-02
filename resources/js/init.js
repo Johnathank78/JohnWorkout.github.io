@@ -48,7 +48,7 @@ function isIntruder(){
 };
 
 $(document).ready(async function(){
-    if(platform == "Web" && isWebMobile && !isStandalonePWA && false){
+    if(platform == "Web" && isWebMobile && !isStandalonePWA){
         isIntruder();
     }else{
         parameters = parameters_read();
