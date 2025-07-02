@@ -12,7 +12,6 @@
 html{
     background-color: #1F1C2D;
     overscroll-behavior: none;
-    height: unset;
 }
 
 body{
