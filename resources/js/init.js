@@ -45,7 +45,7 @@ function isIntruder(){
 
     $('.main_page').css('display', 'none');
     showBlurPage('selection_sessionFinished', true);
-}
+};
 
 $(document).ready(async function(){
     if(platform == "Web" && isWebMobile && !isStandalonePWA){

@@ -189,6 +189,40 @@ function longClickMoveHandler(e) {
     };
 };
 
+function instanceMagnifyBlocker(func, timeout) {
+    let timer = null;
+    let pressed = false;
+
+    return function (e) {
+        // Check if the target is an input, textarea, or contentEditable
+        const isInteractiveElement = 
+            e.target instanceof HTMLInputElement || 
+            e.target instanceof HTMLTextAreaElement || 
+            e.target.isContentEditable;
+
+        // If the target is interactive, skip blocking
+        if (isInteractiveElement) return;
+
+        if (timer) clearTimeout(timer);
+
+        if (pressed) {
+            if (func) func.apply(this, arguments);
+            console.log('double')
+            clear();
+        } else {
+            pressed = true;
+            setTimeout(clear, timeout || 500);
+        };
+    };
+
+    function clear() {
+        timeout = null;
+        pressed = false;
+    };
+};
+
+const magnifyBlocker = instanceMagnifyBlocker((e) => e.preventDefault(), 500);
+
 // ----
 
 $(document).ready(function(){
@@ -267,4 +301,6 @@ $(document).ready(function(){
             });
         };
     });
+
+    document.body.addEventListener('touchstart', magnifyBlocker, { passive: false });
 });
