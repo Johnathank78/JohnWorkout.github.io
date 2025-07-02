@@ -325,5 +325,5 @@ $(document).ready(function(){
         };
     });
 
-    document.body.addEventListener('touchstart', magnifyBlocker, { passive: false });
+    // document.body.addEventListener('touchstart', magnifyBlocker, { passive: false });
 });
