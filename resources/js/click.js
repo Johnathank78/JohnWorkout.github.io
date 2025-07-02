@@ -189,39 +189,55 @@ function longClickMoveHandler(e) {
     };
 };
 
-function instanceMagnifyBlocker(func, timeout) {
-    let timer = null;
-    let pressed = false;
-
-    return function (e) {
-        // Check if the target is an input, textarea, or contentEditable
-        const isInteractiveElement = 
-            e.target instanceof HTMLInputElement || 
-            e.target instanceof HTMLTextAreaElement || 
-            e.target.isContentEditable;
-
-        // If the target is interactive, skip blocking
-        if (isInteractiveElement) return;
-
-        if (timer) clearTimeout(timer);
-
-        if (pressed) {
-            if (func) func.apply(this, arguments);
-            console.log('double')
-            clear();
-        } else {
-            pressed = true;
-            setTimeout(clear, timeout || 500);
-        };
+const magnifyBlocker = (() => {
+  let firstTapTime = 0;
+  let holdTimer = null;
+  let isSecondTap = false;
+  
+  const DOUBLE_TAP_THRESHOLD = 300; // ms between taps
+  const HOLD_THRESHOLD = 200; // ms to trigger hold
+  
+  return (event) => {
+    const currentTime = Date.now();
+    
+    // Check if this is a potential second tap
+    if (currentTime - firstTapTime < DOUBLE_TAP_THRESHOLD) {
+      isSecondTap = true;
+      
+      // Start hold timer
+      holdTimer = setTimeout(() => {
+        // Hold threshold exceeded on second tap
+        event.preventDefault();
+        console.log('Double-click + hold detected!');
+        
+        // You can add custom logic here
+        // For example, trigger a specific action
+      }, HOLD_THRESHOLD);
+      
+    } else {
+      // First tap or taps too far apart
+      firstTapTime = currentTime;
+      isSecondTap = false;
+      
+      // Clear any existing timer
+      if (holdTimer) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+    }
+    
+    // Add touchend listener to clear hold timer if released early
+    const clearHold = () => {
+      if (holdTimer && isSecondTap) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      event.target.removeEventListener('touchend', clearHold);
     };
-
-    function clear() {
-        timeout = null;
-        pressed = false;
-    };
-};
-
-const magnifyBlocker = instanceMagnifyBlocker((e) => e.preventDefault(), 500);
+    
+    event.target.addEventListener('touchend', clearHold, { once: true });
+  };
+})();
 
 // ----
 

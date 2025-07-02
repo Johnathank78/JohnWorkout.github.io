@@ -1515,7 +1515,10 @@ $(document).ready(function(){
 
                 if(platform == "Mobile") console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
 
-                if(reminderOrSession == "session") hasBeenShifted.data[update_current_item.id] = true;
+                if(reminderOrSession == "session"){
+                    hasBeenShifted.data[update_current_item.id] = true;
+                    hasBeenShifted_save(hasBeenShifted);
+                };
             }else{
                 return;
             };
