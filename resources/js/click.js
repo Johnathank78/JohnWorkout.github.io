@@ -190,53 +190,60 @@ function longClickMoveHandler(e) {
 };
 
 const magnifyBlocker = (() => {
-  let firstTapTime = 0;
-  let holdTimer = null;
-  let isSecondTap = false;
-  
-  const DOUBLE_TAP_THRESHOLD = 300; // ms between taps
-  const HOLD_THRESHOLD = 200; // ms to trigger hold
-  
-  return (event) => {
-    const currentTime = Date.now();
+    let firstTapTime = 0;
+    let holdTimer = null;
+    let isSecondTap = false;
     
-    // Check if this is a potential second tap
-    if (currentTime - firstTapTime < DOUBLE_TAP_THRESHOLD) {
-      isSecondTap = true;
-      
-      // Start hold timer
-      holdTimer = setTimeout(() => {
-        // Hold threshold exceeded on second tap
-        event.preventDefault();
-        console.log('Double-click + hold detected!');
+    const DOUBLE_TAP_THRESHOLD = 300; // ms between taps
+    const HOLD_THRESHOLD = 100; // ms to trigger hold
+    
+    return (event) => {
+        // Skip if target is an editable element
+        const target = event.target;
+        const tagName = target.tagName?.toLowerCase();
         
-        // You can add custom logic here
-        // For example, trigger a specific action
-      }, HOLD_THRESHOLD);
-      
-    } else {
-      // First tap or taps too far apart
-      firstTapTime = currentTime;
-      isSecondTap = false;
-      
-      // Clear any existing timer
-      if (holdTimer) {
-        clearTimeout(holdTimer);
-        holdTimer = null;
-      }
-    }
-    
-    // Add touchend listener to clear hold timer if released early
-    const clearHold = () => {
-      if (holdTimer && isSecondTap) {
-        clearTimeout(holdTimer);
-        holdTimer = null;
-      }
-      event.target.removeEventListener('touchend', clearHold);
+        if (tagName === 'input' || 
+            tagName === 'textarea' || 
+            target.contentEditable === 'true' ||
+            target.closest('[contenteditable="true"]')) {
+            return;
+        }
+        
+        const currentTime = Date.now();
+        
+        // Check if this is a potential second tap
+        if (currentTime - firstTapTime < DOUBLE_TAP_THRESHOLD) {
+            isSecondTap = true;
+            
+            // Start hold timer
+            holdTimer = setTimeout(() => {
+                // Hold threshold exceeded on second tap
+                event.preventDefault();
+                // console.log('Double-click + hold detected!');
+            }, HOLD_THRESHOLD);
+        } else {
+            // First tap or taps too far apart
+            firstTapTime = currentTime;
+            isSecondTap = false;
+        
+            // Clear any existing timer
+            if (holdTimer) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+        }
+        
+        // Add touchend listener to clear hold timer if released early
+        const clearHold = () => {
+            if (holdTimer && isSecondTap) {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            }
+            event.target.removeEventListener('touchend', clearHold);
+        };
+        
+        event.target.addEventListener('touchend', clearHold, { once: true });
     };
-    
-    event.target.addEventListener('touchend', clearHold, { once: true });
-  };
 })();
 
 // ----
