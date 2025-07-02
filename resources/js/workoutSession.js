@@ -1229,6 +1229,7 @@ function woIntervallLeave(){
     check_lastSet();
 
     $(".session_intervall_container").css("display", "none");
+    $('.session_next_name').css('display', 'none');
     $(".session_continue_btn").css("display", "none");
     $('.session_workout_footer').css("display", "flex");
     $('.lockTouch').css('display', 'none');

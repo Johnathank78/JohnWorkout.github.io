@@ -28,7 +28,9 @@ function infoStyle(style){
         $('.selection_info_item_value').css("background-color", '#2B2D3D');
         $('.selection_info_item_title').css("color", 'white');
         $('.selection_info_item_value').css("color", 'white');
-
+        
+        $('.versionNumber').css("background-color", '#4c5368');
+        $('.versionNumber').css("color", 'white');
     }else if(style == "intervall"){
         $(".selection_info_container").css({
             top: "38px",
@@ -42,6 +44,9 @@ function infoStyle(style){
         $(".selection_info").css("scale", "0.85");
         $(".selection_info_page").css('max-width', '215px');
 
+        $('.versionNumber').css("background-color", '#ececec');
+        $('.versionNumber').css("color", 'black');
+
     }else if(style == "session"){
         $(".selection_info_container").css({
             top: "38px",
@@ -54,6 +59,8 @@ function infoStyle(style){
         $(".selection_info").css("scale", "0.85");
         $(".selection_info_page").css('max-width', '215px');
 
+        $('.versionNumber').css("background-color", '#4c5368');
+        $('.versionNumber').css("color", 'white');
     };
 };
 

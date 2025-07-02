@@ -1513,9 +1513,9 @@ $(document).ready(function(){
                     $(update_current_node).find(".selection_session_tile_extra_schedule").css('background-color', '#1dbc60');
                 };
 
-                if(platform == "Mobile"){console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()))};
+                if(platform == "Mobile") console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
 
-                if(reminderOrSession == "session"){hasBeenShifted.data[update_current_item.id] = false};
+                if(reminderOrSession == "session") hasBeenShifted.data[update_current_item.id] = true;
             }else{
                 return;
             };

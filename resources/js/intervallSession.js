@@ -359,7 +359,7 @@ function intervall(data, from_wo = false){
                 iRest_time = time_unstring(data[currentExoIndex + 1].rest);
 
                 $(".session_next_name").css("display", "inline-block");
-                $(".session_next_name").text("NEXT : " + data[currentExoIndex + 2].name.toUpperCase());
+                $(".session_next_name").text(textAssets[parameters.language].inSession.next.toUpperCase() + " : " + data[currentExoIndex + 2].name.toUpperCase());
 
                 session_state("Rest"); 
                 historyTarget.rest = "X";

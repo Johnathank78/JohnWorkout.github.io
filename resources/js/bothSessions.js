@@ -259,6 +259,7 @@ async function quit_session(failed=false){
 
     $(".session_workout_historyNotes_inp").val("").change();
     $(".session_next_exercises_container").children().remove();
+    $('.session_next_name').css('display', 'none');
     $(".session_remaining_cycle, .session_intervall_timer").text("");
     $(".main_page").css("display", "flex");
     $(".main_page").css("flex-direction", "column");
