@@ -270,8 +270,8 @@ function iserrorReminder(name, body, from){
 };
 
 function schedule_iserror(dateList, hours, minutes, count, jumpVal, timesVal){
-    let safetyOffset = 5 * 60; 
     let toSubstract = time_unstring($(".selection_parameters_notifbefore").storeVal());
+    let safetyOffset = toSubstract > 0 ? 5 * 60 : 0; 
 
     if(dateList.length == 0){
         $(".update_error_container").css("display", "block");
@@ -279,7 +279,6 @@ function schedule_iserror(dateList, hours, minutes, count, jumpVal, timesVal){
         return true;
     };
 
-    
     if(hours == "" || minutes == "" || count == ""){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[parameters.language].error.updatePage.fillAllEntries);
@@ -289,18 +288,6 @@ function schedule_iserror(dateList, hours, minutes, count, jumpVal, timesVal){
     if(isNaI(hours) || isNaI(minutes) || isNaI(count)){
         $(".update_error_container").css("display", "block");
         $(".update_error_msg").text(textAssets[parameters.language].error.schedule.hoursMinNumeric);
-        return true;
-    };
-    
-    if(parseInt(hours) > 23){
-        $(".update_error_container").css("display", "block");
-        $(".update_error_msg").text(textAssets[parameters.language].error.schedule.greatherHours);
-        return true;
-    };
-
-    if(parseInt(minutes) > 59){
-        $(".update_error_container").css("display", "block");
-        $(".update_error_msg").text(textAssets[parameters.language].error.schedule.greaterMinutes);
         return true;
     };
 

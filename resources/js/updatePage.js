@@ -707,7 +707,7 @@ $(document).ready(function(){
             update_current_item.notif = false;
 
             if(reminderOrSession == "session"){
-                delete calendar_dict[update_current_item.name];
+                delete calendar_dict[update_current_item.id];
 
                 sessionToBeDone.data[update_current_item.id] = false;
                 hasBeenShifted.data[update_current_item.id] = false;
@@ -1320,7 +1320,7 @@ $(document).ready(function(){
                     refresh_session_tile();
                 };
 
-                delete calendar_dict[update_current_item.name];
+                delete calendar_dict[update_current_item.id];
 
                 $(update_current_node).remove();
                 session_list = session_list.delete(update_current_index);
@@ -1359,28 +1359,23 @@ $(document).ready(function(){
 
         }else if(current_page == "schedule"){
             let beforeUpdateHash = SHA256(JSON.stringify(update_current_item.notif));
-            
-            let inp_list = $(".update_schedule_input");
             let scheme = $(".update_schedule_select_every").val();
 
-            let hours = $(inp_list).eq(0).val();
-            let minutes = $(inp_list).eq(1).val();
+            let timeData = time_unstring($('.update_schedule_timeInput').storeVal(), true);
+
+            let hours = timeData.h.toString();
+            if(hours.length == 1) hours = "0" + hours;
+            
+            let minutes = timeData.m.toString();
+            if(minutes.length == 1) minutes = "0" + minutes;
+
+            let count = $(".update_schedule_sline").find(".update_schedule_input").val();
 
             let jumpType = $(".update_schedule_select_jumpEvery").eq(0).val();
-            let jumpVal = $(inp_list).eq(3).val();
-            let everyVal = $(inp_list).eq(4).val();
+            let jumpVal = $(".update_schedule_tline").find(".update_schedule_input").eq(0).val();
+            let everyVal = $(".update_schedule_tline").find(".update_schedule_input").eq(1).val();
 
-            if(minutes.length == 1){
-                minutes = "0" + minutes;
-            };
-
-            if(hours.length == 1){
-                hours = "0" + hours;
-            };
-
-            let count = $(inp_list).eq(2).val();
             let dateList = datePicker.getSelection().sort();
-
             let error = schedule_iserror(dateList, hours, minutes, count, jumpVal, everyVal);
 
             if(!error){

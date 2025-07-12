@@ -108,10 +108,12 @@ function closePanel(src, notAnimated=false){
         case "congrats":
             congrats_shown = false;
             canNowClick();
+            
             $('.blurBG').css('display', 'none');
+            
             $('.selection_sessionFinishedBody').scrollLeft(0);
             $('.selection_sessionFinished_navigator_indicator').css('opacity', '0.5');
-            $($('.selection_sessionFinished_navigator_indicator')[0]).css('opacity', '1');
+            $('.selection_sessionFinished_navigator_indicator').eq(0).css('opacity', '1');
             break;
 
         case "focus":

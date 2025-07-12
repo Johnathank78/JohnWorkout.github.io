@@ -752,19 +752,101 @@ function updateCalendar(data, page){
     });
 };
 
-async function shiftPlusOne(){
+// async function shiftPlusOneSAV_withReminders(){
 
+//     async function shiftPlusCore(input){
+//         for(let i=0; i<input.length; i++){
+//             if(isScheduled(input[i])){
+//                 let notif = isScheduled(input[i]);
+//                 let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
+                
+//                 let id = await getPendingId(input[i].id);
+
+//                 if(getScheduleScheme(input[i]) == "Day"){
+//                     if(input[i].type == "R" && notif.scheduleData.count == 1){continue};                        
+//                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
+
+//                     notif.dateList[0] = setHoursMinutes(new Date(notif.dateList[0]), parseInt(notif.scheduleData.hours), parseInt(notif.scheduleData.minutes)).getTime();
+
+//                     let tempDate = new Date(notif.dateList[0]);
+//                     tempDate.setDate(tempDate.getDate() + 1);
+
+//                     notif.dateList[0] = tempDate.getTime();
+
+//                     if(toSubstract != 0 && notif.dateList[0] - toSubstract > Date.now() + 5000){
+//                         notif.dateList[0] -= toSubstract;
+//                     };
+
+//                     if(platform == "Mobile"){
+//                         if(input[i].type == "R"){
+//                             await scheduleId(new Date(notif.dateList[0]), input[i].name+" | "+notif.scheduleData.hours+":"+notif.scheduleData.minutes, input[i].body, id, 'reminder');
+//                         }else{
+//                             await scheduleId(new Date(notif.dateList[0]), input[i].name+" | "+notif.scheduleData.hours+":"+notif.scheduleData.minutes, textAssets[parameters.language].notification.duration + " : " + get_time(get_session_time(input[i])), id, 'session');
+//                         };
+//                     };
+//                 }else if(getScheduleScheme(input[i]) == "Week"){
+//                     if(input[i].type == "R" && notif.dateList.length == 7){continue};
+
+//                     for(let z=0; z<notif.dateList.length; z++){
+//                         let idx = (z+1).toString() + id.slice(1, id.length);
+
+//                         if(platform == "Mobile"){await undisplayAndCancelNotification(idx)};
+
+//                         notif.dateList[z] = setHoursMinutes(new Date(notif.dateList[z]), parseInt(notif.scheduleData.hours), parseInt(notif.scheduleData.minutes)).getTime();
+
+//                         let tempDate = new Date(notif.dateList[z]);
+//                         tempDate.setDate(tempDate.getDate() + 1);
+
+//                         notif.dateList[z] = tempDate.getTime();
+
+//                         if(toSubstract != 0 && notif.dateList[z] - toSubstract > Date.now() + 5000){
+//                             notif.dateList[z] -= toSubstract;
+//                         };
+
+//                         if(platform == "Mobile"){
+//                             if(input[i].type == "R"){
+//                                 await scheduleId(new Date(notif.dateList[z]), input[i].name+" | "+notif.scheduleData.hours+":"+notif.scheduleData.minutes, input[i].body, id, 'reminder');
+//                             }else{
+//                                 await scheduleId(new Date(notif.dateList[z]), input[i].name+" | "+notif.scheduleData.hours+":"+notif.scheduleData.minutes, textAssets[parameters.language].notification.duration + " : " + get_time(get_session_time(input[i])), id, 'session');
+//                             };
+//                         };
+//                     };
+//                 };
+
+//                 if(input[i].type != "R"){
+//                     hasBeenShifted.data[input[i].id] = true;
+//                     sessionToBeDone.data[input[i].id] = false;
+//                 };
+//             };
+//         };
+
+//         hasBeenShifted_save(hasBeenShifted);
+//     };
+
+//     await shiftPlusCore(session_list);
+//     session_save(session_list);
+//     updateCalendar(session_list, updateCalendarPage);
+
+//     //-------------;
+
+//     await shiftPlusCore(reminder_list);
+//     reminder_save(reminder_list);
+
+//     if(platform == "Mobile"){
+//         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
+//     };
+// };
+
+async function shiftPlusOne(){
     async function shiftPlusCore(input){
         for(let i=0; i<input.length; i++){
-            if(isScheduled(input[i])){
-
+            if(isScheduled(input[i]) && calendar_dict[input[i].id]){
                 let notif = isScheduled(input[i]);
                 let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
                 
                 let id = await getPendingId(input[i].id);
 
                 if(getScheduleScheme(input[i]) == "Day"){
-                    if(input[i].type == "R" && notif.scheduleData.count == 1){continue};                        
                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
 
                     notif.dateList[0] = setHoursMinutes(new Date(notif.dateList[0]), parseInt(notif.scheduleData.hours), parseInt(notif.scheduleData.minutes)).getTime();
@@ -786,9 +868,6 @@ async function shiftPlusOne(){
                         };
                     };
                 }else if(getScheduleScheme(input[i]) == "Week"){
-
-                    if(input[i].type == "R" && notif.dateList.length == 7){continue};
-
                     for(let z=0; z<notif.dateList.length; z++){
                         let idx = (z+1).toString() + id.slice(1, id.length);
 
@@ -815,10 +894,8 @@ async function shiftPlusOne(){
                     };
                 };
 
-                if(input[i].type != "R"){
-                    hasBeenShifted.data[input[i].id] = true;
-                    sessionToBeDone.data[input[i].id] = false;
-                };
+                hasBeenShifted.data[input[i].id] = true;
+                sessionToBeDone.data[input[i].id] = false;
             };
         };
 
@@ -828,11 +905,6 @@ async function shiftPlusOne(){
     await shiftPlusCore(session_list);
     session_save(session_list);
     updateCalendar(session_list, updateCalendarPage);
-
-    //-------------;
-
-    await shiftPlusCore(reminder_list);
-    reminder_save(reminder_list);
 
     if(platform == "Mobile"){
         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));

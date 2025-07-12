@@ -118,7 +118,12 @@ function intervall(data, from_wo = false){
                 $(".session_state").css("color", light_green);
                 $(".session_remaining_subCycle").css({
                     color: light_color,
-                    display: iActualSetNb > 1 ? "inline-block" : "none"
+                    display: 
+                        iActualSetNb > 1 
+                            && data.filter(exo => exo.type == "Int.").length > 1
+                            && getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, false) + 1 != data.length 
+                        ? "inline-block" 
+                        : "none"
                 });
     
                 if(platform == "Mobile" && mobile != "IOS"){
@@ -148,7 +153,12 @@ function intervall(data, from_wo = false){
                 $(".session_state").css("color", light_red);
                 $(".session_remaining_subCycle").css({
                     color: light_color,
-                    display: iActualSetNb > 1 ? "inline-block" : "none"
+                    display: 
+                        iActualSetNb > 1 
+                            && data.filter(exo => exo.type == "Int.").length > 1
+                            && getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, false) + 1 != data.length 
+                        ? "inline-block" 
+                        : "none"
                 });
 
                 if(platform == "Mobile" && mobile != "IOS"){
@@ -169,8 +179,7 @@ function intervall(data, from_wo = false){
     
                 $(".session_state").css("color", light_orange);
                 $(".session_remaining_subCycle").css({
-                    color: light_color,
-                    display: iActualSetNb > 1 ? "inline-block" : "none"
+                    color: light_color
                 });
     
                 if(platform == "Mobile" && mobile != "IOS"){

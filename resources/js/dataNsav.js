@@ -803,6 +803,7 @@ function sessionToBeDone_read(){
             };
     
             stats.missedSessions.val += count;
+            stats_set(stats);
             stats_save(stats);
         };
 

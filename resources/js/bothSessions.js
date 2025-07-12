@@ -456,6 +456,12 @@ function fillSessionEnd(presentHistory, history, failed){
     let liftTile = $('.lift');
     let changesTile = $('.suggestedChanges');
 
+    // RESET
+
+    $('.selection_sessionFinishedBody').scrollLeft(0);
+    $('.selection_sessionFinished_navigator_indicator').css('opacity', '0.5');
+    $('.selection_sessionFinished_navigator_indicator').eq(0).css('opacity', '1');
+
     if(failed){
         $('.failed').css('display', 'flex');
 

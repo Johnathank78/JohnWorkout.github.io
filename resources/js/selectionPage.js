@@ -45,9 +45,9 @@ function manageJumpContainer(data){
         $(".jump_toggle").children().css("marginLeft", "18px");
 
         $(".update_schedule_select_jumpEvery").eq(0).val(data.jumpType);
-        $(".update_schedule_input").eq(3).val(data.jumpVal);
+        $(".update_schedule_tline").find(".update_schedule_input").eq(0).val(data.jumpVal);
 
-        $(".update_schedule_input").eq(4).val(data.everyVal);
+        $(".update_schedule_tline").find(".update_schedule_input").eq(1).val(data.everyVal);
 
         $('.update_schedule_tline_sblock').staticSpawn("flex", 40, 300);
     }else{
@@ -56,9 +56,9 @@ function manageJumpContainer(data){
         $(".jump_toggle").children().css("marginLeft", "unset");
 
         $(".update_schedule_select_jumpEvery").eq(0).val("Day");
-        $(".update_schedule_input").eq(3).val("");
+        $(".update_schedule_tline").find(".update_schedule_input").eq(0).val("");
         $(".update_schedule_select_jumpEvery").eq(1).text(textAssets[parameters.language].updatePage.times);
-        $(".update_schedule_input").eq(4).val("");  
+        $(".update_schedule_tline").find(".update_schedule_input").eq(1).val("");  
 
         $('.update_schedule_tline_sblock').staticDespawn(-14, 300);
     };
@@ -555,7 +555,6 @@ $(document).ready(function(){
         trackItem(item, reminderOrSession);
         $('.update_colorChooser').css('backgroundColor', update_current_item.color);
 
-        let inp_list = $(".update_schedule_input");
         let notif = isScheduled(update_current_item);
 
         if(notif){
@@ -567,9 +566,13 @@ $(document).ready(function(){
 
             $('.update_schedule_select_every option[value="'+getScheduleScheme(update_current_item)+'"]').prop('selected', true);
 
-            $(inp_list[0]).val(notif.scheduleData.hours);
-            $(inp_list[1]).val(notif.scheduleData.minutes);
-            $(inp_list[2]).val(notif.scheduleData.count);
+            let ref = notif.scheduleData.hours * 3600 + notif.scheduleData.minutes * 60;
+            let scheme = $('.update_schedule_timeInput')[0].getAttribute('scheme');
+
+            $(".update_schedule_fline_sblock").find('.update_schedule_timeInput').val(format_timeString(ref, scheme));
+            $(".update_schedule_fline_sblock").find('.update_schedule_timeInput').storeVal(get_timeString(ref));
+
+            $(".update_schedule_sline").find(".update_schedule_input").val(notif.scheduleData.count);
 
             $('.update_schedule_datePicker').css('justify-content', "flex-start");
             manageJumpContainer(notif.jumpData);
@@ -586,9 +589,11 @@ $(document).ready(function(){
             $('.update_schedule_datePicker').css('justify-content', "center");
             $('.update_schedule_datePicker').text(textAssets[parameters.language].updatePage.pickDate);
 
-            $(inp_list[0]).val("");
-            $(inp_list[1]).val("");
-            $(inp_list[2]).val("");
+            $(".update_schedule_fline_sblock").find('.update_schedule_timeInput').val("");
+            $(".update_schedule_fline_sblock").find('.update_schedule_timeInput').storeVal("0"+abrTimeSymols.second);
+
+            $(".update_schedule_sline").find(".update_schedule_input").val("");
+
             $('.update_schedule_select_day option[value="'+dayofweek[new Date().getDay()]+'"]').prop('selected', true);
             $('.update_schedule_select_every option[value="Day"]').prop('selected', true);
 

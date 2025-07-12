@@ -826,6 +826,35 @@ function get_timeString(ref, getList=false){
     }
 };
 
+function format_timeString(ref, scheme){
+    let corr = {
+        y: abrTimeSymols.year,
+        w: abrTimeSymols.week,
+        d: abrTimeSymols.day,
+        h: abrTimeSymols.hour,
+        m: abrTimeSymols.minute,
+        s: abrTimeSymols.second
+    }
+
+    if(scheme == "classic"){
+        return display_timeString(get_timeString(ref));
+    }else{
+        scheme = JSON.parse(scheme);
+        let timeData = get_timeString(ref, true);
+        let output = "";
+        
+        for (const key of Object.keys(scheme)){
+            if(scheme[key].precision == 2 && timeData[key].toString().length == 1) output += "0" 
+            output += timeData[key].toString()
+
+            if(scheme[key].showUnit) output += corr[key.toLowerCase()];
+        };
+
+        return display_timeString(output);
+    };
+
+};
+
 function display_timeString(timeString, lang=false){
     lang = lang ? lang : parameters.language;
 

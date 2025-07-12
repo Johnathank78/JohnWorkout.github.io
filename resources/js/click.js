@@ -158,7 +158,7 @@ function longClickUpHandler(){
     );
 };
 
-function longClickMoveHandler(e) {
+function longClickMoveHandler(e){
     // If the element cannot long-click, or is not pressed, do nothing
     if (!$(this).data("canLongClick")) {
         return;

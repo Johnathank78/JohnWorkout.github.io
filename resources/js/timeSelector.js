@@ -12,7 +12,7 @@ function isAbleToGrow(val, elem){
     };
 };
 
-function summonTimeSelector(target){
+function summonTimeSelector(target, show = {h: true, m: true, s: true}){
     cannotClick = "timeSelector";
 
     isEditing = false
@@ -25,6 +25,15 @@ function summonTimeSelector(target){
     updateTimeSelectorVal($('.timeSelectorHours').find('.timeSelectorInput'), 0);
     updateTimeSelectorVal($('.timeSelectorMinutes').find('.timeSelectorInput'), 0);
     updateTimeSelectorVal($('.timeSelectorSeconds').find('.timeSelectorInput'), 0);
+
+    $(".timeSelectorHours").css('display', show.h ? "flex" : "none");
+    $('.timeSelector_Unit').eq(0).css('display', show.h ? "inline-block" : "none");
+
+    $(".timeSelectorMinutes").css('display', show.m ? "flex" : "none");
+    $('.timeSelector_Unit').eq(1).css('display', show.m ? "inline-block" : "none");
+
+    $(".timeSelectorSeconds").css('display', show.s ? "flex" : "none");
+    $('.timeSelector_Unit').eq(2).css('display', show.s ? "inline-block" : "none");
 
     $(".timeSelectorSubmit").data("target", target);
     showBlurPage('timeSelectorBody');
@@ -111,48 +120,52 @@ function timeSelectorUpdateTarget(classs){
 };
 
 $(document).ready(function(){
-    $(document).on('click', '.timeSelectorBtn_up', function(e){
+    $(document).on('click', '.timeSelectorBtn_up', function(){
         let input = $(this).parent().find(".timeSelectorInput");
         updateTimeSelectorVal(input, 1);
     });
 
-    $(document).on('click', '.timeSelectorBtn_down', function(e){
+    $(document).on('click', '.timeSelectorBtn_down', function(){
         let input = $(this).parent().find(".timeSelectorInput");
         updateTimeSelectorVal(input, -1);
     });
 
-    $(document).on('click', '.timeSelectorSubmit', function(e){
+    $(document).on('click', '.timeSelectorSubmit', function(){
         isEditing = false;
 
-        let target = $(".timeSelectorSubmit").data("target")
+        let target = $(".timeSelectorSubmit").data("target");
         let hours = parseInt($('.timeSelectorHours').find(".timeSelectorInput").val());
         let minutes = parseInt($('.timeSelectorMinutes').find(".timeSelectorInput").val());
         let seconds = parseInt($('.timeSelectorSeconds').find(".timeSelectorInput").val());
+
+        let scheme = $(target)[0].getAttribute("scheme") || "classic";
 
         hours = hours <= 23 ? hours : 23;
         minutes = minutes <= 59 ? minutes : 59;
         seconds = seconds <= 59 ? seconds : 59;
 
-        let timeString = get_timeString(hours * 3600 + minutes * 60 + seconds);
+        let ref = hours * 3600 + minutes * 60 + seconds;
 
-        $(target).storeVal(timeString);
-        $(target).val(display_timeString(timeString));
+        $(target).storeVal(get_timeString(ref));
+        $(target).val(format_timeString(ref, scheme));
 
         closePanel('timeSelector');
         canNowClick("allowed");
     });
 
-    $(document).on('click', '.timeString', function(e){
-        summonTimeSelector($(this));
+    $(document).on('click', '.timeString', function(){
+        let hours = this.getAttribute("hours") == "false" ? false : true;
+        let minutes = this.getAttribute("minutes") == "false" ? false : true;
+        let seconds = this.getAttribute("seconds") == "false" ? false : true;
+
+        summonTimeSelector($(this), {h: hours, m: minutes, s: seconds});
     });
 
-    $(document).on('blur', '.timeSelectorInput', function(e){
-        if($(this).val() == ""){
-            $(this).val(0);
-        };
+    $(document).on('blur', '.timeSelectorInput', function(){
+        if($(this).val() == "") $(this).val(0);
     });
 
-    $(document).on('input', '.timeSelectorInput', function(e){
+    $(document).on('input', '.timeSelectorInput', function(){
         updateTimeSelectorVal(this, 0);
     });
 
