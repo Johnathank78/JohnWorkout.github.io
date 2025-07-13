@@ -1,8 +1,8 @@
 var longClickTS = false;
 var isReactShowin = false;
 
-var DOUBLE_TAP_THRESHOLD;
-var HOLD_THRESHOLD;
+var DOUBLE_TAP_THRESHOLD = 500;
+var HOLD_THRESHOLD = 60;
 
 function loadColors(item){
     let color1 = false;
@@ -196,9 +196,6 @@ const magnifyBlocker = (() => {
     let firstTapTime = 0;
     let holdTimer = null;
     let isSecondTap = false;
-    
-    DOUBLE_TAP_THRESHOLD = 500;
-    HOLD_THRESHOLD = 60; 
     
     return (event) => {
         // Skip if target is an editable element
