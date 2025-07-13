@@ -40,12 +40,11 @@ function keepAwakeToggle(state){
 };
 
 async function launchSession(index){
-
     current_page = "session";
     current_session = session_list[index];
 
     if(platform == "Mobile"){
-        let shown = await isShown(current_session.id, getScheduleScheme(current_session));
+        let shown = await isShown(current_session);
 
         if(shown){
             let id = getNotifFirstIdChar(current_session) + current_session.id + shown.slice(-1);
@@ -212,7 +211,7 @@ async function quit_session(failed=false){
         // Notification related;
 
         if(isScheduled(current_session)){
-            let id = await getTodayPendingId(current_session.id);
+            let id = await getTodayPendingId(current_session);
 
             if(platform == "Mobile"){
                 await undisplayAndCancelNotification(id);
@@ -223,7 +222,7 @@ async function quit_session(failed=false){
     };
 
     stats_set(stats);
-    updateCalendar(session_list, updateCalendarPage);
+    updateCalendar(updateCalendarPage);
 
     
 

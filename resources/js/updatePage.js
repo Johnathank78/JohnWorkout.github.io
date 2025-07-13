@@ -74,7 +74,6 @@ function updateSelectScheduleLabels(nb, item){
 };
 
 function leave_update(){
-
     if(current_page == "add"){
         add_mode_save = selected_mode;
         add_name_save = $(".update_data_name").val();
@@ -89,8 +88,6 @@ function leave_update(){
             
             $(intervallHTML).children().removeAttr('style');
             $(exercisesHTML).children().removeAttr('style');
-
-            console.log($(exercisesHTML).children().prop("outerHTML"))
         }else{
             add_reminder_body_save = $(".udpate_reminder_body_txtarea").val();
         };
@@ -707,26 +704,27 @@ $(document).ready(function(){
             update_current_item.notif = false;
 
             if(reminderOrSession == "session"){
-                delete calendar_dict[update_current_item.id];
-
                 sessionToBeDone.data[update_current_item.id] = false;
                 hasBeenShifted.data[update_current_item.id] = false;
                 deleteRelatedSwap(update_current_item.id);
 
                 session_save(session_list);
-                calendar_save(calendar_dict);
 
                 sessionToBeDone_save(sessionToBeDone);
                 sessionSwapped_save(sessionSwapped);
 
-                calendar_read(session_list);
-                updateCalendar(session_list, updateCalendarPage);
 
                 $($(".selection_session_tile")[update_current_index]).find(".selection_session_tile_extra_schedule").css('background-color', "#363949");
             }else if(reminderOrSession == "reminder"){
                 reminder_save(reminder_list);
                 $($(".selection_reminder_tile")[update_current_index]).find(".selection_session_tile_extra_schedule").css('background-color', '#363949');
             };
+
+            delete calendar_dict[update_current_item.id];
+            calendar_save(calendar_dict);
+
+            calendar_read([...session_list, ...reminder_list]);
+            updateCalendar(updateCalendarPage);
 
             $(".selection_info").css("display", "block");
 
@@ -928,10 +926,10 @@ $(document).ready(function(){
                         });
 
                         if(isScheduled(update_current_item)){
-                            let id = await getPendingId(update_current_item.id);
+                            let id = await getPendingId(update_current_item);
 
                             uniq_scheduler(id, "session");
-                            calendar_read(session_list);
+                            calendar_read([...session_list, ...reminder_list]);;
                         };
 
                         update_current_item.color = color;
@@ -1027,10 +1025,10 @@ $(document).ready(function(){
                         });
 
                         if(isScheduled(update_current_item)){
-                            let id = await getPendingId(update_current_item.id);
+                            let id = await getPendingId(update_current_item);
 
                             uniq_scheduler(id, "session");
-                            calendar_read(session_list);
+                            calendar_read([...session_list, ...reminder_list]);;
                         };
 
                         update_current_item.color = color;
@@ -1051,7 +1049,7 @@ $(document).ready(function(){
                     update_current_item.color = color;
 
                     if(isScheduled(update_current_item)){
-                        let id = await getPendingId(update_current_item.id);
+                        let id = await getPendingId(update_current_item);
                         uniq_scheduler(id, "reminder");
                     };
 
@@ -1320,8 +1318,6 @@ $(document).ready(function(){
                     refresh_session_tile();
                 };
 
-                delete calendar_dict[update_current_item.id];
-
                 $(update_current_node).remove();
                 session_list = session_list.delete(update_current_index);
 
@@ -1331,11 +1327,6 @@ $(document).ready(function(){
                 hasBeenShifted_save(hasBeenShifted);
 
                 session_save(session_list);
-                calendar_save(calendar_dict);
-
-                calendar_read(session_list);
-                updateCalendar(session_list, updateCalendarPage);
-
             }else if(reminderOrSession == "reminder"){
                 title = update_current_item.name;
 
@@ -1348,6 +1339,12 @@ $(document).ready(function(){
 
                 reminder_save(reminder_list);
             };
+
+            delete calendar_dict[update_current_item.id];
+            calendar_save(calendar_dict);
+
+            calendar_read([...session_list, ...reminder_list]);;
+            updateCalendar(updateCalendarPage);
 
             update_pageReset();
             bottomNotification("deleted", title);
@@ -1492,25 +1489,25 @@ $(document).ready(function(){
                 update_current_item.notif = notifJson;
 
                 if(reminderOrSession == "session"){
-                    calendar_dict[update_current_item.id] = true;
                     sessionToBeDone.data[update_current_item.id] = dateList.includes(getToday('timestamp'));
 
                     session_save(session_list);
                     sessionToBeDone_save(sessionToBeDone);
-                    calendar_save(calendar_dict);
-
-                    calendar_read(session_list);
-                    updateCalendar(session_list, updateCalendarPage);
-
-                    $(update_current_node).find(".selection_session_tile_extra_schedule").css('background-color', '#1dbc60');
                 }else if(reminderOrSession == "reminder"){
                     reminder_save(reminder_list);
-                    $(update_current_node).find(".selection_session_tile_extra_schedule").css('background-color', '#1dbc60');
                 };
+                
+                $(update_current_node).find(".selection_session_tile_extra_schedule").css('background-color', '#1dbc60');
+                
+                calendar_dict[update_current_item.id] = true;
+                calendar_save(calendar_dict);
+                
+                calendar_read([...session_list, ...reminder_list]);
+                updateCalendar(updateCalendarPage);
 
                 if(platform == "Mobile") console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
 
-                if(reminderOrSession == "session"){
+                if(reminderOrSession == "session" && !dateList.includes(getToday('timestamp'))){
                     hasBeenShifted.data[update_current_item.id] = true;
                     hasBeenShifted_save(hasBeenShifted);
                 };
@@ -1662,6 +1659,10 @@ $(document).ready(function(){
         update_current_item.notif = false;
 
         $(update_current_node).remove();
+        delete calendar_dict[update_current_item.id];
+        
+        calendar_save(calendar_dict);
+        calendar_read([...session_list, ...reminder_list]);
 
         if(reminderOrSession == "session"){
             sessionReorder_update();

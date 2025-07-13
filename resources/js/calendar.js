@@ -63,7 +63,7 @@ function applyHoursMinutes(date, prov){
     date.setMinutes(prov.getMinutes());
 
     return date;
-}
+};
 
 function getAssociatedDate(dayIndex){
     return zeroAM($(".selection_page_calendar_row_day").eq(dayIndex).data('time'), "date");
@@ -408,7 +408,6 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
     // -------------------------------------
     // 8. Main logic to determine the result
     // -------------------------------------
-
     if (diffInDays >= 0) {
         // If diffInDays >= 0, just check if C is an event day.
         return checkEventDay(diffInDays);
@@ -503,9 +502,10 @@ function generateBaseCalendar(page){
     $(".selection_page_calendar_header_Y").text(tempDate.getFullYear());
 };
 
-function updateCalendar(data, page){
+function updateCalendar(page){
     let end = 20;
 
+    let data = [...session_list, ...reminder_list];
     let today = dayofweek_conventional.indexOf(dayofweek[new Date().getDay()]);
     let dayz = $(".selection_page_calendar_row_day");
 
@@ -518,7 +518,7 @@ function updateCalendar(data, page){
             let id = data[i].id;
             let jumpData = notif.jumpData;
             let scheduleOccurence = notif.occurence;
-            let historyCount = getSessionHistory(data[i]).historyCount;
+            let historyCount = getSessionHistory(data[i])?.historyCount || 0;
 
             if(getScheduleScheme(data[i]) == "Day"){
                 let scheduleDate = zeroAM(notif.dateList[0], "date");
@@ -542,6 +542,11 @@ function updateCalendar(data, page){
                         id
                     ) === false){
                         nbdayz += 1; 
+                        continue;
+                    };
+
+                    if(data.type == "R"){
+                        $(dayz).eq(dayInd).data("sList").push([[data[i].id, data[i].name], [notif.scheduleData.hours, notif.scheduleData.minutes]]);
                         continue;
                     };
 
@@ -594,7 +599,13 @@ function updateCalendar(data, page){
                             $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession.id, "iteration": getSwapedSessionBeforeDate(associatedDate, matchedSession.id, "add") + matchedHistoryCount + 1});  
                         };
 
-                        $(dayz).eq(dayInd).data("sList").push([[matchedSession.id, matchedSession.name], [notif.scheduleData.hours, notif.scheduleData.minutes]]);
+                        $(dayz).eq(dayInd).data("sList").push({
+                            "type": matchedSession.type,
+                            "id": matchedSession.id,
+                            "name": matchedSession.name,
+                            "hours": notif.scheduleData.hours,
+                            "minutes": notif.scheduleData.minutes
+                        });
                     }else{
                         $(dayz).eq(dayInd).data("iteration").push({"id": id, "iteration": getIterationNumber(
                             associatedDate,
@@ -610,7 +621,13 @@ function updateCalendar(data, page){
                             id
                         )});
 
-                        $(dayz).eq(dayInd).data("sList").push([[data[i].id, data[i].name], [notif.scheduleData.hours, notif.scheduleData.minutes]]);
+                        $(dayz).eq(dayInd).data("sList").push({
+                            "type": data[i].type,
+                            "id": data[i].id,
+                            "name": data[i].name,
+                            "hours": notif.scheduleData.hours,
+                            "minutes": notif.scheduleData.minutes
+                        });
                     };
 
                     nbdayz += 1
@@ -639,6 +656,11 @@ function updateCalendar(data, page){
                             id
                         ) === false){
                             nbdayz += 1; 
+                            continue;
+                        };
+
+                        if(data.type == "R"){
+                            $(dayz).eq(dayInd).data("sList").push([[data[i].id, data[i].name], [notif.scheduleData.hours, notif.scheduleData.minutes]]);
                             continue;
                         };
 
@@ -691,7 +713,13 @@ function updateCalendar(data, page){
                                 $(dayz).eq(dayInd).data("iteration").push({"id": matchedSession.id, "iteration": getSwapedSessionBeforeDate(associatedDate, matchedSession.id, "add") + matchedHistoryCount + 1});  
                             };
     
-                            $(dayz).eq(dayInd).data("sList").push([[matchedSession.id, matchedSession.name], [notif.scheduleData.hours, notif.scheduleData.minutes]]);
+                            $(dayz).eq(dayInd).data("sList").push({
+                                "type": matchedSession.type,
+                                "id": matchedSession.id,
+                                "name": matchedSession.name,
+                                "hours": notif.scheduleData.hours,
+                                "minutes": notif.scheduleData.minutes
+                            });
                         }else{
                             $(dayz).eq(dayInd).data("iteration").push({"id": id, "iteration": getIterationNumber(
                                 associatedDate,
@@ -707,7 +735,13 @@ function updateCalendar(data, page){
                                 id
                             )}); 
 
-                            $(dayz).eq(dayInd).data("sList").push([[data[i].id, data[i].name], [notif.scheduleData.hours, notif.scheduleData.minutes]]);
+                           $(dayz).eq(dayInd).data("sList").push({
+                                "type": data[i].type,
+                                "id": data[i].id,
+                                "name": data[i].name,
+                                "hours": notif.scheduleData.hours,
+                                "minutes": notif.scheduleData.minutes
+                            });
                         };
 
                         nbdayz += 1;
@@ -718,7 +752,7 @@ function updateCalendar(data, page){
     };
     
     $(dayz).each(function(i){
-        let sList = $(dayz).eq(i).data("sList");
+        let sList = $(dayz).eq(i).data("sList").filter(item => item.type != "R");
 
         if(sList.length == 0){return};
 
@@ -729,7 +763,7 @@ function updateCalendar(data, page){
             const element = sList[x];
 
             let associatedDate = getAssociatedDate(i);
-            let sessionID = element[0][0];
+            let sessionID = element.id;
 
             let visibility = (calendar_dict[sessionID] || !Object.keys(calendar_dict).includes(sessionID)) 
                                 && !(isToday(associatedDate) && sessionDone.data[sessionID]);
@@ -752,91 +786,6 @@ function updateCalendar(data, page){
     });
 };
 
-// async function shiftPlusOneSAV_withReminders(){
-
-//     async function shiftPlusCore(input){
-//         for(let i=0; i<input.length; i++){
-//             if(isScheduled(input[i])){
-//                 let notif = isScheduled(input[i]);
-//                 let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
-                
-//                 let id = await getPendingId(input[i].id);
-
-//                 if(getScheduleScheme(input[i]) == "Day"){
-//                     if(input[i].type == "R" && notif.scheduleData.count == 1){continue};                        
-//                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
-
-//                     notif.dateList[0] = setHoursMinutes(new Date(notif.dateList[0]), parseInt(notif.scheduleData.hours), parseInt(notif.scheduleData.minutes)).getTime();
-
-//                     let tempDate = new Date(notif.dateList[0]);
-//                     tempDate.setDate(tempDate.getDate() + 1);
-
-//                     notif.dateList[0] = tempDate.getTime();
-
-//                     if(toSubstract != 0 && notif.dateList[0] - toSubstract > Date.now() + 5000){
-//                         notif.dateList[0] -= toSubstract;
-//                     };
-
-//                     if(platform == "Mobile"){
-//                         if(input[i].type == "R"){
-//                             await scheduleId(new Date(notif.dateList[0]), input[i].name+" | "+notif.scheduleData.hours+":"+notif.scheduleData.minutes, input[i].body, id, 'reminder');
-//                         }else{
-//                             await scheduleId(new Date(notif.dateList[0]), input[i].name+" | "+notif.scheduleData.hours+":"+notif.scheduleData.minutes, textAssets[parameters.language].notification.duration + " : " + get_time(get_session_time(input[i])), id, 'session');
-//                         };
-//                     };
-//                 }else if(getScheduleScheme(input[i]) == "Week"){
-//                     if(input[i].type == "R" && notif.dateList.length == 7){continue};
-
-//                     for(let z=0; z<notif.dateList.length; z++){
-//                         let idx = (z+1).toString() + id.slice(1, id.length);
-
-//                         if(platform == "Mobile"){await undisplayAndCancelNotification(idx)};
-
-//                         notif.dateList[z] = setHoursMinutes(new Date(notif.dateList[z]), parseInt(notif.scheduleData.hours), parseInt(notif.scheduleData.minutes)).getTime();
-
-//                         let tempDate = new Date(notif.dateList[z]);
-//                         tempDate.setDate(tempDate.getDate() + 1);
-
-//                         notif.dateList[z] = tempDate.getTime();
-
-//                         if(toSubstract != 0 && notif.dateList[z] - toSubstract > Date.now() + 5000){
-//                             notif.dateList[z] -= toSubstract;
-//                         };
-
-//                         if(platform == "Mobile"){
-//                             if(input[i].type == "R"){
-//                                 await scheduleId(new Date(notif.dateList[z]), input[i].name+" | "+notif.scheduleData.hours+":"+notif.scheduleData.minutes, input[i].body, id, 'reminder');
-//                             }else{
-//                                 await scheduleId(new Date(notif.dateList[z]), input[i].name+" | "+notif.scheduleData.hours+":"+notif.scheduleData.minutes, textAssets[parameters.language].notification.duration + " : " + get_time(get_session_time(input[i])), id, 'session');
-//                             };
-//                         };
-//                     };
-//                 };
-
-//                 if(input[i].type != "R"){
-//                     hasBeenShifted.data[input[i].id] = true;
-//                     sessionToBeDone.data[input[i].id] = false;
-//                 };
-//             };
-//         };
-
-//         hasBeenShifted_save(hasBeenShifted);
-//     };
-
-//     await shiftPlusCore(session_list);
-//     session_save(session_list);
-//     updateCalendar(session_list, updateCalendarPage);
-
-//     //-------------;
-
-//     await shiftPlusCore(reminder_list);
-//     reminder_save(reminder_list);
-
-//     if(platform == "Mobile"){
-//         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
-//     };
-// };
-
 async function shiftPlusOne(){
     async function shiftPlusCore(input){
         for(let i=0; i<input.length; i++){
@@ -844,9 +793,10 @@ async function shiftPlusOne(){
                 let notif = isScheduled(input[i]);
                 let toSubstract = time_unstring($(".selection_parameters_notifbefore").val()) * 1000;
                 
-                let id = await getPendingId(input[i].id);
+                let id = await getPendingId(input[i]);
 
                 if(getScheduleScheme(input[i]) == "Day"){
+                    if(input[i].type == "R" && notif.scheduleData.count == 1){continue};                        
                     if(platform == "Mobile"){await undisplayAndCancelNotification(id)};
 
                     notif.dateList[0] = setHoursMinutes(new Date(notif.dateList[0]), parseInt(notif.scheduleData.hours), parseInt(notif.scheduleData.minutes)).getTime();
@@ -868,6 +818,8 @@ async function shiftPlusOne(){
                         };
                     };
                 }else if(getScheduleScheme(input[i]) == "Week"){
+                    if(input[i].type == "R" && notif.dateList.length == 7){continue};
+
                     for(let z=0; z<notif.dateList.length; z++){
                         let idx = (z+1).toString() + id.slice(1, id.length);
 
@@ -894,8 +846,10 @@ async function shiftPlusOne(){
                     };
                 };
 
-                hasBeenShifted.data[input[i].id] = true;
-                sessionToBeDone.data[input[i].id] = false;
+                if(input[i].type != "R"){
+                    hasBeenShifted.data[input[i].id] = true;
+                    sessionToBeDone.data[input[i].id] = false;
+                };
             };
         };
 
@@ -904,7 +858,12 @@ async function shiftPlusOne(){
 
     await shiftPlusCore(session_list);
     session_save(session_list);
-    updateCalendar(session_list, updateCalendarPage);
+    updateCalendar(updateCalendarPage);
+
+    //-------------;
+
+    await shiftPlusCore(reminder_list);
+    reminder_save(reminder_list);
 
     if(platform == "Mobile"){
         console.log(getIDListFromNotificationArray(await LocalNotifications.getPending()));
@@ -925,12 +884,10 @@ function findChanged(time, data){
 };
 
 function sortSlist(a, b){
-    const timeA = a[1];
-	const timeB = b[1];
-	const hoursA = parseInt(timeA[0], 10);
-	const minutesA = parseInt(timeA[1], 10);
-	const hoursB = parseInt(timeB[0], 10);
-	const minutesB = parseInt(timeB[1], 10);
+	const hoursA = parseInt(a.hours, 10);
+	const minutesA = parseInt(a.minutes, 10);
+	const hoursB = parseInt(b.hours, 10);
+	const minutesB = parseInt(b.minutes, 10);
 	
     if (hoursA < hoursB) return -1;
 	if (hoursA > hoursB) return 1;
@@ -1044,7 +1001,7 @@ function calendarGoHome(mode, page){
             });
         };
 
-        updateCalendar(session_list, page);
+        updateCalendar(page);
         return page;
     }else if(mode == "forward"){
         $(".calendarGoBack").css({
@@ -1054,14 +1011,14 @@ function calendarGoHome(mode, page){
 
         page += 1;
 
-        updateCalendar(session_list, page);
+        updateCalendar(page);
     }else if(mode == "backward"){
         if(page == 1){return};
 
         if(page > 2){
             page -= 1;
 
-            updateCalendar(session_list, page);
+            updateCalendar(page);
         }else if(page == 2){
             $(".calendarGoBack").css({
                 opacity: .5,
@@ -1070,7 +1027,7 @@ function calendarGoHome(mode, page){
 
             page -= 1;
 
-            updateCalendar(session_list, page);
+            updateCalendar(page);
         };
     };
 
@@ -1263,7 +1220,14 @@ $(document).ready(function(){
     $(document).on("click", ".selection_page_calendar_Scheduled_item", function(e){
         $(this).data("state", !$(this).data("state"));
 
-        let color = session_list[getSessionIndexByID($(this).data("id"))].color;
+        let color = false;
+
+        if($(this).data("type") == "R"){
+            color = reminder_list[getReminderIndexByID($(this).data("id"))].color;
+        }else{
+            color = session_list[getSessionIndexByID($(this).data("id"))].color;
+        };
+
 
         if($(this).data("state") === false){
             $(this).css('backgroundColor', '#4C5368');
@@ -1274,7 +1238,7 @@ $(document).ready(function(){
         calendar_dict[$(this).data('id')] = $(this).data("state");
 
         calendar_save(calendar_dict);
-        updateCalendar(session_list, updateCalendarPage);
+        updateCalendar(updateCalendarPage);
     });
 
     let isSyncingHeader = false;
@@ -1303,7 +1267,7 @@ $(document).ready(function(){
         checkDisplayState();
     });
 
-    $('.selection_dayPreview_seekingArrowRight, .seekNbR').on('click', function(){
+    $('.selection_dayPreview_seekingArrowContainerRight').on('click', function(){
         let closest = $(".selection_dayPreview_item").filter((_, el) => {
             let left = $(el).getStyleValue('left');
             let bound = $('.selection_dayPreview_body').scrollLeft() + $('.selection_dayPreview_body').width() - 50;
@@ -1321,7 +1285,7 @@ $(document).ready(function(){
         };
     });
 
-    $('.selection_dayPreview_seekingArrowLeft, .seekNbL').on('click', function(){
+    $('.selection_dayPreview_seekingArrowContainerLeft').on('click', function(){
         let closest = $(".selection_dayPreview_item").filter((_, el) => {
             let left = $(el).getStyleValue('left');
             let bound = $('.selection_dayPreview_body').scrollLeft();
@@ -1396,7 +1360,7 @@ $(document).ready(function(){
         };
 
         sessionSwapped_save(sessionSwapped);
-        updateCalendar(session_list, updateCalendarPage);
+        updateCalendar(updateCalendarPage);
 
         $('.selection_dayPreview_item').eq($(this).data('elemId')).data('id', idTo);
         $('.selection_dayPreview_item').eq($(this).data('elemId')).text(session_list[getSessionIndexByID(idTo)].name);
@@ -1413,7 +1377,7 @@ $(document).ready(function(){
     });
 
     $(document).on('click', '.selection_dayPreview_item', function(){
-        if($(this).css('backgroundColor') == 'rgb(76, 83, 104)'){return};
+        if($(this).css('backgroundColor') == 'rgb(76, 83, 104)' || $(this).data('type') == "R"){return};
 
         if($(this).data("selected")){
             $(this).data("selected", false);
@@ -1478,10 +1442,9 @@ $(document).ready(function(){
 
     $(document).on('click', '.selection_page_calendar_row_day', function(e){
         if(!isDatePicking){
-
             if(!$(this).data('time')){return};
-            actualRowDay = this;
             
+            actualRowDay = this;
             $('.selection_dayPreview_date').text(extractDate($(this).data('time')))
 
             let sList = $(this).data("sList");
@@ -1507,9 +1470,9 @@ $(document).ready(function(){
             let initialHeight = 20;
             let maxHeight = 70;
 
-            sList.forEach(arr => {
+            sList.forEach(item => {
                 // Draw SessionItems & dotsNtimes
-                calculatedOffset = (arr[1][0] * 3600 + arr[1][1] * 60) / 3600 * 150;
+                calculatedOffset = (item.hours * 3600 + item.minutes * 60) / 3600 * 150;
                 Ydata = $('.selection_dayPreview_item').filter((_, el) => $(el).getStyleValue('left') >= calculatedOffset - 90);
 
                 if(Ydata.length > 0){
@@ -1518,17 +1481,24 @@ $(document).ready(function(){
                     itemHeight = initialHeight;
                 };
 
-                let color = session_list[getSessionIndexByID(arr[0][0])].color;
+                let color = item.type == "R" ?
+                    reminder_list[getReminderIndexByID(item.id)].color :
+                    session_list[getSessionIndexByID(item.id)].color; 
+                
+                let visibility = item.type == "R" ? 
+                    !(!hasHourPassed(new Date(), item.hours, item.minutes) && $(actualRowDay).data("time") == getToday("timestamp"))  : 
+                    !(sessionDone.data[item.id] && $(actualRowDay).data("time") == getToday("timestamp"));
 
-                if(sessionDone.data[arr[0][0]] && $(actualRowDay).data("time") == getToday("timestamp")){
-                    itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', 'rgb(76, 83, 104)')) // GRAY
+                if(visibility){
+                    itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', item.name).replace('[bgVAL]', color));
                 }else{
-                    itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', arr[0][1]).replace('[bgVAL]', color)) // GREEN
+                    itemToAdd = $(sessionString.replace('[leftVAL]', calculatedOffset).replace('[topVAL]', itemHeight).replace('[spanVAL]', item.name).replace('[bgVAL]', 'rgb(76, 83, 104)'));
                 };
                 
-                $(itemToAdd).data('id', arr[0][0]);
+                $(itemToAdd).data('type', item.type);
+                $(itemToAdd).data('id', item.id);
                 $(itemToAdd).data("selected", false);
-                $(itemToAdd).data('time', (arr[1][0] * 3600 + arr[1][1] * 60));
+                $(itemToAdd).data('time', (item.hours * 3600 + item.minutes * 60));
                 
                 $('.selection_dayPreview_itemContainer').append(itemToAdd);
 
@@ -1542,7 +1512,7 @@ $(document).ready(function(){
                     if(calculatedOffset % 150 < 60 || calculatedOffset % 150 > 90){
                         clonedDataString = dataString.replace('[timeVAL]', ' ');
                     }else{
-                        clonedDataString = dataString.replace('[timeVAL]', arr[1][0] + textAssets[parameters.language].misc.abrTimeLabels.hour + arr[1][1]);
+                        clonedDataString = dataString.replace('[timeVAL]', item.hours + textAssets[parameters.language].misc.abrTimeLabels.hour + item.minutes);
                     };
 
                     if(!(calculatedOffset % 150 < 15 || calculatedOffset % 150 > 135)){

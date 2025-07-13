@@ -1,9 +1,6 @@
 var longClickTS = false;
 var isReactShowin = false;
 
-var DOUBLE_TAP_THRESHOLD = 500;
-var HOLD_THRESHOLD = 60;
-
 function loadColors(item){
     let color1 = false;
     let color2 = false;
@@ -192,60 +189,6 @@ function longClickMoveHandler(e){
     };
 };
 
-const magnifyBlocker = (() => {
-    let firstTapTime = 0;
-    let holdTimer = null;
-    let isSecondTap = false;
-    
-    return (event) => {
-        // Skip if target is an editable element
-        const target = event.target;
-        const tagName = target.tagName?.toLowerCase();
-        
-        if (tagName === 'input' || 
-            tagName === 'textarea' || 
-            target.contentEditable === 'true' ||
-            target.closest('[contenteditable="true"]')) {
-            return;
-        }
-        
-        const currentTime = Date.now();
-        
-        // Check if this is a potential second tap
-        if (currentTime - firstTapTime < DOUBLE_TAP_THRESHOLD) {
-            isSecondTap = true;
-            
-            // Start hold timer
-            holdTimer = setTimeout(() => {
-                // Hold threshold exceeded on second tap
-                event.preventDefault();
-                console.log('Double-click + hold detected!');
-            }, HOLD_THRESHOLD);
-        } else {
-            // First tap or taps too far apart
-            firstTapTime = currentTime;
-            isSecondTap = false;
-        
-            // Clear any existing timer
-            if (holdTimer) {
-                clearTimeout(holdTimer);
-                holdTimer = null;
-            }
-        }
-        
-        // Add touchend listener to clear hold timer if released early
-        const clearHold = () => {
-            if (holdTimer && isSecondTap) {
-                clearTimeout(holdTimer);
-                holdTimer = null;
-            }
-            event.target.removeEventListener('touchend', clearHold);
-        };
-        
-        event.target.addEventListener('touchend', clearHold, { once: true });
-    };
-})();
-
 // ----
 
 $(document).ready(function(){
@@ -324,16 +267,4 @@ $(document).ready(function(){
             });
         };
     });
-
-    $(".magnifyBlockTweak .doubletap").on("change", function(){
-        DOUBLE_TAP_THRESHOLD = parseInt($(this).val());
-        console.log("Double tap threshold set to: " + DOUBLE_TAP_THRESHOLD);
-    });
-
-    $(".magnifyBlockTweak .hold").on("change", function(){
-        HOLD_THRESHOLD = parseInt($(this).val());
-        console.log("Hold threshold set to: " + HOLD_THRESHOLD);
-    });
-
-    document.body.addEventListener('touchstart', magnifyBlocker, { passive: false });
 });

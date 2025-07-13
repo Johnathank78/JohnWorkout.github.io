@@ -352,7 +352,7 @@ function parametersChecknUpdate(){
 
                     reminder_save(reminder_list);
                     session_save(session_list);
-                    updateCalendar(session_list, updateCalendarPage);
+                    updateCalendar(updateCalendarPage);
                 };
 
                 return false;

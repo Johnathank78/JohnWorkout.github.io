@@ -12,6 +12,7 @@ var muted = false;
 var stats = false;
 var tempStats = false;
 
+var hotfix = false;
 var session_list = false;
 var reminder_list = false;
 var weightData = false;
@@ -51,6 +52,7 @@ $(document).ready(async function(){
     if(platform == "Web" && isWebMobile && !isStandalonePWA){
         isIntruder();
     }else{
+        hotfix = hotfix_read();
         parameters = parameters_read();
 
         exercisesHTML = $('<div class="update_workoutList_container"></div>');
@@ -71,7 +73,9 @@ $(document).ready(async function(){
     
         session_list = session_read();
         reminder_list = reminder_read();
- 
+
+        calendar_dict = calendar_read([...session_list, ...reminder_list]);
+
         sessionSwapped = sessionSwapped_read();
         
         hasBeenShifted = hasBeenShifted_read();
@@ -80,23 +84,12 @@ $(document).ready(async function(){
 
         weightData = weightData_read();
 
-        await rescheduler();
-
         global_pusher(session_list, reminder_list);
-
-        // APPLY FIX
-
-        session_save(session_list);
-        reminder_save(reminder_list);
-        parameters_save(parameters);
-        stats_save(stats);
-
-        // ---------
-
+        
+        await rescheduler();
         deleteHistory();
     
         recovery = recovery_read();
-        showBlurPage("magnifyBlockTweak");
 
         if(platform == "Web"){
             window.oncontextmenu = function(e) {

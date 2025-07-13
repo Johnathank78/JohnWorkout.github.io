@@ -271,10 +271,6 @@ $(document).ready(function(){
     
                         session_list = session_read(temp);
                         sessionSchemeVarsReset();
-                        
-                        calendar_dict = calendar_reset(session_list);
-                        calendar_save(calendar_dict);
-                        calendar_read(session_list);
 
                         session_pusher(session_list);
     
@@ -313,6 +309,14 @@ $(document).ready(function(){
                     };
                 };
 
+                if(checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0){
+                    let comboList = [...session_list, ...reminder_list];
+
+                    calendar_dict = calendar_reset(comboList);
+                    calendar_save(calendar_dict);
+                    calendar_read(comboList);
+                };
+
                 if(schedule){scheduler()};
             }else if(platform == "Web"){
                 for(let i=0; i<localFiles.length;i++){
@@ -334,10 +338,6 @@ $(document).ready(function(){
 
                         session_list = session_read(temp);
                         sessionSchemeVarsReset();
-
-                        calendar_dict = calendar_reset(session_list);
-                        calendar_save(calendar_dict);
-                        calendar_read(session_list)
 
                         session_pusher(session_list);
                         
@@ -368,6 +368,14 @@ $(document).ready(function(){
                         weightData = updateTrackerUnits(weightData, "kg", parameters.weightUnit);
 
                         weightData_save(weightData);
+                    };
+
+                    if(checked.filter($('#selection_saveLoad_sl')).length > 0 || checked.filter($('#selection_saveLoad_rl')).length > 0){
+                        let comboList = [...session_list, ...reminder_list];
+                        
+                        calendar_dict = calendar_reset(comboList);
+                        calendar_read(comboList);
+                        calendar_save(calendar_dict);
                     };
 
                     if(schedule){scheduler()};

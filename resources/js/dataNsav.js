@@ -257,6 +257,23 @@ function saveItem(name, data){
     return;
 };
 
+function hotfix_read(){
+    let data = localStorage.getItem("hotfix");
+    let vNb = $(".versionNumber").text();
+    
+    if(data === null || data == ""){
+        saveItem("hotfix", vNb);
+        return vNb;
+    };
+
+    if(data != vNb){
+        saveItem("hotfix", vNb);
+        return vNb;
+    };
+
+    return false;
+};
+
 
 function stats_read(set=false){
     let data = localStorage.getItem("stats");
@@ -371,18 +388,9 @@ function session_read(set=false){
     if(set) data = set;
 
     if(data === null || data == ""){
-        calendar_dict = calendar_read([]);
         return [];
     }else{
         data = JSON.parse(data);
-        
-        // FIX
-
-        if(data[1] == "kg" || data[1] == "lbs"){
-            data = data[0];
-        };
-
-        calendar_dict = calendar_read(data);
         return data;
     };
 };
@@ -426,6 +434,15 @@ function reminder_read(set=false){
         return [];
     }else{
         data = JSON.parse(data);
+
+        if(hotfix == "v6.93"){
+            data.forEach(reminder => {
+                reminder.id = smallestAvailableId([...session_list, ...data], "id");
+            });
+
+            reminder_save(data);
+        };
+
         return data;
     };
 };
@@ -471,7 +488,7 @@ function global_pusher(session_list, reminder_list, archive = false){
 function calendar_read(data){
     let dict = localStorage.getItem("calendar_shown");
 
-    if (dict === null || dict == ""){
+    if(dict === null || dict == ""){
         dict = calendar_reset(data);
     }else{
         dict = JSON.parse(dict);
@@ -479,23 +496,24 @@ function calendar_read(data){
 
     $(".selection_page_calendar_Scheduled_item").remove();
 
-    data.forEach(session => {
-        if(isScheduled(session)){
-            let temp = $('<span class="selection_page_calendar_Scheduled_item noselect">'+session.name+'</span>');
+    data.forEach(item => {
+        if(isScheduled(item)){
+            let temp = $('<span class="selection_page_calendar_Scheduled_item noselect">'+item.name+'</span>');
+            
+            $(temp).data("type", item.type);
+            $(temp).data("id", item.id);
+            $(temp).data("state", dict[item.id]);
 
-            $(temp).data("state", dict[session.id]);
-            $(temp).data("id", session.id);
-
-            if(dict[session.id]){
-                $(temp).css('backgroundColor', session.color);
+            if(dict[item.id]){
+                $(temp).css('backgroundColor', item.color);
             }else{
                 $(temp).css('backgroundColor', '#4C5368');
             };
 
             $(".selection_page_calendar_second").append(temp);
         }else{
-            if(dict[session.id] !== undefined){
-                delete dict[session.id];
+            if(dict[item.id] !== undefined){
+                delete dict[item.id];
             };
         };
     });
@@ -510,23 +528,22 @@ function calendar_read(data){
     return dict;
 };
 
-function calendar_save(data){
-    saveItem("calendar_shown", JSON.stringify(data));
-    return;
-};
-
 function calendar_reset(data){
     let dict = {};
 
-    data.forEach(session => {
-        if(isScheduled(session)){
-            dict[session.id] = true;
+    data.forEach(item => {
+        if(isScheduled(item)){
+            dict[item.id] = true;
         };
     });
     
     return dict;
 };
 
+function calendar_save(data){
+    saveItem("calendar_shown", JSON.stringify(data));
+    return;
+};
 
 function audio_read(){
     let audio_lv = localStorage.getItem("audio_lv");
@@ -676,7 +693,7 @@ function sessionDone_save(data){
 function hasBeenShifted_read(){
     let data = localStorage.getItem("hasBeenShifted");
 
-    if (data === null || data == ""){
+    if(data === null || data == ""){
         data = emptySessionScheme();
         localStorage.setItem("hasBeenShifted", JSON.stringify(data));
 

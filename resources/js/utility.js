@@ -1142,11 +1142,11 @@ function getReminderIndexByID(id){
     return false;
 };
 
-function getNotifFirstIdChar(session){
-    let notif = isScheduled(session);
+function getNotifFirstIdChar(item){
+    let notif = isScheduled(item);
     let todaysDate = getToday("timestamp");
 
-    if(notif && getScheduleScheme(session) == "Week"){
+    if(notif && getScheduleScheme(item) == "Week"){
         for(let i=0; i<notif.dateList.length; i++){
             if(todaysDate == zeroAM(notif.dateList[i], "timestamp")){
                 return "2"+(i+1).toString();
@@ -1154,7 +1154,7 @@ function getNotifFirstIdChar(session){
         };
 
         return "9";
-    }else if(notif && getScheduleScheme(session) == "Day"){
+    }else if(notif && getScheduleScheme(item) == "Day"){
         if(todaysDate == zeroAM(notif.dateList[0], "timestamp")){
             return "1";
         }else{
@@ -1165,8 +1165,8 @@ function getNotifFirstIdChar(session){
     };
 };
 
-function getScheduleScheme(session){
-    let scheduleData = isScheduled(session);
+function getScheduleScheme(item){
+    let scheduleData = isScheduled(item);
 
     if(scheduleData){
         return scheduleData.scheduleData.scheme;

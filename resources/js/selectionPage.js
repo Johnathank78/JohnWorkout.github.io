@@ -542,6 +542,7 @@ $(document).ready(function(){
     });
 
     $(document).on("click", ".selection_session_tile_extra_schedule", function(e){
+        if(!isAbleToClick('extra')){return};
         current_page = "schedule";
 
         closePanel("xtraContainer");
