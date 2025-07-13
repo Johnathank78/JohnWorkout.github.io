@@ -1,3 +1,8 @@
+.magnifyBlockTweak{
+    display: flex;
+    flex-direction: column;
+}
+
 .timeSelectorBody{
     display: flex;
     flex-direction: column;

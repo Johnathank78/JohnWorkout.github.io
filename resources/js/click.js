@@ -1,6 +1,9 @@
 var longClickTS = false;
 var isReactShowin = false;
 
+var DOUBLE_TAP_THRESHOLD;
+var HOLD_THRESHOLD;
+
 function loadColors(item){
     let color1 = false;
     let color2 = false;
@@ -194,8 +197,8 @@ const magnifyBlocker = (() => {
     let holdTimer = null;
     let isSecondTap = false;
     
-    const DOUBLE_TAP_THRESHOLD = 500; // ms between taps
-    const HOLD_THRESHOLD = 60; // ms to trigger hold
+    DOUBLE_TAP_THRESHOLD = 500;
+    HOLD_THRESHOLD = 60; 
     
     return (event) => {
         // Skip if target is an editable element
@@ -325,5 +328,15 @@ $(document).ready(function(){
         };
     });
 
-    // document.body.addEventListener('touchstart', magnifyBlocker, { passive: false });
+    $(".magnifyBlockTweak .doubletap").on("change", function(){
+        DOUBLE_TAP_THRESHOLD = parseInt($(this).val());
+        console.log("Double tap threshold set to: " + DOUBLE_TAP_THRESHOLD);
+    });
+
+    $(".magnifyBlockTweak .hold").on("change", function(){
+        HOLD_THRESHOLD = parseInt($(this).val());
+        console.log("Hold threshold set to: " + HOLD_THRESHOLD);
+    });
+
+    document.body.addEventListener('touchstart', magnifyBlocker, { passive: false });
 });

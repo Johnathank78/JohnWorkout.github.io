@@ -48,7 +48,7 @@ function isIntruder(){
 };
 
 $(document).ready(async function(){
-    if(platform == "Web" && isWebMobile && !isStandalonePWA && false){
+    if(platform == "Web" && isWebMobile && !isStandalonePWA){
         isIntruder();
     }else{
         parameters = parameters_read();
@@ -96,6 +96,7 @@ $(document).ready(async function(){
         deleteHistory();
     
         recovery = recovery_read();
+        showBlurPage("magnifyBlockTweak");
 
         if(platform == "Web"){
             window.oncontextmenu = function(e) {
