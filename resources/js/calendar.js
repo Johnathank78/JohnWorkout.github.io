@@ -1367,7 +1367,7 @@ $(document).ready(function(){
 
         let color = sessionTo.color;
 
-        if(sessionDone.data[idTo]){
+        if(sessionDone.data[idTo] && time == getToday("timestamp")){
             $(activePreviewItem).css('backgroundColor', 'rgb(76, 83, 104)'); // GRAY
         }else{
             $(activePreviewItem).css('backgroundColor', color); // GREEN
@@ -1415,7 +1415,7 @@ $(document).ready(function(){
             });
 
             session_list.filter(session => session.isArchived === false).forEach(session => {
-                if(!$(actualRowDay).data("sList").map((schedule) => schedule[0][0]).includes(session.id)){
+                if(!$(actualRowDay).data("sList").map((schedule) => schedule.id).includes(session.id)){
                     $('.selection_dayPreview_focusforChange').append($(optString.replace('[idVAL]', session.id).replace('[sessionVAL]', session.name)))
                 };
             });

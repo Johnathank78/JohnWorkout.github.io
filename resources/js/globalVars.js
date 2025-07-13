@@ -136,7 +136,7 @@ const textAssets = {
             "forWard": "Avant",
             "backWard": "Arrière",
             "shiftByOne": "Décaler d'un jour",
-            "emptyMessage": "Aucune séance programmée"
+            "emptyMessage": "Rien de programmée"
         },
         "recovery": {
             "recovery": "Sauvegarde",
@@ -510,7 +510,7 @@ const textAssets = {
             "forWard": "Forward",
             "backWard": "Backward",
             "shiftByOne": "Shift by one Day",
-            "emptyMessage": "No session scheduled"
+            "emptyMessage": "Nothing scheduled"
         },
         "recovery": {
             "recovery": "Recovery",
