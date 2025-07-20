@@ -64,7 +64,11 @@ function goBack(platform){
     }else if(current_page == "session_leave"){
         closePanel('session_cancel');
     }else if(current_page == "import"){
-        closePanel('import');
+        if(importSubPage != "main"){
+            $('.selection_saveLoad_btn_submit').click();
+        }else{
+            closePanel('import');
+        };
     }else if(current_page == "schedule" && isDatePicking){
         closePanel("datePicker");
     }else if(current_page == "history" && historyGraphShown){

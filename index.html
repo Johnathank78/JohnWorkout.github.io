@@ -158,7 +158,7 @@
         <div class="blurBG">
             <!-- GLOBAL -->
 
-            <span class="intruder_versionNumber">v6.94</span>
+            <span class="intruder_versionNumber">v6.95</span>
 
             <div class="timeSelectorBody">
                 <div class="timeSelectorFirstRow">
@@ -447,12 +447,18 @@
 
             <div class="selection_saveLoad_page">
                 <span class="selection_saveLoad_headerText">Select elements</span>
-                <div class="selection_saveLoad_item"><input type="checkbox" name="session_list" id="selection_saveLoad_sl" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Session List</span></div>
-                <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_rl" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Reminder List</span></div>
-                <div class="selection_saveLoad_item"><input type="checkbox" name="parameters" id="selection_saveLoad_pa" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Parameters</span></div>
-                <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_st" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Stats</span></div>
-                <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_we" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Weights</span></div>
-                <span class="selection_saveLoad_emptyMsg">Nothing saved</span>
+                <div class="selection_saveLoad_mainContainer">
+                    <div class="selection_saveLoad_item"><input type="checkbox" name="session_list" id="selection_saveLoad_sl" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Session List</span><div class="selection_saveLoad_goTo">></div></div>
+                    <div class="selection_saveLoad_item"><input type="checkbox" name="reminder_list" id="selection_saveLoad_rl" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Reminder List</span><div class="selection_saveLoad_goTo">></div></div>
+                    <div class="selection_saveLoad_item"><input type="checkbox" name="parameters" id="selection_saveLoad_pa" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Parameters</span></div>
+                    <div class="selection_saveLoad_item"><input type="checkbox" name="stats" id="selection_saveLoad_st" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Stats</span></div>
+                    <div class="selection_saveLoad_item"><input type="checkbox" name="weight" id="selection_saveLoad_we" class="selection_saveLoad_checkbox"><span class="selection_saveLoad_itemText">Weights</span></div>
+                    <span class="selection_saveLoad_emptyMsg">Nothing saved</span>
+                </div>
+
+                <div class="selection_saveLoad_sessionContainer"></div>
+                <div class="selection_saveLoad_reminderContainer"></div>
+
                 <span class="selection_saveLoad_btn_submit">Export</span>
             </div>
 
@@ -653,7 +659,7 @@
 
                     <div class="selection_header_secondRow">
                         <div class="selection_info_page">
-                            <span class="versionNumber">v6.94</span>
+                            <span class="versionNumber">v6.95</span>
 
                             <div class="selection_info_item">
                                 <div class="selection_info_itemWrapper">

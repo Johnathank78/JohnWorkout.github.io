@@ -103,6 +103,11 @@ function closePanel(src, notAnimated=false){
             if(platform == "Web"){$("#folder").val("")};
             $('.blurBG').css('display', 'none');
             canNowClick('allowed');
+
+            $('.selection_saveLoad_sessionContainer, .selection_saveLoad_reminderContainer').find('.selection_saveLoad_item').remove();
+            $('.selection_saveLoad_sessionContainer, .selection_saveLoad_reminderContainer').scrollTop(0);
+            $('.selection_saveLoad_sessionContainer, .selection_saveLoad_reminderContainer').scrollLeft(0);
+
             break;
 
         case "congrats":
@@ -275,8 +280,12 @@ function unfocusDivs(e){
     };
 
     if(notTargeted(e.target, '.selection_saveLoad_page') && current_page == 'import'){
-        closePanel('import');
-        canNowClick();
+        if(importSubPage != "main"){
+            $('.selection_saveLoad_btn_submit').click();
+        }else{
+            closePanel('import');
+            canNowClick();
+        };
     };
 
     if(notTargeted(e.target, '.session_exit_confirm') && current_page == 'session_leave'){
