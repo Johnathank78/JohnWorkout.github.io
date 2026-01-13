@@ -41,7 +41,7 @@ function keepAwakeToggle(state){
 
 async function launchSession(index){
     current_page = "session";
-    current_session = session_list[index];
+    current_session = session_list.filter(session => !session.isArchived)[index];
 
     if(platform == "Mobile"){
         let shown = await isShown(current_session);

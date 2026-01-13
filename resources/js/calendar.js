@@ -395,7 +395,7 @@ function isEventScheduled(C, D, X, Y, Z, U, T, O, ID = false) {
                     // Reset the occurrence each cycle:
                     const partialEvents = Math.floor(adjustedDaysIntoCycle / intervalDays);
                     const occurrence = partialEvents + 1; 
-
+                    
                     return occurrence;
                 }
             }
@@ -644,7 +644,7 @@ function updateCalendar(page){
                         let dayInd = nbdayz - pageOffset;
                         let associatedDate = getAssociatedDate(dayInd);
 
-                        if(!isEventScheduled(
+                        if(isEventScheduled(
                             associatedDate, 
                             scheduleDate, 
                             notif.scheduleData.count, 
