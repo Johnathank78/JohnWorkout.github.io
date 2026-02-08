@@ -1216,7 +1216,7 @@
 
     min-width: 30%;
 
-    padding-left: 0px;
+    padding-left: unset;
 
     cursor: pointer;
 }

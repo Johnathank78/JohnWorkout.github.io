@@ -210,7 +210,7 @@ function notTargeted(target, classs){
 function unfocusDivs(e){
     if($(e.target).is(".IOSbacker")){return};
 
-    if(notTargeted(e.target, ".selection_info_page, .info_icon") && statOpened && (current_page == "selection" || current_page == "session")){
+    if(notTargeted(e.target, ".selection_info_page, .info_icon") && !isTrackerShown && statOpened && (current_page == "selection" || current_page == "session")){
         closePanel("stat");
         canNowClick();
     };
@@ -225,7 +225,7 @@ function unfocusDivs(e){
         canNowClick();
     };
 
-    if(notTargeted(e.target, ".selection_parameters, .selection_parameters_page") && rotation_state && !timeInputShown && !deleteHistoryConfirmShown && !isTrackerShown){
+    if(notTargeted(e.target, ".selection_parameters, .selection_parameters_page") && rotation_state && !timeInputShown && !deleteHistoryConfirmShown){
         closePanel("parameters");
         canNowClick();
     };

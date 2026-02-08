@@ -52,12 +52,12 @@ function bottomNotification(from, target="", queued=false){
         }else if(from == "weightProcessed"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.weightProcessed);
         };
-    }else if(["unscheduled", "deleted", "write", "read", "weightTooFar", "alreadyWeight", "weightTooBig"].includes(from)){
+    }else if(["unscheduled", "deleted", "write", "read", "weightTooFar", "alreadyWeight", "weightTooBig", "fatalError"].includes(from)){
         $('.bottomNotification_Icon').css('filter', redFilter);
         $(".bottomNotification_msg").css('color', redText);
         $('.bottomNotification').css("backgroundColor", redBG);
 
-        if(["write", "read", "weightTooFar", "alreadyWeight", "weightTooBig"].includes(from)){
+        if(["write", "read", "weightTooFar", "alreadyWeight", "weightTooBig", "fatalError"].includes(from)){
             $(".bottomNotification_Icon").attr('src', addIMG);
             $('.bottomNotification_Icon').css("transform", "rotate(45deg)");
         }else{
@@ -80,6 +80,8 @@ function bottomNotification(from, target="", queued=false){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.alreadyWeight);
         }else if(from == "weightTooBig"){
             $(".bottomNotification_msg").text(target + " " + textAssets[parameters.language].bottomNotif.weightTooBig);
+        }else if(from == "fatalError"){
+            $(".bottomNotification_msg").text(textAssets[parameters.language].bottomNotif.fatalError);
         };
     }else if(from == "updated"){
         $('.bottomNotification_Icon').css('filter', blueFilter);

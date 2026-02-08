@@ -1084,7 +1084,9 @@ $(document).ready(function(){
 
                     if(!error){
                         add_name_save = "";
-                        intervallHTML = Iintervall_tile();
+
+                        intervallHTML = $('<div class="update_intervallList_container"></div>');
+                        $(intervallHTML).append(Iintervall_tile());
 
                         new_session = generateSessionObj({
                             "type": "I",
@@ -1236,7 +1238,8 @@ $(document).ready(function(){
                             };
                         });
 
-                        exercisesHTML = exercise_tile();
+                        exercisesHTML = $('<div class="update_workoutList_container"></div>');
+                        $(exercisesHTML).append(exercise_tile());
 
                         $(".selection_session_container").append(session_tile(new_session));
                         session_list.push(new_session);

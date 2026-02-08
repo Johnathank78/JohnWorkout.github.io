@@ -255,6 +255,16 @@ function intervall(data, from_wo = false){
     };
 
     currentExoIndex = getIntervallExoData(totalCycle - iCurrent_cycle + 1, data, true);
+
+    if(currentExoIndex === false || iWork_time === 0){
+        // Erreur critique de récupération : Index ou temps invalide : Reset forcé
+        iActualSet = 0;
+        iCurrent_cycle = totalCycle;
+        currentExoIndex = getIntervallExoData(1, data, true); // Récupérer le 1er exo proprement
+
+        bottomNotification("fatalError");
+    };
+
     if(currentExoIndex != currentExoIndexSAV){iActualSet = 0};
 
     // Graphic Update

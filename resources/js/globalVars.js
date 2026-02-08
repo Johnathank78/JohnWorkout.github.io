@@ -318,7 +318,8 @@ const textAssets = {
             "alreadyWeight": "Masse déjà renseigné aujourd'hui",
             "weightTooBig": "Tu ne peux pas être aussi lourd",
             "weightTooLow": "Tu ne peux pas être aussi léger",
-            "weightProcessed": "Pesé enregistrée avec succès"
+            "weightProcessed": "Pesé enregistrée avec succès",
+            "fatalError": "Erreur fatale !"
         },
         "sessionEnd": {
             "mainText": {
@@ -692,7 +693,8 @@ const textAssets = {
             "alreadyWeight": "Today's weight already registered",
             "weightTooBig": "You cannot be that heavy",
             "weightTooLow": "You cannot be that light",
-            "weightProcessed": "Weight successfully registered"
+            "weightProcessed": "Weight successfully registered",
+            "fatalError": "Fatal error !"
         },
         "sessionEnd": {
             "mainText": {

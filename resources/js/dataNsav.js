@@ -294,9 +294,12 @@ function stats_read(set=false){
     }else{
         data = JSON.parse(data);
 
-        if(getToday('date').getFullYear() != data.missedSessions.year || getToday('timestamp') == 1751320800000){
+        if(getToday('date').getFullYear() != data.missedSessions.year){
             data.missedSessions.val = 0;
+            data.missedSessions.year = getToday('date').getFullYear();
         };
+
+        $('.selection_info_item_year').text(data.missedSessions.year);
     };
 
     stats_set(data);
