@@ -307,7 +307,7 @@ $(document).ready(function(){
     
                 update_current_item.exoList.forEach(exo => {
                     if(exo.type == "Int."){
-                        $(".update_intervallList_container").append(Iintervall_tile(exo));
+                        $(".update_intervallList_container").append(Iintervall_tile(update_current_item, exo.id));
                         if(exo.hint){showHint(".update_intervallList_container")};
     
                         manageRestInputVisibility($(".update_intervallList_container").children().last(), update_current_item.type);
@@ -327,7 +327,7 @@ $(document).ready(function(){
                     if(exo.type == "Brk."){
                         $(".update_workoutList_container").append(pause_tile(exo));
                     }else if(exo.type == "Int."){
-                        $(".update_workoutList_container").append(exercise_tile(exo));
+                        $(".update_workoutList_container").append(exercise_tile(update_current_item, exo.id));
     
                         if(isIntervallLinked(exo)){
                             $(".update_workoutList_container").children().last().attr('exo-data', JSON.stringify({"type": exo.type, "linkId": exo.linkId}));
@@ -337,12 +337,12 @@ $(document).ready(function(){
     
                         if(exo.hint){showHint(".update_workoutList_container")};
                     }else if(exo.type == "Wrm."){
-                        $(".update_workoutList_container").append(exercise_tile(exo));
+                        $(".update_workoutList_container").append(exercise_tile(update_current_item, exo.id));
                         if(exo.hint){showHint(".update_workoutList_container")};
                         
                         $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                     }else{
-                        $(".update_workoutList_container").append(exercise_tile(exo));
+                        $(".update_workoutList_container").append(exercise_tile(update_current_item, exo.id));
                         manageRestInputVisibility($(".update_workoutList_container").children().last(), update_current_item.type);
                         if(exo.hint){showHint(".update_workoutList_container")};
                     };
@@ -385,7 +385,7 @@ $(document).ready(function(){
                 
                 update_current_item.exoList.forEach(exo => {
                     if(exo.type == "Int."){
-                        $(".update_intervallList_container").append(Iintervall_tile(exo));
+                        $(".update_intervallList_container").append(Iintervall_tile(update_current_item, exo.id));
                     }else if(exo.type == "Brk."){
                         $(".update_intervallList_container").append(pause_tile(exo));
                     };
@@ -409,7 +409,7 @@ $(document).ready(function(){
                     if(exo.type == "Brk."){
                         $(".update_workoutList_container").append(pause_tile(exo));
                     }else if(exo.type == "Int."){
-                        $(".update_workoutList_container").append(exercise_tile(exo));
+                        $(".update_workoutList_container").append(exercise_tile(update_current_item, exo.id));
     
                         if(isIntervallLinked(exo)){ // IS LINKED
                             $(".update_workoutList_container").children().last().data('data', exo.idLink);
@@ -417,10 +417,10 @@ $(document).ready(function(){
                             $(".update_workoutList_container").children().last().data('data', exo.id);
                         };
                     }else if(exo.type == "Wrm."){
-                        $(".update_workoutList_container").append(exercise_tile(exo));
+                        $(".update_workoutList_container").append(exercise_tile(update_current_item, exo.id));
                         $(".update_workoutList_container").children().last().find('.update_workout_item_second_line').css('display', 'none');
                     }else{
-                        $(".update_workoutList_container").append(exercise_tile(exo));
+                        $(".update_workoutList_container").append(exercise_tile(update_current_item, exo.id));
                         manageRestInputVisibility($(".update_workoutList_container").children().last(), update_current_item.type);
                     };
                 })

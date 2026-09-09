@@ -68,6 +68,18 @@ function openHint(){
         $(".session_hintText").css('text-align', 'left');
     };
 
+    if(ongoing == "intervall"){ 
+        $('.session_hintText, .session_hintTitle').css('color', 'black');
+        $('.session_hintHeader').css('background-color', '#ececec');
+        $('.session_hintBody').css('background-color', 'white');
+        $('.session_hintIcon').css('filter', 'unset');
+    }else{
+        $('.session_hintIcon').css('filter', 'invert(100%) sepia(0%) saturate(0%) hue-rotate(246deg) brightness(105%) contrast(103%)');
+        $('.session_hintText, .session_hintTitle').css('color', 'white');
+        $('.session_hintHeader').css('background-color', '#363651');
+        $('.session_hintBody').css('background-color', '#29293f');
+    };
+
     isSetPreviewingHint = true;
     showBlurPage('session_hintBody');
 };
@@ -444,14 +456,15 @@ function workout(exercises_list){
                 $(".session_next_exercises_container").append(bigExercise);
         
             }else if(exo.type == "Int."){
-                let intervallSession = isIntervallLinked(exo) ? session_list[getSessionIndexByID(exo.linkId)] : exo;
-                let intervallString = JSON.stringify(intervallSession.exoList);
+                let linkedSessionIndex = isIntervallLinked(exo) ? getSessionIndexByID(exo.linkId) : -1;
+                let intervallSession = (linkedSessionIndex !== -1 && session_list[linkedSessionIndex]) ? session_list[linkedSessionIndex] : exo;
+                let intervallString = JSON.stringify(intervallSession.exoList || []);
 
-                remaining_sets += getInvervallSessionCycleCount(intervallSession.exoList);
+                remaining_sets += getInvervallSessionCycleCount(intervallSession.exoList || []);
 
                 tempNewHistory.exoList.push(generateHistoryINTExoObj({
                     "type": exo.type,
-                    "name": exo.name,
+                    "name": intervallSession.name,
                     "exoList": generateIntervallHistoryExoList(intervallSession),
                     "note": "",
                     "id": exo.id
@@ -957,9 +970,11 @@ async function next_exercise(first){
 
 function getIntervallSpecs(id){
 
-    let intervallData = isIntervallLinked(current_session.exoList[getExoIndexById(current_session, id)]) 
-        ? session_list[getSessionIndexByID(current_session.exoList[getExoIndexById(current_session, id)].linkId)].exoList
-        : current_session.exoList[getExoIndexById(current_session, id)].exoList;
+    let exoObj = current_session.exoList[getExoIndexById(current_session, id)];
+    let linkedSessionIndex = (exoObj && isIntervallLinked(exoObj)) ? getSessionIndexByID(exoObj.linkId) : -1;
+    let intervallData = (linkedSessionIndex !== -1 && session_list[linkedSessionIndex]) 
+        ? session_list[linkedSessionIndex].exoList 
+        : (exoObj && exoObj.exoList ? exoObj.exoList : []);
 
     let workRest = {"work": 0, "rest": 0};
 
@@ -1096,16 +1111,21 @@ function update_info(update=false){
 };
 
 function getPastData(extype, id, actual_set){
-    if(['Bi.', 'Uni.'].includes(extype)){
-        historyIndex = getHistoryExoIndex(getLastHistoryDay(current_history), id);
+    if(current_history && current_history.historyList && current_history.historyList.length > 0){
+        if(['Bi.', 'Uni.'].includes(extype)){
+            let historyDay = getLastHistoryDay(current_history);
+            if(historyDay && historyDay.exoList){
+                historyIndex = getHistoryExoIndex(historyDay, id);
 
-        if(historyIndex != -1){
-            past_data = getLastHistoryDay(current_history).exoList[historyIndex];
-
-            if(past_data.setList.length > actual_set && past_data.setList[actual_set].reps != 0){
-                return past_data.setList[actual_set].reps+" x "+unitRound(convertToUnit(past_data.setList[actual_set].weight, past_data.expectedStats.weightUnit, parameters.weightUnit))+parameters.weightUnit;
-            }else{
-                return false;
+                if(historyIndex != -1){
+                    past_data = historyDay.exoList[historyIndex];
+                    
+                    if(past_data.setList.length > actual_set && past_data.setList[actual_set].reps != 0){
+                        return past_data.setList[actual_set].reps+" x "+unitRound(convertToUnit(past_data.setList[actual_set].weight, past_data.expectedStats.weightUnit, parameters.weightUnit))+parameters.weightUnit;
+                    }else{
+                        return false;
+                    };
+                };
             };
         };
     };
@@ -1121,7 +1141,7 @@ function update_pastData(exoIndex = 0){
         let filled = false;
         let id = $('.session_next_exercise').eq(exoIndex).find('.session_next_exercise_set').eq(0).find('.session_exercise_id').text();
 
-        if($('.session_next_exercise').eq(exoIndex).children().lenght == 0 || next_id != id && exoIndex == 0){
+        if($('.session_next_exercise').eq(exoIndex).children().length == 0 || next_id != id && exoIndex == 0){
             id = next_id;
         };
 
@@ -1686,7 +1706,7 @@ function undoMemorise(way, param=false){
         
         $('.session_undo').css('display', 'block');
     }else if(way == "out"){
-        if(undoMemory.lenght < 1){return};
+        if(undoMemory.length < 1){return};
         
         let undoData = undoMemory[undoMemory.length - 1];
         undoMemory = undoMemory.slice(0, -1);   

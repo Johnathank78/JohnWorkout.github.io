@@ -623,22 +623,67 @@ function getHistoryExoIndex(history, id){
     return -1;
 };
 
-function smallestAvailableExoId(mode){
+function smallestAvailableExoId(session = false){
 
     let idList = [0];
     
-    if(mode == "workout"){
+    let type = "W";
+    if(session && session.type){
+        type = session.type;
+    }
+
+    if(type == "W"){
         $('.update_workoutList_container').find(".update_workout_item").each((index, item) => {
             if($(item).attr('id') !== undefined){
                 idList.push(parseInt($(item).attr('id')));
             };
         });
-    }else if(mode == "intervall"){
+    }else if(type == "I"){
         $('.update_intervallList_container').find(".update_workout_item").each((index, item) => {
             if($(item).attr('id') !== undefined){
                 idList.push(parseInt($(item).attr('id')));
             };
         });
+    };
+
+    if(session){
+        if(session.exoList && Array.isArray(session.exoList)){
+            session.exoList.forEach(exo => {
+                if(exo && exo.id){
+                    let cleanId = parseInt(exo.id.toString().replace(/_(1|2)/g, ""));
+                    if(!isNaI(cleanId)) idList.push(cleanId);
+                };
+                if(exo && Array.isArray(exo.exoList)){
+                    exo.exoList.forEach(subExo => {
+                        if(subExo && subExo.id){
+                            let cleanSubId = parseInt(subExo.id.toString().replace(/_(1|2)/g, ""));
+                            if(!isNaI(cleanSubId)) idList.push(cleanSubId);
+                        };
+                    });
+                };
+            });
+        };
+
+        if(session.history && Array.isArray(session.history.historyList)){
+            session.history.historyList.forEach(historyDay => {
+                if(historyDay && Array.isArray(historyDay.exoList)){
+                    historyDay.exoList.forEach(exo => {
+                        if(exo && exo.id){
+                            let cleanId = parseInt(exo.id.toString().replace(/_(1|2)/g, ""));
+                            if(!isNaI(cleanId)) idList.push(cleanId);
+                        };
+                        if(exo && Array.isArray(exo.exoList)){
+                            exo.exoList.forEach(subExo => {
+                                if(subExo && subExo.id){
+                                    let cleanSubId = parseInt(subExo.id.toString().replace(/_(1|2)/g, ""));
+                                    if(!isNaI(cleanSubId)) idList.push(cleanSubId);
+                                };
+                            });
+                        };
+                    });
+                };
+            });
+        };
     };
 
     let max = Math.max(...idList.filter(id => !isNaI(id)));
@@ -715,7 +760,7 @@ function areSessionEquallyCompleted(currentHistory, pastHistory, type){
                 };
             }else{
                 pastExo = findHistoryExoByID(pastHistory, exo.id);
-                
+
                 if(pastExo){
                     setList = exo.setList.filter(set => set.reps != 0);
                     pastSetList = pastExo.setList.filter(set => set.reps != 0);

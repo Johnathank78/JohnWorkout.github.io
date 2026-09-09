@@ -133,11 +133,12 @@ function generateExoObj({type, name, setNb, reps, weight, rest, cycle, work, hin
             "id" : id
         };
     }else if(type == "Brk."){
-        return {
+        let obj = {
             "type" : type,
-            "rest" : rest,
-            "id" : id
+            "rest" : rest
         };
+        if(id !== undefined) obj.id = id;
+        return obj;
     }else if(type == "Wrm."){
         return {
             "type" : type,

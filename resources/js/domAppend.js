@@ -89,12 +89,17 @@ function session_tile(session, archived = false){
 
 };
 
-function Iintervall_tile(data = false){
+function Iintervall_tile(session = false, exoID = false){
+    let data = false;
+    if(session && session.exoList && exoID){
+        data = session.exoList.find(e => e.id == exoID);
+    }
+
     if(data){
         let hint = data.hint ? data.hint : "";
 
         return `
-            <div class="update_workout_item noselect reorder__child" id="`+data.id+`">
+            <div class="update_workout_item noselect reorder__child" id="`+data.id+`" data-initial-type="`+data.type+`" data-initial-id="`+data.id+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
@@ -140,8 +145,9 @@ function Iintervall_tile(data = false){
             </div>
         `;
     }else{
+        let newId = smallestAvailableExoId(session);
         return `
-            <div class="update_workout_item noselect reorder__child" id="`+smallestAvailableExoId("intervall")+`">
+            <div class="update_workout_item noselect reorder__child" id="`+newId+`" data-initial-type="Int." data-initial-id="`+newId+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
@@ -188,7 +194,12 @@ function Iintervall_tile(data = false){
     };
 };
 
-function exercise_tile(data = false){
+function exercise_tile(session = false, exoID = false){
+    let data = false;
+    if(session && session.exoList && exoID){
+        data = session.exoList.find(e => e.id == exoID);
+    }
+
     if(data){
         let hint = data.hint ? data.hint : "";
 
@@ -196,7 +207,7 @@ function exercise_tile(data = false){
             let name = data.linkId ? session_list[getSessionIndexByID(data.linkId)].name : data.name;
 
             let element = $(`
-            <div class="update_workout_item noselect reorder__child" id="`+data.id+`">
+            <div class="update_workout_item noselect reorder__child" id="`+data.id+`" data-initial-type="`+data.type+`" data-initial-id="`+data.id+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
@@ -260,7 +271,7 @@ function exercise_tile(data = false){
             let rest = data.rest ? data.rest : "0" + abrTimeSymols.second;
             
             let element = $(`
-            <div class="update_workout_item noselect reorder__child" id="`+data.id+`">
+            <div class="update_workout_item noselect reorder__child" id="`+data.id+`" data-initial-type="`+data.type+`" data-initial-id="`+data.id+`">
 
                 <div class="update_workout_item_first_line">
                     <div class="update_workout_data_type_container reorder__avoid">
@@ -318,8 +329,9 @@ function exercise_tile(data = false){
             return element
         };
     }else{
+        let newId = smallestAvailableExoId(session);
         let element = $(`
-        <div class="update_workout_item noselect reorder__child" id="`+smallestAvailableExoId("workout")+`">
+        <div class="update_workout_item noselect reorder__child" id="`+newId+`" data-initial-type="Bi." data-initial-id="`+newId+`">
 
             <div class="update_workout_item_first_line">
                 <div class="update_workout_data_type_container reorder__avoid">

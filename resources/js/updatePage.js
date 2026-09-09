@@ -168,7 +168,7 @@ function exctractGraphData(session){
                         completedSets = exo.setList.filter(set => set.reps != 0).length;
                     };
     
-                    if(exoId == focusId && exoName == focusName){
+                    if(exoId == focusId){
                         let correctedSetList = exo.setList.filter(set => set.reps != 0);
                         if(correctedSetList.length == 0) return;
     
@@ -186,12 +186,12 @@ function exctractGraphData(session){
                     exoId = exo.id;
                     exoName = exo.name;
     
-                    if(exoId == focusId && exoName == focusName){
+                    if(exoId == focusId){
                         exo.exoList.forEach(subExo => {
                             subExoId = subExo.id;
                             subExoName = subExo.name;
     
-                            if(subExoId == focussSubId && subExoName == focusSubName){
+                            if(subExoId == focussSubId){
                                 let correctedSetList = subExo.setList.filter(set => set.work != "X");
                                 let completedCycle = correctedSetList.length;
                                 if(completedCycle == 0){return};
@@ -217,7 +217,7 @@ function exctractGraphData(session){
                 exoId = exo.id;
                 exoName = exo.name;
 
-                if(exoId == focusId && exoName == focusName){
+                if(exoId == focusId){
                     let correctedSetList = exo.setList.filter(set => set.work != "X");
                     let completedCycle = correctedSetList.length;
                     if(completedCycle == 0){return};
@@ -488,7 +488,7 @@ $(document).ready(function(){
 
     $(".update_workout_add").on("click", function(){
         let classs = selected_mode == 'I' || current_page == "intervallEdit" ? '.update_intervallList_container' : '.update_workoutList_container';
-        let tile = selected_mode == 'I' || current_page == "intervallEdit" ? Iintervall_tile() : exercise_tile();
+        let tile = selected_mode == 'I' || current_page == "intervallEdit" ? Iintervall_tile(update_current_item) : exercise_tile(update_current_item);
         let speed = parseInt(($(classs).prop('scrollHeight') - $(classs).scrollTop()))/1410*700;
 
         $(classs).animateFullScrollDown(speed, () => {
@@ -541,6 +541,19 @@ $(document).ready(function(){
     });
 
     $(document).on("change", ".update_workout_data_type", function(){
+        let item = $(this).closest(".update_workout_item");
+        let initialType = $(item).attr("data-initial-type");
+        let initialId = $(item).attr("data-initial-id");
+        let currentType = $(this).val();
+
+        if(initialType && currentType !== initialType){
+            let mode = selected_mode == 'I' || current_page == "intervallEdit" ? "intervall" : "workout";
+            let newId = smallestAvailableExoId(update_current_item);
+            $(item).attr("id", newId);
+        }else if(initialId && currentType === initialType){
+            $(item).attr("id", initialId);
+        };
+
         if($(this).val() == "Bi."){
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_intervallEdit_container").css("display", "none");
             $(this).closest(".update_workout_item").find(".update_workout_item_first_line").find(".update_workout_data_name_container").css("display", "flex");
@@ -618,7 +631,7 @@ $(document).ready(function(){
                 $('.update_intervallLink option[value="'+elementData.linkId+'"]').prop('selected', true);
 
                 $(".update_data_name").val("");
-                $('.update_intervallList_container').append(Iintervall_tile());
+                $('.update_intervallList_container').append(Iintervall_tile(update_current_item));
                 update_pageFormat('intCREATION');
             }else{
                 if(!disabled){
@@ -633,7 +646,7 @@ $(document).ready(function(){
 
                 elementData.exoList.forEach(exo => {
                     if(exo.type == "Int."){
-                        $(".update_intervallList_container").append(Iintervall_tile(exo));
+                        $(".update_intervallList_container").append(Iintervall_tile(update_current_item, exo.id));
                         if(exo.hint){showHint(".update_intervallList_container")};
     
                         manageRestInputVisibility($(".update_intervallList_container").children().last(), "I");
@@ -653,7 +666,7 @@ $(document).ready(function(){
             });
             
             $(".update_data_name").val("");
-            $('.update_intervallList_container').append(Iintervall_tile());
+            $('.update_intervallList_container').append(Iintervall_tile(update_current_item));
             $(".update_intervallList_container").children().length == 1 ? $('.update_workout_item_cross_container').css("display", "none") : false;
             update_pageFormat('intCREATION');
         };

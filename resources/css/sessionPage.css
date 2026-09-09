@@ -103,22 +103,6 @@
     background-color: #363651;
 }
 
-.session_hintHeader{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    gap: 15px;
-
-    width: calc(100% - 30px);
-
-    padding: 12px 15px;
-
-    background-color: #363651;
-
-    border-radius: 12px 12px 0 0;
-}
-
 .session_hintIconContainer{
     display: flex;
 
@@ -156,6 +140,21 @@
     border-radius: 12px;
     background-color: rgb(41, 41, 63);
     display: none;
+}
+
+.session_hintHeader{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    gap: 15px;
+
+    width: calc(100% - 30px);
+
+    padding: 12px 15px;
+
+    background-color: #363651;
+    border-radius: 12px 12px 0 0;
 }
 
 .session_hintText{

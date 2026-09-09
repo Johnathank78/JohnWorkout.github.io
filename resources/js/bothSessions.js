@@ -97,7 +97,7 @@ async function launchSession(index){
                 $(".selection_info_TimeSpent").text(display_timeString(get_timeString(timeFloor(tempStats.timeSpent))));
             };
         }, timeUnit);
-
+        
         intervall(current_session.exoList);
     }else if(current_session.type == "W"){
         ongoing = "workout";
