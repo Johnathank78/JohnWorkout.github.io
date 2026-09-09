@@ -835,7 +835,7 @@ $(document).ready(function(){
 
     $("img").attr("draggable", false);
     
-    
+    /*KONSOLEADD
 
     konsole = new Konsole($(".konsole")[0]);
     window.onerror = function(message, error) {
@@ -853,6 +853,6 @@ $(document).ready(function(){
         consoleShown = !consoleShown;
     })
 
-    
+    KONSOLEADD*/
     
 });//readyEnd

@@ -1334,8 +1334,9 @@ $(document).ready(function(){
                     refresh_session_tile();
                 };
 
+                let real_index = session_list.findIndex(s => s.id === update_current_item.id);
                 $(update_current_node).remove();
-                session_list = session_list.delete(update_current_index);
+                session_list = session_list.delete(real_index);
 
                 cleanSessionScheme(id);
 
@@ -1343,6 +1344,7 @@ $(document).ready(function(){
                 hasBeenShifted_save(hasBeenShifted);
 
                 session_save(session_list);
+                manageHomeContainerStyle(update_current_item.isArchived);
             }else if(reminderOrSession == "reminder"){
                 title = update_current_item.name;
 
@@ -1350,10 +1352,12 @@ $(document).ready(function(){
                     await removeAllNotifsFromSession(update_current_item);
                 };
 
+                let real_index = reminder_list.findIndex(r => r.id === update_current_item.id);
                 $(update_current_node).remove();
-                reminder_list = reminder_list.delete(update_current_index);
+                reminder_list = reminder_list.delete(real_index);
 
                 reminder_save(reminder_list);
+                manageHomeContainerStyle(update_current_item.isArchived);
             };
 
             delete calendar_dict[update_current_item.id];
