@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1F1C2D">
+    <title>Workouts - Export</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="saveLoad_page">
+        <span class="saveLoad_headerText">Select elements</span>
+
+        <div class="saveLoad_mainContainer">
+            <div class="saveLoad_item" data-key="sl"><input type="checkbox" name="session_list" id="saveLoad_sl" class="saveLoad_checkbox"><span class="saveLoad_itemText">Sessions</span><div class="saveLoad_goTo">&gt;</div></div>
+            <div class="saveLoad_item" data-key="rl"><input type="checkbox" name="reminder_list" id="saveLoad_rl" class="saveLoad_checkbox"><span class="saveLoad_itemText">Reminders</span><div class="saveLoad_goTo">&gt;</div></div>
+            <div class="saveLoad_item" data-key="pa"><input type="checkbox" name="parameters" id="saveLoad_pa" class="saveLoad_checkbox"><span class="saveLoad_itemText">Preferences</span></div>
+            <div class="saveLoad_item" data-key="st"><input type="checkbox" name="stats" id="saveLoad_st" class="saveLoad_checkbox"><span class="saveLoad_itemText">Statistics</span></div>
+            <div class="saveLoad_item" data-key="we"><input type="checkbox" name="weight" id="saveLoad_we" class="saveLoad_checkbox"><span class="saveLoad_itemText">Weights</span></div>
+            <span class="saveLoad_emptyMsg">Nothing saved</span>
+        </div>
+
+        <div class="saveLoad_subContainer saveLoad_sessionContainer"></div>
+        <div class="saveLoad_subContainer saveLoad_reminderContainer"></div>
+
+        <span class="saveLoad_btn_submit">Export</span>
+    </div>
+
+    <div class="bottomNotification"></div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
